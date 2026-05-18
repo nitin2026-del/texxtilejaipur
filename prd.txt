@@ -1,0 +1,563 @@
+
+PRODUCT REQUIREMENTS DOCUMENT
+IndiThread – Global Clothes Export E-Commerce Platform
+
+Document Version
+1.0
+Date
+May 2025
+Owner
+Product Manager – IndiThread
+Business Type
+B2C / B2B Clothing Export from India
+Status
+Draft – For Review
+
+Confidential | Internal Use Only
+
+1. Executive Summary
+IndiThread is a direct-to-consumer and business-to-business e-commerce platform purpose-built for an Indian clothing exporter to sell apparel directly to international buyers worldwide. The platform addresses the key pain points of cross-border fashion commerce: secure global payments, currency localisation, smooth buyer authentication, and trustworthy logistics tracking.
+
+The platform will enable the exporter to showcase curated Indian textile and clothing collections, accept payments in multiple currencies via industry-standard international payment gateways, and enforce a frictionless authentication flow that is triggered only at the point of purchase — ensuring a browse-first, buy-authenticated experience.
+
+2. Business Context & Goals
+2.1 Business Background
+Attribute
+Detail
+Company Type
+Garment / Textile Exporter, based in India (Jaipur, Rajasthan)
+Target Markets
+USA, UK, EU, Australia, Canada, Middle East, Southeast Asia
+Product Range
+Ethnic wear, fusion apparel, kurtas, sarees, fabrics, home textiles
+Export Compliance
+DGFT registered, IEC (Import Export Code) holder
+Primary Goal
+Remove middlemen; sell directly to international retail & wholesale buyers
+
+2.2 Business Objectives
+Launch an internationally accessible storefront within 4 months of project kick-off.
+Accept payments in USD, EUR, GBP, AED, AUD and auto-convert to INR for the seller's GST reporting.
+Reduce cart abandonment by deferring authentication to checkout — not on browse.
+Build buyer trust via SSL, PCI-DSS compliant payments, and transparent shipment tracking.
+Support both retail (B2C) and wholesale bulk-order (B2B) flows from a single codebase.
+
+2.3 Success Metrics
+KPI
+Target (12 months post-launch)
+Monthly Active Buyers
+5,000+ unique international buyers
+Conversion Rate
+>3.5% (global e-commerce avg 2.5%)
+Cart Abandonment Rate
+<60%
+Payment Success Rate
+>97%
+Average Order Value
+USD 120+
+Return Customer Rate
+>25%
+
+3. Scope
+3.1 In Scope
+Public product catalogue with search, filter, and category navigation
+International storefront with multi-currency display and automatic geo-pricing
+Backend user authentication (register / login / JWT sessions) — triggered at checkout
+International payment gateway integration (Stripe + Razorpay International / PayPal)
+Order management system (OMS) with buyer dashboard
+Shipment tracking integrated with DHL, FedEx, and India Post EMS
+Admin panel for the exporter to manage inventory, orders, pricing, and analytics
+Email & WhatsApp notification system (order confirmation, dispatch, delivery)
+GDPR / data-privacy compliant user data handling
+
+3.2 Out of Scope (Phase 1)
+Mobile native apps (iOS / Android) — planned for Phase 2
+AI-powered size recommendation engine
+Marketplace model (multi-vendor)
+Full ERP integration (SAP / Tally)
+
+4. User Personas
+4.1 Persona A — International Retail Buyer
+Attribute
+Description
+Name
+Sarah Mitchell (London, UK)
+Age
+28–45
+Goal
+Purchase unique Indian ethnic wear & fusion clothing online
+Pain Points
+Confusion about sizing, distrust of unknown Indian sites, currency friction
+Device
+Mobile-first (70%), Desktop (30%)
+
+4.2 Persona B — Wholesale / Boutique Buyer
+Attribute
+Description
+Name
+Ahmed Al-Farsi (Dubai, UAE)
+Age
+30–55
+Goal
+Source 500+ units of cotton kurtas for his retail stores at competitive ex-works price
+Pain Points
+MOQ clarity, payment terms, HS code documentation for UAE customs
+Device
+Desktop (65%), Mobile (35%)
+
+4.3 Persona C — Exporter / Admin
+Attribute
+Description
+Name
+Ramesh Sharma (Jaipur, Rajasthan)
+Role
+Owner / Admin — the platform operator
+Goal
+Manage inventory, approve wholesale orders, view revenue in INR, dispatch orders
+Pain Points
+Manual invoicing, coordinating with freight forwarders, currency reconciliation
+
+5. Core User Journey
+5.1 Retail Purchase Flow (Happy Path)
+#
+Step
+Detail
+1
+Land on Homepage
+Browse hero banner, featured collections, sale items
+2
+Explore Catalogue
+Filter by category, price, size, colour; search by keyword
+3
+View Product Detail
+See HD images, size guide, fabric, origin, shipping estimate
+4
+Add to Cart
+No login required at this step
+5
+Click 'Buy Now' / Checkout
+Authentication gate triggered HERE — login or register
+6
+Authentication
+Register (email + OTP) or social login (Google / Facebook)
+7
+Shipping Details
+Enter delivery address; auto-detect country for duties estimate
+8
+Payment
+Choose Stripe / PayPal; multi-currency checkout; 3D Secure
+9
+Order Confirmation
+Order ID generated; email + WhatsApp notification dispatched
+10
+Tracking
+Real-time shipment tracking via courier API
+
+6. User Authentication — Backend Specification
+Authentication is intentionally deferred to the point of purchase. Unauthenticated users can browse the full catalogue and add items to a guest cart. When a user clicks 'Buy Now' or 'Proceed to Checkout', the authentication flow is triggered.
+
+6.1 Authentication Trigger Logic
+Event
+Behaviour
+Browse / Search / View Product
+No auth required — fully public
+Add to Cart
+No auth required — guest cart persisted in localStorage / session
+Click 'Buy Now' or 'Checkout'
+Auth gate shown — modal overlay with Login / Register tabs
+Guest Checkout (future phase)
+Optional — not in Phase 1
+
+6.2 Registration Flow
+Email + Password signup with real-time validation (password strength indicator)
+Email OTP verification (6-digit code; valid for 10 minutes) — required before first purchase
+Optional: social login via Google OAuth 2.0 and Facebook Login
+Profile auto-populated from social provider (name, email, profile picture)
+Country of residence captured to enable tax / duty estimate logic
+
+6.3 Login Flow
+Email + password with bcrypt hashing (cost factor 12)
+'Forgot Password' — secure reset link via email (token expires in 1 hour)
+Remember Me — 30-day persistent session via HttpOnly, SameSite=Strict cookie
+Failed login lockout — 5 attempts in 15 min triggers CAPTCHA + 30-min lock
+
+6.4 Session & Token Management
+Parameter
+Specification
+Token Type
+JWT (JSON Web Token) — RS256 signed
+Access Token TTL
+15 minutes
+Refresh Token TTL
+30 days; stored in HttpOnly cookie
+Token Storage
+Access token in memory (React state); Refresh token in HttpOnly cookie
+CSRF Protection
+SameSite=Strict cookie + CSRF token header for state-changing requests
+Session Revocation
+Token blocklist in Redis on logout / password change / suspicious activity
+
+6.5 Security Requirements
+All communication over TLS 1.3 (HTTPS enforced via HSTS)
+Passwords never stored in plain text — bcrypt with salt
+PII encrypted at rest (AES-256) in PostgreSQL
+GDPR-compliant: right to erasure, data portability endpoints required
+Rate limiting on auth endpoints: 10 req/min per IP via Redis
+Audit log: all login events, password resets, suspicious activity stored in append-only log
+
+7. International Payment System — Specification
+7.1 Payment Gateway Strategy
+A dual-gateway approach is adopted to maximise global coverage and minimise failed transactions:
+
+Gateway
+Role & Coverage
+Stripe
+Primary gateway for USD, EUR, GBP, AUD, CAD — supports 135+ currencies; PCI-DSS Level 1; 3D Secure 2.0; Apple Pay, Google Pay
+Razorpay International
+Secondary gateway optimised for India-originated transactions; best INR reconciliation; supports UPI for NRI buyers
+PayPal
+Buyer-trust option — widely recognised globally; used by 435M+ accounts; Buyer Protection increases conversion
+
+7.2 Accepted Payment Methods
+Credit / Debit Cards — Visa, Mastercard, Amex, Discover
+Digital Wallets — Apple Pay, Google Pay, PayPal
+Buy Now Pay Later — Klarna (EU/UK), Afterpay (AU/US) — Phase 2
+Bank Transfers — for wholesale orders above USD 2,000 (manual approval flow)
+UPI — for NRI buyers via Razorpay International
+
+7.3 Multi-Currency & Pricing
+Feature
+Detail
+Currency Detection
+Auto-detect buyer's country via IP geolocation (MaxMind GeoIP2)
+Display Currency
+Show prices in buyer's local currency (USD, EUR, GBP, AED, AUD, etc.)
+Base Currency
+INR — all prices maintained in INR in the database
+FX Rate Source
+Open Exchange Rates API — refreshed every 6 hours
+FX Markup
+3% markup applied on live rate to protect against rate fluctuation
+Seller Settlement
+All gateway settlements converted to INR to seller's Indian bank account
+GST / Tax Handling
+Displayed as 'Duties & Taxes' — estimated at checkout; actuals on customs docs
+
+7.4 Payment Flow
+#
+Step
+Backend Action
+1
+User confirms cart & address
+Backend creates Order (status: PENDING) in DB
+2
+Payment intent created
+POST /api/payments/intent — Stripe creates PaymentIntent; returns client_secret
+3
+User enters card details
+Stripe.js handles card data — PCI scope removed from backend
+4
+3D Secure challenge (if required)
+Stripe handles SCA redirect; webhook fires on completion
+5
+Payment success webhook
+Stripe → /api/webhooks/stripe; Order status → PAID; inventory decremented
+6
+Order confirmation
+Email + WhatsApp sent; invoice PDF generated; customs docs queued
+7
+Payment failure
+Order status → PAYMENT_FAILED; user shown retry screen with error reason
+8
+Refund / dispute
+Admin initiates via Stripe Dashboard or /api/orders/:id/refund endpoint
+
+7.5 Security & Compliance
+PCI-DSS Level 1 compliance via Stripe.js (card data never touches IndiThread servers)
+3D Secure 2.0 (SCA) enforced for EU buyers under PSD2
+Fraud detection via Stripe Radar — ML-based rules, block suspicious IPs/cards
+FEMA compliance — all inward remittances via AD Category I bank; FIRC documentation
+RBI LRS limits — buyer-side compliance via gateway T&Cs
+
+8. Feature List & Prioritisation
+8.1 Buyer-Facing Features
+Feature
+Priority
+Phase
+Homepage & Hero Banner
+Must Have
+Phase 1
+Product Catalogue with Filters
+Must Have
+Phase 1
+Product Detail Page (PDP)
+Must Have
+Phase 1
+Guest Cart (no login required)
+Must Have
+Phase 1
+Auth Gate at Checkout
+Must Have
+Phase 1
+User Registration & Login
+Must Have
+Phase 1
+Social Login (Google / Facebook)
+Should Have
+Phase 1
+Multi-Currency Pricing
+Must Have
+Phase 1
+Stripe & PayPal Checkout
+Must Have
+Phase 1
+Razorpay International
+Should Have
+Phase 1
+Order Confirmation & Email Notification
+Must Have
+Phase 1
+Order History Dashboard
+Must Have
+Phase 1
+Shipment Tracking
+Must Have
+Phase 1
+Wishlist / Save for Later
+Should Have
+Phase 1
+Product Reviews & Ratings
+Should Have
+Phase 2
+Size Guide & Measurement Tool
+Should Have
+Phase 2
+WhatsApp Order Notifications
+Nice to Have
+Phase 2
+BNPL (Klarna / Afterpay)
+Nice to Have
+Phase 2
+AI Size Recommendation
+Nice to Have
+Phase 3
+Native Mobile App
+Nice to Have
+Phase 3
+
+8.2 Admin / Exporter Features
+Feature
+Priority
+Phase
+Product & Inventory Management
+Must Have
+Phase 1
+Order Management System
+Must Have
+Phase 1
+Revenue Dashboard (INR view)
+Must Have
+Phase 1
+Bulk Order / Wholesale Management
+Should Have
+Phase 1
+Shipping Label & Customs Doc Gen
+Should Have
+Phase 1
+Discount & Coupon Engine
+Should Have
+Phase 2
+Analytics & Sales Reports
+Should Have
+Phase 2
+CRM / Buyer Communication Tool
+Nice to Have
+Phase 2
+
+9. Technical Architecture
+9.1 Technology Stack
+Layer
+Technology
+Frontend
+Next.js 14 (App Router), React 18, Tailwind CSS, ShadCN UI
+Backend / API
+Node.js + Express (or NestJS) REST API + GraphQL (product catalogue)
+Database
+PostgreSQL (primary) + Redis (sessions, rate-limit, cart cache)
+Authentication
+Custom JWT (RS256) + Passport.js (social OAuth)
+Payment
+Stripe SDK + Razorpay SDK + PayPal REST API
+File / Image Storage
+AWS S3 + CloudFront CDN (product images, invoices, customs docs)
+Email
+AWS SES (transactional) + Mailchimp (marketing)
+WhatsApp
+Meta Cloud API (WhatsApp Business)
+Shipping / Tracking
+DHL API + FedEx Ship Manager API + India Post EMS
+Geolocation / FX
+MaxMind GeoIP2 + Open Exchange Rates API
+Hosting
+AWS (EC2 / ECS Fargate) — India region (ap-south-1) + CloudFront global
+Monitoring
+Datadog APM + Sentry (frontend errors) + PagerDuty (alerts)
+
+9.2 Database Schema — Key Entities
+Entity
+Key Attributes
+users
+id, email, password_hash, country, role (buyer/admin), verified_at, created_at
+products
+id, sku, name_en, description, base_price_inr, category, tags, stock_qty, images[]
+carts
+id, session_id, user_id (nullable), items (JSONB), currency, expires_at
+orders
+id, user_id, status, items (JSONB), total_inr, total_display_currency, gateway, payment_intent_id
+payments
+id, order_id, gateway, amount, currency, status, raw_response (JSONB), created_at
+shipments
+id, order_id, courier, tracking_number, status, estimated_delivery, events (JSONB)
+addresses
+id, user_id, line1, line2, city, state, country_code, postal_code, is_default
+
+9.3 API Endpoints — Authentication & Payment (Key Routes)
+Method + Route
+Description
+POST /api/auth/register
+Create new user account; send OTP verification email
+POST /api/auth/verify-email
+Verify OTP; activate account
+POST /api/auth/login
+Authenticate; issue JWT access + refresh tokens
+POST /api/auth/refresh
+Issue new access token from valid refresh token
+POST /api/auth/logout
+Revoke refresh token; add to blocklist in Redis
+POST /api/auth/forgot-password
+Send secure password reset link
+POST /api/auth/reset-password
+Validate reset token; update password
+GET  /api/auth/me
+Return authenticated user profile
+POST /api/payments/intent
+Create Stripe PaymentIntent; return client_secret
+POST /api/payments/razorpay/order
+Create Razorpay order
+POST /api/webhooks/stripe
+Stripe signed webhook — handle payment events
+POST /api/webhooks/razorpay
+Razorpay webhook — handle payment events
+GET  /api/orders/:id
+Return order details (auth required)
+POST /api/orders/:id/refund
+Admin: initiate full or partial refund
+
+10. Non-Functional Requirements
+Category
+Requirement
+Performance
+Homepage LCP < 2.5 s (Core Web Vitals Good). API P95 latency < 300 ms.
+Availability
+99.9% uptime SLA (< 8.7 hrs downtime/year). Multi-AZ deployment on AWS.
+Scalability
+Handle 10,000 concurrent users on peak sale days. Horizontal scaling via ECS.
+Security
+OWASP Top 10 mitigated. Pen test prior to launch. WAF on CloudFront.
+Compliance
+GDPR (EU), CCPA (California), Indian IT Act 2000, RBI / FEMA guidelines.
+SEO
+Server-side rendering via Next.js. Structured data (schema.org Product). Sitemap.
+Accessibility
+WCAG 2.1 AA compliance. Screen reader compatible. Keyboard navigable.
+Internationalisation
+i18n support: English (launch); Arabic, German, French (Phase 2).
+Browser Support
+Chrome, Safari, Firefox, Edge — last 2 major versions. iOS 15+. Android 10+.
+
+11. Delivery Roadmap
+Phase
+Timeline
+Deliverables
+Phase 1 — MVP
+Months 1–4
+Product catalogue, guest cart, auth gate, Stripe + PayPal payments, multi-currency, order management, email notifications, admin panel (basic), shipment tracking
+Phase 2 — Growth
+Months 5–7
+Razorpay International, WhatsApp notifications, Wishlist, Reviews & Ratings, Discount engine, Analytics dashboard, BNPL options, AR (Arabic) & DE (German) locale
+Phase 3 — Scale
+Months 8–12
+Native mobile apps (iOS/Android), AI size recommendations, CRM integration, B2B wholesale portal enhancements, Tally / ERP integration, Multi-language (FR/ES)
+Phase 4 — Expansion
+Year 2
+Marketplace model (onboard more Indian exporters), Subscription boxes, Live shopping (Instagram/WhatsApp integration), Loyalty programme
+
+12. Risks & Mitigations
+Risk
+Severity
+Mitigation
+International payment failures / chargeback
+High
+Stripe Radar fraud rules; 3DS enforced; chargeback alert service (Chargebacks911)
+Currency rate fluctuation reducing margins
+Medium
+3% FX markup; rate hedging via forward contracts with banker
+FEMA / RBI compliance violation
+High
+Legal review before launch; use AD Category I bank; maintain FIRC records
+Customs delays reducing buyer satisfaction
+Medium
+Transparent delivery estimates; proactive WhatsApp notifications; DDP pricing option
+Authentication friction causing cart abandonment
+Medium
+Deferred auth (browse first); social login; OTP rather than email confirmation upfront
+Data breach / PII exposure
+High
+PCI-DSS via Stripe.js; AES-256 at rest; annual pen test; WAF; GDPR erasure flows
+Website downtime on peak sale events
+Medium
+Multi-AZ AWS; ECS auto-scaling; load testing pre-launch; CDN for static assets
+
+13. Definition of Done & Acceptance Criteria
+13.1 Authentication
+A new user can register with email + OTP in under 2 minutes
+Auth gate modal appears within 200 ms of clicking 'Buy Now'
+JWT access token expires in 15 min; refresh token rotates correctly
+Brute-force lockout activates after 5 failed attempts
+Password reset email arrives within 60 seconds
+
+13.2 International Payments
+A test buyer in the UK sees prices in GBP; a test buyer in the UAE sees AED
+Stripe test payment succeeds end-to-end in sandbox for Visa, Mastercard, Amex
+3D Secure challenge completes and order status updates correctly
+Failed payment triggers retry UI with human-readable error message
+Stripe webhook correctly transitions order to PAID within 5 seconds of payment success
+Seller sees settled amount in INR in their admin dashboard within 24 hours
+
+14. Glossary
+Term
+Definition
+DGFT
+Directorate General of Foreign Trade — Indian government body governing export/import
+IEC
+Import Export Code — mandatory 10-digit code for Indian exporters/importers
+FEMA
+Foreign Exchange Management Act — governs foreign exchange transactions in India
+FIRC
+Foreign Inward Remittance Certificate — proof of foreign currency receipt
+JWT
+JSON Web Token — compact, self-contained token used for authentication
+PCI-DSS
+Payment Card Industry Data Security Standard — security standard for card payments
+3DS / SCA
+3D Secure / Strong Customer Authentication — EU PSD2-mandated payment auth step
+DDP
+Delivered Duty Paid — seller pays all import duties; reduces buyer friction
+LCP
+Largest Contentful Paint — Core Web Vitals metric for page load performance
+MOQ
+Minimum Order Quantity — minimum number of units for wholesale orders
+OMS
+Order Management System — software to track orders from placement to delivery
+FX
+Foreign Exchange — conversion between currencies

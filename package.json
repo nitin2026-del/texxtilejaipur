@@ -1,0 +1,11 @@
+{
+  "name": "nitin-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix indithread",
+    "build": "npm run build --prefix indithread",
+    "start": "npm run start --prefix indithread",
+    "lint": "npm run lint --prefix indithread"
+  }
+}
