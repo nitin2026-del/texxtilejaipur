@@ -277,9 +277,7 @@ export default function ProductPage() {
 
                 <div className="text-3xl font-serif font-bold text-zinc-900 py-4 border-y border-zinc-200">
                   {formatPrice(product.price_inr)}
-                  <span className="block text-[10px] font-sans text-zinc-500 font-normal uppercase tracking-wider mt-1">
-                    Export Price (DHL Shipping Included)
-                  </span>
+
                 </div>
 
                 <p className="text-zinc-600 font-light leading-relaxed">
