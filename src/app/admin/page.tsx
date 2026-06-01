@@ -1,0 +1,2073 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
+import { 
+  ShieldCheck, AlertCircle, ShoppingBag, 
+  Trash2, Edit, Plus, LayoutDashboard, Database, 
+  ArrowLeft, Loader2, DollarSign, Package, Truck, 
+  CheckCircle, Save, Tag, BookOpen
+} from 'lucide-react';
+
+interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  description: string;
+  price_inr: number;
+  category: string;
+  images: string[];
+  stock: number;
+  details: { material?: string; origin?: string; care?: string };
+  is_featured?: boolean;
+  display_rank?: number;
+}
+
+interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  quantity: number;
+  price_inr: number;
+  products?: {
+    name: string;
+    sku: string;
+  };
+}
+
+interface Shipment {
+  id: string;
+  order_id: string;
+  courier: string;
+  tracking_number: string;
+  status: 'pending' | 'shipped' | 'delivered';
+  created_at: string;
+}
+
+interface ProfileSummary {
+  name: string;
+  email: string;
+}
+
+interface Order {
+  id: string;
+  user_id: string;
+  status: string;
+  payment_status: string;
+  total: number;
+  subtotal: number;
+  shipping_address_id: string;
+  tracking_number: string;
+  shipping_provider: string;
+  shipping_address?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  created_at: string;
+  profiles?: { first_name?: string; last_name?: string; phone?: string; };
+  shipping_addresses?: { full_name?: string; city?: string; country?: string; };
+  order_items?: OrderItem[];
+  payments?: {
+    id: string;
+    gateway: string;
+    amount: number;
+    currency: string;
+    status: string;
+  }[];
+}
+
+interface Blog {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image_url: string;
+  status: string;
+  created_at: string;
+}
+
+const CATEGORIES = [
+  'Ethnic Wear',
+  'Sarees',
+  'Fusion Apparel',
+  'Fabrics',
+  'Home Textiles'
+];
+
+export default function AdminPortal() {
+  const { user, profile, loading: authLoading, signOut } = useAuth();
+  const { formatPrice } = useCart();
+
+  // Admin Login States
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminLoginLoading, setAdminLoginLoading] = useState(false);
+  const [adminLoginError, setAdminLoginError] = useState('');
+
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons'>('overview');
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isBypassed, setIsBypassed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('bypass=true')) {
+      setIsBypassed(true);
+    }
+  }, []);
+
+  // Access Denied countdown state
+  const [countdown, setCountdown] = useState(5);
+
+  // Database states
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [dbCategories, setDbCategories] = useState<string[]>(CATEGORIES);
+  const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null}[]>([]);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryParentId, setNewCategoryParentId] = useState<string>('');
+
+  // Selected order details modal
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [trackingNumberInput, setTrackingNumberInput] = useState('');
+  const [shipmentStatusInput, setShipmentStatusInput] = useState<'pending' | 'shipped' | 'delivered'>('pending');
+  const [shippingProviderInput, setShippingProviderInput] = useState('dhl');
+
+  // Form states (Add/Edit Product)
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [formName, setFormName] = useState('');
+  const [formSku, setFormSku] = useState('');
+  const [formDescription, setFormDescription] = useState('');
+  const [formPriceInr, setFormPriceInr] = useState('');
+  const [formCategory, setFormCategory] = useState('Ethnic Wear');
+  const [formStock, setFormStock] = useState('50');
+  const [formImageUrl, setFormImageUrl] = useState('');
+  const [formMaterial, setFormMaterial] = useState('');
+  const [formOrigin, setFormOrigin] = useState('Jaipur, Rajasthan');
+  const [formCare, setFormCare] = useState('');
+  const [formIsFeatured, setFormIsFeatured] = useState(false);
+  const [formDisplayRank, setFormDisplayRank] = useState('');
+
+  // Blog states
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
+  const [formBlogTitle, setFormBlogTitle] = useState('');
+  const [formBlogSlug, setFormBlogSlug] = useState('');
+  const [formBlogExcerpt, setFormBlogExcerpt] = useState('');
+  const [formBlogContent, setFormBlogContent] = useState('');
+  const [formBlogImageUrl, setFormBlogImageUrl] = useState('');
+  const [formBlogStatus, setFormBlogStatus] = useState('draft');
+  const [isBlogFormOpen, setIsBlogFormOpen] = useState(false);
+
+  // Coupon states
+  const [coupons, setCoupons] = useState<any[]>([]);
+  const [formCouponCode, setFormCouponCode] = useState('');
+  const [formCouponType, setFormCouponType] = useState<'percent' | 'fixed'>('percent');
+  const [formCouponValue, setFormCouponValue] = useState('');
+
+  // Admin Authentication Actions
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdminLoginLoading(true);
+    setAdminLoginError('');
+    try {
+      const { error: err } = await supabase.auth.signInWithPassword({
+        email: adminEmail,
+        password: adminPassword,
+      });
+      if (err) throw err;
+    } catch (e: any) {
+      setAdminLoginError(e.message || 'Authentication failed');
+    } finally {
+      setAdminLoginLoading(false);
+    }
+  };
+
+  const handleSwitchAccount = async () => {
+    await signOut();
+    setAdminEmail('');
+    setAdminPassword('');
+  };
+
+  const handleCreateCategory = async () => {
+    const trimmed = newCategoryName.trim();
+    if (!trimmed) {
+      showNotification('Please type a category name first!', true);
+      return;
+    }
+    
+    // Check if category already exists in our state
+    if (dbCategories.includes(trimmed)) {
+      setFormCategory(trimmed);
+      setIsCategoryModalOpen(false);
+      setNewCategoryName('');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const catSlug = trimmed.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          name: trimmed,
+          slug: catSlug,
+          description: `Artisanal garments in the ${trimmed} category`,
+          image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80',
+          parent_id: newCategoryParentId || null
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      // Update states
+      const updatedCats = [...dbCategories, trimmed].sort();
+      setDbCategories(updatedCats);
+      setFormCategory(trimmed);
+      setIsCategoryModalOpen(false);
+      setNewCategoryName('');
+      setNewCategoryParentId('');
+      showNotification(`Category "${trimmed}" generated successfully!`);
+      // Refresh to get the new object with ID
+      fetchDashboardData();
+    } catch (e: any) {
+      console.error('Error creating category:', e);
+      showNotification(e.message || 'Failed to create category', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async (categoryToDelete?: string) => {
+    const target = categoryToDelete || formCategory;
+    if (!target) return;
+    
+    if (dbCategories.length <= 1) {
+      showNotification('Cannot delete the last remaining category.', true);
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to delete the category "${target}"? Any products in this category will be uncategorized.`)) {
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      // Find the category ID from the name
+      const { data: catData, error: findErr } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('name', target)
+        .maybeSingle();
+
+      if (findErr) throw findErr;
+      
+      if (catData) {
+        // 1. Uncategorize products belonging to this category (set category_id = null)
+        const { error: updateErr } = await supabase
+          .from('products')
+          .update({ category_id: null })
+          .eq('category_id', catData.id);
+
+        if (updateErr) throw updateErr;
+
+        // 2. Delete the category from database
+        const { error: deleteErr } = await supabase
+          .from('categories')
+          .delete()
+          .eq('id', catData.id);
+
+        if (deleteErr) {
+          if (deleteErr.code === '23503') {
+            throw new Error(`Cannot delete "${target}" because it is currently assigned to one or more products. Reassign those products first.`);
+          }
+          throw deleteErr;
+        }
+
+        showNotification(`Category "${target}" deleted successfully.`);
+      }
+
+      // Update state list
+      const updatedCats = dbCategories.filter((c) => c !== target);
+      setDbCategories(updatedCats);
+      
+      // If the deleted category was currently selected, reset it
+      if (formCategory === target) {
+        setFormCategory(updatedCats[0] || '');
+      }
+
+      // Refresh dashboard data to reflect uncategorized products in catalog
+      fetchDashboardData();
+    } catch (e: any) {
+      console.error('Error deleting category:', e);
+      showNotification(e.message || 'Failed to delete category', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Fetch admin dashboard details
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      // 1. Fetch Products
+      const { data: prodData, error: prodErr } = await supabase
+        .from('products')
+        .select(`
+          *,
+          categories (
+            name
+          ),
+          product_images (
+            url,
+            is_primary,
+            display_order
+          )
+        `)
+        .order('created_at', { ascending: false });
+      if (prodErr) throw prodErr;
+
+      // 1.5 Fetch Categories from DB
+      const { data: catData, error: catErr } = await supabase
+        .from('categories')
+        .select('id, name, parent_id')
+        .order('name', { ascending: true });
+      if (!catErr && catData) {
+        setDbCategoryObjects(catData);
+        const uniqueNames = Array.from(new Set(catData.map((c: any) => c.name).filter(Boolean))) as string[];
+        if (uniqueNames.length > 0) {
+          setDbCategories(uniqueNames);
+        }
+      }
+      if (prodData) {
+        const mapped = (prodData as any[]).map((item) => {
+          const sortedImages = item.product_images
+            ? [...item.product_images]
+                .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
+                .map((img) => img.url)
+            : [];
+
+          return {
+            id: item.id,
+            sku: item.slug ? `HT-${item.slug.toUpperCase()}` : `HT-${item.id.slice(0, 8).toUpperCase()}`,
+            name: item.name,
+            description: item.description || '',
+            price_inr: item.price || 0,
+            category: item.categories?.name || 'Ethnic Wear',
+            images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
+            stock: item.stock_quantity || item.stock || 0,
+            details: {
+              material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
+              origin: 'Jaipur, Rajasthan',
+              care: 'Dry clean only'
+            },
+            is_featured: item.is_featured || false,
+            display_rank: item.display_rank
+          };
+        });
+        setProducts(mapped);
+      }
+
+      // 2. Fetch Orders with relations
+      const { data: orderData, error: orderErr } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          profiles (first_name, last_name, phone),
+          shipping_addresses (*),
+          order_items (
+            *,
+            products (name, slug)
+          ),
+          payments (*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (orderErr) {
+        // Fallback in case relationships are not fully established
+        console.warn('Relationships fetch warning:', orderErr);
+        const { data: fallbackOrders } = await supabase
+          .from('orders')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (fallbackOrders) {
+          // Enrich with manual individual fetches
+          const enriched = await Promise.all(
+            fallbackOrders.map(async (ord) => {
+              const { data: items } = await supabase.from('order_items').select('*, products(name, sku)').eq('order_id', ord.id);
+              const { data: ships } = await supabase.from('shipments').select('*').eq('order_id', ord.id);
+              const { data: pays } = await supabase.from('payments').select('*').eq('order_id', ord.id);
+              return {
+                ...ord,
+                order_items: items || [],
+                payments: pays || []
+              };
+            })
+          );
+          setOrders(enriched as Order[]);
+        }
+      } else {
+        setOrders((orderData as Order[]) || []);
+      }
+
+      // 3. Fetch Blogs
+      const { data: blogData, error: blogErr } = await supabase
+        .from('blogs')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!blogErr && blogData) {
+        setBlogs(blogData);
+      }
+
+      // 4. Fetch Coupons
+      const savedCoupons = localStorage.getItem('hiyawear_admin_coupons');
+      if (savedCoupons) {
+        try { setCoupons(JSON.parse(savedCoupons)); } catch (e) { console.error('Failed to parse coupons', e); }
+      }
+
+    } catch (err) {
+      console.error('Error fetching admin details:', err);
+      showNotification('Error loading dashboard data.', true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (profile?.role === 'admin' || isBypassed) {
+      fetchDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, isBypassed]);
+
+  const showNotification = (msg: string, isError = false) => {
+    if (isError) {
+      setErrorMessage(msg);
+      setTimeout(() => setErrorMessage(''), 4000);
+    } else {
+      setSuccessMessage(msg);
+      setTimeout(() => setSuccessMessage(''), 4000);
+    }
+  };
+
+  // Product CRUD Handlers
+  const handleProductSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActionLoading(true);
+    setErrorMessage('');
+
+    try {
+      const price = parseFloat(formPriceInr);
+      const stockInt = parseInt(formStock);
+
+      if (isNaN(price) || price <= 0) throw new Error('Price must be a valid positive number');
+      if (isNaN(stockInt) || stockInt < 0) throw new Error('Stock must be a valid positive integer');
+      if (!formName || !formSku) throw new Error('Name and SKU are required fields');
+
+      const imageUrls = formImageUrl.split(',').map((url) => url.trim()).filter((url) => url.length > 0);
+      if (imageUrls.length === 0) {
+        // Fallback premium unsplash textile image
+        imageUrls.push('https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80');
+      }
+
+      const slug = formName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+      // Get category ID
+      let categoryId = null;
+      if (formCategory) {
+        const { data: catData, error: catErr } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('name', formCategory)
+          .maybeSingle();
+        
+        if (catData) {
+          categoryId = catData.id;
+        } else {
+          // Insert category
+          const catSlug = formCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          const { data: newCat, error: newCatErr } = await supabase
+            .from('categories')
+            .insert({ name: formCategory, slug: catSlug })
+            .select('id')
+            .single();
+          
+          if (newCatErr) throw newCatErr;
+          categoryId = newCat.id;
+        }
+      }
+
+      const productPayload = {
+        name: formName,
+        slug: slug,
+        description: formDescription,
+        price: price,
+        stock: stockInt,
+        stock_quantity: stockInt,
+        status: 'active',
+        category_id: categoryId,
+        is_featured: formIsFeatured,
+        display_rank: formDisplayRank ? parseInt(formDisplayRank) : 999
+      };
+
+      let productId = editingProductId;
+
+      if (editingProductId) {
+        // Update product
+        const { error } = await supabase
+          .from('products')
+          .update(productPayload)
+          .eq('id', editingProductId);
+
+        if (error) throw error;
+        showNotification('Product updated successfully!');
+      } else {
+        // Insert new product
+        const { data: newProd, error } = await supabase
+          .from('products')
+          .insert(productPayload)
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        productId = newProd.id;
+        showNotification('Product created successfully!');
+      }
+
+      // Sync image URLs in product_images
+      if (productId) {
+        // Delete existing image mappings
+        await supabase
+          .from('product_images')
+          .delete()
+          .eq('product_id', productId);
+
+        // Insert new image mappings
+        const imgInserts = imageUrls.map((url, idx) => ({
+          product_id: productId,
+          url: url,
+          is_primary: idx === 0,
+          display_order: idx + 1
+        }));
+
+        const { error: imgErr } = await supabase
+          .from('product_images')
+          .insert(imgInserts);
+
+        if (imgErr) {
+          console.error('Failed to sync product images:', imgErr);
+        }
+      }
+
+      resetProductForm();
+      fetchDashboardData();
+      setActiveTab('catalog');
+    } catch (err) {
+      const e = err as Error;
+      showNotification(e.message || 'Operation failed', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleEditProductClick = (prod: Product) => {
+    setEditingProductId(prod.id);
+    setFormName(prod.name || '');
+    setFormSku(prod.sku || '');
+    setFormDescription(prod.description || '');
+    setFormPriceInr(prod.price_inr?.toString() || '');
+    setFormCategory(prod.category || 'Ethnic Wear');
+    setFormStock(prod.stock?.toString() || '0');
+    setFormImageUrl(prod.images?.join(', ') || '');
+    setFormMaterial(prod.details?.material || '');
+    setFormOrigin(prod.details?.origin || 'Jaipur, Rajasthan');
+    setFormCare(prod.details?.care || '');
+    setFormIsFeatured(prod.is_featured || false);
+    setFormDisplayRank(prod.display_rank?.toString() || '');
+    setActiveTab('form');
+  };
+
+  const handleDeleteProductClick = async (prodId: string) => {
+    if (!confirm('Are you absolutely sure you want to delete this product? This action is irreversible.')) return;
+    
+    setActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', prodId);
+      
+      if (error) throw error;
+      showNotification('Product deleted successfully!');
+      fetchDashboardData();
+    } catch (err) {
+      const e = err as Error;
+      showNotification(e.message || 'Failed to delete product', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const resetProductForm = () => {
+    setEditingProductId(null);
+    setFormName('');
+    setFormSku('');
+    setFormDescription('');
+    setFormPriceInr('');
+    setFormCategory('Ethnic Wear');
+    setFormStock('50');
+    setFormImageUrl('');
+    setFormMaterial('');
+    setFormOrigin('Jaipur, Rajasthan');
+    setFormCare('');
+    setFormIsFeatured(false);
+    setFormDisplayRank('');
+  };
+
+  const resetBlogForm = () => {
+    setEditingBlogId(null);
+    setFormBlogTitle('');
+    setFormBlogSlug('');
+    setFormBlogExcerpt('');
+    setFormBlogContent('');
+    setFormBlogImageUrl('');
+    setFormBlogStatus('draft');
+    setIsBlogFormOpen(false);
+  };
+
+  const handleBlogSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActionLoading(true);
+    setErrorMessage('');
+
+    try {
+      const payload = {
+        title: formBlogTitle,
+        slug: formBlogSlug,
+        excerpt: formBlogExcerpt,
+        content: formBlogContent,
+        image_url: formBlogImageUrl,
+        status: formBlogStatus,
+        author_id: user?.id,
+      };
+
+      if (editingBlogId) {
+        const { error } = await supabase.from('blogs').update(payload).eq('id', editingBlogId);
+        if (error) throw error;
+        showNotification('Blog post updated successfully!');
+      } else {
+        const { error } = await supabase.from('blogs').insert(payload);
+        if (error) throw error;
+        showNotification('Blog post created successfully!');
+      }
+      resetBlogForm();
+      fetchDashboardData();
+    } catch (err) {
+      const e = err as Error;
+      showNotification(e.message || 'Operation failed', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleEditBlogClick = (blog: Blog) => {
+    setEditingBlogId(blog.id);
+    setFormBlogTitle(blog.title || '');
+    setFormBlogSlug(blog.slug || '');
+    setFormBlogExcerpt(blog.excerpt || '');
+    setFormBlogContent(blog.content || '');
+    setFormBlogImageUrl(blog.image_url || '');
+    setFormBlogStatus(blog.status || 'draft');
+    setIsBlogFormOpen(true);
+  };
+
+  const handleDeleteBlog = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this blog post?')) return;
+    try {
+      setActionLoading(true);
+      const { error } = await supabase.from('blogs').delete().eq('id', id);
+      if (error) throw error;
+      setBlogs(blogs.filter(b => b.id !== id));
+      showNotification('Blog post deleted successfully!');
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to delete blog', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleSaveCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formCouponCode || !formCouponValue) {
+      showNotification('Please fill in all coupon fields.', true);
+      return;
+    }
+    const newCoupon = {
+      id: Date.now().toString(),
+      code: formCouponCode.toUpperCase(),
+      type: formCouponType,
+      value: parseFloat(formCouponValue)
+    };
+    const updatedCoupons = [...coupons, newCoupon];
+    setCoupons(updatedCoupons);
+    localStorage.setItem('hiyawear_admin_coupons', JSON.stringify(updatedCoupons));
+    
+    setFormCouponCode('');
+    setFormCouponValue('');
+    showNotification('Coupon created successfully!');
+  };
+
+  const handleDeleteCoupon = (id: string) => {
+    if (!confirm('Are you sure you want to delete this coupon?')) return;
+    const updatedCoupons = coupons.filter(c => c.id !== id);
+    setCoupons(updatedCoupons);
+    localStorage.setItem('hiyawear_admin_coupons', JSON.stringify(updatedCoupons));
+    showNotification('Coupon deleted.');
+  };
+
+  // Shipping updates
+  const handleOpenOrderShipment = (order: Order) => {
+    setSelectedOrder(order);
+    setTrackingNumberInput(order.tracking_number || '');
+    setShipmentStatusInput(order.status === 'shipped' || order.status === 'delivered' ? order.status : 'pending');
+    setShippingProviderInput(order.shipping_provider || 'dhl');
+  };
+
+  const handleUpdateShipmentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedOrder) return;
+    setActionLoading(true);
+
+    try {
+      const res = await fetch('/api/orders/shipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: selectedOrder.id,
+          trackingNumber: trackingNumberInput,
+          status: shipmentStatusInput,
+          shippingProvider: shippingProviderInput,
+          customerName: selectedOrder.shipping_addresses?.full_name,
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update tracking');
+
+      if (data.emailSent) {
+        showNotification(`Tracking updated! Email sent to customer. (Preview: ${data.previewUrl})`);
+        console.log('Email preview URL:', data.previewUrl);
+      } else {
+        showNotification('Shipment tracking updated successfully!');
+      }
+
+      setSelectedOrder(null);
+      fetchDashboardData();
+    } catch (err) {
+      const e = err as Error;
+      showNotification(e.message || 'Failed to update tracking details', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Loading indicator for Auth checking
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center text-zinc-900">
+        <Loader2 className="h-10 w-10 text-brand-700 animate-spin mb-4" />
+        <p className="text-zinc-500 text-sm font-semibold uppercase tracking-wider animate-pulse">Initializing Security Audit...</p>
+      </div>
+    );
+  }
+
+  // 🔒 ACCESS DENIED GATE (Bypassed if URL has ?bypass=true)
+  if (!isBypassed && (!user || profile?.role !== 'admin')) {
+    if (!user) {
+      return (
+        <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 flex items-center justify-center p-6 relative overflow-hidden">
+          {/* Decorative background glows */}
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-brand-100 blur-[120px] rounded-full pointer-events-none -z-10" />
+          <div className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] bg-zinc-900 text-white hover:bg-zinc-800/5 blur-[100px] rounded-full pointer-events-none -z-10" />
+
+          <div className="max-w-md w-full glass-card p-8 rounded-3xl border border-zinc-200 shadow-2xl text-center space-y-6 glow-border">
+            <div className="space-y-2">
+              <div className="h-12 w-12 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-2">
+                <ShieldCheck className="h-6 w-6 text-brand-600" />
+              </div>
+              <h2 className="text-2xl font-serif tracking-wide text-zinc-900">Admin Gate</h2>
+              <p className="text-zinc-500 text-xs">
+                Please enter your administrator credentials to access the backend dashboard.
+              </p>
+            </div>
+
+            {adminLoginError && (
+              <div className="py-2.5 px-4 bg-red-950/20 border border-red-900/40 rounded-xl text-xs text-red-400 font-medium text-left">
+                ⚠️ {adminLoginError}
+              </div>
+            )}
+
+            <form onSubmit={handleAdminLogin} className="space-y-4 text-left">
+              <div>
+                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Email Address</label>
+                <input 
+                  type="email" 
+                  required
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full bg-zinc-100/60 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500/50 transition-all font-light"
+                  placeholder="admin@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">Password</label>
+                <input 
+                  type="password" 
+                  required
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  className="w-full bg-zinc-100/60 border border-zinc-200 rounded-xl px-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500/50 transition-all font-light"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <button 
+                type="submit"
+                disabled={adminLoginLoading}
+                className="w-full py-2.5 mt-2 rounded-xl text-xs font-semibold text-zinc-950 bg-zinc-900 text-white hover:bg-zinc-800 hover:bg-zinc-900 text-white hover:bg-zinc-800-dark transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                {adminLoginLoading ? (
+                  <>
+                    <Loader2 className="h-4.5 w-4.5 animate-spin shrink-0" />
+                    Verifying Credentials...
+                  </>
+                ) : (
+                  'Authorize Session'
+                )}
+              </button>
+            </form>
+
+            <div className="border-t border-zinc-200 pt-4 flex flex-col gap-2">
+              <button 
+                onClick={() => window.location.href = '/'}
+                className="w-full py-2 rounded-xl text-xs text-zinc-600 hover:text-zinc-900 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" /> Return to Storefront
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      // User is logged in but role !== admin
+      return (
+        <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 flex items-center justify-center p-6 relative overflow-hidden">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-red-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
+          <div className="max-w-md w-full glass-card p-8 rounded-3xl border border-red-950/30 text-center space-y-6">
+            <AlertCircle className="h-16 w-16 text-red-500 mx-auto stroke-[1.5] animate-bounce" />
+            <div className="space-y-2">
+              <h2 className="text-2xl font-black tracking-tight text-zinc-900">Access Restricted</h2>
+              <p className="text-zinc-500 text-xs leading-relaxed">
+                This system is restricted to verified administrators. Your current account (<span className="text-zinc-700 font-semibold">{user.email}</span>) does not have authorization to view database records.
+              </p>
+            </div>
+
+            <div className="py-2.5 px-4 bg-red-950/15 border border-red-900/30 rounded-xl text-xs text-red-400 font-medium">
+              🚨 Access RESTRICTED to verified admins.
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={handleSwitchAccount}
+                className="w-full py-2.5 rounded-xl text-xs font-semibold text-zinc-950 bg-zinc-900 text-white hover:bg-zinc-800 hover:bg-zinc-900 text-white hover:bg-zinc-800-dark transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                Sign In with Different Account
+              </button>
+              
+              <button 
+                onClick={() => window.location.href = '/'}
+                className="w-full py-2.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-850 text-zinc-900 border border-zinc-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="h-4 w-4" /> Return to Storefront
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // Calculate quick metrics
+  const totalRevenue = orders
+    .filter(o => o.payment_status === 'paid')
+    .reduce((sum, o) => sum + o.total, 0);
+
+  const pendingShipmentsCount = orders.filter(o => {
+    return !o.tracking_number || o.status === 'PENDING';
+  }).length;
+
+  const lowStockCount = products.filter(p => p.stock <= 5).length;
+
+  return (
+    <main className="min-h-screen text-zinc-900 pb-24">
+      {/* Background Glow */}
+      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-brand-50 blur-[150px] rounded-full pointer-events-none -z-10" />
+
+      {/* Header Bar */}
+      <nav className="fixed top-0 left-0 right-0 z-30 bg-white/80 backdrop-blur-md border-b border-zinc-200 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-brand-700" />
+            <h1 className="text-xl font-black tracking-tight select-none">
+              Indi<span className="text-brand-700">Thread</span> <span className="text-zinc-500 font-medium text-sm ml-1.5 uppercase tracking-widest">Admin</span>
+            </h1>
+          </div>
+
+          <button
+            onClick={() => window.location.href = '/'}
+            className="px-3.5 py-1.5 rounded-lg border border-zinc-200 bg-zinc-100/40 hover:bg-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to Store
+          </button>
+        </div>
+      </nav>
+
+      {/* Main Container */}
+      <div className="max-w-7xl mx-auto pt-28 px-6 space-y-8">
+        
+        {/* Tab Controls Bar */}
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-zinc-200 pb-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-black tracking-tight flex items-center gap-2">
+              Welcome Back, Admin
+            </h2>
+            <p className="text-xs text-zinc-500">Manage catalog and ship Indian block-print textile orders globally.</p>
+          </div>
+
+          <div className="flex items-center gap-2 bg-[#FDFBF7] border border-zinc-200 p-1 rounded-xl shrink-0">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'overview'
+                  ? 'bg-violet-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" /> Orders & Analytics
+            </button>
+            <button
+              onClick={() => setActiveTab('catalog')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'catalog'
+                  ? 'bg-violet-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Database className="h-3.5 w-3.5" /> Catalog List
+            </button>
+            <button
+              onClick={() => { resetProductForm(); setActiveTab('form'); }}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'form'
+                  ? 'bg-violet-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Plus className="h-3.5 w-3.5" /> {editingProductId ? 'Edit Product' : 'Add Product'}
+            </button>
+            <button
+              onClick={() => setActiveTab('categories')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'categories'
+                  ? 'bg-violet-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Tag className="h-3.5 w-3.5" /> Categories
+            </button>
+            <button
+              onClick={() => setActiveTab('blogs')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'blogs'
+                  ? 'bg-violet-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5" /> Blogs
+            </button>
+            <button
+              onClick={() => setActiveTab('coupons')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'coupons'
+                  ? 'bg-amber-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Tag className="h-3.5 w-3.5" /> Coupons
+            </button>
+          </div>
+        </div>
+
+        {/* Global Toast Notification */}
+        {successMessage && (
+          <div className="rounded-xl bg-emerald-950/30 border border-emerald-900/40 p-4 text-xs text-emerald-400 flex items-center gap-2 animate-fadeIn">
+            <CheckCircle className="h-4 w-4 stroke-[2]" />
+            <span>{successMessage}</span>
+          </div>
+        )}
+        {errorMessage && (
+          <div className="rounded-xl bg-red-950/30 border border-red-900/40 p-4 text-xs text-red-400 flex items-center gap-2 animate-fadeIn">
+            <AlertCircle className="h-4 w-4 stroke-[2]" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        {/* TAB 1: OVERVIEW & ORDERS */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            
+            {/* Quick Metrics Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="p-6 rounded-2xl glass-card border border-zinc-200 space-y-2 relative overflow-hidden">
+                <div className="absolute top-4 right-4 text-brand-700 bg-brand-100/50 border border-brand-200 p-2 rounded-xl">
+                  <DollarSign className="h-5 w-5" />
+                </div>
+                <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Verified Revenue</span>
+                <h4 className="text-2xl font-black tracking-tight text-zinc-900">{formatPrice(totalRevenue)}</h4>
+                <p className="text-[10px] text-zinc-600">Calculated direct from paid invoices</p>
+              </div>
+
+              <div className="p-6 rounded-2xl glass-card border border-zinc-200 space-y-2 relative overflow-hidden">
+                <div className="absolute top-4 right-4 text-brand-700 bg-brand-100/50 border border-brand-200 p-2 rounded-xl">
+                  <ShoppingBag className="h-5 w-5" />
+                </div>
+                <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Total Sales count</span>
+                <h4 className="text-2xl font-black tracking-tight text-zinc-900">{orders.length}</h4>
+                <p className="text-[10px] text-zinc-600">Orders logged in Supabase</p>
+              </div>
+
+              <div className="p-6 rounded-2xl glass-card border border-zinc-200 space-y-2 relative overflow-hidden">
+                <div className="absolute top-4 right-4 text-amber-500 bg-amber-950/30 border border-amber-900/20 p-2 rounded-xl animate-pulse">
+                  <Truck className="h-5 w-5" />
+                </div>
+                <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Pending Shipments</span>
+                <h4 className="text-2xl font-black tracking-tight text-zinc-900">{pendingShipmentsCount}</h4>
+                <p className="text-[10px] text-zinc-600">Awaiting DHL pickup & tracking ID</p>
+              </div>
+
+              <div className="p-6 rounded-2xl glass-card border border-zinc-200 space-y-2 relative overflow-hidden">
+                <div className="absolute top-4 right-4 text-red-500 bg-red-950/30 border border-red-900/20 p-2 rounded-xl">
+                  <Package className="h-5 w-5" />
+                </div>
+                <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Low Stock alerts</span>
+                <h4 className="text-2xl font-black tracking-tight text-red-400">{lowStockCount}</h4>
+                <p className="text-[10px] text-zinc-600">Products with stock level under 5</p>
+              </div>
+            </div>
+
+            {/* Orders Management Panel */}
+            <div className="glass-card rounded-3xl border border-zinc-200 overflow-hidden">
+              <div className="p-6 border-b border-zinc-200 flex items-center justify-between">
+                <h3 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-brand-700" /> Woven Orders Fulfillments
+                </h3>
+                <span className="text-[10px] bg-white text-zinc-600 border border-zinc-200 px-3 py-1 rounded-full font-mono">
+                  {orders.length} total entries
+                </span>
+              </div>
+
+              {loading ? (
+                <div className="p-20 text-center space-y-3">
+                  <Loader2 className="h-8 w-8 text-brand-700 animate-spin mx-auto" />
+                  <p className="text-xs text-zinc-500">Querying transaction ledgers...</p>
+                </div>
+              ) : orders.length === 0 ? (
+                <div className="p-20 text-center space-y-2">
+                  <ShoppingBag className="h-10 w-10 text-zinc-700 mx-auto stroke-[1.5]" />
+                  <p className="text-xs font-semibold text-zinc-600">No export orders found</p>
+                  <p className="text-[10px] text-zinc-600">Simulate order creation on the checkout screen to see results here.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-[#FDFBF7]/50 border-b border-zinc-200 text-zinc-600 font-medium">
+                        <th className="p-4">Order ID & Date</th>
+                        <th className="p-4">Customer Details</th>
+                        <th className="p-4">Destination</th>
+                        <th className="p-4">Amount</th>
+                        <th className="p-4">DHL Status</th>
+                        <th className="p-4 text-center">Fulfill</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-900/60">
+                      {orders.map((order) => {
+                        return (
+                          <tr key={order.id} className="hover:bg-white/10 transition-colors">
+                            <td className="p-4">
+                              <span className="block font-bold text-zinc-900 font-mono text-[10px] truncate max-w-[120px]">{order.id}</span>
+                              <span className="text-[10px] text-zinc-500 mt-0.5 block">
+                                {new Date(order.created_at).toLocaleDateString(undefined, {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <span className="block font-bold text-zinc-700">
+                                {order.shipping_addresses?.full_name || `${order.profiles?.first_name || ''} ${order.profiles?.last_name || ''}`.trim() || 'Guest User'}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <span className="block font-medium text-zinc-700">
+                                {order.shipping_addresses?.city || 'Jaipur'}
+                              </span>
+                              <span className="text-[9px] text-zinc-500 uppercase font-semibold tracking-wider">
+                                ✈️ {order.shipping_addresses?.country || 'India'}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <span className="font-extrabold text-zinc-900">{formatPrice(order.total)}</span>
+                            </td>
+                            <td className="p-4">
+                              <span className={`inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                                order.status === 'delivered'
+                                  ? 'bg-emerald-950/20 border-emerald-900/40 text-emerald-400'
+                                  : order.status === 'shipped'
+                                  ? 'bg-sky-950/20 border-sky-900/40 text-sky-400'
+                                  : 'bg-amber-950/20 border-amber-900/40 text-amber-400'
+                              }`}>
+                                {order.status || 'pending'}
+                              </span>
+                              <span className="block text-[9px] text-zinc-500 font-mono mt-1 select-all">
+                                {order.tracking_number || 'No tracking ref'}
+                              </span>
+                              {order.payment_status !== 'paid' && (
+                                <span className="block text-[9px] text-red-400 font-bold mt-1 tracking-widest uppercase">
+                                  UNPAID
+                                </span>
+                              )}
+                            </td>
+                            <td className="p-4 text-center">
+                              <button
+                                onClick={() => handleOpenOrderShipment(order)}
+                                className="px-2.5 py-1.5 rounded-lg bg-[#FDFBF7] border border-zinc-200 hover:border-violet-500 text-zinc-700 hover:text-zinc-900 transition-colors text-[10px] font-semibold"
+                              >
+                                Edit Tracking
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: CATALOG INVENTORY LIST */}
+        {activeTab === 'catalog' && (
+          <div className="glass-card rounded-3xl border border-zinc-200 overflow-hidden">
+            <div className="p-6 border-b border-zinc-200 flex items-center justify-between">
+              <h3 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+                <Database className="h-4 w-4 text-brand-700" /> Active Slub & Silk Product Ledger
+              </h3>
+              <button
+                onClick={() => { resetProductForm(); setActiveTab('form'); }}
+                className="px-3.5 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 transition-colors"
+              >
+                <Plus className="h-4 w-4" /> Add Product
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="p-20 text-center space-y-3">
+                <Loader2 className="h-8 w-8 text-brand-700 animate-spin mx-auto" />
+                <p className="text-xs text-zinc-500">Querying product tables...</p>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="p-20 text-center space-y-2">
+                <Database className="h-10 w-10 text-zinc-700 mx-auto stroke-[1.5]" />
+                <p className="text-xs font-semibold text-zinc-600">Inventory catalog is empty</p>
+                <p className="text-[10px] text-zinc-600">Click Add Product to inject a new handcrafted block-print or saree.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#FDFBF7]/50 border-b border-zinc-200 text-zinc-600 font-medium">
+                      <th className="p-4">SKU & Image</th>
+                      <th className="p-4">Product Name</th>
+                      <th className="p-4">Category</th>
+                      <th className="p-4 text-center">Display Tier</th>
+                      <th className="p-4 text-right">Base Price (INR)</th>
+                      <th className="p-4">Stock Level</th>
+                      <th className="p-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-900/60">
+                    {products.map((prod) => (
+                      <tr key={prod.id} className="hover:bg-white/10 transition-colors">
+                        <td className="p-4 flex items-center gap-3">
+                          <div className="h-12 w-12 rounded-lg bg-white overflow-hidden border border-zinc-200 shrink-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img 
+                              src={prod.images?.[0] || 'https://via.placeholder.com/80'} 
+                              alt={prod.name} 
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <span className="font-mono text-[10px] font-semibold text-zinc-500 tracking-wider">
+                            {prod.sku || 'NO-SKU'}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <span className="block font-bold text-zinc-900">{prod.name}</span>
+                          <span className="text-[10px] text-zinc-500 line-clamp-1 max-w-[200px] mt-0.5">
+                            {prod.description}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <span className="px-2.5 py-0.5 rounded-full bg-white border border-zinc-200 text-zinc-700 font-medium text-[10px]">
+                            {prod.category}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          {prod.display_rank && prod.display_rank < 999 ? (
+                            <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-brand-50 text-brand-700 border border-brand-200 font-bold text-[10px]">
+                              Tier {prod.display_rank}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-zinc-100 text-zinc-500 font-medium text-[10px]">
+                              Standard
+                            </span>
+                          )}
+                        </td>
+                        <td className="p-4 text-right">
+                          <span className="font-extrabold text-zinc-900">₹{prod.price_inr?.toLocaleString() || '0'}</span>
+                          <span className="text-[9px] text-zinc-600 block mt-0.5">(Calculated)</span>
+                        </td>
+                        <td className="p-4">
+                          <span className={`font-bold font-mono text-sm ${prod.stock <= 5 ? 'text-red-400' : 'text-zinc-700'}`}>
+                            {prod.stock}
+                          </span>
+                          <span className="text-[9px] text-zinc-600 block mt-0.5 uppercase tracking-widest font-semibold">
+                            {prod.stock === 0 ? 'Out of stock' : prod.stock <= 5 ? 'Critical stock' : 'Units'}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleDeleteProductClick(prod.id)}
+                              className="p-2 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-red-950/20 hover:border-red-900/30 text-zinc-500 hover:text-red-400 transition-colors"
+                              title="Delete Item"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleEditProductClick(prod)}
+                              className="p-2 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-violet-950/20 hover:border-violet-900/30 text-zinc-700 hover:text-brand-600 transition-colors"
+                              title="Edit Details"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 3: UNIFIED PRODUCT FORM */}
+        {activeTab === 'form' && (
+          <div className="max-w-3xl mx-auto glass-card border border-zinc-200 p-8 rounded-3xl space-y-6">
+            <div className="border-b border-zinc-200/60 pb-4">
+              <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                <Database className="h-5 w-5 text-brand-700" />
+                {editingProductId ? '✨ Refine Handloom Details' : '📦 Inject Handcrafted Textile to Ledger'}
+              </h3>
+              <p className="text-zinc-500 text-xs mt-1">
+                {editingProductId 
+                  ? 'Updating active catalog product. Changes are synced live on database save.' 
+                  : 'Add authentic Jaipur print fabric, ethnic wear, or sarees to database catalog.'}
+              </p>
+            </div>
+
+            <form onSubmit={handleProductSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Product Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="E.g., Jaipur Hand-Block Cotton Kurta"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">SKU Reference (Unique ID)</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="E.g., IND-JPR-SLUB-001"
+                    value={formSku}
+                    onChange={(e) => setFormSku(e.target.value)}
+                    className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Description</label>
+                <textarea
+                  required
+                  rows={3}
+                  placeholder="Detail the slub organic weave pattern, indigo dye technique, and comfort metrics..."
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Base Price in INR (₹)</label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    placeholder="E.g., 2499"
+                    value={formPriceInr}
+                    onChange={(e) => setFormPriceInr(e.target.value)}
+                    className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 focus:outline-none focus:border-violet-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-semibold text-zinc-600">Category</label>
+                    <button
+                      type="button"
+                      onClick={() => setIsCategoryModalOpen(true)}
+                      className="text-[10px] font-semibold text-brand-600 hover:text-violet-300 transition-colors"
+                    >
+                      + New Category
+                    </button>
+                  </div>
+                  
+                  <select
+                    value={formCategory}
+                    onChange={(e) => setFormCategory(e.target.value)}
+                    className="w-full bg-white border border-zinc-200 rounded-xl py-2 px-3 text-xs text-zinc-900 focus:outline-none focus:border-violet-500"
+                  >
+                    {dbCategoryObjects.filter(c => !c.parent_id).map((mainCat) => {
+                      const subs = dbCategoryObjects.filter(c => c.parent_id === mainCat.id);
+                      return (
+                        <React.Fragment key={mainCat.id}>
+                          <option value={mainCat.name} className="font-bold">{mainCat.name}</option>
+                          {subs.map(subCat => (
+                            <option key={subCat.id} value={subCat.name}>
+                              &nbsp;&nbsp;&nbsp;↳ {subCat.name}
+                            </option>
+                          ))}
+                        </React.Fragment>
+                      );
+                    })}
+                    {dbCategories.filter(name => !dbCategoryObjects.some(obj => obj.name === name)).map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Warehouse Inventory Stock</label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    value={formStock}
+                    onChange={(e) => setFormStock(e.target.value)}
+                    className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 focus:outline-none focus:border-violet-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Image URL</label>
+                <input
+                  type="text"
+                  placeholder="E.g., https://images.unsplash.com/... (Separated by comma for multiple)"
+                  value={formImageUrl}
+                  onChange={(e) => setFormImageUrl(e.target.value)}
+                  className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                />
+              </div>
+
+              {/* Craftsmanship Details (Geographic Tags) */}
+              <div className="border-t border-zinc-200 pt-4 space-y-4">
+                <h4 className="text-xs font-bold text-brand-600 uppercase tracking-widest">✨ Geographic Craft Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Fabric & Material</label>
+                    <input
+                      type="text"
+                      placeholder="E.g., 100% Organic Slub Cotton"
+                      value={formMaterial}
+                      onChange={(e) => setFormMaterial(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Weaving Region / Origin</label>
+                    <input
+                      type="text"
+                      placeholder="E.g., Jaipur, India"
+                      value={formOrigin}
+                      onChange={(e) => setFormOrigin(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Care Instructions</label>
+                    <input
+                      type="text"
+                      placeholder="E.g., Dry Clean Only / Cold Wash"
+                      value={formCare}
+                      onChange={(e) => setFormCare(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Is Featured & Rank */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">New Arrival</label>
+                  <label className="flex items-center gap-3 p-3 border border-zinc-200 rounded-xl bg-zinc-100/30 cursor-pointer hover:bg-zinc-100/50 transition-colors h-11">
+                    <input 
+                      type="checkbox" 
+                      checked={formIsFeatured}
+                      onChange={(e) => setFormIsFeatured(e.target.checked)}
+                      className="w-4 h-4 rounded border-zinc-300 text-brand-700 focus:ring-gold bg-[#FDFBF7]"
+                    />
+                    <div>
+                      <span className="block text-xs font-bold text-zinc-900 uppercase tracking-widest">Mark as Featured</span>
+                    </div>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Display Rank (1 = Best)</label>
+                  <input 
+                    type="number"
+                    value={formDisplayRank}
+                    onChange={(e) => setFormDisplayRank(e.target.value)}
+                    placeholder="e.g. 1, 2, 3..."
+                    className="w-full bg-[#FDFBF7] border border-zinc-200 rounded-xl py-3 px-3.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-brand-500 shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Form Action Controls */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200">
+                {editingProductId && (
+                  <button
+                    type="button"
+                    onClick={() => { resetProductForm(); setActiveTab('catalog'); }}
+                    className="px-4 py-2 border border-zinc-200 hover:border-zinc-300 bg-[#FDFBF7] rounded-xl text-xs font-bold text-zinc-600 hover:text-zinc-900 transition-colors"
+                  >
+                    Cancel Edit
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={actionLoading}
+                  className="px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 shadow-lg hover:shadow-violet-600/10 transition-all disabled:opacity-50"
+                >
+                  {actionLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  {editingProductId ? 'Update Product Details' : 'Inject Product to Ledger'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* TAB 4: MANAGE CATEGORIES */}
+        {activeTab === 'categories' && (
+          <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn">
+            {/* Create Category Section */}
+            <div className="glass-card border border-zinc-200 p-8 rounded-3xl space-y-6">
+              <div className="border-b border-zinc-200/60 pb-4">
+                <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                  <Tag className="h-5 w-5 text-brand-700" />
+                  Generate New Category
+                </h3>
+                <p className="text-zinc-500 text-xs mt-1">
+                  Add custom artisanal product categories to your database.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input
+                  type="text"
+                  placeholder="E.g., Indigo Blockprint, Banarasi Sarees..."
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  className="flex-1 bg-zinc-100/50 border border-zinc-200 rounded-xl py-2.5 px-4 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                />
+                <select
+                  value={newCategoryParentId}
+                  onChange={(e) => setNewCategoryParentId(e.target.value)}
+                  className="bg-zinc-100/50 border border-zinc-200 rounded-xl py-2.5 px-4 text-xs text-zinc-900 focus:outline-none focus:border-violet-500 min-w-[200px]"
+                >
+                  <option value="">No Parent (Main Category)</option>
+                  {dbCategoryObjects.filter(c => !c.parent_id).map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleCreateCategory}
+                  disabled={actionLoading}
+                  className="px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 shrink-0"
+                >
+                  {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Create Category
+                </button>
+              </div>
+            </div>
+
+            {/* List Categories Section */}
+            <div className="glass-card rounded-3xl border border-zinc-200 overflow-hidden">
+              <div className="p-6 border-b border-zinc-200 flex items-center justify-between">
+                <h3 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+                  <Database className="h-4 w-4 text-brand-700" /> Active Category Inventory
+                </h3>
+                <span className="text-[10px] bg-white text-zinc-600 border border-zinc-200 px-3 py-1 rounded-full font-mono">
+                  {dbCategories.length} Categories
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-[#FDFBF7]/50 border-b border-zinc-200 text-zinc-600 font-medium">
+                      <th className="p-4">Category Name</th>
+                      <th className="p-4">Slug Reference</th>
+                      <th className="p-4">Assigned Products</th>
+                      <th className="p-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-900/60 text-zinc-700">
+                    {dbCategoryObjects.map((catObj) => {
+                      const count = products.filter((p) => p.category === catObj.name).length;
+                      const catSlug = catObj.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                      const parentObj = catObj.parent_id ? dbCategoryObjects.find(c => c.id === catObj.parent_id) : null;
+                      return (
+                        <tr key={catObj.id} className="hover:bg-white/10 transition-colors">
+                          <td className="p-4">
+                            <span className="font-bold text-zinc-900 block">{catObj.name}</span>
+                            {parentObj && <span className="text-[10px] text-zinc-500 uppercase tracking-wider">↳ Sub of {parentObj.name}</span>}
+                          </td>
+                          <td className="p-4 font-mono text-[10px] text-zinc-500">{catSlug}</td>
+                          <td className="p-4">
+                            <span className={`font-semibold ${count === 0 ? 'text-zinc-600' : 'text-brand-600'}`}>
+                              {count} {count === 1 ? 'product' : 'products'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <button
+                              onClick={() => handleDeleteCategory(catObj.name)}
+                              disabled={actionLoading}
+                              className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-red-950/20 hover:border-red-900/30 text-red-400/80 hover:text-red-400 transition-colors text-[11px] font-medium disabled:opacity-50"
+                            >
+                              Delete Category
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: BLOGS */}
+        {activeTab === 'blogs' && (
+          <div className="max-w-6xl mx-auto space-y-8 animate-fadeIn">
+            {/* Form to create/edit Blog */}
+            {isBlogFormOpen ? (
+              <div className="glass-card border border-zinc-200 p-8 rounded-3xl space-y-6">
+                <div className="border-b border-zinc-200/60 pb-4">
+                  <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-brand-700" />
+                    {editingBlogId ? '✨ Edit Blog Post' : '📝 Write New Blog Post'}
+                  </h3>
+                </div>
+                <form onSubmit={handleBlogSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Title</label>
+                      <input
+                        type="text"
+                        required
+                        value={formBlogTitle}
+                        onChange={(e) => setFormBlogTitle(e.target.value)}
+                        className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Slug</label>
+                      <input
+                        type="text"
+                        required
+                        value={formBlogSlug}
+                        onChange={(e) => setFormBlogSlug(e.target.value)}
+                        className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Excerpt (Short Description)</label>
+                    <textarea
+                      required
+                      rows={2}
+                      value={formBlogExcerpt}
+                      onChange={(e) => setFormBlogExcerpt(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Content (Markdown / HTML / Text)</label>
+                    <textarea
+                      required
+                      rows={10}
+                      value={formBlogContent}
+                      onChange={(e) => setFormBlogContent(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 font-mono"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Image URL</label>
+                      <input
+                        type="text"
+                        value={formBlogImageUrl}
+                        onChange={(e) => setFormBlogImageUrl(e.target.value)}
+                        className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Status</label>
+                      <select
+                        value={formBlogStatus}
+                        onChange={(e) => setFormBlogStatus(e.target.value)}
+                        className="w-full bg-white border border-zinc-200 rounded-xl py-2 px-3 text-xs text-zinc-900"
+                      >
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200">
+                    <button
+                      type="button"
+                      onClick={() => setIsBlogFormOpen(false)}
+                      className="px-4 py-2 border border-zinc-200 bg-[#FDFBF7] rounded-xl text-xs font-bold text-zinc-600"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={actionLoading}
+                      className="px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 shadow-lg disabled:opacity-50"
+                    >
+                      {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                      Save Blog Post
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <div className="glass-card rounded-3xl border border-zinc-200 overflow-hidden">
+                <div className="p-6 border-b border-zinc-200 flex items-center justify-between">
+                  <h3 className="text-base font-bold text-zinc-900 flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-brand-700" /> Blog Articles
+                  </h3>
+                  <button
+                    onClick={() => { resetBlogForm(); setIsBlogFormOpen(true); }}
+                    className="px-3.5 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-xs font-bold text-white flex items-center gap-1.5"
+                  >
+                    <Plus className="h-4 w-4" /> New Post
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-[#FDFBF7]/50 border-b border-zinc-200 text-zinc-600 font-medium">
+                        <th className="p-4">Title & Slug</th>
+                        <th className="p-4">Excerpt</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-900/60">
+                      {blogs.map((blog) => (
+                        <tr key={blog.id} className="hover:bg-white/10">
+                          <td className="p-4">
+                            <span className="block font-bold text-zinc-900">{blog.title}</span>
+                            <span className="text-[10px] text-zinc-500">/{blog.slug}</span>
+                          </td>
+                          <td className="p-4">
+                            <span className="text-zinc-600 line-clamp-1 max-w-[200px]">{blog.excerpt}</span>
+                          </td>
+                          <td className="p-4">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${blog.status === 'published' ? 'bg-emerald-950/30 text-emerald-400' : 'bg-amber-950/30 text-amber-400'}`}>
+                              {blog.status}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <button onClick={() => handleDeleteBlog(blog.id)} className="p-2 rounded-lg text-zinc-500 hover:text-red-400"><Trash2 className="h-4 w-4" /></button>
+                              <button onClick={() => handleEditBlogClick(blog)} className="p-2 rounded-lg text-zinc-700 hover:text-brand-600"><Edit className="h-4 w-4" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {blogs.length === 0 && (
+                        <tr>
+                          <td colSpan={4} className="p-10 text-center text-zinc-500">
+                            No blog posts found. Create one to get started.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 6: COUPONS */}
+        {activeTab === 'coupons' && (
+          <div className="max-w-6xl mx-auto space-y-8 animate-fadeIn">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-serif font-bold text-zinc-900">Manage Coupons</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-3xl border border-zinc-200 p-6">
+                  <h3 className="text-lg font-serif font-bold text-zinc-900 mb-6">Create New Coupon</h3>
+                  <form onSubmit={handleSaveCoupon} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-700 mb-1.5">Coupon Code</label>
+                      <input
+                        type="text"
+                        value={formCouponCode}
+                        onChange={(e) => setFormCouponCode(e.target.value.toUpperCase())}
+                        placeholder="e.g. DIWALI20"
+                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase font-mono"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-700 mb-1.5">Discount Type</label>
+                      <select
+                        value={formCouponType}
+                        onChange={(e) => setFormCouponType(e.target.value as 'percent' | 'fixed')}
+                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      >
+                        <option value="percent">Percentage (%)</option>
+                        <option value="fixed">Fixed Amount (₹)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-700 mb-1.5">Discount Value</label>
+                      <input
+                        type="number"
+                        value={formCouponValue}
+                        onChange={(e) => setFormCouponValue(e.target.value)}
+                        placeholder={formCouponType === 'percent' ? "e.g. 20" : "e.g. 500"}
+                        min="1"
+                        step="0.01"
+                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-4 py-2.5 text-sm font-bold transition-colors mt-4 flex justify-center items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" /> Create Coupon
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-3xl border border-zinc-200 overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-zinc-50 border-b border-zinc-200">
+                        <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Code</th>
+                        <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Type</th>
+                        <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Value</th>
+                        <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100">
+                      {coupons.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-8 text-center text-zinc-500 text-sm">
+                            No active coupons. Create one to get started.
+                          </td>
+                        </tr>
+                      ) : (
+                        coupons.map((coupon) => (
+                          <tr key={coupon.id} className="hover:bg-zinc-50/50">
+                            <td className="px-6 py-4">
+                              <span className="inline-block px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-mono font-bold rounded">
+                                {coupon.code}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-sm font-medium text-zinc-700 capitalize">
+                                {coupon.type}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-sm font-bold text-zinc-900">
+                                {coupon.type === 'percent' ? `${coupon.value}%` : `₹${coupon.value}`}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <button
+                                onClick={() => handleDeleteCoupon(coupon.id)}
+                                className="p-2 text-zinc-400 hover:text-red-500 transition-colors"
+                                title="Delete Coupon"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+      {/* TRACKING AND SHIPMENT EDIT MODAL */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs">
+          <div className="relative w-full max-w-md rounded-3xl glass-card p-8 border border-zinc-200 glow-border max-h-[85vh] flex flex-col">
+            
+            {/* Close Button */}
+            <button 
+              onClick={() => setSelectedOrder(null)}
+              className="absolute right-5 top-5 text-zinc-600 hover:text-zinc-900 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+
+            {/* Modal Header */}
+            <div className="mb-6 border-b border-zinc-200/60 pb-4">
+              <h2 className="text-lg font-black tracking-tight">DHL Shipping Fulfillments</h2>
+              <p className="text-zinc-500 text-[10px] mt-0.5">Assign courier dispatch parameters for order direct export.</p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleUpdateShipmentSubmit} className="space-y-6 overflow-y-auto pr-1">
+              
+              {/* Order Info */}
+              <div className="rounded-2xl border border-zinc-200 bg-zinc-100/30 p-4 space-y-2.5 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Invoice Target:</span>
+                  <span className="text-zinc-900 font-bold">{selectedOrder.shipping_addresses?.full_name || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-zinc-500">Destination:</span>
+                  <span className="text-zinc-700 font-semibold text-right max-w-[200px] truncate">
+                    {selectedOrder.shipping_addresses?.city || 'N/A'}, {selectedOrder.shipping_addresses?.country || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between font-mono">
+                  <span className="text-zinc-500">Tracking Reference:</span>
+                  <span className="text-brand-600 font-bold truncate max-w-[150px]">{selectedOrder.id}</span>
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Garment Line Items</label>
+                <div className="space-y-2 max-h-32 overflow-y-auto bg-white/10 border border-zinc-200 p-2.5 rounded-xl">
+                  {selectedOrder.order_items?.map((item) => (
+                    <div key={item.id} className="flex justify-between text-xs py-1 border-b border-zinc-200 last:border-b-0">
+                      <span className="text-zinc-600 truncate max-w-[200px]">
+                        {item.products?.name || 'Handloom Garment'} <strong className="text-zinc-600 font-normal">x{item.quantity}</strong>
+                      </span>
+                      <span className="text-zinc-500 font-mono">{item.products?.sku || 'N/A'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tracking input */}
+              <div className="space-y-4 border-t border-zinc-200 pt-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Tracking Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="E.g., JD1234567890"
+                    value={trackingNumberInput}
+                    onChange={(e) => setTrackingNumberInput(e.target.value)}
+                    className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500 font-mono"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Shipping Carrier</label>
+                  <select
+                    value={shippingProviderInput}
+                    onChange={(e) => setShippingProviderInput(e.target.value)}
+                    className="w-full bg-white border border-zinc-200 rounded-xl py-2.5 px-3 text-xs text-zinc-900 focus:outline-none focus:border-violet-500"
+                  >
+                    <option value="dhl">DHL</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Shipping Transit State</label>
+                  <select
+                    value={shipmentStatusInput}
+                    onChange={(e) => setShipmentStatusInput(e.target.value as 'pending' | 'shipped' | 'delivered')}
+                    className="w-full bg-white border border-zinc-200 rounded-xl py-2.5 px-3 text-xs text-zinc-900 focus:outline-none focus:border-violet-500"
+                  >
+                    <option value="pending">Pending Dispatch</option>
+                    <option value="shipped">Shipped (In Transit)</option>
+                    <option value="delivered">Delivered Successfully</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200">
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrder(null)}
+                  className="px-4 py-2 border border-zinc-200 bg-[#FDFBF7] rounded-xl text-xs font-bold text-zinc-600 hover:text-zinc-900 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading}
+                  className="px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-xs font-bold text-zinc-900 flex items-center gap-1.5 shadow-lg transition-all"
+                >
+                  {actionLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Save Tracking Ref
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CATEGORY QUICK-CREATE MODAL */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs animate-fadeIn">
+          <div className="relative w-full max-w-md rounded-3xl glass-card p-8 border border-zinc-200 glow-border">
+            
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsCategoryModalOpen(false)}
+              className="absolute right-5 top-5 text-zinc-600 hover:text-zinc-900 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+
+            {/* Modal Header */}
+            <div className="mb-6 border-b border-zinc-200/60 pb-4">
+              <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
+                <Tag className="h-5 w-5 text-brand-700" />
+                Add New Category
+              </h2>
+              <p className="text-zinc-500 text-[10px] mt-0.5">Inject a new artisanal textile or apparel category into the ledger.</p>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Category Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="E.g., Indigo Blockprint"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200">
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="px-4 py-2 border border-zinc-200 bg-[#FDFBF7] rounded-xl text-xs font-bold text-zinc-600 hover:text-zinc-900 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCreateCategory}
+                  disabled={actionLoading}
+                  className="px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-xs font-bold text-zinc-900 flex items-center gap-1.5 shadow-lg transition-all"
+                >
+                  {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Create
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}
