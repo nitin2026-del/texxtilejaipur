@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2 group cursor-pointer">
               <Sparkles className="h-6 w-6 text-brand-700 animate-pulse" />
               <h1 className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900">
-                TEXTILE <span className="text-brand-700 font-light">WEAR</span>
+                TEXTILE <span className="text-brand-700 font-light">JAIPUR</span>
               </h1>
             </div>
             <p className="text-sm text-zinc-600 leading-relaxed font-medium">
