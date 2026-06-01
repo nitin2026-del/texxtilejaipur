@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Base URLs
-  const baseUrl = 'https://hiyawear.com';
+  const baseUrl = 'https://textilejaipur.com';
   
   const staticRoutes = [
     '',

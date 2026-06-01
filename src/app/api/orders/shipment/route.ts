@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       
       const emailHtml = `
         <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; background: #000; color: #fff; padding: 40px; border-radius: 8px;">
-          <h1 style="color: #d4af37; text-align: center; font-family: serif;">Hiya Wear</h1>
+          <h1 style="color: #d4af37; text-align: center; font-family: serif;">Textile Jaipur</h1>
           <h2 style="text-align: center;">Your Order is on the way!</h2>
           <p>Hi ${finalName || 'Valued Customer'},</p>
           <p>Great news! Your luxury handcrafted order <strong>#${orderId.slice(0, 8)}</strong> has been shipped via <strong>${(shippingProvider || 'Courier').toUpperCase()}</strong>.</p>
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
             <p style="margin: 10px 0 0 0; font-size: 24px; font-weight: bold; font-family: monospace; color: #d4af37;">${trackingNumber}</p>
           </div>
           <p style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://hiyawear.com'}/track" style="display: inline-block; background: #d4af37; color: #000; text-decoration: none; padding: 12px 30px; font-weight: bold; border-radius: 4px;">Track Package Online</a>
+            <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com'}/track" style="display: inline-block; background: #d4af37; color: #000; text-decoration: none; padding: 12px 30px; font-weight: bold; border-radius: 4px;">Track Package Online</a>
           </p>
           <p style="color: #666; font-size: 12px; text-align: center; margin-top: 40px;">
             Thank you for choosing Hiya Wear for your export needs.

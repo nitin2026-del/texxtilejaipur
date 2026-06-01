@@ -32,7 +32,7 @@ export default function WishlistPage() {
   useEffect(() => {
     try {
       const wlProducts: Record<string, WishlistProduct> = JSON.parse(
-        localStorage.getItem('hiyawear_wishlist_products') || '{}'
+        localStorage.getItem('textilejaipur_wishlist_products') || '{}'
       );
       setProducts(Object.values(wlProducts));
     } catch {}

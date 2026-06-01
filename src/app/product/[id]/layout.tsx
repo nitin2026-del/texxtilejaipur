@@ -25,7 +25,7 @@ export async function generateMetadata(
       : [];
 
     return {
-      title: `${product.name} | Hiya Wear`,
+      title: `${product.name} | Textile Jaipur`,
       description: product.description?.substring(0, 160) || 'Premium handcrafted ethnic wear.',
       openGraph: {
         title: product.name,

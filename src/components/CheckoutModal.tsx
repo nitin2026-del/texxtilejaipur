@@ -177,7 +177,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         {/* Modal Header */}
         <div className="mb-6 shrink-0 border-b border-zinc-800 pb-4">
           <h2 className="text-2xl font-serif font-bold text-white tracking-wide">Checkout</h2>
-          <p className="text-gold text-xs mt-1 tracking-wider uppercase font-light">Hiya Wear Secure Export Gateway</p>
+          <p className="text-gold text-xs mt-1 tracking-wider uppercase font-light">Textile Jaipur Secure Export Gateway</p>
         </div>
 
         {/* Error notification */}

@@ -118,7 +118,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         {/* Logo Section */}
         <div className="mb-6 text-center">
           <h2 className="text-3xl font-serif font-bold tracking-wide">
-            HIYA <span className="text-gold font-light">WEAR</span>
+            TEXTILE <span className="text-gold font-light">WEAR</span>
           </h2>
           <p className="mt-1 text-xs text-zinc-400 tracking-widest uppercase">Luxury Ethnic Clothing Exporters</p>
         </div>

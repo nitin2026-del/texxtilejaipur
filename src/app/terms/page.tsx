@@ -23,7 +23,7 @@ export default function TermsOfServicePage() {
           
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">1. Acceptance of Terms</h2>
           <p>
-            By accessing and using Hiya Wear's website, you accept and agree to be bound by the terms and provision of this agreement.
+            By accessing and using Textile Jaipur's website, you accept and agree to be bound by the terms and provision of this agreement.
           </p>
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">2. Handcrafted Goods Disclaimer</h2>

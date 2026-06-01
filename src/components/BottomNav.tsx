@@ -18,7 +18,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onCartOpen, onMenuOpen }) 
   useEffect(() => {
     setCurrentPath(window.location.pathname);
     try {
-      const wl = JSON.parse(localStorage.getItem('hiyawear_wishlist') || '[]');
+      const wl = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
       setWishlistCount(wl.length);
     } catch {}
 

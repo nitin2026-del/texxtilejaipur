@@ -431,7 +431,7 @@ export default function AdminPortal() {
       }
 
       // 4. Fetch Coupons
-      const savedCoupons = localStorage.getItem('hiyawear_admin_coupons');
+      const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
       if (savedCoupons) {
         try { setCoupons(JSON.parse(savedCoupons)); } catch (e) { console.error('Failed to parse coupons', e); }
       }

@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2 group cursor-pointer">
               <Sparkles className="h-6 w-6 text-brand-700 animate-pulse" />
               <h1 className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900">
-                HIYA <span className="text-brand-700 font-light">WEAR</span>
+                TEXTILE <span className="text-brand-700 font-light">WEAR</span>
               </h1>
             </div>
             <p className="text-sm text-zinc-600 leading-relaxed font-medium">
@@ -119,7 +119,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-zinc-500 font-medium">
-            © {new Date().getFullYear()} Hiya Wear. All rights reserved.
+            © {new Date().getFullYear()} Textile Jaipur. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-xs text-zinc-500 font-medium">
             <a href="/privacy" className="hover:text-zinc-900 transition-colors">Privacy Policy</a>

@@ -709,7 +709,7 @@ function RecentlyViewedSection() {
 
   useEffect(() => {
     try {
-      const rvIds: string[] = JSON.parse(localStorage.getItem('hiyawear_recently_viewed') || '[]');
+      const rvIds: string[] = JSON.parse(localStorage.getItem('textilejaipur_recently_viewed') || '[]');
       const rvProducts = JSON.parse(localStorage.getItem('hiyawear_rv_products') || '{}');
       const list = rvIds.map((id: string) => rvProducts[id]).filter(Boolean).slice(0, 6);
       setProducts(list);

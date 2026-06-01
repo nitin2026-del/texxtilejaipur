@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [orderCount, setOrderCountState] = useState<number>(0);
 
   useEffect(() => {
-    const savedCoins = localStorage.getItem('hiyawear_jaicoins');
+    const savedCoins = localStorage.getItem('textilejaipur_jaicoins');
     if (savedCoins) {
       setJaiCoinsState(parseInt(savedCoins, 10));
     } else {

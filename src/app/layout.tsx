@@ -9,16 +9,16 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Hiya Wear | Luxury Traditional Ethnic Clothing',
-  description: 'Explore the finest handcrafted ethnic fashion, vintage embroidered jackets, boho dresses, and premium Indian export clothing from Hiya Wear.',
+  title: 'Textile Jaipur | Luxury Traditional Ethnic Clothing',
+  description: 'Explore the finest handcrafted ethnic fashion, vintage embroidered jackets, boho dresses, and premium Indian export clothing from Textile Jaipur.',
   keywords: 'ethnic wear, boho fashion, suzani jackets, handmade jackets, vintage embroidered jackets, Indian export clothing, sustainable fashion, Hiya Wear, luxury fashion, Jaipur handloom',
   authors: [{ name: 'Hiya Wear' }],
   manifest: '/manifest.json',
-  metadataBase: new URL('https://hiyawear.com'),
+  metadataBase: new URL('https://textilejaipur.com'),
   openGraph: {
     title: 'Hiya Wear | Luxury Ethnic Fashion',
     description: 'Premium handcrafted ethnic wear and sustainable fashion shipped worldwide.',
-    url: 'https://hiyawear.com',
+    url: 'https://textilejaipur.com',
     siteName: 'Hiya Wear',
     locale: 'en_US',
     type: 'website',

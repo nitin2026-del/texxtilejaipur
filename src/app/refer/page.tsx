@@ -15,7 +15,7 @@ export default function ReferPage() {
   const [copied, setCopied] = useState(false);
 
   const referralCode = 'JAIPUR500';
-  const referralLink = `https://hiyawear.com/invite/${referralCode}`;
+  const referralLink = `https://textilejaipur.com/invite/${referralCode}`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);

@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
           <ul className="list-disc pl-5 space-y-2">
             <li>Provide, maintain, and improve our services, including facilitating payments and sending receipts.</li>
             <li>Perform internal operations, including troubleshooting software bugs and operational problems.</li>
-            <li>Send communications we think will be of interest to you, including information about products, services, promotions, news, and events of Hiya Wear.</li>
+            <li>Send communications we think will be of interest to you, including information about products, services, promotions, news, and events of Textile Jaipur.</li>
           </ul>
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">3. Sharing of Information</h2>

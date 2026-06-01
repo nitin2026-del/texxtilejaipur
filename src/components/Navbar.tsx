@@ -23,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
 
   useEffect(() => {
-    const savedCoupons = localStorage.getItem('hiyawear_admin_coupons');
+    const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
     if (savedCoupons) {
       try {
         const coupons = JSON.parse(savedCoupons);
@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             <a href="/" className="flex items-center gap-2 group cursor-pointer">
               <Sparkles className="h-5 w-5 text-brand-600 animate-pulse group-hover:scale-105 transition-transform" />
               <h1 className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900 hidden sm:block">
-                HIYA <span className="text-brand-600 font-light">WEAR</span>
+                TEXTILE <span className="text-brand-600 font-light">WEAR</span>
               </h1>
             </a>
           </div>

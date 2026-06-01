@@ -31,7 +31,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Load wishlist state from localStorage
   useEffect(() => {
     try {
-      const wl = JSON.parse(localStorage.getItem('hiyawear_wishlist') || '[]');
+      const wl = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
       setWishlisted(wl.includes(product.id));
     } catch {}
   }, [product.id]);

@@ -12,7 +12,7 @@ export const AbandonedCartSimulator: React.FC = () => {
   useEffect(() => {
     // Inject COMEBACK10 into local storage so it works globally
     try {
-      const savedCoupons = localStorage.getItem('hiyawear_admin_coupons');
+      const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
       let coupons = savedCoupons ? JSON.parse(savedCoupons) : [];
       if (!coupons.find((c: any) => c.code === 'COMEBACK10')) {
         coupons.push({

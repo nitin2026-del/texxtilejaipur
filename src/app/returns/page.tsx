@@ -59,7 +59,7 @@ export default function ReturnsPage() {
                     <label className="block text-sm font-bold text-zinc-900 mb-2">Order Number</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. HIYA123456" 
+                      placeholder="e.g. TEXTILE123456" 
                       value={orderId}
                       onChange={(e) => setOrderId(e.target.value)}
                       className="w-full px-4 py-3 rounded-xl border border-zinc-200 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none transition-all"
@@ -152,7 +152,7 @@ export default function ReturnsPage() {
             
             <div className="mt-4 pt-6 border-t border-zinc-200">
               <p className="text-sm text-zinc-500">
-                Need help? <a href="mailto:support@hiyawear.com" className="text-brand-700 font-bold hover:underline">Contact Support</a>
+                Need help? <a href="mailto:support@textilejaipur.com" className="text-brand-700 font-bold hover:underline">Contact Support</a>
               </p>
             </div>
           </div>

@@ -76,7 +76,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Load guest cart from localStorage
-    const savedCart = localStorage.getItem('hiyawear_cart');
+    const savedCart = localStorage.getItem('textilejaipur_cart');
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
