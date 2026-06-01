@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">Contact Us</h2>
           <p>
-            If you have any questions about this Privacy Policy, please contact us at <strong>export@hiyawear.com</strong>.
+            If you have any questions about this Privacy Policy, please contact us at <strong>priyanshug863@gmail.com</strong>.
           </p>
         </div>
       </div>

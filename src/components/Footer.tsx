@@ -78,7 +78,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-brand-700 shrink-0" />
-                <span className="text-sm text-zinc-600 font-medium">export@hiyawear.com</span>
+                <span className="text-sm text-zinc-600 font-medium">priyanshug863@gmail.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <AtSign className="h-4 w-4 text-brand-700 shrink-0" />
