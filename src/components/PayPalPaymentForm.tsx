@@ -13,8 +13,8 @@ interface PayPalPaymentFormProps {
 export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({ orderId, amount, onSuccess, onError }) => {
   const [loading, setLoading] = useState(false);
 
-  // Always pay in USD (PayPal India requirement)
-  const usdAmount = Number((amount * 0.012).toFixed(2));
+  // Amount is already converted to USD by CheckoutModal (effectiveInr * 0.012)
+  const usdAmount = Number(amount.toFixed(2));
 
   const handlePayPalClick = async () => {
     try {
