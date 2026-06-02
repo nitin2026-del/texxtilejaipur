@@ -433,7 +433,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <div className="flex justify-between text-xs text-zinc-400">
                   <span>Duties & Port Taxes</span>
                   <span className="text-amber-500 font-bold bg-amber-900/30 px-2 py-0.5 rounded border border-amber-500/30">
-                    FREE DHL Express
+                    FREE UPS Express
                   </span>
                 </div>
                 
@@ -467,8 +467,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               {paymentMethod === 'paypal' && (
                 <PayPalPaymentForm 
                   orderId={createdOrderId} 
-                  amount={effectiveDisplay}
-                  currency={currency} 
+                  amount={effectiveInr * 0.012}
+                  currency="USD" 
                   onSuccess={handlePaymentSuccess} 
                   onError={setError} 
                 />
