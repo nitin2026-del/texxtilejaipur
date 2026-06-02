@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
       }
 
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com';
       const request = new paypal.orders.OrdersCreateRequest();
       request.prefer("return=representation");
       request.requestBody({
@@ -63,13 +64,23 @@ export async function POST(req: NextRequest) {
           reference_id: orderId,
           amount: {
             currency_code: currency.toUpperCase(),
-            value: amount.toFixed(2),
+            value: Number(amount).toFixed(2),
           }
-        }]
+        }],
+        application_context: {
+          return_url: `${siteUrl}/dashboard?payment=success&order_id=${orderId}`,
+          cancel_url: `${siteUrl}/?payment=cancelled`,
+          brand_name: 'Textile Jaipur',
+          shipping_preference: 'NO_SHIPPING',
+          user_action: 'PAY_NOW'
+        }
       });
 
       const response = await client.execute(request);
       const createdPaypalOrderId = response.result.id;
+
+      // Get the approval URL so the frontend can redirect the user
+      const approvalUrl = response.result.links?.find((l: any) => l.rel === 'approve')?.href || '';
 
       // Update the order in Supabase with the PayPal order ID
       await supabaseAdmin
@@ -89,7 +100,7 @@ export async function POST(req: NextRequest) {
           raw_response: response.result,
         });
 
-      return NextResponse.json({ id: createdPaypalOrderId }, { status: 200 });
+      return NextResponse.json({ id: createdPaypalOrderId, approvalUrl }, { status: 200 });
     }
   } catch (error: any) {
     console.error('PayPal API Error:', error);
