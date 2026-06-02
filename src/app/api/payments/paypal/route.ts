@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import paypal from '@paypal/checkout-server-sdk';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize PayPal with SANDBOX credentials for testing
-// ⚠️ TESTING MODE — switch back to LiveEnvironment before going live
+// Initialize PayPal with LIVE credentials
 const clientId = process.env.PAYPAL_CLIENT_ID || '';
 const clientSecret = process.env.PAYPAL_CLIENT_SECRET || '';
-const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
+const environment = new paypal.core.LiveEnvironment(clientId, clientSecret);
 const client = new paypal.core.PayPalHttpClient(environment);
 
 const supabaseAdmin = createClient(
