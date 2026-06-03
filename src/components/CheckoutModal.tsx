@@ -49,6 +49,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const effectiveInr = useJaiCoins ? Math.max(0, getCartTotalInr() - JAI_COINS_VALUE_INR) : getCartTotalInr();
   const FX_RATES: Record<string, number> = { INR: 1, USD: 0.012 * 1.03, EUR: 0.011 * 1.03, GBP: 0.0095 * 1.03, AED: 0.044 * 1.03, AUD: 0.018 * 1.03 };
   const effectiveDisplay = effectiveInr * (FX_RATES[currency] || 0.012 * 1.03);
+  // PayPal always charges in USD — use the EXACT same rate CartContext uses for USD display
+  // This guarantees PayPal Amount = Total Charges (when displayed in USD)
+  const CART_USD_RATE = 0.012 * 1.03; // Must stay in sync with CartContext FX_RATES USD
+  const paypalUsdAmount = Number((effectiveInr * CART_USD_RATE).toFixed(2));
 
   // Set default shipping name if profile exists
   useEffect(() => {
@@ -467,7 +471,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               {paymentMethod === 'paypal' && (
                 <PayPalPaymentForm 
                   orderId={createdOrderId} 
-                  amount={effectiveDisplay}
+                  amount={paypalUsdAmount}
                   currency="USD" 
                   onSuccess={handlePaymentSuccess} 
                   onError={setError} 
