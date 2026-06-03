@@ -507,10 +507,10 @@ export default function Home() {
                     <span className="text-xs text-zinc-500 font-medium tracking-widest uppercase">{catProducts.length} items</span>
                   </div>
 
-                  {/* Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                    {visibleCatProducts.map((prod, i) => (
-                      <div key={prod.id} className={`${i % 3 === 1 ? 'lg:mt-16' : ''} ${i % 3 === 2 ? 'lg:-mt-8' : ''}`}>
+                  {/* Horizontal Scrolling Carousel */}
+                  <div className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar snap-x snap-mandatory">
+                    {visibleCatProducts.map((prod) => (
+                      <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0 snap-start">
                         <ProductCard product={prod} />
                       </div>
                     ))}
