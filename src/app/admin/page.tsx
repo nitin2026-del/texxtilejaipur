@@ -741,7 +741,7 @@ export default function AdminPortal() {
     setSelectedOrder(order);
     setTrackingNumberInput(order.tracking_number || '');
     setShipmentStatusInput(order.status === 'shipped' || order.status === 'delivered' ? order.status : 'pending');
-    setShippingProviderInput(order.shipping_provider || 'dhl');
+    setShippingProviderInput(order.shipping_provider || 'ups');
   };
 
   const handleUpdateShipmentSubmit = async (e: React.FormEvent) => {
@@ -1109,7 +1109,7 @@ export default function AdminPortal() {
                         <th className="p-4">Customer Details</th>
                         <th className="p-4">Destination</th>
                         <th className="p-4">Amount</th>
-                        <th className="p-4">DHL Status</th>
+                        <th className="p-4">UPS Status</th>
                         <th className="p-4 text-center">Fulfill</th>
                       </tr>
                     </thead>
@@ -1908,7 +1908,7 @@ export default function AdminPortal() {
 
             {/* Modal Header */}
             <div className="mb-6 border-b border-zinc-200/60 pb-4">
-              <h2 className="text-lg font-black tracking-tight">DHL Shipping Fulfillments</h2>
+              <h2 className="text-lg font-black tracking-tight">UPS Shipping Fulfillments</h2>
               <p className="text-zinc-500 text-[10px] mt-0.5">Assign courier dispatch parameters for order direct export.</p>
             </div>
 
@@ -1969,7 +1969,7 @@ export default function AdminPortal() {
                     onChange={(e) => setShippingProviderInput(e.target.value)}
                     className="w-full bg-white border border-zinc-200 rounded-xl py-2.5 px-3 text-xs text-zinc-900 focus:outline-none focus:border-violet-500"
                   >
-                    <option value="dhl">DHL</option>
+                    <option value="ups">UPS</option>
                   </select>
                 </div>
 

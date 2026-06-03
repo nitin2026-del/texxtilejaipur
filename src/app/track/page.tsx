@@ -81,7 +81,7 @@ export default function TrackOrderPage() {
                 onChange={(e) => setCarrier(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-gold transition-colors appearance-none"
               >
-                <option value="dhl">UPS Express</option>
+                <option value="ups">UPS Express</option>
               </select>
             </div>
 
