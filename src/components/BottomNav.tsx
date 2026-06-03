@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Home, Search, Heart, ShoppingBag, Menu } from 'lucide-react';
+import { Home, Search, Heart, ShoppingBag, AlignJustify } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 interface BottomNavProps {
@@ -22,10 +22,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onCartOpen, onMenuOpen }) 
       setWishlistCount(wl.length);
     } catch {}
 
-    // Listen for wishlist changes
     const onStorage = () => {
       try {
-        const wl = JSON.parse(localStorage.getItem('hiyawear_wishlist') || '[]');
+        const wl = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
         setWishlistCount(wl.length);
       } catch {}
     };
@@ -33,12 +32,23 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onCartOpen, onMenuOpen }) 
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
+  // Click the hamburger button in the Navbar to open the drawer
+  const handleMenuOpen = () => {
+    if (onMenuOpen) {
+      onMenuOpen();
+      return;
+    }
+    // Fallback: find and click the hamburger button in the top Navbar
+    const menuBtn = document.querySelector('[aria-label="Open Mobile Menu"]') as HTMLButtonElement;
+    if (menuBtn) menuBtn.click();
+  };
+
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },
     { href: '/#categories', icon: Search, label: 'Shop' },
     { href: '/wishlist', icon: Heart, label: 'Wishlist', badge: wishlistCount },
     { href: '#cart', icon: ShoppingBag, label: 'Cart', badge: cartCount, onClick: onCartOpen },
-    { href: '#menu', icon: Menu, label: 'Menu', onClick: onMenuOpen },
+    { href: '#menu', icon: AlignJustify, label: 'Menu', onClick: handleMenuOpen },
   ];
 
   return (

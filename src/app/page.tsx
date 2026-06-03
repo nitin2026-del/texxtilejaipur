@@ -302,7 +302,7 @@ export default function Home() {
           </h2>
           
           <p className="text-white/80 text-sm sm:text-lg max-w-xl leading-relaxed font-medium drop-shadow-lg border-l-2 border-brand-400 pl-4">
-            A premium curation of handcrafted vintage textiles, blockprints, and suzani masterpieces. Delivered worldwide with DHL Express shipping.
+            A premium curation of handcrafted vintage textiles, blockprints, and suzani masterpieces. Delivered worldwide with UPS Express shipping.
           </p>
 
           <div className="pt-8 flex flex-col sm:flex-row items-start gap-6">
@@ -316,12 +316,12 @@ export default function Home() {
       {/* Infinite Scrolling Marquee */}
       <div className="w-full bg-zinc-950 text-white overflow-hidden py-3 border-y border-zinc-800 relative z-20">
         <div className="whitespace-nowrap flex animate-marquee items-center text-xs font-bold tracking-widest uppercase opacity-90">
-          <span className="mx-8">✦ WORLDWIDE DHL SHIPPING</span>
+          <span className="mx-8">✦ WORLDWIDE UPS SHIPPING</span>
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
           <span className="mx-8">✦ PREMIUM EXPORT QUALITY</span>
           <span className="mx-8">✦ SUSTAINABLE LUXURY</span>
           <span className="mx-8">✦ EXOTIC BOHO CHIC</span>
-          <span className="mx-8">✦ WORLDWIDE DHL SHIPPING</span>
+          <span className="mx-8">✦ WORLDWIDE UPS SHIPPING</span>
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
           <span className="mx-8">✦ PREMIUM EXPORT QUALITY</span>
           <span className="mx-8">✦ SUSTAINABLE LUXURY</span>
@@ -569,7 +569,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-10 rounded-2xl bg-[#FDFBF7] border border-[#E5DFD3] shadow-sm">
           <div className="space-y-3">
             <Truck className="h-10 w-10 text-[#6B2A2A] mb-3" />
-            <h4 className="text-xl font-serif text-zinc-900 font-medium tracking-wide">Worldwide DHL Shipping</h4>
+            <h4 className="text-xl font-serif text-zinc-900 font-medium tracking-wide">Worldwide UPS Shipping</h4>
             <p className="text-sm text-zinc-600 leading-relaxed font-medium">
               We manage all port tariffs, customs clearances, and international logistic flows. Seamlessly shipped to the USA, Europe, Japan, Korea, and worldwide.
             </p>
