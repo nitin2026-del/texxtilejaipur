@@ -1,11 +1,23 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Package, MapPin, User, LogOut, ChevronRight, Truck, Edit2, Trash2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+
+// Separate component to safely use useSearchParams inside Suspense
+function PaymentSuccessHandler({ onSuccess }: { onSuccess: () => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get('payment') === 'success') {
+      onSuccess();
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, [searchParams, onSuccess]);
+  return null;
+}
 
 export default function Dashboard() {
   const { user, profile, loading: authLoading, signOut } = useAuth();
@@ -15,7 +27,6 @@ export default function Dashboard() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const searchParams = useSearchParams();
 
   // Tracking states
   const [trackingOrder, setTrackingOrder] = useState<any>(null);
@@ -30,16 +41,10 @@ export default function Dashboard() {
   const [editPhone, setEditPhone] = useState('');
   const [updateLoading, setUpdateLoading] = useState(false);
 
-  useEffect(() => {
-    // Check if PayPal just redirected back after successful payment
-    if (searchParams.get('payment') === 'success') {
-      setPaymentSuccess(true);
-      // Remove the query params from URL without reloading
-      window.history.replaceState({}, '', '/dashboard');
-      // Auto-hide after 8 seconds
-      setTimeout(() => setPaymentSuccess(false), 8000);
-    }
-  }, [searchParams]);
+  const handlePaymentSuccess = () => {
+    setPaymentSuccess(true);
+    setTimeout(() => setPaymentSuccess(false), 8000);
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -159,6 +164,10 @@ export default function Dashboard() {
       <Navbar onCartOpen={() => {}} />
 
       <div className="pt-32 px-6 max-w-7xl mx-auto">
+        {/* PaymentSuccessHandler inside Suspense - required by Next.js for useSearchParams */}
+        <Suspense fallback={null}>
+          <PaymentSuccessHandler onSuccess={handlePaymentSuccess} />
+        </Suspense>
         {/* PayPal Payment Success Banner */}
         {paymentSuccess && (
           <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 animate-pulse">
