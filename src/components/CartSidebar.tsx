@@ -149,7 +149,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   <div className="flex justify-between text-xs text-zinc-400">
                     <span>Duties & Taxes</span>
                     <span className="text-amber-500 font-bold bg-amber-900/30 px-2 py-0.5 rounded border border-amber-500/30">
-                      FREE DHL Express
+                      FREE UPS Express
                     </span>
                   </div>
                   

@@ -380,7 +380,7 @@ export default function ProductPage() {
                     <Truck className="h-4 w-4 text-gold shrink-0 mt-0.5" />
                     <div>
                       <h5 className="text-xs font-semibold text-zinc-900">Global Express Delivery</h5>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">Shipped with DHL Express.</p>
+                      <p className="text-[10px] text-zinc-500 mt-0.5">Shipped with UPS Express.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg border border-green-100">

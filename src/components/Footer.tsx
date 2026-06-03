@@ -6,7 +6,7 @@ import { Sparkles, MapPin, Mail, Phone, AtSign, Hash, Globe, ChevronDown, Chevro
 const FAQS = [
   {
     question: "Do you ship internationally?",
-    answer: "Yes, we offer DHL shipping to the USA, Europe, Australia, and most global destinations. Delivery times typically range from 5-10 business days."
+    answer: "Yes, we offer UPS shipping to the USA, Europe, Australia, and most global destinations. Delivery times typically range from 5-10 business days."
   },
   {
     question: "Are your garments truly handmade?",

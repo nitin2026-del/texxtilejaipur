@@ -206,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="text-brand-500">•</span>
-                          <span>Free Worldwide DHL Express Delivery</span>
+                          <span>Free Worldwide UPS Express Delivery</span>
                         </li>
                         {userTier === 'Gold' && (
                           <li className="flex items-start gap-2">

@@ -38,7 +38,7 @@ export default function TermsOfServicePage() {
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">4. Shipping and Duties</h2>
           <p>
-            For international orders, the customer is responsible for all customs duties, taxes, and fees associated with the importation of goods into their respective countries, unless specified as DHL Express at checkout.
+            For international orders, the customer is responsible for all customs duties, taxes, and fees associated with the importation of goods into their respective countries, unless specified as UPS Express at checkout.
           </p>
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">5. Governing Law</h2>

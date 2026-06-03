@@ -9,7 +9,7 @@ import { Search, Package, MapPin, Truck, ChevronRight, Loader2 } from 'lucide-re
 export default function TrackOrderPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState('');
-  const [carrier, setCarrier] = useState('dhl');
+  const [carrier, setCarrier] = useState('ups');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [trackingDetails, setTrackingDetails] = useState<any>(null);
@@ -81,7 +81,7 @@ export default function TrackOrderPage() {
                 onChange={(e) => setCarrier(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-gold transition-colors appearance-none"
               >
-                <option value="dhl">DHL Express</option>
+                <option value="dhl">UPS Express</option>
               </select>
             </div>
 

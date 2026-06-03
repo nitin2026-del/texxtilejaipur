@@ -140,7 +140,7 @@ export default function AdminPortal() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [trackingNumberInput, setTrackingNumberInput] = useState('');
   const [shipmentStatusInput, setShipmentStatusInput] = useState<'pending' | 'shipped' | 'delivered'>('pending');
-  const [shippingProviderInput, setShippingProviderInput] = useState('dhl');
+  const [shippingProviderInput, setShippingProviderInput] = useState('ups');
 
   // Form states (Add/Edit Product)
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
@@ -1065,7 +1065,7 @@ export default function AdminPortal() {
                 </div>
                 <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Pending Shipments</span>
                 <h4 className="text-2xl font-black tracking-tight text-zinc-900">{pendingShipmentsCount}</h4>
-                <p className="text-[10px] text-zinc-600">Awaiting DHL pickup & tracking ID</p>
+                <p className="text-[10px] text-zinc-600">Awaiting UPS pickup & tracking ID</p>
               </div>
 
               <div className="p-6 rounded-2xl glass-card border border-zinc-200 space-y-2 relative overflow-hidden">
