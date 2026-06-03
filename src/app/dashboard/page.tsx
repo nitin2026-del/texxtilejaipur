@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Package, MapPin, User, LogOut, ChevronRight, Truck, Edit2, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Dashboard() {
   const { user, profile, loading: authLoading, signOut } = useAuth();
@@ -14,6 +14,8 @@ export default function Dashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const searchParams = useSearchParams();
 
   // Tracking states
   const [trackingOrder, setTrackingOrder] = useState<any>(null);
@@ -27,6 +29,17 @@ export default function Dashboard() {
   const [editLastName, setEditLastName] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [updateLoading, setUpdateLoading] = useState(false);
+
+  useEffect(() => {
+    // Check if PayPal just redirected back after successful payment
+    if (searchParams.get('payment') === 'success') {
+      setPaymentSuccess(true);
+      // Remove the query params from URL without reloading
+      window.history.replaceState({}, '', '/dashboard');
+      // Auto-hide after 8 seconds
+      setTimeout(() => setPaymentSuccess(false), 8000);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -81,9 +94,9 @@ export default function Dashboard() {
   };
 
   const handleTrackShipment = async (order: any) => {
-    // Direct link to DHL Global tracking since no API key is available
+    // Direct link to UPS Global tracking since no API key is available
     if (order.tracking_number) {
-      window.open(`https://www.dhl.com/global-en/home/tracking.html?tracking-id=${order.tracking_number}`, '_blank');
+      window.open(`https://www.ups.com/global-en/home/tracking.html?tracking-id=${order.tracking_number}`, '_blank');
     }
   };
 
@@ -146,6 +159,16 @@ export default function Dashboard() {
       <Navbar onCartOpen={() => {}} />
 
       <div className="pt-32 px-6 max-w-7xl mx-auto">
+        {/* PayPal Payment Success Banner */}
+        {paymentSuccess && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 animate-pulse">
+            <span className="text-2xl">🎉</span>
+            <div>
+              <p className="font-bold text-green-800">Payment Successful!</p>
+              <p className="text-sm text-green-600">Thank you for your order. Your order is now being processed and you will receive a confirmation email shortly.</p>
+            </div>
+          </div>
+        )}
         <div className="mb-12 border-b border-zinc-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-serif font-medium text-zinc-900">My Account</h1>
