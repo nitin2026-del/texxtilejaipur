@@ -514,19 +514,20 @@ export default function Home() {
                         <ProductCard product={prod} />
                       </div>
                     ))}
+                    
+                    {/* Load More Button at the end of carousel */}
+                    {hasMoreProducts && (
+                      <div className="w-[280px] sm:w-[320px] shrink-0 snap-start flex items-center justify-center">
+                        <button
+                          onClick={() => handleLoadMore(catName)}
+                          className="px-8 py-6 border border-zinc-900 text-zinc-900 font-bold tracking-widest uppercase text-xs hover:bg-zinc-900 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col items-center gap-2"
+                        >
+                          <span>View More</span>
+                          <span className="text-[10px] text-zinc-500">{catProducts.length - visibleCatProducts.length} more items</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  
-                  {/* Load More Button */}
-                  {hasMoreProducts && (
-                    <div className="flex justify-center pt-8">
-                      <button
-                        onClick={() => handleLoadMore(catName)}
-                        className="px-8 py-4 md:py-3 border border-zinc-900 text-zinc-900 font-bold tracking-widest uppercase text-xs hover:bg-zinc-900 hover:text-white transition-all duration-300 w-full sm:w-auto shadow-sm hover:shadow-xl"
-                      >
-                        Load More {catName}
-                      </button>
-                    </div>
-                  )}
                 </div>
               );
             })}
