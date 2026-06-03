@@ -467,7 +467,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               {paymentMethod === 'paypal' && (
                 <PayPalPaymentForm 
                   orderId={createdOrderId} 
-                  amount={effectiveInr * 0.012}
+                  amount={effectiveDisplay}
                   currency="USD" 
                   onSuccess={handlePaymentSuccess} 
                   onError={setError} 
