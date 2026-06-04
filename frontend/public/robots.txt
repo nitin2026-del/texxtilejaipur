@@ -1,0 +1,9 @@
+# Robots.txt for IndiThread - Global Clothing Exporter
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /dashboard/
+
+Sitemap: https://indithread.com/sitemap.xml
