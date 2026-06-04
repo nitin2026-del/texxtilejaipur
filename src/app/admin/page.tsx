@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import imageCompression from 'browser-image-compression';
+import { v4 as uuidv4 } from 'uuid';
 import { 
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X
 } from 'lucide-react';
 
 interface Product {
@@ -114,6 +116,7 @@ export default function AdminPortal() {
   const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons'>('overview');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [imageUploadLoading, setImageUploadLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isBypassed, setIsBypassed] = useState(false);
@@ -500,6 +503,51 @@ export default function AdminPortal() {
   };
 
   // Product CRUD Handlers
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setImageUploadLoading(true);
+    
+    try {
+      const files = Array.from(e.target.files);
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
+        const options = {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1200,
+          useWebWorker: true,
+          fileType: 'image/webp'
+        };
+        const compressedFile = await imageCompression(file, options);
+        
+        const fileName = `${uuidv4()}.webp`;
+        const { error } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, compressedFile, { contentType: 'image/webp' });
+          
+        if (error) throw error;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+          
+        uploadedUrls.push(publicUrl);
+      }
+
+      const existingUrls = formImageUrl.split(',').map(u => u.trim()).filter(u => u);
+      const allUrls = [...existingUrls, ...uploadedUrls];
+      setFormImageUrl(allUrls.join(', '));
+      
+      showNotification(`Successfully uploaded ${uploadedUrls.length} image(s).`);
+    } catch (err: any) {
+      console.error('Upload Error:', err);
+      showNotification(err.message || 'Error uploading images', true);
+    } finally {
+      setImageUploadLoading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setActionLoading(true);
@@ -1451,14 +1499,52 @@ export default function AdminPortal() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Image URL</label>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <label className="block text-xs font-semibold text-zinc-600">Product Images</label>
+                  <label className="cursor-pointer px-3 py-1.5 bg-brand-50 text-brand-700 hover:bg-brand-100 border border-brand-200 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">
+                    {imageUploadLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <UploadCloud className="h-3 w-3" />}
+                    {imageUploadLoading ? 'Uploading & Compressing...' : 'Upload Photos'}
+                    <input 
+                      type="file" 
+                      multiple 
+                      accept="image/*" 
+                      onChange={handleImageUpload} 
+                      disabled={imageUploadLoading}
+                      className="hidden" 
+                    />
+                  </label>
+                </div>
+                
+                {/* Visual Image Preview (If URLs exist) */}
+                {formImageUrl.trim() && (
+                  <div className="flex flex-wrap gap-3 p-3 bg-zinc-50 border border-zinc-200 rounded-xl">
+                    {formImageUrl.split(',').map(u => u.trim()).filter(u => u).map((url, idx) => (
+                      <div key={idx} className="relative h-16 w-16 rounded-lg overflow-hidden border border-zinc-200 bg-white group">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="preview" className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newUrls = formImageUrl.split(',').map(u => u.trim()).filter(u => u);
+                            newUrls.splice(idx, 1);
+                            setFormImageUrl(newUrls.join(', '));
+                          }}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity transform scale-75"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
                 <input
                   type="text"
-                  placeholder="E.g., https://images.unsplash.com/... (Separated by comma for multiple)"
+                  placeholder="Or paste URLs separated by commas..."
                   value={formImageUrl}
                   onChange={(e) => setFormImageUrl(e.target.value)}
-                  className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                  className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500 font-mono"
                 />
               </div>
 
