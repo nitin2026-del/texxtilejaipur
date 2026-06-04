@@ -222,8 +222,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                         )}
                       </ul>
 
-                  )}
-                </div>
+                      <button
+                        onClick={() => setShowCoinsInfo(false)}
+                        className="w-full text-center text-[10px] text-zinc-500 hover:text-zinc-300 mt-1 transition-colors"
+                      >
+                        Close
+                      </button>
+                    </div>
                   )}
                 </div>
                 <a
@@ -262,14 +267,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
       <InfoModal
         isOpen={activeModal === 'about'}
         onClose={() => setActiveModal(null)}
-        title="About Hiyawear"
+        title="About Textile Jaipur"
         content={
           <div className="space-y-4">
-            <p>Hiyawear was born from a desire to bridge the gap between high-end luxury and everyday streetwear. We believe that premium aesthetics should be accessible and wearable.</p>
-            <p>Every piece is crafted with meticulous attention to detail, using ethically sourced materials and innovative manufacturing processes that respect both the environment and the artisans.</p>
+            <p>Textile Jaipur was born from a desire to bring India's finest handcrafted textiles to the world. We bridge the gap between Jaipur's legendary artisans and discerning customers globally who appreciate authentic craftsmanship.</p>
+            <p>Every piece is crafted with meticulous attention to detail, using ethically sourced materials and traditional techniques passed down through generations in Rajasthan.</p>
             <div className="mt-6 pt-6 border-t border-zinc-200">
               <h4 className="text-zinc-900 font-semibold mb-2">Our Mission</h4>
-              <p className="text-sm text-zinc-600">To redefine modern apparel through timeless design, uncompromising quality, and a commitment to golden standards.</p>
+              <p className="text-sm text-zinc-600">To redefine global fashion through timeless Indian design, uncompromising quality, and a commitment to preserving artisanal heritage.</p>
             </div>
           </div>
         }
@@ -320,7 +325,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
         <div className="flex items-center justify-between p-6 border-b border-zinc-900">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-gold" />
-            <h2 className="text-xl font-serif font-bold text-white">HIYA <span className="text-gold font-light">WEAR</span></h2>
+            <h2 className="text-xl font-serif font-bold text-white">TEXTILE <span className="text-gold font-light">JAIPUR</span></h2>
           </div>
           <button 
             onClick={() => setIsDrawerOpen(false)}

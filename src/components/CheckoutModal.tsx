@@ -54,18 +54,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const CART_USD_RATE = 0.012 * 1.03; // Must stay in sync with CartContext FX_RATES USD
   const paypalUsdAmount = Number((effectiveInr * CART_USD_RATE).toFixed(2));
 
-  // Set default shipping name if profile exists
+  // Reset createdOrderId and step on every open to avoid stale state (BUG-006)
   useEffect(() => {
-    if (user) {
-      setStep('shipping');
-      if (profile) {
-        setFullName(profile.full_name || '');
-        setPhone(profile.phone || '');
+    if (isOpen) {
+      setCreatedOrderId(null);
+      setError('');
+      if (user) {
+        setStep('shipping');
+        if (profile) {
+          setFullName(profile.full_name || '');
+          setPhone(profile.phone || '');
+        }
+      } else {
+        setStep('auth');
       }
-    } else {
-      setStep('auth');
     }
-  }, [user, profile, isOpen]);
+  }, [isOpen, user, profile]);
 
   if (!isOpen) return null;
 
@@ -493,7 +497,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               </div>
               <h3 className="text-xl font-bold text-white font-serif">Order Confirmed!</h3>
               <div className="text-xs text-zinc-400 space-y-1">
-                <p>Thank you for purchasing with Hiya Wear Export Store!</p>
+                <p>Thank you for purchasing with Textile Jaipur!</p>
                 <p className="mt-2 text-zinc-500">Order ID: <span className="font-mono text-zinc-300">{createdOrderId}</span></p>
                 <p className="text-zinc-500">Our Jaipur logistics hub has queued your shipment.</p>
               </div>

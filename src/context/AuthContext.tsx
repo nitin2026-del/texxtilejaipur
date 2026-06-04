@@ -52,25 +52,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (savedCoins) {
       setJaiCoinsState(parseInt(savedCoins, 10));
     } else {
-      localStorage.setItem('hiyawear_jaicoins', '500'); // default for demo
+      localStorage.setItem('textilejaipur_jaicoins', '500'); // default sign-up bonus
     }
 
-    const savedOrders = localStorage.getItem('hiyawear_order_count');
+    const savedOrders = localStorage.getItem('textilejaipur_order_count');
     if (savedOrders) {
       setOrderCountState(parseInt(savedOrders, 10));
     } else {
-      localStorage.setItem('hiyawear_order_count', '0');
+      localStorage.setItem('textilejaipur_order_count', '0');
     }
   }, []);
 
   const setJaiCoins = (coins: number) => {
     setJaiCoinsState(coins);
-    localStorage.setItem('hiyawear_jaicoins', coins.toString());
+    localStorage.setItem('textilejaipur_jaicoins', coins.toString());
   };
 
   const setOrderCount = (count: number) => {
     setOrderCountState(count);
-    localStorage.setItem('hiyawear_order_count', count.toString());
+    localStorage.setItem('textilejaipur_order_count', count.toString());
   };
 
   const userTier = orderCount >= 2 ? 'Platinum' : orderCount === 1 ? 'Gold' : 'Silver';

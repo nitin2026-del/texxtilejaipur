@@ -108,7 +108,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     // Check if user has a saved preference first
-    const savedCurrency = localStorage.getItem('hiyawear_currency') as Currency;
+    const savedCurrency = localStorage.getItem('textilejaipur_currency') as Currency;
     if (savedCurrency && FX_RATES[savedCurrency]) {
       setCurrencyState(savedCurrency);
     } else {
@@ -118,8 +118,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const saveCart = (newCart: CartItem[]) => {
     setCart(newCart);
-    localStorage.setItem('hiyawear_cart', JSON.stringify(newCart));
-    localStorage.setItem('hiyawear_cart_updated_at', Date.now().toString());
+    localStorage.setItem('textilejaipur_cart', JSON.stringify(newCart));
+    localStorage.setItem('textilejaipur_cart_updated_at', Date.now().toString());
   };
 
   const addToCart = (product: CartContextProduct, quantity = 1) => {
@@ -164,7 +164,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setCurrency = (curr: Currency) => {
     setCurrencyState(curr);
-    localStorage.setItem('hiyawear_currency', curr);
+    localStorage.setItem('textilejaipur_currency', curr);
   };
 
   const formatPrice = (priceInr: number) => {
@@ -204,7 +204,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const applyCoupon = (code: string) => {
-    const savedCoupons = localStorage.getItem('hiyawear_admin_coupons');
+    const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
     if (savedCoupons) {
       try {
         const coupons: Coupon[] = JSON.parse(savedCoupons);
