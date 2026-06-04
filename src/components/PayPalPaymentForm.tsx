@@ -17,10 +17,8 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
 }) => {
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
-
   const usdAmount = Number(amount.toFixed(2));
 
-  // Creates a PayPal order and redirects — no popup, works on ALL devices
   const handleRedirect = async (landingPage: 'LOGIN' | 'BILLING') => {
     const setLoading = landingPage === 'LOGIN' ? setPaypalLoading : setCardLoading;
     try {
@@ -31,12 +29,11 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
         body: JSON.stringify({ orderId, amount: usdAmount, currency: 'USD', landingPage }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create PayPal order');
-
+      if (!res.ok) throw new Error(data.error || 'Failed to create order');
       if (data.approvalUrl) {
-        window.location.href = data.approvalUrl; // Full redirect — no popup
+        window.location.href = data.approvalUrl;
       } else {
-        throw new Error('No PayPal approval URL received');
+        throw new Error('No approval URL received');
       }
     } catch (err: any) {
       setLoading(false);
@@ -45,9 +42,9 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
 
-      {/* Amount Display */}
+      {/* Amount */}
       <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-3 text-center">
         <p className="text-xs text-zinc-400 mb-1">Total Amount</p>
         <p className="text-sm font-bold text-white">
@@ -55,11 +52,11 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
         </p>
       </div>
 
-      {/* PayPal Account Button */}
+      {/* PayPal Button */}
       <button
         onClick={() => handleRedirect('LOGIN')}
         disabled={paypalLoading || cardLoading}
-        className="w-full py-3 rounded-xl font-bold text-zinc-900 text-sm flex items-center justify-center gap-3 transition-all disabled:opacity-60 active:scale-95"
+        className="w-full py-4 rounded-xl font-bold text-zinc-900 text-sm flex items-center justify-center gap-3 transition-all disabled:opacity-60 active:scale-95 shadow-lg"
         style={{ background: 'linear-gradient(135deg, #FFC439 0%, #F0A500 100%)' }}
       >
         {paypalLoading ? (
@@ -72,12 +69,11 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
           </>
         ) : (
           <>
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="22" viewBox="0 0 124 33">
-              <path fill="#003087" d="M46.2 6.8h-8.6c-.6 0-1.1.4-1.2 1l-3.5 22.2c-.1.4.2.8.6.8h4.5c.6 0 1.1-.4 1.2-1l1-6c.1-.6.6-1 1.2-1h2.7c5.6 0 8.8-2.7 9.7-8.1.4-2.4 0-4.2-1-5.5C51.4 7.5 49.2 6.8 46.2 6.8z"/>
-              <path fill="#009cde" d="M88.3 6.8h-8.6c-.6 0-1.1.4-1.2 1l-3.5 22.2c-.1.4.2.8.6.8h4.7c.4 0 .8-.3.8-.7l1-6.3c.1-.6.6-1 1.2-1h2.7c5.6 0 8.8-2.7 9.7-8.1.4-2.4 0-4.2-1-5.5C93.5 7.5 91.3 6.8 88.3 6.8z"/>
-              <path fill="#003087" d="M58.2 15.2c-.3 2-2 2-3.6 2h-.9l.6-4c0-.3.3-.5.6-.5h.4c1.1 0 2.1 0 2.6.6.4.4.5 1 .3 1.9zM56.9 6.8h-8.6c-.6 0-1.1.4-1.2 1l-3.5 22.2c-.1.4.2.8.6.8h4.1c.6 0 1.1-.4 1.2-1l.9-5.9c.1-.6.6-1 1.2-1h2.7c5.6 0 8.8-2.7 9.7-8.1.4-2.4 0-4.2-1-5.5-1.3-1.7-3.5-2.5-6.1-2.5z"/>
+            {/* PayPal Logo */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" width="80" height="26">
+              <text x="0" y="24" fontFamily="Arial" fontWeight="900" fontSize="26" fill="#003087">Pay</text>
+              <text x="42" y="24" fontFamily="Arial" fontWeight="900" fontSize="26" fill="#009cde">Pal</text>
             </svg>
-            Pay with PayPal
           </>
         )}
       </button>
@@ -85,15 +81,15 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       {/* Divider */}
       <div className="flex items-center gap-2">
         <div className="flex-1 h-px bg-zinc-700" />
-        <span className="text-xs text-zinc-500">or pay with card</span>
+        <span className="text-[10px] text-zinc-500 uppercase tracking-widest">or</span>
         <div className="flex-1 h-px bg-zinc-700" />
       </div>
 
-      {/* Debit / Credit Card Button */}
+      {/* Card Button */}
       <button
         onClick={() => handleRedirect('BILLING')}
         disabled={paypalLoading || cardLoading}
-        className="w-full py-3 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-3 transition-all disabled:opacity-60 active:scale-95 border border-zinc-600 bg-zinc-800 hover:bg-zinc-700"
+        className="w-full py-4 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-3 transition-all disabled:opacity-60 active:scale-95 border border-zinc-600 bg-zinc-800 hover:bg-zinc-700 shadow"
       >
         {cardLoading ? (
           <>
@@ -101,7 +97,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            Redirecting to Card Payment...
+            Loading...
           </>
         ) : (
           <>
@@ -115,42 +111,42 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
         )}
       </button>
 
-      {/* Accepted Cards */}
-      <div className="border border-zinc-700 rounded-xl p-3 bg-zinc-800/30">
-        <p className="text-center text-[10px] text-zinc-500 uppercase tracking-widest mb-3">We Accept</p>
-        <div className="flex items-center justify-center gap-2 flex-wrap">
+      {/* Accepted Cards Row */}
+      <div className="border border-zinc-700/60 rounded-xl p-3 bg-zinc-800/20">
+        <p className="text-center text-[10px] text-zinc-500 uppercase tracking-widest mb-2">We Accept</p>
+        <div className="flex items-center justify-center gap-2">
 
           {/* Visa */}
-          <div className="bg-white rounded-md px-2 py-1 flex items-center justify-center" style={{ width: 54, height: 34 }}>
-            <svg viewBox="0 0 780 500" xmlns="http://www.w3.org/2000/svg" width="46">
+          <div className="bg-white rounded-md flex items-center justify-center" style={{ width: 52, height: 32 }}>
+            <svg viewBox="0 0 780 500" xmlns="http://www.w3.org/2000/svg" width="44">
               <path d="M293.2 348.7L323.3 151h51.4L344.6 348.7H293.2z" fill="#00579F"/>
               <path d="M524.3 154.9c-10.2-3.8-26.1-7.9-46.1-7.9-50.8 0-86.6 25.6-86.9 62.3-.3 27.1 25.6 42.2 45.1 51.2 20 9.2 26.7 15.1 26.6 23.3-.1 12.6-16 18.3-30.7 18.3-20.5 0-31.4-2.8-48.2-9.8l-6.6-3-7.2 42.1c12 5.2 34 9.8 56.9 10 53.7 0 88.6-25.3 89-64.3.2-21.4-13.5-37.7-43.2-51.1-18-8.7-29-14.5-28.9-23.3 0-7.8 9.3-16.2 29.5-16.2 16.8-.3 29 3.3 38.5 7l4.6 2.2 7-40.8" fill="#00579F"/>
-              <path d="M616.3 151h-39.7c-12.3 0-21.5 3.4-26.9 15.6l-76.3 182.1h53.9l10.8-28.2 65.7.1c1.5 6.6 6.2 28.1 6.2 28.1h47.6L616.3 151zm-63.1 128.2l20.4-52.7 6.8-17.8 3.4 16.1 11.8 54.4h-42.4z" fill="#00579F"/>
+              <path d="M616.3 151h-39.7c-12.3 0-21.5 3.4-26.9 15.6l-76.3 182.1h53.9l10.8-28.2 65.7.1 6.2 28.1h47.6L616.3 151zm-63.1 128.2l20.4-52.7 6.8-17.8 3.4 16.1 11.8 54.4h-42.4z" fill="#00579F"/>
               <path d="M232.8 151l-50.3 135-5.4-25.9c-9.3-30.1-38.4-62.7-70.9-79L153 348.5l54.3-.1 80.9-197.4h-55.4" fill="#00579F"/>
               <path d="M138.8 151H57.5l-.7 3.7c63.1 15.3 104.9 52.3 122.2 96.8L161.5 167c-3-11.9-11.8-15.5-22.7-16" fill="#FAA61A"/>
             </svg>
           </div>
 
           {/* Mastercard */}
-          <div className="bg-white rounded-md px-2 py-1 flex items-center justify-center" style={{ width: 54, height: 34 }}>
-            <svg viewBox="0 0 131.39 86.9" xmlns="http://www.w3.org/2000/svg" width="42">
+          <div className="bg-white rounded-md flex items-center justify-center" style={{ width: 52, height: 32 }}>
+            <svg viewBox="0 0 131.39 86.9" xmlns="http://www.w3.org/2000/svg" width="40">
               <circle cx="48.37" cy="43.45" r="27.23" fill="#EB001B"/>
               <circle cx="83.02" cy="43.45" r="27.23" fill="#F79E1B"/>
               <path d="M65.7 19.76a27.22 27.22 0 0 1 0 47.38 27.22 27.22 0 0 1 0-47.38z" fill="#FF5F00"/>
             </svg>
           </div>
 
-          {/* American Express */}
-          <div className="rounded-md flex items-center justify-center overflow-hidden" style={{ width: 54, height: 34, background: '#2E77BC' }}>
-            <svg viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg" width="46">
-              <path d="M185.6 181.5H130l-25.2 54.8-25.4-54.8H24l-.1 107.8 46.2.1 .1-80.8 29.8 62.5h30.3l29.6-63.3.1 81.6h46l-.4-107.9zM243.3 181.5l-48.5 107.8h50.5l7.7-18.3h57l7.5 18.3h52.3l-48.4-107.8h-78.1zm18.9 72.1l17.5-41.3 17.4 41.3h-34.9z" fill="white"/>
+          {/* Amex */}
+          <div className="rounded-md flex items-center justify-center" style={{ width: 52, height: 32, background: '#2E77BC' }}>
+            <svg viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg" width="44">
+              <path d="M185.6 181.5H130l-25.2 54.8-25.4-54.8H24l-.1 107.8 46.2.1.1-80.8 29.8 62.5h30.3l29.6-63.3.1 81.6h46l-.4-107.9zM243.3 181.5l-48.5 107.8h50.5l7.7-18.3h57l7.5 18.3h52.3l-48.4-107.8h-78.1zm18.9 72.1l17.5-41.3 17.4 41.3h-34.9z" fill="white"/>
               <path d="M510 181.5v107.8h120.7c26.5 0 44.3-14.1 44.3-37.3 0-15.5-9.3-27.2-25.3-31.9 12.7-4.9 20.3-15.4 20.3-28.7 0-20-16.3-9.9-159.9-9.9zm45.9 35.5h61.4c8.6 0 13 3.7 13 10.1 0 6.4-4.5 10.2-13.3 10.2h-61.1v-20.3zm0 51.3v-21.5h63.4c9.7 0 14.5 4.1 14.5 11.2 0 6.7-4.9 10.3-13.8 10.3h-64.1z" fill="white"/>
             </svg>
           </div>
 
           {/* Discover */}
-          <div className="bg-white rounded-md px-2 py-1 flex items-center justify-center overflow-hidden" style={{ width: 54, height: 34 }}>
-            <svg viewBox="0 0 780 500" xmlns="http://www.w3.org/2000/svg" width="46">
+          <div className="bg-white rounded-md flex items-center justify-center" style={{ width: 52, height: 32 }}>
+            <svg viewBox="0 0 780 500" xmlns="http://www.w3.org/2000/svg" width="44">
               <path d="M510 250c0 63.5-51.5 115-115 115s-115-51.5-115-115 51.5-115 115-115 115 51.5 115 115z" fill="#F76F20"/>
               <path d="M36 180h60c58 0 98 36 98 90s-40 90-98 90H36V180zm55 145c38 0 63-22 63-55s-25-55-63-55H78v110h13zM208 180h43v180h-43zM261 270c0-55 43-95 99-95 16 0 30 3 44 10v50c-11-13-26-21-44-21-33 0-56 24-56 56s23 56 57 56c17 0 32-7 43-21v50c-14 8-28 11-45 11-55 0-98-40-98-96z" fill="#221F1F"/>
             </svg>
@@ -160,7 +156,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
         <p className="text-center text-[9px] text-zinc-600 mt-2">All major credit &amp; debit cards accepted</p>
       </div>
 
-      {/* Security Badge */}
+      {/* Security */}
       <p className="text-center text-[10px] text-zinc-500">
         🔒 Secured by PayPal · 256-bit SSL encryption
       </p>
