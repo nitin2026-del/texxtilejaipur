@@ -41,16 +41,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     e.preventDefault();
     e.stopPropagation();
     try {
-      const wl: string[] = JSON.parse(localStorage.getItem('hiyawear_wishlist') || '[]');
+      const wl: string[] = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
       const updated = wishlisted
         ? wl.filter((id) => id !== product.id)
         : [...wl, product.id];
-      localStorage.setItem('hiyawear_wishlist', JSON.stringify(updated));
+      localStorage.setItem('textilejaipur_wishlist', JSON.stringify(updated));
       // Store full product data for wishlist page
-      const wlProducts: Record<string, Product> = JSON.parse(localStorage.getItem('hiyawear_wishlist_products') || '{}');
+      const wlProducts: Record<string, Product> = JSON.parse(localStorage.getItem('textilejaipur_wishlist_products') || '{}');
       if (!wishlisted) wlProducts[product.id] = product;
       else delete wlProducts[product.id];
-      localStorage.setItem('hiyawear_wishlist_products', JSON.stringify(wlProducts));
+      localStorage.setItem('textilejaipur_wishlist_products', JSON.stringify(wlProducts));
       setWishlisted(!wishlisted);
     } catch {}
   };
@@ -68,12 +68,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Track recently viewed
   useEffect(() => {
     try {
-      const rv: string[] = JSON.parse(localStorage.getItem('hiyawear_recently_viewed') || '[]');
+      const rv: string[] = JSON.parse(localStorage.getItem('textilejaipur_recently_viewed') || '[]');
       const updated = [product.id, ...rv.filter((id) => id !== product.id)].slice(0, 10);
-      localStorage.setItem('hiyawear_recently_viewed', JSON.stringify(updated));
-      const rvProducts: Record<string, Product> = JSON.parse(localStorage.getItem('hiyawear_rv_products') || '{}');
+      localStorage.setItem('textilejaipur_recently_viewed', JSON.stringify(updated));
+      const rvProducts: Record<string, Product> = JSON.parse(localStorage.getItem('textilejaipur_rv_products') || '{}');
       rvProducts[product.id] = product;
-      localStorage.setItem('hiyawear_rv_products', JSON.stringify(rvProducts));
+      localStorage.setItem('textilejaipur_rv_products', JSON.stringify(rvProducts));
     } catch {}
   }, [product.id]);
 

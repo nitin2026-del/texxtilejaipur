@@ -63,6 +63,7 @@ export default function Dashboard() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Tracking states
   const [trackingOrder, setTrackingOrder] = useState<any>(null);
@@ -79,6 +80,7 @@ export default function Dashboard() {
 
   const handlePaymentSuccess = () => {
     setPaymentSuccess(true);
+    setRefreshTrigger((prev) => prev + 1);
     setTimeout(() => setPaymentSuccess(false), 8000);
   };
 
@@ -101,7 +103,9 @@ export default function Dashboard() {
               *,
               products (
                 name,
-                images
+                product_images (
+                  url
+                )
               )
             )
           `)
@@ -127,7 +131,7 @@ export default function Dashboard() {
     };
 
     fetchDashboardData();
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, refreshTrigger]);
 
   const handleLogout = async () => {
     await signOut();
@@ -358,12 +362,22 @@ export default function Dashboard() {
                       </div>
                       
                       <div className="flex items-center gap-2">
+                        {/* Payment Status Pill */}
+                        <span className={`px-2.5 py-1 rounded text-[10px] font-semibold uppercase tracking-wider ${
+                          order.payment_status === 'paid' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                          order.payment_status === 'failed' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
+                          'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                        }`}>
+                          {order.payment_status === 'paid' ? 'Paid' : 'Unpaid'}
+                        </span>
+
+                        {/* Fulfillment Status Pill */}
                         <span className={`px-2.5 py-1 rounded text-[10px] font-semibold uppercase tracking-wider ${
                           order.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
                           order.status === 'shipped' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
-                          'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                          'bg-zinc-500/10 text-zinc-500 border border-zinc-500/20'
                         }`}>
-                          {order.status}
+                          {order.status === 'pending' ? 'Processing' : order.status}
                         </span>
                       </div>
                     </div>
@@ -374,7 +388,7 @@ export default function Dashboard() {
                           <div className="h-16 w-16 bg-zinc-100 rounded overflow-hidden shrink-0 border border-zinc-200">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img 
-                              src={item.products?.images?.[0] || 'https://via.placeholder.com/64'} 
+                              src={item.products?.product_images?.[0]?.url || 'https://via.placeholder.com/64'} 
                               alt={item.product_name}
                               className="w-full h-full object-cover"
                             />

@@ -11,6 +11,9 @@ const environment = isSandbox
   : new paypal.core.LiveEnvironment(clientId, clientSecret);
 const client = new paypal.core.PayPalHttpClient(environment);
 
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.warn('CRITICAL: SUPABASE_SERVICE_ROLE_KEY is missing! Falling back to anon key.');
+}
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
@@ -38,17 +41,26 @@ export async function POST(req: NextRequest) {
       }
 
       // Update the order payment status in Supabase to paid
-      await supabaseAdmin
+      const { error: orderError } = await supabaseAdmin
         .from('orders')
         .update({ payment_status: 'paid' })
         .eq('id', orderId);
+        
+      if (orderError) {
+        throw new Error(`Failed to update order status: ${orderError.message}`);
+      }
 
       // Update payment record in payments table
-      await supabaseAdmin
+      const { error: paymentError } = await supabaseAdmin
         .from('payments')
         .update({ status: 'succeeded', raw_response: response.result })
         .eq('order_id', orderId)
         .eq('gateway', 'paypal');
+        
+      if (paymentError) {
+        console.error('Failed to update payments table:', paymentError);
+        // We don't throw here because the main order was marked as paid, but we log it.
+      }
 
       return NextResponse.json({ success: true, status }, { status: 200 });
     } else {

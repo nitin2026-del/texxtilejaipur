@@ -56,13 +56,13 @@ export default function ProductPage() {
   const toggleWishlist = () => {
     if (!product) return;
     try {
-      const wl: string[] = JSON.parse(localStorage.getItem('hiyawear_wishlist') || '[]');
+      const wl: string[] = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
       const updated = wishlisted ? wl.filter((id) => id !== product.id) : [...wl, product.id];
-      localStorage.setItem('hiyawear_wishlist', JSON.stringify(updated));
-      const wlProducts: Record<string, unknown> = JSON.parse(localStorage.getItem('hiyawear_wishlist_products') || '{}');
+      localStorage.setItem('textilejaipur_wishlist', JSON.stringify(updated));
+      const wlProducts: Record<string, unknown> = JSON.parse(localStorage.getItem('textilejaipur_wishlist_products') || '{}');
       if (!wishlisted) wlProducts[product.id] = product;
       else delete wlProducts[product.id];
-      localStorage.setItem('hiyawear_wishlist_products', JSON.stringify(wlProducts));
+      localStorage.setItem('textilejaipur_wishlist_products', JSON.stringify(wlProducts));
       setWishlisted(!wishlisted);
     } catch {}
   };
@@ -352,7 +352,7 @@ export default function ProductPage() {
                       <button
                         onClick={handleBuyNow}
                         disabled={product.stock_quantity === 0}
-                        className="flex-1 h-14 md:h-12 rounded font-bold text-zinc-900 bg-brand-700 hover:bg-brand-800 border border-brand-700 flex items-center justify-center gap-2 shadow-lg transition-all disabled:opacity-50"
+                        className="flex-1 h-14 md:h-12 rounded font-bold text-white bg-brand-700 hover:bg-brand-800 border border-brand-700 flex items-center justify-center gap-2 shadow-lg transition-all disabled:opacity-50"
                       >
                         Buy Now
                       </button>
