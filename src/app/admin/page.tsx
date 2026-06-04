@@ -8,7 +8,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown
 } from 'lucide-react';
 
 interface Product {
@@ -131,7 +131,7 @@ export default function AdminPortal() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [dbCategories, setDbCategories] = useState<string[]>(CATEGORIES);
-  const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null}[]>([]);
+  const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null, display_order?: number}[]>([]);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryParentId, setNewCategoryParentId] = useState<string>('');
@@ -248,6 +248,43 @@ export default function AdminPortal() {
     }
   };
 
+  const handleMoveCategory = async (catObj: any, direction: 'up' | 'down') => {
+    const siblings = dbCategoryObjects
+      .filter(c => c.parent_id === catObj.parent_id)
+      .sort((a, b) => ((a.display_order || 0) - (b.display_order || 0)) || a.name.localeCompare(b.name));
+    
+    const currentIndex = siblings.findIndex(c => c.id === catObj.id);
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    
+    if (targetIndex < 0 || targetIndex >= siblings.length) return;
+    
+    const newSiblings = [...siblings];
+    const temp = newSiblings[currentIndex];
+    newSiblings[currentIndex] = newSiblings[targetIndex];
+    newSiblings[targetIndex] = temp;
+    
+    setActionLoading(true);
+    
+    const updatedCategories = dbCategoryObjects.map(c => {
+      const siblingIndex = newSiblings.findIndex(s => s.id === c.id);
+      if (siblingIndex !== -1 && c.parent_id === catObj.parent_id) {
+        return { ...c, display_order: siblingIndex };
+      }
+      return c;
+    });
+    
+    // Also sort the updatedCategories so they immediately reflect in the UI correctly
+    updatedCategories.sort((a, b) => ((a.display_order || 0) - (b.display_order || 0)) || a.name.localeCompare(b.name));
+    setDbCategoryObjects(updatedCategories);
+
+    const updates = newSiblings.map((s, idx) => {
+      return supabase.from('categories').update({ display_order: idx }).eq('id', s.id);
+    });
+    
+    await Promise.all(updates);
+    setActionLoading(false);
+  };
+
   const handleDeleteCategory = async (categoryToDelete?: string) => {
     const target = categoryToDelete || formCategory;
     if (!target) return;
@@ -340,7 +377,8 @@ export default function AdminPortal() {
       // 1.5 Fetch Categories from DB
       const { data: catData, error: catErr } = await supabase
         .from('categories')
-        .select('id, name, parent_id')
+        .select('id, name, parent_id, display_order')
+        .order('display_order', { ascending: true })
         .order('name', { ascending: true });
       if (!catErr && catData) {
         setDbCategoryObjects(catData);
@@ -1604,13 +1642,31 @@ export default function AdminPortal() {
                             </span>
                           </td>
                           <td className="p-4 text-center">
-                            <button
-                              onClick={() => handleDeleteCategory(catObj.name)}
-                              disabled={actionLoading}
-                              className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-red-950/20 hover:border-red-900/30 text-red-400/80 hover:text-red-400 transition-colors text-[11px] font-medium disabled:opacity-50"
-                            >
-                              Delete Category
-                            </button>
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => handleMoveCategory(catObj, 'up')}
+                                disabled={actionLoading}
+                                className="p-2 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-violet-950/20 hover:border-violet-900/30 text-zinc-500 hover:text-brand-600 transition-colors disabled:opacity-50"
+                                title="Move Up"
+                              >
+                                <ChevronUp className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleMoveCategory(catObj, 'down')}
+                                disabled={actionLoading}
+                                className="p-2 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-violet-950/20 hover:border-violet-900/30 text-zinc-500 hover:text-brand-600 transition-colors disabled:opacity-50"
+                                title="Move Down"
+                              >
+                                <ChevronDown className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCategory(catObj.name)}
+                                disabled={actionLoading}
+                                className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-red-950/20 hover:border-red-900/30 text-red-400/80 hover:text-red-400 transition-colors text-[11px] font-medium disabled:opacity-50"
+                              >
+                                Delete Category
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
