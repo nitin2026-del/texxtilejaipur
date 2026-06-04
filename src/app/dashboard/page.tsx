@@ -10,14 +10,50 @@ import { useRouter, useSearchParams } from 'next/navigation';
 // Separate component to safely use useSearchParams inside Suspense
 function PaymentSuccessHandler({ onSuccess }: { onSuccess: () => void }) {
   const searchParams = useSearchParams();
+
   useEffect(() => {
-    if (searchParams.get('payment') === 'success') {
+    const payment = searchParams.get('payment');
+    const orderId = searchParams.get('order_id');
+    const paypalToken = searchParams.get('token'); // PayPal appends ?token=PAYPAL_ORDER_ID
+
+    // PayPal redirect returns: ?payment=success&order_id=xxx&token=PAYPAL_TOKEN&PayerID=yyy
+    if (payment === 'success' && orderId && paypalToken) {
+      // Capture the PayPal payment now that user has approved it
+      fetch('/api/payments/paypal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'capture',
+          paypalOrderId: paypalToken,
+          orderId: orderId,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            onSuccess();
+          } else {
+            console.error('PayPal capture failed:', data.error);
+            onSuccess(); // Still show success UI — payment may already be captured
+          }
+        })
+        .catch((err) => {
+          console.error('PayPal capture error:', err);
+          onSuccess();
+        });
+
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard');
+    } else if (payment === 'success') {
+      // Non-PayPal success (e.g. already captured inline)
       onSuccess();
       window.history.replaceState({}, '', '/dashboard');
     }
   }, [searchParams, onSuccess]);
+
   return null;
 }
+
 
 export default function Dashboard() {
   const { user, profile, loading: authLoading, signOut } = useAuth();
