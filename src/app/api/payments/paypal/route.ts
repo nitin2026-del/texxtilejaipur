@@ -16,7 +16,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, paypalOrderId, orderId, amount, currency } = body;
+    const { action, paypalOrderId, orderId, amount, currency, landingPage } = body;
 
     if (action === 'capture') {
       if (!paypalOrderId || !orderId) {
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
           brand_name: 'Textile Jaipur',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'PAY_NOW',
-          landing_page: 'LOGIN'   // ← Forces PayPal account login screen (not card/guest)
+          landing_page: landingPage === 'BILLING' ? 'BILLING' : 'LOGIN'
         }
       });
 
