@@ -71,7 +71,8 @@ export async function POST(req: NextRequest) {
           cancel_url: `${siteUrl}/?payment=cancelled`,
           brand_name: 'Textile Jaipur',
           shipping_preference: 'NO_SHIPPING',
-          user_action: 'PAY_NOW'
+          user_action: 'PAY_NOW',
+          landing_page: 'LOGIN'   // ← Forces PayPal account login screen (not card/guest)
         }
       });
 
