@@ -288,7 +288,7 @@ export default function Home() {
             loading="eager"
             fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
         </div>
 
         <div className="relative z-10 px-5 sm:px-12 md:px-24 max-w-7xl mx-auto w-full pb-12 sm:pb-0 sm:pt-20 animate-slide-up">
