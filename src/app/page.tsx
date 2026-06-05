@@ -302,7 +302,7 @@ export default function Home() {
           </h2>
           
           <p className="text-white/80 text-sm sm:text-lg max-w-xl leading-relaxed font-medium drop-shadow-lg border-l-2 border-brand-400 pl-4">
-            Handcrafted by master artisans in Jaipur for 400+ years. Every piece ships to the USA, Europe &amp; South America via UPS Express — fully tracked, duty-managed, and guaranteed.
+            Handcrafted by master artisans in Jaipur for 400+ years. Every piece ships anywhere in the world via UPS Express — fully tracked, duty-managed, and guaranteed.
           </p>
 
           <div className="pt-8 flex flex-col sm:flex-row items-start gap-6">
@@ -324,14 +324,14 @@ export default function Home() {
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
           <span className="mx-8">✦ 14-DAY MONEY BACK GUARANTEE</span>
           <span className="mx-8">✦ TRUSTED BY 3,200+ BUYERS</span>
-          <span className="mx-8">✦ SHIPS TO USA · EU · UK · LATAM</span>
+          <span className="mx-8">✦ WE SHIP TO EVERY COUNTRY</span>
           <span className="mx-8">✦ SECURE PAYPAL CHECKOUT</span>
           <span className="mx-8">✦ 400+ YEARS OF CRAFT HERITAGE</span>
           <span className="mx-8">✦ FREE UPS EXPRESS WORLDWIDE</span>
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
           <span className="mx-8">✦ 14-DAY MONEY BACK GUARANTEE</span>
           <span className="mx-8">✦ TRUSTED BY 3,200+ BUYERS</span>
-          <span className="mx-8">✦ SHIPS TO USA · EU · UK · LATAM</span>
+          <span className="mx-8">✦ WE SHIP TO EVERY COUNTRY</span>
         </div>
       </div>
 
@@ -578,7 +578,7 @@ export default function Home() {
             <Truck className="h-10 w-10 text-[#6B2A2A] mb-3" />
             <h4 className="text-xl font-serif text-zinc-900 font-medium tracking-wide">Worldwide UPS Shipping</h4>
             <p className="text-sm text-zinc-600 leading-relaxed font-medium">
-              We manage all port tariffs, customs clearances, and international logistic flows. Seamlessly shipped to the USA, Europe, Japan, Korea, and worldwide.
+              We manage all port tariffs, customs clearances, and international logistic flows. Seamlessly shipped to any country in the world with full tracking and care.
             </p>
           </div>
           <div className="space-y-3 border-t md:border-t-0 md:border-l border-[#E5DFD3] pt-6 md:pt-0 md:pl-10">
@@ -663,7 +663,7 @@ export default function Home() {
       {/* Press Mentions & Trust Stats */}
       <section className="w-full bg-zinc-950 py-14">
         <div className="px-6 max-w-7xl mx-auto">
-          <p className="text-center text-zinc-500 text-xs font-bold tracking-[0.3em] uppercase mb-8">Trusted by Buyers in 30+ Countries — USA · UK · France · Germany · Brazil · Australia</p>
+          <p className="text-center text-zinc-500 text-xs font-bold tracking-[0.3em] uppercase mb-8">Trusted by Buyers in 30+ Countries Worldwide</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
             {[
               { number: '3,200+', label: 'Happy Customers Worldwide', icon: '🌍' },
@@ -752,7 +752,7 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: '🚀', title: 'UPS Express — Delivered Fast', desc: 'All orders ship via UPS Express Worldwide. Average delivery: 5–8 business days to USA, 4–6 to Europe, 7–10 to South America. Full tracking included.' },
+              { icon: '🚀', title: 'UPS Express — Delivered Worldwide', desc: 'All orders ship via UPS Express Worldwide. Fast, fully tracked delivery to every country on the globe. Full tracking number provided on dispatch.' },
               { icon: '🔒', title: 'Secure & Trusted Payments', desc: 'Pay by Visa, Mastercard, Amex or PayPal. All transactions are 256-bit SSL encrypted and PayPal buyer-protected. No hidden fees.' },
               { icon: '🤝', title: '14-Day No-Questions Returns', desc: 'Not happy? Return your item within 14 days for a full refund — no questions asked. We want you to love every piece you order.' },
               { icon: '🛃', title: 'We Handle All Customs & Duties', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork and customs declarations. You receive the package — we handle the rest.' },
