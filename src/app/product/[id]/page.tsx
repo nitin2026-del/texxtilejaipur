@@ -196,9 +196,8 @@ export default function ProductPage() {
                 />
                 
                 {/* Brand Logo Overlay */}
-                <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm border border-white/40">
-                  <img src="/icon.png" alt="Texxtile Jaipur" className="h-5 w-5 rounded object-cover" />
-                  <span className="text-[10px] font-bold text-zinc-900 tracking-widest uppercase">Texxtile Jaipur</span>
+                <div className="absolute top-4 right-4 z-10 opacity-90 drop-shadow-md">
+                  <img src="/icon.png" alt="Texxtile Jaipur" className="h-10 w-10 rounded-lg object-cover border border-white/30 shadow-lg" />
                 </div>
               </div>
               {product.images && product.images.length > 1 && (

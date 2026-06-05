@@ -95,14 +95,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        {/* Top-left: Brand Logo Overlay */}
-        <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-md shadow-sm border border-white/40">
-          <img src="/icon.png" alt="Texxtile Jaipur" className="h-4 w-4 rounded-sm object-cover" />
-          <span className="text-[8px] font-bold text-zinc-900 tracking-widest uppercase">Texxtile Jaipur</span>
+        {/* Top-right: Brand Logo Overlay */}
+        <div className="absolute top-4 right-4 z-20 opacity-90 drop-shadow-md">
+          <img src="/icon.png" alt="Texxtile Jaipur" className="h-7 w-7 rounded-md object-cover border border-white/30 shadow-lg" />
         </div>
 
         {/* Top-left: Badges */}
-        <div className="absolute top-12 left-3 flex flex-col items-start gap-2 z-10">
+        <div className="absolute top-4 left-4 flex flex-col items-start gap-2 z-10">
           {product.is_featured && (
             <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800 animate-pulse">
               New Arrival
@@ -113,8 +112,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </span>
         </div>
 
-        {/* Top-right: Wishlist + Share buttons */}
-        <div className="absolute top-3 right-3 flex flex-col gap-2 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+        {/* Right-side: Wishlist + Share buttons */}
+        <div className="absolute top-14 right-4 flex flex-col gap-2 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
           <button
             onClick={toggleWishlist}
             className={`p-2 rounded-full shadow-md backdrop-blur-sm transition-all duration-200 ${
