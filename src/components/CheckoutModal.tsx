@@ -51,12 +51,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
   // Compute effective totals accounting for JaiCoins
   const effectiveInr = useJaiCoins ? Math.max(0, getCartTotalInr() - JAI_COINS_VALUE_INR) : getCartTotalInr();
-  const FX_RATES: Record<string, number> = { INR: 1, USD: 0.012 * 1.03, EUR: 0.011 * 1.03, GBP: 0.0095 * 1.03, AED: 0.044 * 1.03, AUD: 0.018 * 1.03 };
-  const effectiveDisplay = effectiveInr * (FX_RATES[currency] || 0.012 * 1.03);
-  // PayPal always charges in USD — use the EXACT same rate CartContext uses for USD display
-  // This guarantees PayPal Amount = Total Charges (when displayed in USD)
-  const CART_USD_RATE = 0.012 * 1.03; // Must stay in sync with CartContext FX_RATES USD
-  const paypalUsdAmount = Number((effectiveInr * CART_USD_RATE).toFixed(2));
+  // PayPal always charges in USD — 1 INR = 0.012 USD with 3% markup (kept in sync with CartContext)
+  const USD_RATE = 0.012 * 1.03;
+  const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
+  // Display total in user's chosen currency (uses CartContext FX_RATES directly)
+  const effectiveDisplay = effectiveInr * (effectiveInr > 0 ? (getCartTotalDisplay() / Math.max(getCartTotalInr(), 1)) : USD_RATE);
 
   // Reset createdOrderId and step on every open to avoid stale state (BUG-006)
   useEffect(() => {

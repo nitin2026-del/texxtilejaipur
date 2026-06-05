@@ -13,6 +13,8 @@ interface PayPalPaymentFormProps {
 export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
   orderId,
   amount,
+  currency,
+  onSuccess,
   onError,
 }) => {
   const [paypalLoading, setPaypalLoading] = useState(false);

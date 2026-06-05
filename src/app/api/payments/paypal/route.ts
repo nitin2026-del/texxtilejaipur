@@ -29,15 +29,28 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Missing required parameters for capture' }, { status: 400 });
       }
 
-      // Capture the PayPal order
-      const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
-      request.requestBody({});
-      const response = await client.execute(request);
+      let captureStatus = '';
+      try {
+        // Capture the PayPal order
+        const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
+        request.requestBody({});
+        const response = await client.execute(request);
+        captureStatus = response.result.status;
+      } catch (captureError: any) {
+        // If already captured (back button / duplicate request), treat as success
+        const isAlreadyCaptured =
+          captureError?.statusCode === 422 ||
+          JSON.stringify(captureError).includes('ORDER_ALREADY_CAPTURED');
+        if (isAlreadyCaptured) {
+          captureStatus = 'COMPLETED'; // Already captured — order is paid
+        } else {
+          throw captureError; // Real error — re-throw
+        }
+      }
 
       // Check if capture was successful
-      const status = response.result.status;
-      if (status !== 'COMPLETED') {
-        throw new Error(`PayPal payment not completed: ${status}`);
+      if (captureStatus !== 'COMPLETED') {
+        throw new Error(`PayPal payment not completed: ${captureStatus}`);
       }
 
       // Update the order payment status in Supabase to paid
@@ -59,10 +72,10 @@ export async function POST(req: NextRequest) {
         
       if (paymentError) {
         console.error('Failed to update payments table:', paymentError);
-        // We don't throw here because the main order was marked as paid, but we log it.
+        // Don't throw — main order is already marked paid
       }
 
-      return NextResponse.json({ success: true, status }, { status: 200 });
+      return NextResponse.json({ success: true, status: captureStatus }, { status: 200 });
     } else {
       // Default: Create PayPal Order
       if (!orderId || !amount || !currency) {
