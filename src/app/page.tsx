@@ -292,28 +292,48 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
         </div>
 
-        <div className="relative z-10 px-5 sm:px-12 md:px-24 max-w-7xl mx-auto w-full pb-12 sm:pb-0 sm:pt-20 animate-slide-up">
-          <div className="inline-flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/90 text-[10px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2 font-bold tracking-widest uppercase border border-white/20 mb-4">
-            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-brand-400" />
-            ★★★★★ &nbsp;Rated 4.9/5 by 3,200+ Global Buyers
+        <div className="relative z-10 w-full h-full flex flex-col justify-between px-5 sm:px-12 md:px-24 max-w-7xl mx-auto pt-4 pb-10 sm:pb-0 sm:pt-20 animate-slide-up">
+          
+          {/* Brand logo — fills the blank upper area on mobile */}
+          <div className="flex flex-col items-center justify-center flex-1 sm:hidden">
+            <div className="flex flex-col items-center gap-3">
+              <img
+                src="/icon.png"
+                alt="Texxtile Jaipur"
+                className="h-20 w-20 rounded-2xl shadow-2xl border-2 border-white/20 object-cover"
+              />
+              <div className="text-center">
+                <p className="text-white font-serif text-2xl font-bold tracking-wider drop-shadow-lg">TEXXTILE</p>
+                <p className="text-brand-300 text-xs font-bold tracking-[0.4em] uppercase">JAIPUR</p>
+              </div>
+              <p className="text-white/50 text-[10px] tracking-widest uppercase font-medium">Est. Since Centuries · Jaipur, India</p>
+            </div>
           </div>
-          
-          <h2 className="text-[2.6rem] sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1.05] text-white drop-shadow-2xl max-w-4xl mb-4">
-            Modern <br />
-            <span className="font-light italic text-brand-200">Bohemian</span> Luxe.
-          </h2>
-          
-          <p className="text-white/80 text-xs sm:text-lg max-w-xs sm:max-w-xl leading-relaxed font-medium drop-shadow-lg border-l-2 border-brand-400 pl-3 sm:pl-4 mb-6">
-            Handcrafted by master artisans in Jaipur for 400+ years. Delivered anywhere in the world — fully tracked &amp; guaranteed.
-          </p>
 
-          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-6">
-            <a href="#categories" className="px-8 py-3 sm:px-10 sm:py-4 bg-white text-zinc-950 hover:bg-brand-50 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-xl">
-              Explore Collection
-            </a>
-            <div className="flex items-center gap-2 text-white/60 text-[10px] sm:text-xs font-medium">
-              <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 shrink-0" />
-              <span>Secure Payments &bull; 14-Day Returns &bull; Free UPS Express</span>
+          {/* Bottom content — rating badge, headline, CTA */}
+          <div className="space-y-3 sm:space-y-6 sm:mt-0">
+            <div className="inline-flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/90 text-[10px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2 font-bold tracking-widest uppercase border border-white/20">
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-brand-400" />
+              ★★★★★ &nbsp;Rated 4.9/5 by 3,200+ Global Buyers
+            </div>
+            
+            <h2 className="text-[2.6rem] sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1.05] text-white drop-shadow-2xl max-w-4xl">
+              Modern <br />
+              <span className="font-light italic text-brand-200">Bohemian</span> Luxe.
+            </h2>
+            
+            <p className="text-white/80 text-xs sm:text-lg max-w-xs sm:max-w-xl leading-relaxed font-medium drop-shadow-lg border-l-2 border-brand-400 pl-3 sm:pl-4">
+              Handcrafted by master artisans in Jaipur for 400+ years. Delivered anywhere in the world — fully tracked &amp; guaranteed.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-6 pt-1">
+              <a href="#categories" className="px-8 py-3 sm:px-10 sm:py-4 bg-white text-zinc-950 hover:bg-brand-50 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-xl">
+                Explore Collection
+              </a>
+              <div className="flex items-center gap-2 text-white/60 text-[10px] sm:text-xs font-medium">
+                <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 shrink-0" />
+                <span>Secure Payments &bull; 14-Day Returns &bull; Free UPS Express</span>
+              </div>
             </div>
           </div>
         </div>
