@@ -241,10 +241,9 @@ export default function ProductPage() {
                     {product.name}
                   </h1>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-gold">
-                      <Star className="h-4 w-4 fill-gold" />
-                      <span className="font-semibold text-zinc-900 text-sm">4.9</span>
-                      <span className="text-zinc-500 text-sm">(124 Reviews)</span>
+                    <div className="flex items-center gap-1 text-zinc-400">
+                      <Star className="h-4 w-4 fill-zinc-200 text-zinc-200" />
+                      <span className="text-sm">No reviews yet</span>
                     </div>
                     {/* Wishlist + Share actions */}
                     <div className="flex items-center gap-2">
@@ -533,12 +532,12 @@ export default function ProductPage() {
                   Customer Reviews
                 </h3>
                 <div className="flex items-end gap-3 mb-6">
-                  <span className="text-5xl font-serif font-bold text-zinc-900">4.9</span>
+                  <span className="text-5xl font-serif font-bold text-zinc-300">0.0</span>
                   <div className="pb-1">
-                    <div className="flex text-brand-600 mb-1">
-                      {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-brand-600" />)}
+                    <div className="flex text-zinc-200 mb-1">
+                      {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-zinc-200 text-zinc-200" />)}
                     </div>
-                    <p className="text-xs text-zinc-500">Based on 124 reviews</p>
+                    <p className="text-xs text-zinc-400">No reviews yet</p>
                   </div>
                 </div>
                 {!showReviewForm ? (
@@ -587,40 +586,11 @@ export default function ProductPage() {
                   </div>
                 )}
               </div>
-              <div className="w-full md:w-2/3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {[
-                    { name: 'Priya M.', date: 'Oct 12, 2023', text: 'Absolutely in love with the quality! The hand block printing is so intricate and the fabric is incredibly soft. Fast shipping to the UK too.', img: 'https://images.unsplash.com/photo-1583391733959-b158b4f177c9?w=400&q=80' },
-                    { name: 'Sarah L.', date: 'Sep 28, 2023', text: 'Got so many compliments wearing this. The colors are vibrant and true to the pictures. Will definitely buy more from this store.', img: 'https://images.unsplash.com/photo-1583391733975-13b3d2c88f17?w=400&q=80' },
-                    { name: 'Ananya S.', date: 'Sep 15, 2023', text: 'Beautiful craftsmanship. You can really tell it is authentic handloom. Customer service was also very helpful with sizing.', img: null },
-                    { name: 'Elena V.', date: 'Aug 30, 2023', text: 'Stunning piece! The material is lightweight and perfect for summer. Fits exactly as described.', img: 'https://images.unsplash.com/photo-1583391265517-35bbd697f353?w=400&q=80' },
-                  ].map((review, i) => (
-                    <div key={i} className="bg-white border border-zinc-100 p-5 rounded-2xl shadow-sm">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <div className="flex text-brand-600 mb-1">
-                            {[...Array(5)].map((_, j) => <Star key={j} className="h-3 w-3 fill-brand-600" />)}
-                          </div>
-                          <p className="font-bold text-zinc-900 text-sm">{review.name}</p>
-                          <p className="text-[10px] text-zinc-400">{review.date}</p>
-                        </div>
-                        <span className="flex items-center gap-1 text-[9px] font-bold text-green-700 bg-green-50 px-2 py-1 rounded text-uppercase tracking-widest">
-                          <Check className="h-2.5 w-2.5" /> Verified
-                        </span>
-                      </div>
-                      <p className="text-sm text-zinc-600 mb-4">{review.text}</p>
-                      {review.img && (
-                        <div className="w-full h-32 rounded-lg overflow-hidden bg-zinc-100">
-                          <img src={review.img} alt="Customer photo" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-8 text-center">
-                  <button className="text-brand-700 font-bold text-sm hover:underline">
-                    Load More Reviews
-                  </button>
+              <div className="w-full md:w-2/3 flex items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 h-full min-h-[300px]">
+                <div className="text-center">
+                  <Star className="h-10 w-10 text-zinc-300 mx-auto mb-3" />
+                  <p className="font-bold text-zinc-700 text-lg">No reviews yet</p>
+                  <p className="text-sm text-zinc-500 mt-1">Be the first to share your experience!</p>
                 </div>
               </div>
             </div>
