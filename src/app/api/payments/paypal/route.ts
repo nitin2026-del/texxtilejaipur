@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       // Update payment record in payments table
       const { error: paymentError } = await supabaseAdmin
         .from('payments')
-        .update({ status: 'succeeded', raw_response: response.result })
+        .update({ status: 'succeeded' })
         .eq('order_id', orderId)
         .eq('gateway', 'paypal');
         
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         application_context: {
           return_url: `${siteUrl}/dashboard?payment=success&order_id=${orderId}`,
           cancel_url: `${siteUrl}/?payment=cancelled`,
-          brand_name: 'Textile Jaipur',
+          brand_name: 'Texxtile Jaipur',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'PAY_NOW',
           landing_page: landingPage === 'BILLING' ? 'BILLING' : 'LOGIN'
