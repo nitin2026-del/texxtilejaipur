@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Home, Search, Heart, ShoppingBag, AlignJustify } from 'lucide-react';
+import { Home, Search, Heart, ShoppingBag, AlignJustify, Truck } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 interface BottomNavProps {
@@ -48,7 +48,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onCartOpen, onMenuOpen }) 
     { href: '/#categories', icon: Search, label: 'Shop' },
     { href: '/wishlist', icon: Heart, label: 'Wishlist', badge: wishlistCount },
     { href: '#cart', icon: ShoppingBag, label: 'Cart', badge: cartCount, onClick: onCartOpen },
-    { href: '#menu', icon: AlignJustify, label: 'Menu', onClick: handleMenuOpen },
+    { href: '/track', icon: Truck, label: 'Track' },
   ];
 
   return (
