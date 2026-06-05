@@ -76,7 +76,7 @@ function PaymentCaptureHandler() {
       <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-2">
         If this page takes too long, don’t worry —{' '}
         <a href="mailto:support@textilejaipur.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
-        <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>.
+        <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>.
         We will confirm your payment and order from our side.
       </p>
     </div>
@@ -93,7 +93,7 @@ export default function PaymentSuccessPage() {
         <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-4">
           Having trouble?{' '}
           <a href="mailto:support@textilejaipur.com" className="text-amber-600 underline">Email us</a>{' '}or{' '}
-          <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>
+          <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>
           {' '}— we handle all issues from our side.
         </p>
       </div>
