@@ -292,31 +292,26 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
         </div>
 
-        <div className="relative z-10 w-full h-full flex flex-col justify-between px-5 sm:px-12 md:px-24 max-w-7xl mx-auto pt-4 pb-10 sm:pb-0 sm:pt-20 animate-slide-up">
+        <div className="relative z-10 w-full h-full flex flex-col justify-between px-5 sm:px-12 md:px-24 max-w-7xl mx-auto pt-20 pb-10 sm:pb-0 sm:pt-28 animate-slide-up">
           
-          {/* Brand logo — fills the blank upper area on mobile */}
+          {/* Brand logo — visible in upper area on mobile, properly below navbar */}
           <div className="flex flex-col items-center justify-center flex-1 sm:hidden">
             <div className="flex flex-col items-center gap-3">
               <img
                 src="/icon.png"
                 alt="Texxtile Jaipur"
-                className="h-20 w-20 rounded-2xl shadow-2xl border-2 border-white/20 object-cover"
+                className="h-24 w-24 rounded-2xl shadow-2xl border-2 border-white/30 object-cover"
               />
               <div className="text-center">
-                <p className="text-white font-serif text-2xl font-bold tracking-wider drop-shadow-lg">TEXXTILE</p>
-                <p className="text-brand-300 text-xs font-bold tracking-[0.4em] uppercase">JAIPUR</p>
+                <p className="text-white font-serif text-3xl font-bold tracking-wider drop-shadow-lg">TEXXTILE</p>
+                <p className="text-brand-300 text-sm font-bold tracking-[0.4em] uppercase mt-0.5">JAIPUR</p>
               </div>
               <p className="text-white/50 text-[10px] tracking-widest uppercase font-medium">Est. Since Centuries · Jaipur, India</p>
             </div>
           </div>
 
-          {/* Bottom content — rating badge, headline, CTA */}
+          {/* Bottom content — headline & CTA */}
           <div className="space-y-3 sm:space-y-6 sm:mt-0">
-            <div className="inline-flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/90 text-[10px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2 font-bold tracking-widest uppercase border border-white/20">
-              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-brand-400" />
-              ★★★★★ &nbsp;Rated 4.9/5 by 3,200+ Global Buyers
-            </div>
-            
             <h2 className="text-[2.6rem] sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1.05] text-white drop-shadow-2xl max-w-4xl">
               Modern <br />
               <span className="font-light italic text-brand-200">Bohemian</span> Luxe.
@@ -699,68 +694,6 @@ export default function Home() {
                 <span className="text-xs text-zinc-400 mt-1 font-medium">{stat.label}</span>
               </div>
             ))}
-          </div>
-
-          {/* Customer Testimonials */}
-          <div className="border-t border-zinc-800 pt-12">
-            <p className="text-center text-zinc-400 text-xs font-bold tracking-[0.3em] uppercase mb-8">What Our Customers Say</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  name: 'Sophie L.',
-                  location: '🇫🇷 Paris, France',
-                  review: 'The embroidered jacket is absolutely stunning — even better in person. Arrived in just 5 days via UPS! I get compliments every single time I wear it. Will definitely order again.',
-                  rating: 5,
-                  product: 'Vintage Suzani Jacket'
-                },
-                {
-                  name: 'Maria G.',
-                  location: '🇺🇸 New York, USA',
-                  review: 'I was skeptical ordering from India but this store is incredibly professional. The packaging was luxurious, tracking was perfect, and the Boho dress is beyond beautiful. Zero issues with customs.',
-                  rating: 5,
-                  product: 'Boho Mirror Dress'
-                },
-                {
-                  name: 'Valentina R.',
-                  location: '🇧🇷 São Paulo, Brazil',
-                  review: 'Comprei um vestido incrível! Chegou em perfeito estado, embalagem linda e qualidade artesanal única. O atendimento foi excelente e o frete foi rápido. Recomendo muito!',
-                  rating: 5,
-                  product: 'Block Print Maxi Dress'
-                },
-                {
-                  name: 'Emma T.',
-                  location: '🇬🇧 London, UK',
-                  review: 'Ordered three pieces for a festival. The quality is outstanding — clearly handmade with tremendous care. The Banarasi silk feels like something from a high-end boutique. Shipping was swift.',
-                  rating: 5,
-                  product: 'Banarasi Silk Set'
-                },
-                {
-                  name: 'Klaus M.',
-                  location: '🇩🇪 Berlin, Germany',
-                  review: 'Exceptional quality, fair prices, fast international shipping. The craftsmanship is on another level compared to what you find in local stores. I ordered the embroidered jacket and it fits perfectly.',
-                  rating: 5,
-                  product: 'Hand-Embroidered Jacket'
-                },
-                {
-                  name: 'Isabella C.',
-                  location: '🇦🇺 Sydney, Australia',
-                  review: 'Found this store through Instagram and so glad I did. Absolutely genuine handmade quality. The block print fabric is unlike anything I have seen in Australia. Customs was handled perfectly.',
-                  rating: 5,
-                  product: 'Block Print Kurta'
-                },
-              ].map((t) => (
-                <div key={t.name} className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col gap-3">
-                  <div className="flex text-amber-400 text-sm gap-0.5">
-                    {'★'.repeat(t.rating)}
-                  </div>
-                  <p className="text-zinc-300 text-sm leading-relaxed italic">&ldquo;{t.review}&rdquo;</p>
-                  <div className="pt-2 border-t border-white/10">
-                    <p className="text-white text-xs font-bold">{t.name} <span className="text-zinc-500 font-normal">· {t.location}</span></p>
-                    <p className="text-zinc-500 text-[10px] mt-0.5">Purchased: {t.product}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
