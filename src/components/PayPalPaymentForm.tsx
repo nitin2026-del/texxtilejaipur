@@ -60,7 +60,12 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create order');
       if (data.approvalUrl) {
-        window.location.href = data.approvalUrl;
+        // Force the card view if BILLING is requested, bypassing PayPal's smart cookie detection
+        const url = new URL(data.approvalUrl);
+        if (landingPage === 'BILLING') {
+          url.searchParams.append('fundingSource', 'card');
+        }
+        window.location.href = url.toString();
       } else {
         throw new Error('No approval URL received');
       }
