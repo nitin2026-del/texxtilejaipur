@@ -48,12 +48,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [orderCount, setOrderCountState] = useState<number>(0);
 
   useEffect(() => {
+    // Only load/init JaiCoins from localStorage — guests start at 0
     const savedCoins = localStorage.getItem('textilejaipur_jaicoins');
-    if (savedCoins) {
+    if (savedCoins !== null) {
       setJaiCoinsState(parseInt(savedCoins, 10));
-    } else {
-      localStorage.setItem('textilejaipur_jaicoins', '500'); // default sign-up bonus
     }
+    // Note: 500 welcome bonus is only given on first real login (handled in onAuthStateChange)
 
     const savedOrders = localStorage.getItem('textilejaipur_order_count');
     if (savedOrders) {

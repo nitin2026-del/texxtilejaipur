@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Create the order
-    const orderNumber = 'HW-' + Math.floor(100000 + Math.random() * 900000);
+    const orderNumber = 'TJ-' + Math.floor(100000 + Math.random() * 900000);
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
       .insert({
@@ -93,7 +93,10 @@ export async function POST(req: NextRequest) {
         order_number: orderNumber,
         total: total_inr,
         subtotal: total_inr,
-        status: 'pending'
+        display_currency: display_currency || 'USD',
+        total_display: total_display_currency || null,
+        status: 'pending',
+        payment_status: 'unpaid',
       })
       .select('id')
       .single();

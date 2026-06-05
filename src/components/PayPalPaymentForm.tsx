@@ -62,6 +62,27 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
     }
   };
 
+  if (paypalLoading || cardLoading) {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6">
+        <div className="animate-spin h-12 w-12 border-4 border-amber-500 border-t-transparent rounded-full" />
+        <div className="text-center">
+          <p className="text-zinc-800 font-bold text-base">Confirming your payment…</p>
+          <p className="text-zinc-500 text-sm mt-1">Please do not close or refresh this page</p>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-zinc-400 border border-zinc-200 rounded-full px-4 py-2 bg-white">
+          🔒 Secured by PayPal · 256-bit SSL
+        </div>
+        <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed">
+          If this page takes too long, don’t worry —{' '}
+          <a href="mailto:support@textilejaipur.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
+          <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>.
+          We will confirm your payment and order from our side.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
 
@@ -180,6 +201,13 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       {/* Security */}
       <p className="text-center text-[10px] text-zinc-500">
         🔒 Secured by PayPal · 256-bit SSL encryption
+      </p>
+      {/* Support */}
+      <p className="text-center text-[10px] text-zinc-400 leading-relaxed">
+        Payment issue?{' '}
+        <a href="mailto:support@textilejaipur.com" className="text-amber-500 underline underline-offset-2">Email us</a>{' '}or{' '}
+        <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-green-500 underline underline-offset-2">WhatsApp</a>
+        {' '}— we’ll resolve it from our side.
       </p>
     </div>
   );

@@ -65,6 +65,12 @@ function PaymentCaptureHandler() {
       <div className="flex items-center gap-2 text-xs text-zinc-400 border border-zinc-200 rounded-full px-4 py-2 bg-white">
         🔒 Secured by PayPal · 256-bit SSL
       </div>
+      <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-2">
+        If this page takes too long, don’t worry —{' '}
+        <a href="mailto:support@textilejaipur.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
+        <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>.
+        We will confirm your payment and order from our side.
+      </p>
     </div>
   );
 }
@@ -76,6 +82,12 @@ export default function PaymentSuccessPage() {
         <div className="animate-spin h-12 w-12 border-4 border-amber-500 border-t-transparent rounded-full" />
         <p className="text-zinc-700 font-semibold text-sm">Processing payment…</p>
         <p className="text-zinc-400 text-xs">Please do not close this page</p>
+        <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-4">
+          Having trouble?{' '}
+          <a href="mailto:support@textilejaipur.com" className="text-amber-600 underline">Email us</a>{' '}or{' '}
+          <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>
+          {' '}— we handle all issues from our side.
+        </p>
       </div>
     }>
       <PaymentCaptureHandler />
