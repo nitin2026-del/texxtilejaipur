@@ -44,6 +44,14 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
     const setLoading = landingPage === 'LOGIN' ? setPaypalLoading : setCardLoading;
     try {
       setLoading(true);
+
+      // Save JaiCoins info to localStorage so the return URL can deduct them after PayPal capture
+      const coinsUsed = amount === 0 ? 0 : (localStorage.getItem('temp_jaicoins_used') || '0');
+      const coinsEarned = localStorage.getItem('temp_jaicoins_earned') || '0';
+      localStorage.setItem('pending_order_id', orderId);
+      localStorage.setItem('pending_jaicoins_used', coinsUsed);
+      localStorage.setItem('pending_jaicoins_earned', coinsEarned);
+
       const res = await fetch('/api/payments/paypal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

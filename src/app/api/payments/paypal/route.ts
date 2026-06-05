@@ -22,7 +22,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, paypalOrderId, orderId, amount, currency, landingPage } = body;
+    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned } = body;
 
     if (action === 'capture') {
       if (!paypalOrderId || !orderId) {
@@ -54,13 +54,24 @@ export async function POST(req: NextRequest) {
       }
 
       // Update the order payment status in Supabase to paid
-      const { error: orderError } = await supabaseAdmin
+      const { data: order, error: orderError } = await supabaseAdmin
         .from('orders')
         .update({ payment_status: 'paid' })
-        .eq('id', orderId);
+        .eq('id', orderId)
+        .select('user_id')
+        .single();
         
       if (orderError) {
         throw new Error(`Failed to update order status: ${orderError.message}`);
+      }
+
+      // Deduct JaiCoins from user profile if applicable
+      if (order?.user_id && (coinsUsed > 0 || coinsEarned > 0)) {
+        const { data: profile } = await supabaseAdmin.from('profiles').select('jai_coins').eq('id', order.user_id).single();
+        if (profile) {
+          const newBalance = Math.max(0, profile.jai_coins - (coinsUsed || 0)) + (coinsEarned || 0);
+          await supabaseAdmin.from('profiles').update({ jai_coins: newBalance }).eq('id', order.user_id);
+        }
       }
 
       // Update payment record in payments table

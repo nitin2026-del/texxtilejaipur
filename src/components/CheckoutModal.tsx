@@ -163,27 +163,29 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   };
 
   const handlePaymentSuccess = async (orderId: string) => {
-    // Credit JaiCoins earned (5% of order value)
+    // Free order handling - securely process via backend
     const coinsEarned = Math.round(getCartTotalInr() * 0.05);
     const coinsUsed = useJaiCoins ? JAI_COINS_VALUE_INR : 0;
-    const newBalance = Math.max(0, jaiCoins - coinsUsed) + coinsEarned;
     
-    // Persist new JaiCoins balance to Supabase (BUG-3 fix)
-    if (user) {
-      try {
-        await supabase
-          .from('profiles')
-          .update({ jai_coins: newBalance })
-          .eq('id', user.id);
-      } catch (e) {
-        console.error('Failed to persist JaiCoins balance:', e);
-      }
+    setLoading(true);
+    try {
+      await fetch('/api/payments/free-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, coinsUsed, coinsEarned })
+      });
+      // Update local context
+      const newBalance = Math.max(0, jaiCoins - coinsUsed) + coinsEarned;
+      setJaiCoins(newBalance);
+      
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+      setStep('success');
+      clearCart();
+    } catch(err) {
+      setError("Failed to confirm free order. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    
-    setJaiCoins(newBalance);
-    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-    setStep('success');
-    clearCart();
   };
 
   return (
@@ -524,15 +526,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
 
 
-              {paymentMethod === 'paypal' && (
-                <PayPalPaymentForm 
-                  orderId={createdOrderId} 
-                  amount={paypalUsdAmount}
-                  currency="USD" 
-                  onSuccess={handlePaymentSuccess} 
-                  onError={setError} 
-                />
-              )}
+              {paymentMethod === 'paypal' && (() => {
+                // Save temp state for PayPal redirect to read
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('temp_jaicoins_used', useJaiCoins ? JAI_COINS_VALUE_INR.toString() : '0');
+                  localStorage.setItem('temp_jaicoins_earned', Math.round(getCartTotalInr() * 0.05).toString());
+                }
+                return (
+                  <PayPalPaymentForm 
+                    orderId={createdOrderId} 
+                    amount={paypalUsdAmount}
+                    currency="USD" 
+                    onSuccess={handlePaymentSuccess} 
+                    onError={setError} 
+                  />
+                );
+              })()}
 
               {/* Payment help */}
               <div className="mt-4 space-y-2">
