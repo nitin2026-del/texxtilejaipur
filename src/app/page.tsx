@@ -279,15 +279,16 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative w-full h-[72vh] sm:h-screen min-h-[500px] sm:min-h-[700px] flex flex-col justify-end sm:justify-center overflow-hidden">
-        {/* Background — dark fallback so it never shows grey */}
-        <div className="absolute inset-0 z-0 bg-zinc-900">
-          <img 
-            src="https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=1200&auto=format&fit=crop" 
-            alt="Artisanal Indian Textiles" 
-            className="w-full h-full object-cover object-top animate-slow-zoom"
-            loading="eager"
-            fetchPriority="high"
-          />
+        {/* Background — CSS bg-image loads more reliably on mobile than img tag */}
+        <div
+          className="absolute inset-0 z-0 animate-slow-zoom"
+          style={{
+            backgroundColor: '#2C1810',
+            backgroundImage: 'url(https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=75&w=800&auto=format&fit=crop)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'top center',
+          }}
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
         </div>
 
