@@ -95,8 +95,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+        {/* Top-left: Brand Logo Overlay */}
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-md shadow-sm border border-white/40">
+          <img src="/icon.png" alt="Texxtile Jaipur" className="h-4 w-4 rounded-sm object-cover" />
+          <span className="text-[8px] font-bold text-zinc-900 tracking-widest uppercase">Texxtile Jaipur</span>
+        </div>
+
         {/* Top-left: Badges */}
-        <div className="absolute top-4 left-4 flex flex-col items-start gap-2 z-10">
+        <div className="absolute top-12 left-3 flex flex-col items-start gap-2 z-10">
           {product.is_featured && (
             <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800 animate-pulse">
               New Arrival
