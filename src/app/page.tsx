@@ -277,40 +277,41 @@ export default function Home() {
       {/* Navigation */}
       <Navbar onCartOpen={() => setCartOpen(true)} />
 
-      {/* 100vh Editorial Hero Section */}
-      <section className="relative w-full h-screen min-h-[700px] flex flex-col justify-center overflow-hidden">
-        {/* Background Image with Slow Zoom & Contrast Overlay */}
-        <div className="absolute inset-0 z-0">
+      {/* Hero Section */}
+      <section className="relative w-full h-[72vh] sm:h-screen min-h-[500px] sm:min-h-[700px] flex flex-col justify-end sm:justify-center overflow-hidden">
+        {/* Background — dark fallback so it never shows grey */}
+        <div className="absolute inset-0 z-0 bg-zinc-900">
           <img 
-            src="https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=2600&auto=format&fit=crop" 
+            src="https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=1200&auto=format&fit=crop" 
             alt="Artisanal Indian Textiles" 
             className="w-full h-full object-cover object-top animate-slow-zoom"
+            loading="eager"
+            fetchPriority="high"
           />
-          {/* Heavy gradients to ensure text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
         </div>
 
-        <div className="relative z-10 px-6 sm:px-12 md:px-24 max-w-7xl mx-auto w-full pt-20 animate-slide-up space-y-6">
-          <div className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 text-xs px-4 py-2 font-bold tracking-widest uppercase border border-white/20">
-            <Sparkles className="h-4 w-4 text-brand-400" />
+        <div className="relative z-10 px-5 sm:px-12 md:px-24 max-w-7xl mx-auto w-full pb-12 sm:pb-0 sm:pt-20 animate-slide-up">
+          <div className="inline-flex items-center gap-1.5 bg-black/50 backdrop-blur-md text-white/90 text-[10px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2 font-bold tracking-widest uppercase border border-white/20 mb-4">
+            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-brand-400" />
             ★★★★★ &nbsp;Rated 4.9/5 by 3,200+ Global Buyers
           </div>
           
-          <h2 className="text-5xl sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1] text-white drop-shadow-2xl max-w-4xl">
+          <h2 className="text-[2.6rem] sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1.05] text-white drop-shadow-2xl max-w-4xl mb-4">
             Modern <br />
             <span className="font-light italic text-brand-200">Bohemian</span> Luxe.
           </h2>
           
-          <p className="text-white/80 text-sm sm:text-lg max-w-xl leading-relaxed font-medium drop-shadow-lg border-l-2 border-brand-400 pl-4">
-            Handcrafted by master artisans in Jaipur for 400+ years. Every piece ships anywhere in the world via UPS Express — fully tracked, duty-managed, and guaranteed.
+          <p className="text-white/80 text-xs sm:text-lg max-w-xs sm:max-w-xl leading-relaxed font-medium drop-shadow-lg border-l-2 border-brand-400 pl-3 sm:pl-4 mb-6">
+            Handcrafted by master artisans in Jaipur for 400+ years. Delivered anywhere in the world — fully tracked &amp; guaranteed.
           </p>
 
-          <div className="pt-8 flex flex-col sm:flex-row items-start gap-6">
-            <a href="#categories" className="px-10 py-4 bg-white text-zinc-950 hover:bg-brand-50 text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-xl hover:shadow-brand-500/20">
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-6">
+            <a href="#categories" className="px-8 py-3 sm:px-10 sm:py-4 bg-white text-zinc-950 hover:bg-brand-50 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-xl">
               Explore Collection
             </a>
-            <div className="flex items-center gap-3 text-white/70 text-xs font-medium">
-              <ShieldCheck className="h-4 w-4 text-green-400" />
+            <div className="flex items-center gap-2 text-white/60 text-[10px] sm:text-xs font-medium">
+              <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 shrink-0" />
               <span>Secure Payments &bull; 14-Day Returns &bull; Free UPS Express</span>
             </div>
           </div>
