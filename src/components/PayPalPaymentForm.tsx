@@ -17,7 +17,26 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
 }) => {
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
-  const usdAmount = Number(amount.toFixed(2));
+  const usdAmount = Number(Math.max(0, amount).toFixed(2));
+
+  // BUG-7 fix: If order is fully covered by JaiCoins (amount = 0), skip PayPal
+  if (usdAmount === 0) {
+    return (
+      <div className="space-y-3">
+        <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 text-center">
+          <p className="text-emerald-400 font-bold text-sm mb-1">🎉 Order Fully Covered by JaiCoins!</p>
+          <p className="text-xs text-zinc-400">No payment needed. Click below to confirm your order.</p>
+        </div>
+        <button
+          onClick={() => onSuccess(orderId)}
+          className="w-full py-4 rounded-xl font-bold text-zinc-900 text-sm flex items-center justify-center gap-2 transition-all shadow-lg"
+          style={{ background: 'linear-gradient(135deg, #FFC439 0%, #F0A500 100%)' }}
+        >
+          ✓ Confirm Free Order
+        </button>
+      </div>
+    );
+  }
 
   const handleRedirect = async (landingPage: 'LOGIN' | 'BILLING') => {
     const setLoading = landingPage === 'LOGIN' ? setPaypalLoading : setCardLoading;

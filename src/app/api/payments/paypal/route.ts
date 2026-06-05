@@ -82,12 +82,12 @@ export async function POST(req: NextRequest) {
           }
         }],
         application_context: {
-          return_url: `${siteUrl}/dashboard?payment=success&order_id=${orderId}`,
+          return_url: `${siteUrl}/payment/success?order_id=${orderId}`,
           cancel_url: `${siteUrl}/?payment=cancelled`,
           brand_name: 'Texxtile Jaipur',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'PAY_NOW',
-          landing_page: landingPage === 'BILLING' ? 'BILLING' : 'LOGIN'
+          landing_page: landingPage === 'LOGIN' ? 'LOGIN' : 'BILLING'
         }
       });
 

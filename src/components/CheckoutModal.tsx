@@ -163,13 +163,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     }
   };
 
-  const handlePaymentSuccess = (orderId: string) => {
+  const handlePaymentSuccess = async (orderId: string) => {
     // Credit JaiCoins earned (5% of order value)
     const coinsEarned = Math.round(getCartTotalInr() * 0.05);
-    // Deduct used JaiCoins and add earned ones
-    const newBalance = Math.max(0, jaiCoins - (useJaiCoins ? JAI_COINS_VALUE_INR : 0)) + coinsEarned;
+    const coinsUsed = useJaiCoins ? JAI_COINS_VALUE_INR : 0;
+    const newBalance = Math.max(0, jaiCoins - coinsUsed) + coinsEarned;
+    
+    // Persist new JaiCoins balance to Supabase (BUG-3 fix)
+    if (user) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({ jai_coins: newBalance })
+          .eq('id', user.id);
+      } catch (e) {
+        console.error('Failed to persist JaiCoins balance:', e);
+      }
+    }
+    
     setJaiCoins(newBalance);
-
     confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
     setStep('success');
     clearCart();

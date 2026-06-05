@@ -16,9 +16,12 @@ function PaymentSuccessHandler({ onSuccess }: { onSuccess: () => void }) {
     const orderId = searchParams.get('order_id');
     const paypalToken = searchParams.get('token'); // PayPal appends ?token=PAYPAL_ORDER_ID
 
-    // PayPal redirect returns: ?payment=success&order_id=xxx&token=PAYPAL_TOKEN&PayerID=yyy
-    if (payment === 'success' && orderId && paypalToken) {
-      // Capture the PayPal payment now that user has approved it
+    // PayPal redirect returns via /payment/success which then redirects here with ?payment=captured
+    // Legacy direct return: ?payment=success&order_id=xxx&token=PAYPAL_TOKEN&PayerID=yyy
+    const isSuccess = payment === 'captured' || (payment === 'success' && orderId);
+
+    if (isSuccess && orderId && paypalToken) {
+      // Legacy flow: capture inline if token present
       fetch('/api/payments/paypal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -34,18 +37,16 @@ function PaymentSuccessHandler({ onSuccess }: { onSuccess: () => void }) {
             onSuccess();
           } else {
             console.error('PayPal capture failed:', data.error);
-            onSuccess(); // Still show success UI — payment may already be captured
+            onSuccess();
           }
         })
         .catch((err) => {
           console.error('PayPal capture error:', err);
           onSuccess();
         });
-
-      // Clean up URL
       window.history.replaceState({}, '', '/dashboard');
-    } else if (payment === 'success') {
-      // Non-PayPal success (e.g. already captured inline)
+    } else if (isSuccess) {
+      // New flow: /payment/success already captured, just show success banner
       onSuccess();
       window.history.replaceState({}, '', '/dashboard');
     }
