@@ -93,10 +93,7 @@ export async function POST(req: NextRequest) {
         order_number: orderNumber,
         total: total_inr,
         subtotal: total_inr,
-        display_currency: display_currency || 'USD',
-        total_display: total_display_currency || null,
-        status: 'pending',
-        payment_status: 'unpaid',
+        status: 'pending'
       })
       .select('id')
       .single();
