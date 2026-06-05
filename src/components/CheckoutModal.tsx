@@ -560,9 +560,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               <div className="mt-4">
                 <label className="block text-xs font-semibold text-zinc-600 mb-2">Select Payment Method</label>
                 <div className="flex gap-4">
-                  <label className={`flex-1 border rounded p-3 cursor-pointer transition-colors border-gold bg-gold/10`}>
+                  <label className={`flex-1 border rounded py-3 px-2 cursor-pointer transition-colors border-gold bg-gold/10`}>
                     <input type="radio" name="payment" value="paypal" checked={true} readOnly className="hidden" />
-                    <div className="text-xs font-bold text-center text-zinc-900">PayPal</div>
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <div className="text-sm font-bold text-zinc-900">Credit / Debit Card & PayPal</div>
+                      <div className="text-[10px] text-zinc-600 mt-1 font-medium">All major cards accepted securely</div>
+                    </div>
                   </label>
                 </div>
               </div>
