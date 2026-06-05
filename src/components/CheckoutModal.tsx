@@ -236,7 +236,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                       placeholder="Sarah Mitchell"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                      className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                     />
                   </div>
                 )}
@@ -248,7 +248,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="name@domain.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
                 <div>
@@ -259,7 +259,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
 
@@ -295,7 +295,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   placeholder="Sarah Mitchell"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                  className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                 />
               </div>
 
@@ -307,7 +307,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   placeholder="123 Export Avenue, Apt 4B"
                   value={addressLine1}
                   onChange={(e) => setAddressLine1(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                  className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                 />
               </div>
 
@@ -319,7 +319,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="Suite, unit, etc."
                     value={addressLine2}
                     onChange={(e) => setAddressLine2(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
                 <div>
@@ -330,7 +330,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="+1 555-0199"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="New York"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
                 <div>
@@ -355,7 +355,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="New York"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
               </div>
@@ -369,7 +369,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="10001"
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded py-2 px-3 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800/80 border border-zinc-700 rounded py-2 px-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
                 <div>
@@ -377,14 +377,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full bg-zinc-900 border border-zinc-800 rounded py-2 px-3 text-xs text-white focus:outline-none focus:border-gold"
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded py-2 px-3 text-sm text-white focus:outline-none focus:border-gold"
                   >
                     <option value="United States">United States</option>
                     <option value="United Kingdom">United Kingdom</option>
-                    <option value="Germany">Germany</option>
-                    <option value="United Arab Emirates">United Arab Emirates</option>
-                    <option value="Australia">Australia</option>
                     <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Germany">Germany</option>
+                    <option value="France">France</option>
+                    <option value="Italy">Italy</option>
+                    <option value="Spain">Spain</option>
+                    <option value="Netherlands">Netherlands</option>
+                    <option value="United Arab Emirates">United Arab Emirates</option>
+                    <option value="Saudi Arabia">Saudi Arabia</option>
+                    <option value="Singapore">Singapore</option>
+                    <option value="Japan">Japan</option>
+                    <option value="New Zealand">New Zealand</option>
+                    <option value="Switzerland">Switzerland</option>
+                    <option value="Sweden">Sweden</option>
                     <option value="India">India</option>
                   </select>
                 </div>
@@ -417,12 +427,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <CreditCard className="h-4 w-4 text-gold" /> Secure Checkout
               </h3>
 
-              <div className="rounded border border-zinc-800 bg-zinc-900/20 p-4 space-y-2 mb-4">
-                <div className="flex justify-between text-xs text-zinc-400">
+              <div className="rounded border border-zinc-700 bg-zinc-800/40 p-4 space-y-3 mb-4">
+                
+                {/* Product List Summary */}
+                <div className="space-y-2 border-b border-zinc-700 pb-3 mb-3">
+                  <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Order Items</h4>
+                  {cart.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-start text-sm">
+                      <span className="text-zinc-100 pr-4">{item.quantity}x {item.name}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-between text-sm text-zinc-300">
                   <span>Cart Items Count</span>
                   <span className="text-white font-medium">{cart.reduce((a, b) => a + b.quantity, 0)}</span>
                 </div>
-                <div className="flex justify-between text-xs text-zinc-400">
+                <div className="flex justify-between text-sm text-zinc-300">
                   <span>Subtotal</span>
                   <span className="text-white font-medium">{formatPrice(getCartSubtotalInr())}</span>
                 </div>
