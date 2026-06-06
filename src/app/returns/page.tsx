@@ -16,11 +16,33 @@ export default function ReturnsPage() {
   const [orderId, setOrderId] = useState('');
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<'form' | 'success'>('form');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (orderId && email) {
-      setStep('success');
+    if (!orderId || !email) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/returns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, email })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setStep('success');
+      } else {
+        setError(data.error || 'Failed to process return request.');
+      }
+    } catch (err) {
+      setError('A network error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,6 +77,11 @@ export default function ReturnsPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-medium">
+                      {error}
+                    </div>
+                  )}
                   <div>
                     <label className="block text-sm font-bold text-zinc-900 mb-2">Order Number</label>
                     <input 
@@ -79,9 +106,12 @@ export default function ReturnsPage() {
                   </div>
                   <button 
                     type="submit"
-                    className="w-full mt-4 bg-brand-700 hover:bg-brand-800 text-white font-bold py-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2"
+                    disabled={loading}
+                    className="w-full mt-4 bg-brand-700 hover:bg-brand-800 text-white font-bold py-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 disabled:opacity-70"
                   >
-                    Find My Order <ArrowRight className="h-4 w-4" />
+                    {loading ? 'Verifying...' : (
+                      <>Find My Order <ArrowRight className="h-4 w-4" /></>
+                    )}
                   </button>
                 </form>
               </>
