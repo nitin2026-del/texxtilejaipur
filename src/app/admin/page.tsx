@@ -807,7 +807,7 @@ export default function AdminPortal() {
     };
     const updatedCoupons = [...coupons, newCoupon];
     setCoupons(updatedCoupons);
-    localStorage.setItem('hiyawear_admin_coupons', JSON.stringify(updatedCoupons));
+    localStorage.setItem('textilejaipur_admin_coupons', JSON.stringify(updatedCoupons));
     
     setFormCouponCode('');
     setFormCouponValue('');
@@ -818,7 +818,7 @@ export default function AdminPortal() {
     if (!confirm('Are you sure you want to delete this coupon?')) return;
     const updatedCoupons = coupons.filter(c => c.id !== id);
     setCoupons(updatedCoupons);
-    localStorage.setItem('hiyawear_admin_coupons', JSON.stringify(updatedCoupons));
+    localStorage.setItem('textilejaipur_admin_coupons', JSON.stringify(updatedCoupons));
     showNotification('Coupon deleted.');
   };
 

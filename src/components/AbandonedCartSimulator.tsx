@@ -21,7 +21,7 @@ export const AbandonedCartSimulator: React.FC = () => {
           type: 'percent',
           value: 10
         });
-        localStorage.setItem('hiyawear_admin_coupons', JSON.stringify(coupons));
+        localStorage.setItem('textilejaipur_admin_coupons', JSON.stringify(coupons));
       }
     } catch (e) {}
 
