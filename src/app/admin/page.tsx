@@ -22,7 +22,7 @@ interface Product {
   category: string;
   images: string[];
   stock: number;
-  details: { material?: string; origin?: string; care?: string };
+  details: { material?: string; origin?: string; care?: string; video_url?: string };
   is_featured?: boolean;
   display_rank?: number;
 }
@@ -160,6 +160,7 @@ export default function AdminPortal() {
   const [formMaterial, setFormMaterial] = useState('');
   const [formOrigin, setFormOrigin] = useState('Jaipur, Rajasthan');
   const [formCare, setFormCare] = useState('');
+  const [formVideoUrl, setFormVideoUrl] = useState('');
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [formDisplayRank, setFormDisplayRank] = useState('');
 
@@ -609,7 +610,13 @@ export default function AdminPortal() {
         status: 'active',
         category_id: categoryId,
         is_featured: formIsFeatured,
-        display_rank: formDisplayRank ? parseInt(formDisplayRank) : 999
+        display_rank: formDisplayRank ? parseInt(formDisplayRank) : 999,
+        details: {
+          material: formMaterial,
+          origin: formOrigin,
+          care: formCare,
+          video_url: formVideoUrl
+        }
       };
 
       let productId = editingProductId;
@@ -686,6 +693,7 @@ export default function AdminPortal() {
     setFormMaterial(prod.details?.material || '');
     setFormOrigin(prod.details?.origin || 'Jaipur, Rajasthan');
     setFormCare(prod.details?.care || '');
+    setFormVideoUrl(prod.details?.video_url || '');
     setFormIsFeatured(prod.is_featured || false);
     setFormDisplayRank(prod.display_rank?.toString() || '');
     setActiveTab('form');
@@ -724,6 +732,7 @@ export default function AdminPortal() {
     setFormMaterial('');
     setFormOrigin('Jaipur, Rajasthan');
     setFormCare('');
+    setFormVideoUrl('');
     setFormIsFeatured(false);
     setFormDisplayRank('');
   };
@@ -1686,6 +1695,16 @@ export default function AdminPortal() {
                       <option value="Cold wash" />
                       <option value="Do not bleach" />
                     </datalist>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Video URL (Optional)</label>
+                    <input
+                      type="url"
+                      placeholder="E.g., YouTube or direct MP4 link"
+                      value={formVideoUrl}
+                      onChange={(e) => setFormVideoUrl(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
+                    />
                   </div>
                 </div>
               </div>
