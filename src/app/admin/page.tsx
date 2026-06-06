@@ -572,7 +572,7 @@ export default function AdminPortal() {
         imageUrls.push('https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80');
       }
 
-      const slug = formName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const baseSlug = formName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
       // Get category ID
       let categoryId = null;
@@ -599,9 +599,9 @@ export default function AdminPortal() {
         }
       }
 
-      const productPayload = {
+      // Base payload — slug is added only for new products
+      const basePayload = {
         name: formName,
-        slug: slug,
         description: formDescription,
         price: price,
         stock: stockInt,
@@ -615,19 +615,21 @@ export default function AdminPortal() {
       let productId = editingProductId;
 
       if (editingProductId) {
-        // Update product
+        // UPDATE — never change the slug to avoid unique constraint conflicts
         const { error } = await supabase
           .from('products')
-          .update(productPayload)
+          .update(basePayload)
           .eq('id', editingProductId);
 
         if (error) throw error;
         showNotification('Product updated successfully!');
       } else {
-        // Insert new product
+        // INSERT — add a unique suffix to the slug to prevent duplicates
+        const uniqueSuffix = Date.now().toString(36).slice(-4); // e.g. "k3f2"
+        const uniqueSlug = `${baseSlug}-${uniqueSuffix}`;
         const { data: newProd, error } = await supabase
           .from('products')
-          .insert(productPayload)
+          .insert({ ...basePayload, slug: uniqueSlug })
           .select('id')
           .single();
 
