@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart, Currency } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone } from 'lucide-react';
+import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { InfoModal } from './InfoModal';
 
@@ -404,6 +404,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           >
             <BookOpen className="h-5 w-5 text-zinc-500" />
             Blog
+          </a>
+
+          <a 
+            href="/returns"
+            onClick={() => setIsDrawerOpen(false)}
+            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+          >
+            <RefreshCcw className="h-5 w-5 text-zinc-500" />
+            Returns Portal
           </a>
           
           <button 
