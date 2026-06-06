@@ -1673,11 +1673,19 @@ export default function AdminPortal() {
                     <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Care Instructions</label>
                     <input
                       type="text"
+                      list="care-options"
                       placeholder="E.g., Dry Clean Only / Cold Wash"
                       value={formCare}
                       onChange={(e) => setFormCare(e.target.value)}
                       className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500"
                     />
+                    <datalist id="care-options">
+                      <option value="Machine wash" />
+                      <option value="Hand wash only" />
+                      <option value="Dry clean only" />
+                      <option value="Cold wash" />
+                      <option value="Do not bleach" />
+                    </datalist>
                   </div>
                 </div>
               </div>
