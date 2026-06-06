@@ -1518,167 +1518,142 @@ export default function AdminPortal() {
                   </label>
                 </div>
                 
-                {/* Visual Image Preview — Drag to Reorder */}
+                {/* Visual Image Preview — Free Drag to Any Position */}
                 {formImageUrl.trim() && (() => {
                   const imageList = formImageUrl.split(',').map(u => u.trim()).filter(u => u);
                   const isDragging = draggedImageIdx !== null;
+
+                  const handleDrop = (insertAt: number) => {
+                    if (draggedImageIdx === null) return;
+                    const reordered = [...imageList];
+                    const [moved] = reordered.splice(draggedImageIdx, 1);
+                    // adjust index after removal
+                    const adjusted = draggedImageIdx < insertAt ? insertAt - 1 : insertAt;
+                    reordered.splice(adjusted, 0, moved);
+                    setFormImageUrl(reordered.join(', '));
+                    setDraggedImageIdx(null);
+                    setDragOverImageIdx(null);
+                  };
+
                   return (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <p className="text-[10px] text-zinc-500 flex items-center gap-1">
                           <GripVertical className="h-3 w-3" />
-                          Hold any image → drag to cover zone or tap ⭐ to set as cover
+                          Hold &amp; drag any image to place it anywhere
                         </p>
                         <span className="text-[10px] text-zinc-400 font-mono">{imageList.length} image{imageList.length !== 1 ? 's' : ''}</span>
                       </div>
 
-                      {/* ── COVER DROP ZONE ── shown always when more than 1 image */}
-                      {imageList.length > 1 && (
-                        <div
-                          onDragOver={(e) => { e.preventDefault(); setDragOverImageIdx(-1); }}
-                          onDragLeave={() => setDragOverImageIdx(null)}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            if (draggedImageIdx === null || draggedImageIdx === 0) return;
-                            const reordered = [...imageList];
-                            const [moved] = reordered.splice(draggedImageIdx, 1);
-                            reordered.unshift(moved);
-                            setFormImageUrl(reordered.join(', '));
-                            setDraggedImageIdx(null);
-                            setDragOverImageIdx(null);
-                          }}
-                          className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed py-3 px-4 transition-all duration-200 ${
-                            isDragging && draggedImageIdx !== 0
-                              ? dragOverImageIdx === -1
-                                ? 'border-violet-500 bg-violet-50 scale-[1.01] shadow-md shadow-violet-100'
-                                : 'border-violet-300 bg-violet-50/60 animate-pulse'
-                              : 'border-zinc-200 bg-zinc-50 opacity-60'
-                          }`}
-                        >
-                          <Star className={`h-4 w-4 transition-colors ${isDragging && draggedImageIdx !== 0 ? 'text-violet-500 fill-violet-500' : 'text-zinc-400'}`} />
-                          <span className={`text-xs font-bold transition-colors ${isDragging && draggedImageIdx !== 0 ? 'text-violet-600' : 'text-zinc-400'}`}>
-                            {dragOverImageIdx === -1 ? '✦ Drop to Make Cover Photo!' : 'Drop Here → Set as Cover (#1)'}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* ── IMAGE GRID ── */}
-                      <div className="flex flex-wrap gap-3 p-4 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-xl min-h-[100px] items-start">
+                      {/* ── IMAGE GRID with insertion bars ── */}
+                      <div
+                        className={`flex flex-wrap p-4 rounded-xl border-2 transition-all duration-200 min-h-[110px] items-center ${
+                          isDragging
+                            ? 'bg-violet-50/40 border-violet-300 border-dashed'
+                            : 'bg-zinc-50 border-zinc-200 border-dashed'
+                        }`}
+                      >
                         {imageList.map((url, idx) => (
-                          <div
-                            key={url + idx}
-                            draggable
-                            onDragStart={() => setDraggedImageIdx(idx)}
-                            onDragEnd={() => { setDraggedImageIdx(null); setDragOverImageIdx(null); }}
-                            onDragOver={(e) => { e.preventDefault(); setDragOverImageIdx(idx); }}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              if (draggedImageIdx === null || draggedImageIdx === idx) return;
-                              const reordered = [...imageList];
-                              const [moved] = reordered.splice(draggedImageIdx, 1);
-                              reordered.splice(idx, 0, moved);
-                              setFormImageUrl(reordered.join(', '));
-                              setDraggedImageIdx(null);
-                              setDragOverImageIdx(null);
-                            }}
-                            className={`relative group flex flex-col items-center gap-1 cursor-grab active:cursor-grabbing transition-all duration-200 ${
-                              draggedImageIdx === idx ? 'opacity-40 scale-90' : 'opacity-100 scale-100'
-                            } ${
-                              dragOverImageIdx === idx && draggedImageIdx !== idx
-                                ? 'ring-2 ring-violet-500 ring-offset-1 rounded-xl'
-                                : ''
-                            }`}
-                          >
-                            {/* Image thumbnail */}
-                            <div className={`relative h-20 w-20 rounded-xl overflow-hidden border-2 bg-white shadow-sm transition-all ${
-                              idx === 0 ? 'border-violet-400 shadow-violet-100' : 'border-zinc-200 group-hover:border-zinc-300'
-                            }`}>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={url} alt={`Product image ${idx + 1}`} className="h-full w-full object-cover" />
+                          <React.Fragment key={url + idx}>
+                            {/* ── Insertion slot BEFORE this image ── */}
+                            <div
+                              className={`flex items-center justify-center transition-all duration-150 ${
+                                isDragging ? 'w-4 h-20 cursor-pointer' : 'w-2 h-0'
+                              }`}
+                              onDragOver={(e) => { e.preventDefault(); setDragOverImageIdx(idx); }}
+                              onDragLeave={() => setDragOverImageIdx(null)}
+                              onDrop={(e) => { e.preventDefault(); handleDrop(idx); }}
+                            >
+                              {/* Glowing bar — shows when hovering this insertion slot */}
+                              <div className={`rounded-full transition-all duration-150 ${
+                                isDragging && dragOverImageIdx === idx && draggedImageIdx !== idx && draggedImageIdx !== idx - 1
+                                  ? 'w-1 h-16 bg-violet-500 shadow-lg shadow-violet-400/60'
+                                  : isDragging
+                                    ? 'w-0.5 h-10 bg-violet-200'
+                                    : 'w-0 h-0'
+                              }`} />
+                            </div>
 
-                              {/* Cover badge on first image */}
-                              {idx === 0 && (
-                                <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[8px] font-bold text-center py-0.5 flex items-center justify-center gap-0.5">
-                                  <Star className="h-2 w-2 fill-current" /> COVER
+                            {/* ── Image card ── */}
+                            <div
+                              draggable
+                              onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; setDraggedImageIdx(idx); setDragOverImageIdx(null); }}
+                              onDragEnd={() => { setDraggedImageIdx(null); setDragOverImageIdx(null); }}
+                              className={`relative group flex flex-col items-center gap-1 cursor-grab active:cursor-grabbing select-none transition-all duration-200 mr-2 mb-2 ${
+                                draggedImageIdx === idx ? 'opacity-30 scale-90' : 'opacity-100 scale-100'
+                              }`}
+                            >
+                              {/* Thumbnail */}
+                              <div className={`relative h-20 w-20 rounded-xl overflow-hidden border-2 bg-white shadow-sm transition-all ${
+                                idx === 0
+                                  ? 'border-violet-400 shadow-violet-100'
+                                  : 'border-zinc-200 group-hover:border-violet-300'
+                              }`}>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={url} alt={`Product image ${idx + 1}`} className="h-full w-full object-cover pointer-events-none" />
+
+                                {/* COVER badge */}
+                                {idx === 0 && (
+                                  <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[8px] font-bold text-center py-0.5 flex items-center justify-center gap-0.5">
+                                    <Star className="h-2 w-2 fill-current" /> COVER
+                                  </div>
+                                )}
+
+                                {/* Position number */}
+                                {idx !== 0 && (
+                                  <div className="absolute top-1 left-1 bg-black/50 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                    {idx + 1}
+                                  </div>
+                                )}
+
+                                {/* Drag grip icon */}
+                                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                  <div className="bg-black/50 rounded p-0.5">
+                                    <GripVertical className="h-2.5 w-2.5 text-white" />
+                                  </div>
                                 </div>
-                              )}
 
-                              {/* Position number badge for non-cover images */}
-                              {idx !== 0 && (
-                                <div className="absolute top-1 left-1 bg-black/50 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                                  {idx + 1}
-                                </div>
-                              )}
-
-                              {/* ⭐ SET AS COVER button — tap to instantly move to position 1 */}
-                              {idx !== 0 && (
+                                {/* Delete button */}
                                 <button
                                   type="button"
-                                  title="Set as Cover Photo"
                                   onClick={() => {
-                                    const reordered = [...imageList];
-                                    const [moved] = reordered.splice(idx, 1);
-                                    reordered.unshift(moved);
-                                    setFormImageUrl(reordered.join(', '));
+                                    const newUrls = [...imageList];
+                                    newUrls.splice(idx, 1);
+                                    setFormImageUrl(newUrls.join(', '));
                                   }}
-                                  className="absolute bottom-0 left-0 right-0 bg-amber-500/90 hover:bg-amber-400 text-white text-[8px] font-bold py-0.5 flex items-center justify-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all"
+                                  className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-400 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
                                 >
-                                  <Star className="h-2 w-2" /> SET COVER
+                                  <X className="h-2.5 w-2.5" />
                                 </button>
-                              )}
-
-                              {/* Drag handle */}
-                              <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <div className="bg-black/40 rounded p-0.5">
-                                  <GripVertical className="h-2.5 w-2.5 text-white" />
-                                </div>
                               </div>
-
-                              {/* Delete button */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newUrls = [...imageList];
-                                  newUrls.splice(idx, 1);
-                                  setFormImageUrl(newUrls.join(', '));
-                                }}
-                                className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-400 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
-                              >
-                                <X className="h-2.5 w-2.5" />
-                              </button>
                             </div>
-
-                            {/* Arrow controls */}
-                            <div className="flex gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => {
-                                  const reordered = [...imageList];
-                                  [reordered[idx - 1], reordered[idx]] = [reordered[idx], reordered[idx - 1]];
-                                  setFormImageUrl(reordered.join(', '));
-                                }}
-                                className="p-0.5 rounded bg-zinc-100 hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                                title="Move left"
-                              >
-                                <ChevronLeft className="h-2.5 w-2.5 text-zinc-600" />
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === imageList.length - 1}
-                                onClick={() => {
-                                  const reordered = [...imageList];
-                                  [reordered[idx], reordered[idx + 1]] = [reordered[idx + 1], reordered[idx]];
-                                  setFormImageUrl(reordered.join(', '));
-                                }}
-                                className="p-0.5 rounded bg-zinc-100 hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                                title="Move right"
-                              >
-                                <ChevronRight className="h-2.5 w-2.5 text-zinc-600" />
-                              </button>
-                            </div>
-                          </div>
+                          </React.Fragment>
                         ))}
+
+                        {/* ── Insertion slot AFTER the last image ── */}
+                        <div
+                          className={`flex items-center justify-center transition-all duration-150 ${
+                            isDragging ? 'w-4 h-20' : 'w-0 h-0'
+                          }`}
+                          onDragOver={(e) => { e.preventDefault(); setDragOverImageIdx(imageList.length); }}
+                          onDragLeave={() => setDragOverImageIdx(null)}
+                          onDrop={(e) => { e.preventDefault(); handleDrop(imageList.length); }}
+                        >
+                          <div className={`rounded-full transition-all duration-150 ${
+                            isDragging && dragOverImageIdx === imageList.length
+                              ? 'w-1 h-16 bg-violet-500 shadow-lg shadow-violet-400/60'
+                              : isDragging
+                                ? 'w-0.5 h-10 bg-violet-200'
+                                : 'w-0 h-0'
+                          }`} />
+                        </div>
+
+                        {/* Empty state when dragging */}
+                        {isDragging && (
+                          <p className="w-full text-center text-[10px] text-violet-400 font-semibold mt-1 pointer-events-none">
+                            Drop between images to place here
+                          </p>
+                        )}
                       </div>
                     </div>
                   );
