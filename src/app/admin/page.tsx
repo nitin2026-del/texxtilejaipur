@@ -10,7 +10,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star
 } from 'lucide-react';
 
 interface Product {
@@ -117,6 +117,8 @@ export default function AdminPortal() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [draggedImageIdx, setDraggedImageIdx] = useState<number | null>(null);
+  const [dragOverImageIdx, setDragOverImageIdx] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isBypassed, setIsBypassed] = useState(false);
@@ -1516,28 +1518,121 @@ export default function AdminPortal() {
                   </label>
                 </div>
                 
-                {/* Visual Image Preview (If URLs exist) */}
-                {formImageUrl.trim() && (
-                  <div className="flex flex-wrap gap-3 p-3 bg-zinc-50 border border-zinc-200 rounded-xl">
-                    {formImageUrl.split(',').map(u => u.trim()).filter(u => u).map((url, idx) => (
-                      <div key={idx} className="relative h-16 w-16 rounded-lg overflow-hidden border border-zinc-200 bg-white group">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt="preview" className="h-full w-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newUrls = formImageUrl.split(',').map(u => u.trim()).filter(u => u);
-                            newUrls.splice(idx, 1);
-                            setFormImageUrl(newUrls.join(', '));
-                          }}
-                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity transform scale-75"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                {/* Visual Image Preview — Drag to Reorder */}
+                {formImageUrl.trim() && (() => {
+                  const imageList = formImageUrl.split(',').map(u => u.trim()).filter(u => u);
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] text-zinc-500 flex items-center gap-1">
+                          <GripVertical className="h-3 w-3" />
+                          Drag images to reorder · First image is the cover photo
+                        </p>
+                        <span className="text-[10px] text-zinc-400 font-mono">{imageList.length} image{imageList.length !== 1 ? 's' : ''}</span>
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <div className="flex flex-wrap gap-3 p-4 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-xl min-h-[100px] items-start">
+                        {imageList.map((url, idx) => (
+                          <div
+                            key={url + idx}
+                            draggable
+                            onDragStart={() => setDraggedImageIdx(idx)}
+                            onDragEnd={() => { setDraggedImageIdx(null); setDragOverImageIdx(null); }}
+                            onDragOver={(e) => { e.preventDefault(); setDragOverImageIdx(idx); }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              if (draggedImageIdx === null || draggedImageIdx === idx) return;
+                              const reordered = [...imageList];
+                              const [moved] = reordered.splice(draggedImageIdx, 1);
+                              reordered.splice(idx, 0, moved);
+                              setFormImageUrl(reordered.join(', '));
+                              setDraggedImageIdx(null);
+                              setDragOverImageIdx(null);
+                            }}
+                            className={`relative group flex flex-col items-center gap-1 cursor-grab active:cursor-grabbing transition-all duration-200 ${
+                              draggedImageIdx === idx ? 'opacity-40 scale-95' : 'opacity-100 scale-100'
+                            } ${
+                              dragOverImageIdx === idx && draggedImageIdx !== idx
+                                ? 'ring-2 ring-violet-500 ring-offset-1 rounded-xl'
+                                : ''
+                            }`}
+                          >
+                            {/* Image thumbnail */}
+                            <div className={`relative h-20 w-20 rounded-xl overflow-hidden border-2 bg-white shadow-sm transition-all ${
+                              idx === 0 ? 'border-violet-400 shadow-violet-100' : 'border-zinc-200 group-hover:border-zinc-300'
+                            }`}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt={`Product image ${idx + 1}`} className="h-full w-full object-cover" />
+                              
+                              {/* Cover badge on first image */}
+                              {idx === 0 && (
+                                <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[8px] font-bold text-center py-0.5 flex items-center justify-center gap-0.5">
+                                  <Star className="h-2 w-2 fill-current" /> COVER
+                                </div>
+                              )}
+
+                              {/* Position number badge */}
+                              {idx !== 0 && (
+                                <div className="absolute top-1 left-1 bg-black/50 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                  {idx + 1}
+                                </div>
+                              )}
+
+                              {/* Drag handle overlay */}
+                              <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="bg-black/40 rounded p-0.5">
+                                  <GripVertical className="h-2.5 w-2.5 text-white" />
+                                </div>
+                              </div>
+
+                              {/* Delete button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newUrls = [...imageList];
+                                  newUrls.splice(idx, 1);
+                                  setFormImageUrl(newUrls.join(', '));
+                                }}
+                                className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-400 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
+                              >
+                                <X className="h-2.5 w-2.5" />
+                              </button>
+                            </div>
+
+                            {/* Arrow controls below each image */}
+                            <div className="flex gap-0.5">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={() => {
+                                  const reordered = [...imageList];
+                                  [reordered[idx - 1], reordered[idx]] = [reordered[idx], reordered[idx - 1]];
+                                  setFormImageUrl(reordered.join(', '));
+                                }}
+                                className="p-0.5 rounded bg-zinc-100 hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="Move left"
+                              >
+                                <ChevronLeft className="h-2.5 w-2.5 text-zinc-600" />
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === imageList.length - 1}
+                                onClick={() => {
+                                  const reordered = [...imageList];
+                                  [reordered[idx], reordered[idx + 1]] = [reordered[idx + 1], reordered[idx]];
+                                  setFormImageUrl(reordered.join(', '));
+                                }}
+                                className="p-0.5 rounded bg-zinc-100 hover:bg-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title="Move right"
+                              >
+                                <ChevronRight className="h-2.5 w-2.5 text-zinc-600" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
                 
                 <input
                   type="text"
