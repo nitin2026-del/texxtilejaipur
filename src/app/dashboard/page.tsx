@@ -308,7 +308,7 @@ export default function Dashboard() {
                     <div key={addr.id} className="p-4 rounded border border-zinc-200 bg-white relative group">
                       <button
                         onClick={() => handleDeleteAddress(addr.id)}
-                        className="absolute top-3 right-3 text-zinc-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-3 right-3 text-zinc-400 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                         title="Delete Address"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -358,7 +358,10 @@ export default function Dashboard() {
                         </div>
                         <div>
                           <p className="text-zinc-500 uppercase tracking-wider mb-0.5 text-[10px]">Total Amount</p>
-                          <p className="text-zinc-900 font-semibold">₹{order.total?.toLocaleString()}</p>
+                          <p className="text-zinc-900 font-semibold">
+                            {order.display_currency === 'INR' ? '₹' : order.display_currency === 'USD' ? '$' : order.display_currency === 'EUR' ? '€' : order.display_currency === 'GBP' ? '£' : order.display_currency === 'AED' ? 'د.إ' : order.display_currency === 'AUD' ? 'A$' : '₹'}
+                            {(order.total_display_currency || order.total)?.toLocaleString()}
+                          </p>
                         </div>
                         <div>
                           <p className="text-zinc-500 uppercase tracking-wider mb-0.5 text-[10px]">Order #</p>

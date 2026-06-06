@@ -21,6 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [showCoinsInfo, setShowCoinsInfo] = useState(false);
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
+  const [isPromoDismissed, setIsPromoDismissed] = useState(false);
 
   useEffect(() => {
     const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
@@ -42,13 +43,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 w-full flex flex-col shadow-sm">
-      {activePromo && (
-        <div className="bg-gradient-to-r from-brand-600 via-amber-500 to-brand-600 text-white text-[11px] sm:text-xs py-2 text-center font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(245,158,11,0.3)] border-b border-amber-400/50 w-full">
+      {activePromo && !isPromoDismissed && (
+        <div className="bg-gradient-to-r from-brand-600 via-amber-500 to-brand-600 text-white text-[11px] sm:text-xs py-2 px-4 text-center font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(245,158,11,0.3)] border-b border-amber-400/50 w-full relative">
           <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white animate-pulse shrink-0" />
           <span className="drop-shadow-md">
             Use code <span className="bg-white/20 px-2 py-0.5 rounded-md font-mono mx-1.5 border border-white/40 shadow-inner">{activePromo.code}</span> for {activePromo.value} OFF!
           </span>
           <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white animate-pulse shrink-0" />
+          <button 
+            onClick={() => setIsPromoDismissed(true)} 
+            className="absolute right-4 text-white/80 hover:text-white transition-colors"
+            aria-label="Dismiss Promo"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
       <nav className="bg-white/90 backdrop-blur-md border-b border-zinc-200 px-6 py-4 w-full">
