@@ -1613,12 +1613,6 @@ export default function AdminPortal() {
                               className={`flex-shrink-0 flex items-center justify-center transition-all duration-100 ${
                                 isDragging ? 'w-5 h-20' : 'w-1 h-0'
                               }`}
-                              onMouseEnter={() => {
-                                if (isDragging) {
-                                  setDragOverImageIdx(idx);
-                                  dragInsertRef.current = idx;
-                                }
-                              }}
                             >
                               <div className={`rounded-full transition-all duration-100 ${
                                 isDragging && dragOverImageIdx === idx && draggedImageIdx !== idx && draggedImageIdx !== idx - 1
@@ -1642,6 +1636,16 @@ export default function AdminPortal() {
                                 setDraggedImageIdx(idx);
                                 setDragOverImageIdx(null);
                                 setDragCursorPos({ x: e.clientX, y: e.clientY });
+                              }}
+                              onMouseMove={(e) => {
+                                if (draggedImageIdx === null) return;
+                                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                                const isLeftHalf = e.clientX < rect.left + rect.width / 2;
+                                const newInsert = isLeftHalf ? idx : idx + 1;
+                                if (dragInsertRef.current !== newInsert) {
+                                  dragInsertRef.current = newInsert;
+                                  setDragOverImageIdx(newInsert);
+                                }
                               }}
                               className={`relative group flex-shrink-0 flex flex-col items-center gap-1 mr-2 mb-2 transition-all duration-150 ${
                                 isDragging ? 'cursor-grabbing' : 'cursor-grab'
