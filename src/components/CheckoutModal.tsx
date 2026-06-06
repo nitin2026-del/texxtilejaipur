@@ -571,7 +571,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               </div>
               <h3 className="text-xl font-bold text-zinc-900 font-serif">Order Confirmed! 🎉</h3>
               <div className="text-xs text-zinc-600 space-y-1">
-                <p className="font-medium">Thank you for shopping with Texxtile Jaipur!</p>
+                <p className="font-medium">Thank you for shopping with Textile Jaipur!</p>
                 <p className="mt-1 text-zinc-500">Order ID: <span className="font-mono text-zinc-800 font-bold">{createdOrderId}</span></p>
                 <p className="text-zinc-500">Your order has been received and our Jaipur team will dispatch it shortly.</p>
               </div>

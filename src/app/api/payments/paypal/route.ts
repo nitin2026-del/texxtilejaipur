@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
         application_context: {
           return_url: `${siteUrl}/payment/success?order_id=${orderId}`,
           cancel_url: `${siteUrl}/?payment=cancelled`,
-          brand_name: 'Texxtile Jaipur',
+          brand_name: 'Textile Jaipur',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'PAY_NOW',
           landing_page: landingPage === 'LOGIN' ? 'LOGIN' : 'BILLING'

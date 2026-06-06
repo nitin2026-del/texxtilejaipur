@@ -93,7 +93,8 @@ export async function POST(req: NextRequest) {
         order_number: orderNumber,
         total: total_inr,
         subtotal: total_inr,
-        status: 'pending'
+        status: 'pending',
+        payment_status: 'pending'
       })
       .select('id')
       .single();
@@ -107,6 +108,7 @@ export async function POST(req: NextRequest) {
     const orderItems = items.map((item: any) => ({
       order_id: order.id,
       product_id: item.id,
+      product_name: item.name || null,
       quantity: item.quantity,
       price_at_time: item.price_inr
     }));

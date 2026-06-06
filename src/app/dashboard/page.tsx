@@ -81,7 +81,11 @@ export default function Dashboard() {
 
   const handlePaymentSuccess = () => {
     setPaymentSuccess(true);
-    setRefreshTrigger((prev) => prev + 1);
+    // Delay the re-fetch by 1.5s to ensure the PayPal capture has been
+    // written to DB before we pull the order list (fixes timing race condition)
+    setTimeout(() => {
+      setRefreshTrigger((prev) => prev + 1);
+    }, 1500);
     setTimeout(() => setPaymentSuccess(false), 8000);
   };
 
