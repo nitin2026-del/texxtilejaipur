@@ -86,6 +86,46 @@ export async function POST(req: NextRequest) {
         // Don't throw — main order is already marked paid
       }
 
+      // Send Order Confirmation Email
+      if (order?.user_id && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+        try {
+          const { data: userData } = await supabaseAdmin.from('users').select('email, full_name').eq('id', order.user_id).single();
+          const userEmail = userData?.email;
+          const userName = userData?.full_name || 'Valued Customer';
+          
+          if (userEmail) {
+            const nodemailer = require('nodemailer');
+            const transporter = nodemailer.createTransport({
+              host: process.env.SMTP_HOST,
+              port: parseInt(process.env.SMTP_PORT || '587'),
+              secure: false,
+              auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+              },
+            });
+
+            await transporter.sendMail({
+              from: `"Textile Jaipur" <${process.env.SMTP_USER}>`,
+              to: userEmail,
+              subject: `Order Confirmation - ${orderId}`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h2 style="color: #d4af37;">Thank you for your order, ${userName}!</h2>
+                  <p>We are thrilled to confirm that your payment was successful and your order <strong>#${orderId}</strong> is now being processed.</p>
+                  <p>We will send you another update as soon as your items have shipped.</p>
+                  <p>Warm regards,<br>The Textile Jaipur Team</p>
+                </div>
+              `
+            });
+            console.log('Order confirmation email sent to:', userEmail);
+          }
+        } catch (emailErr) {
+          console.error('Failed to send order confirmation email:', emailErr);
+          // Don't block the request if email fails
+        }
+      }
+
       return NextResponse.json({ success: true, status: captureStatus }, { status: 200 });
     } else {
       // Default: Create PayPal Order
