@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -117,16 +117,9 @@ export default function AdminPortal() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
-  const [draggedImageIdx, setDraggedImageIdx] = useState<number | null>(null);
-  const [dragOverImageIdx, setDragOverImageIdx] = useState<number | null>(null);
-  const [dragCursorPos, setDragCursorPos] = useState<{ x: number; y: number } | null>(null);
-
-  // Refs for drag-to-reorder (mouse-based)
-  const dragOffsetRef = useRef({ x: 0, y: 0 });
-  const dragInsertRef = useRef<number | null>(null);
-  const dragSrcIdxRef = useRef<number | null>(null);
-  const formImageUrlRef = useRef('');
-  formImageUrlRef.current = formImageUrl;
+  // Image reorder: click position number to edit
+  const [editingPosIdx, setEditingPosIdx] = useState<number | null>(null);
+  const [editingPosValue, setEditingPosValue] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isBypassed, setIsBypassed] = useState(false);
@@ -502,43 +495,7 @@ export default function AdminPortal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, isBypassed]);
 
-  // Global mouse-move / mouse-up for image drag-to-reorder
-  useEffect(() => {
-    if (draggedImageIdx === null) return;
-    dragSrcIdxRef.current = draggedImageIdx;
 
-    const onMove = (e: MouseEvent) => {
-      setDragCursorPos({ x: e.clientX, y: e.clientY });
-    };
-
-    const onUp = () => {
-      const src = dragSrcIdxRef.current;
-      const insertAt = dragInsertRef.current;
-      if (src !== null && insertAt !== null) {
-        const list = formImageUrlRef.current.split(',').map(u => u.trim()).filter(Boolean);
-        if (src !== insertAt && src !== insertAt - 1) {
-          const reordered = [...list];
-          const [moved] = reordered.splice(src, 1);
-          const adjusted = src < insertAt ? insertAt - 1 : insertAt;
-          reordered.splice(adjusted, 0, moved);
-          setFormImageUrl(reordered.join(', '));
-        }
-      }
-      setDraggedImageIdx(null);
-      setDragOverImageIdx(null);
-      setDragCursorPos(null);
-      dragInsertRef.current = null;
-      dragSrcIdxRef.current = null;
-    };
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draggedImageIdx]);
 
   const showNotification = (msg: string, isError = false) => {
     if (isError) {
@@ -1564,173 +1521,118 @@ export default function AdminPortal() {
                   </label>
                 </div>
                 
-                {/* Visual Image Preview — Hold & Move to Any Position */}
+                {/* Visual Image Preview — Click number to reorder */}
                 {formImageUrl.trim() && (() => {
                   const imageList = formImageUrl.split(',').map(u => u.trim()).filter(u => u);
-                  const isDragging = draggedImageIdx !== null;
-                  const draggedUrl = isDragging ? imageList[draggedImageIdx!] : null;
+
+                  const applyMove = (fromIdx: number, rawValue: string) => {
+                    const target = parseInt(rawValue, 10);
+                    if (isNaN(target) || target < 1 || target > imageList.length || target === fromIdx + 1) {
+                      setEditingPosIdx(null);
+                      setEditingPosValue('');
+                      return;
+                    }
+                    const toIdx = target - 1; // convert 1-based to 0-based
+                    const reordered = [...imageList];
+                    const [moved] = reordered.splice(fromIdx, 1);
+                    reordered.splice(toIdx, 0, moved);
+                    setFormImageUrl(reordered.join(', '));
+                    setEditingPosIdx(null);
+                    setEditingPosValue('');
+                  };
 
                   return (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <p className="text-[10px] text-zinc-500 flex items-center gap-1">
-                          <GripVertical className="h-3 w-3" />
-                          Hold any image and move it to any position
+                        <p className="text-[10px] text-zinc-500">
+                          Click the <span className="font-bold text-violet-600">position number</span> on any image to move it
                         </p>
                         <span className="text-[10px] text-zinc-400 font-mono">{imageList.length} image{imageList.length !== 1 ? 's' : ''}</span>
                       </div>
 
-                      {/* ── Floating image clone that follows cursor ── */}
-                      {isDragging && dragCursorPos && draggedUrl && (
-                        <div
-                          style={{
-                            position: 'fixed',
-                            left: dragCursorPos.x - dragOffsetRef.current.x,
-                            top: dragCursorPos.y - dragOffsetRef.current.y,
-                            zIndex: 9999,
-                            pointerEvents: 'none',
-                            willChange: 'transform',
-                          }}
-                          className="h-20 w-20 rounded-xl overflow-hidden border-2 border-violet-500 shadow-2xl shadow-violet-500/50 rotate-3 scale-110 opacity-95"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={draggedUrl} alt="dragging" className="h-full w-full object-cover" />
-                        </div>
-                      )}
-
-                      {/* ── IMAGE GRID with insertion bars ── */}
-                      <div
-                        className={`flex flex-wrap p-4 rounded-xl border-2 transition-colors duration-200 min-h-[110px] items-center ${
-                          isDragging
-                            ? 'bg-violet-50/40 border-violet-300 border-dashed select-none'
-                            : 'bg-zinc-50 border-zinc-200 border-dashed'
-                        }`}
-                      >
+                      <div className="flex flex-wrap gap-3 p-4 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-xl min-h-[100px] items-start">
                         {imageList.map((url, idx) => (
-                          <React.Fragment key={url + idx}>
-                            {/* Insertion bar BEFORE this image */}
-                            <div
-                              className={`flex-shrink-0 flex items-center justify-center transition-all duration-100 ${
-                                isDragging ? 'w-5 h-20' : 'w-1 h-0'
-                              }`}
-                            >
-                              <div className={`rounded-full transition-all duration-100 ${
-                                isDragging && dragOverImageIdx === idx && draggedImageIdx !== idx && draggedImageIdx !== idx - 1
-                                  ? 'w-[3px] h-16 bg-violet-500 shadow-lg shadow-violet-400/70'
-                                  : isDragging
-                                    ? 'w-px h-8 bg-violet-200'
-                                    : 'w-0 h-0'
-                              }`} />
+                          <div key={url + idx} className="relative group flex-shrink-0">
+                            {/* Thumbnail */}
+                            <div className={`relative h-24 w-24 rounded-xl overflow-hidden border-2 bg-white shadow-sm ${
+                              idx === 0 ? 'border-violet-400 shadow-violet-100' : 'border-zinc-200'
+                            }`}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt={`Product image ${idx + 1}`} className="h-full w-full object-cover" />
+
+                              {/* COVER label on first image */}
+                              {idx === 0 && (
+                                <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[8px] font-bold text-center py-0.5 flex items-center justify-center gap-0.5">
+                                  <Star className="h-2 w-2 fill-current" /> COVER
+                                </div>
+                              )}
+
+                              {/* Delete button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newUrls = [...imageList];
+                                  newUrls.splice(idx, 1);
+                                  setFormImageUrl(newUrls.join(', '));
+                                  setEditingPosIdx(null);
+                                }}
+                                className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-400 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
+                              >
+                                <X className="h-2.5 w-2.5" />
+                              </button>
                             </div>
 
-                            {/* Image card */}
-                            <div
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                                dragOffsetRef.current = {
-                                  x: e.clientX - rect.left,
-                                  y: e.clientY - rect.top,
-                                };
-                                dragInsertRef.current = null;
-                                setDraggedImageIdx(idx);
-                                setDragOverImageIdx(null);
-                                setDragCursorPos({ x: e.clientX, y: e.clientY });
-                              }}
-                              onMouseMove={(e) => {
-                                if (draggedImageIdx === null) return;
-                                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                                const isLeftHalf = e.clientX < rect.left + rect.width / 2;
-                                const newInsert = isLeftHalf ? idx : idx + 1;
-                                if (dragInsertRef.current !== newInsert) {
-                                  dragInsertRef.current = newInsert;
-                                  setDragOverImageIdx(newInsert);
-                                }
-                              }}
-                              className={`relative group flex-shrink-0 flex flex-col items-center gap-1 mr-2 mb-2 transition-all duration-150 ${
-                                isDragging ? 'cursor-grabbing' : 'cursor-grab'
-                              } ${
-                                draggedImageIdx === idx ? 'opacity-25 scale-90' : 'opacity-100 scale-100'
-                              }`}
-                            >
-                              {/* Thumbnail */}
-                              <div className={`relative h-20 w-20 rounded-xl overflow-hidden border-2 bg-white shadow-sm transition-all ${
-                                idx === 0
-                                  ? 'border-violet-400 shadow-violet-100'
-                                  : 'border-zinc-200 group-hover:border-violet-300'
-                              }`}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={url}
-                                  alt={`Product image ${idx + 1}`}
-                                  className="h-full w-full object-cover pointer-events-none"
-                                  draggable={false}
+                            {/* Position badge / input below image */}
+                            <div className="mt-1.5 flex justify-center">
+                              {editingPosIdx === idx ? (
+                                // ── Editable input mode ──
+                                <input
+                                  type="number"
+                                  autoFocus
+                                  min={1}
+                                  max={imageList.length}
+                                  value={editingPosValue}
+                                  onChange={(e) => setEditingPosValue(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') applyMove(idx, editingPosValue);
+                                    if (e.key === 'Escape') { setEditingPosIdx(null); setEditingPosValue(''); }
+                                  }}
+                                  onBlur={() => applyMove(idx, editingPosValue)}
+                                  className="w-10 text-center text-xs font-bold bg-violet-600 text-white rounded-lg px-1 py-0.5 border-2 border-violet-400 outline-none focus:ring-2 focus:ring-violet-300"
                                 />
-
-                                {/* COVER badge */}
-                                {idx === 0 && (
-                                  <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[8px] font-bold text-center py-0.5 flex items-center justify-center gap-0.5 pointer-events-none">
-                                    <Star className="h-2 w-2 fill-current" /> COVER
-                                  </div>
-                                )}
-
-                                {/* Position number */}
-                                {idx !== 0 && (
-                                  <div className="absolute top-1 left-1 bg-black/50 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center pointer-events-none">
-                                    {idx + 1}
-                                  </div>
-                                )}
-
-                                {/* Delete button — only show when not dragging */}
-                                {!isDragging && (
-                                  <button
-                                    type="button"
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onClick={() => {
-                                      const newUrls = [...imageList];
-                                      newUrls.splice(idx, 1);
-                                      setFormImageUrl(newUrls.join(', '));
-                                    }}
-                                    className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-400 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
-                                  >
-                                    <X className="h-2.5 w-2.5" />
-                                  </button>
-                                )}
-                              </div>
+                              ) : (
+                                // ── Clickable number badge ──
+                                <button
+                                  type="button"
+                                  title={`Click to move image ${idx + 1} to a different position`}
+                                  onClick={() => {
+                                    setEditingPosIdx(idx);
+                                    setEditingPosValue(String(idx + 1));
+                                  }}
+                                  className={`w-8 h-6 rounded-lg text-[11px] font-bold transition-all ${
+                                    idx === 0
+                                      ? 'bg-violet-100 text-violet-700 border border-violet-300 cursor-default'
+                                      : 'bg-zinc-200 hover:bg-violet-600 hover:text-white text-zinc-700 border border-zinc-300 hover:border-violet-500 cursor-pointer'
+                                  }`}
+                                >
+                                  {idx + 1}
+                                </button>
+                              )}
                             </div>
-                          </React.Fragment>
+                          </div>
                         ))}
-
-                        {/* Insertion bar AFTER the last image */}
-                        <div
-                          className={`flex-shrink-0 flex items-center justify-center transition-all duration-100 ${
-                            isDragging ? 'w-5 h-20' : 'w-0 h-0'
-                          }`}
-                          onMouseEnter={() => {
-                            if (isDragging) {
-                              setDragOverImageIdx(imageList.length);
-                              dragInsertRef.current = imageList.length;
-                            }
-                          }}
-                        >
-                          <div className={`rounded-full transition-all duration-100 ${
-                            isDragging && dragOverImageIdx === imageList.length
-                              ? 'w-[3px] h-16 bg-violet-500 shadow-lg shadow-violet-400/70'
-                              : isDragging
-                                ? 'w-px h-8 bg-violet-200'
-                                : 'w-0 h-0'
-                          }`} />
-                        </div>
-
-                        {isDragging && (
-                          <p className="w-full text-center text-[10px] text-violet-400 font-semibold mt-2 pointer-events-none">
-                            Release to place here
-                          </p>
-                        )}
                       </div>
+
+                      {editingPosIdx !== null && (
+                        <p className="text-[10px] text-violet-500 font-medium">
+                          Type a position (1–{imageList.length}) and press <kbd className="bg-zinc-100 border border-zinc-300 rounded px-1">Enter</kbd>
+                        </p>
+                      )}
                     </div>
                   );
                 })()}
+
+
                 
                 <input
                   type="text"
