@@ -102,6 +102,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           }
         });
         if (err) throw err;
+        
+        // Trigger Welcome Email (fire and forget)
+        fetch('/api/auth/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name: name })
+        }).catch(console.error);
+
         setRegisterSuccess(true);
       }
     } catch (e) {

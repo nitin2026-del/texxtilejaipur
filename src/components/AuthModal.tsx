@@ -90,6 +90,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       if (err) {
         setError(err.message);
       } else {
+        // Trigger Welcome Email (fire and forget)
+        fetch('/api/auth/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name: name })
+        }).catch(console.error);
+
         setSuccess('Registration successful! Please check your email for confirmation.');
         setTimeout(() => {
           setActiveTab('login');
