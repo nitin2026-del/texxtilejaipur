@@ -1521,15 +1521,48 @@ export default function AdminPortal() {
                 {/* Visual Image Preview — Drag to Reorder */}
                 {formImageUrl.trim() && (() => {
                   const imageList = formImageUrl.split(',').map(u => u.trim()).filter(u => u);
+                  const isDragging = draggedImageIdx !== null;
                   return (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <p className="text-[10px] text-zinc-500 flex items-center gap-1">
                           <GripVertical className="h-3 w-3" />
-                          Drag images to reorder · First image is the cover photo
+                          Hold any image → drag to cover zone or tap ⭐ to set as cover
                         </p>
                         <span className="text-[10px] text-zinc-400 font-mono">{imageList.length} image{imageList.length !== 1 ? 's' : ''}</span>
                       </div>
+
+                      {/* ── COVER DROP ZONE ── shown always when more than 1 image */}
+                      {imageList.length > 1 && (
+                        <div
+                          onDragOver={(e) => { e.preventDefault(); setDragOverImageIdx(-1); }}
+                          onDragLeave={() => setDragOverImageIdx(null)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            if (draggedImageIdx === null || draggedImageIdx === 0) return;
+                            const reordered = [...imageList];
+                            const [moved] = reordered.splice(draggedImageIdx, 1);
+                            reordered.unshift(moved);
+                            setFormImageUrl(reordered.join(', '));
+                            setDraggedImageIdx(null);
+                            setDragOverImageIdx(null);
+                          }}
+                          className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed py-3 px-4 transition-all duration-200 ${
+                            isDragging && draggedImageIdx !== 0
+                              ? dragOverImageIdx === -1
+                                ? 'border-violet-500 bg-violet-50 scale-[1.01] shadow-md shadow-violet-100'
+                                : 'border-violet-300 bg-violet-50/60 animate-pulse'
+                              : 'border-zinc-200 bg-zinc-50 opacity-60'
+                          }`}
+                        >
+                          <Star className={`h-4 w-4 transition-colors ${isDragging && draggedImageIdx !== 0 ? 'text-violet-500 fill-violet-500' : 'text-zinc-400'}`} />
+                          <span className={`text-xs font-bold transition-colors ${isDragging && draggedImageIdx !== 0 ? 'text-violet-600' : 'text-zinc-400'}`}>
+                            {dragOverImageIdx === -1 ? '✦ Drop to Make Cover Photo!' : 'Drop Here → Set as Cover (#1)'}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* ── IMAGE GRID ── */}
                       <div className="flex flex-wrap gap-3 p-4 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-xl min-h-[100px] items-start">
                         {imageList.map((url, idx) => (
                           <div
@@ -1549,7 +1582,7 @@ export default function AdminPortal() {
                               setDragOverImageIdx(null);
                             }}
                             className={`relative group flex flex-col items-center gap-1 cursor-grab active:cursor-grabbing transition-all duration-200 ${
-                              draggedImageIdx === idx ? 'opacity-40 scale-95' : 'opacity-100 scale-100'
+                              draggedImageIdx === idx ? 'opacity-40 scale-90' : 'opacity-100 scale-100'
                             } ${
                               dragOverImageIdx === idx && draggedImageIdx !== idx
                                 ? 'ring-2 ring-violet-500 ring-offset-1 rounded-xl'
@@ -1562,7 +1595,7 @@ export default function AdminPortal() {
                             }`}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={url} alt={`Product image ${idx + 1}`} className="h-full w-full object-cover" />
-                              
+
                               {/* Cover badge on first image */}
                               {idx === 0 && (
                                 <div className="absolute bottom-0 left-0 right-0 bg-violet-600/90 text-white text-[8px] font-bold text-center py-0.5 flex items-center justify-center gap-0.5">
@@ -1570,14 +1603,31 @@ export default function AdminPortal() {
                                 </div>
                               )}
 
-                              {/* Position number badge */}
+                              {/* Position number badge for non-cover images */}
                               {idx !== 0 && (
                                 <div className="absolute top-1 left-1 bg-black/50 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                                   {idx + 1}
                                 </div>
                               )}
 
-                              {/* Drag handle overlay */}
+                              {/* ⭐ SET AS COVER button — tap to instantly move to position 1 */}
+                              {idx !== 0 && (
+                                <button
+                                  type="button"
+                                  title="Set as Cover Photo"
+                                  onClick={() => {
+                                    const reordered = [...imageList];
+                                    const [moved] = reordered.splice(idx, 1);
+                                    reordered.unshift(moved);
+                                    setFormImageUrl(reordered.join(', '));
+                                  }}
+                                  className="absolute bottom-0 left-0 right-0 bg-amber-500/90 hover:bg-amber-400 text-white text-[8px] font-bold py-0.5 flex items-center justify-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all"
+                                >
+                                  <Star className="h-2 w-2" /> SET COVER
+                                </button>
+                              )}
+
+                              {/* Drag handle */}
                               <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <div className="bg-black/40 rounded p-0.5">
                                   <GripVertical className="h-2.5 w-2.5 text-white" />
@@ -1598,7 +1648,7 @@ export default function AdminPortal() {
                               </button>
                             </div>
 
-                            {/* Arrow controls below each image */}
+                            {/* Arrow controls */}
                             <div className="flex gap-0.5">
                               <button
                                 type="button"
