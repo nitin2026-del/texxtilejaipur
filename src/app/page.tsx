@@ -303,10 +303,9 @@ export default function Home() {
                 className="h-24 w-24 rounded-2xl shadow-2xl border-2 border-white/30 object-cover"
               />
               <div className="text-center">
-                <p className="text-white font-serif text-3xl font-bold tracking-wider drop-shadow-lg">TEXXTILE</p>
+                <p className="text-white font-serif text-3xl font-bold tracking-wider drop-shadow-lg">TEXTILE</p>
                 <p className="text-brand-300 text-sm font-bold tracking-[0.4em] uppercase mt-0.5">JAIPUR</p>
               </div>
-              <p className="text-white/50 text-[10px] tracking-widest uppercase font-medium">Est. Since Centuries · Jaipur, India</p>
             </div>
           </div>
 
