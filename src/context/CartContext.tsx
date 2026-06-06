@@ -204,19 +204,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const applyCoupon = (code: string) => {
-    const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
-    if (savedCoupons) {
-      try {
-        const coupons: Coupon[] = JSON.parse(savedCoupons);
-        const found = coupons.find(c => c.code.toUpperCase() === code.toUpperCase());
-        if (found) {
-          setAppliedCoupon(found);
-          return { success: true, message: `Coupon applied successfully!` };
-        }
-      } catch (e) {
-        console.error('Error parsing coupons', e);
-      }
+    const cleanCode = code.trim().toUpperCase();
+    const savedCoupons1 = localStorage.getItem('textilejaipur_admin_coupons');
+    const savedCoupons2 = localStorage.getItem('hiyawear_admin_coupons');
+    
+    let allCoupons: Coupon[] = [];
+    try {
+      if (savedCoupons1) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons1)];
+      if (savedCoupons2) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons2)];
+    } catch (e) {
+      console.error('Error parsing coupons', e);
     }
+    
+    const found = allCoupons.find(c => c?.code && c.code.trim().toUpperCase() === cleanCode);
+    if (found) {
+      setAppliedCoupon(found);
+      return { success: true, message: `Coupon applied successfully!` };
+    }
+    
     return { success: false, message: 'Invalid or expired coupon code.' };
   };
 
