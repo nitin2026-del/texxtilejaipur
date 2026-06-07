@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import paypal from '@paypal/checkout-server-sdk';
 import { createClient } from '@supabase/supabase-js';
+import { handlePaymentSuccess } from '@/lib/paymentSuccessHandler';
 
 // Initialize PayPal — switches between Sandbox and Live via env variable
 const clientId = process.env.PAYPAL_CLIENT_ID || '';
@@ -53,27 +54,6 @@ export async function POST(req: NextRequest) {
         throw new Error(`PayPal payment not completed: ${captureStatus}`);
       }
 
-      // Update the order payment status in Supabase to paid
-      const { data: order, error: orderError } = await supabaseAdmin
-        .from('orders')
-        .update({ payment_status: 'paid' })
-        .eq('id', orderId)
-        .select('user_id')
-        .single();
-        
-      if (orderError) {
-        throw new Error(`Failed to update order status: ${orderError.message}`);
-      }
-
-      // Deduct JaiCoins from user profile if applicable
-      if (order?.user_id && (coinsUsed > 0 || coinsEarned > 0)) {
-        const { data: profile } = await supabaseAdmin.from('profiles').select('jai_coins').eq('id', order.user_id).single();
-        if (profile) {
-          const newBalance = Math.max(0, profile.jai_coins - (coinsUsed || 0)) + (coinsEarned || 0);
-          await supabaseAdmin.from('profiles').update({ jai_coins: newBalance }).eq('id', order.user_id);
-        }
-      }
-
       // Update payment record in payments table
       const { error: paymentError } = await supabaseAdmin
         .from('payments')
@@ -86,45 +66,18 @@ export async function POST(req: NextRequest) {
         // Don't throw — main order is already marked paid
       }
 
-      // Send Order Confirmation Email
-      if (order?.user_id && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-        try {
-          const { data: userData } = await supabaseAdmin.from('users').select('email, full_name').eq('id', order.user_id).single();
-          const userEmail = userData?.email;
-          const userName = userData?.full_name || 'Valued Customer';
-          
-          if (userEmail) {
-            const nodemailer = require('nodemailer');
-            const transporter = nodemailer.createTransport({
-              host: process.env.SMTP_HOST,
-              port: parseInt(process.env.SMTP_PORT || '587'),
-              secure: false,
-              auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-              },
-            });
-
-            await transporter.sendMail({
-              from: `"Textile Jaipur" <${process.env.SMTP_USER}>`,
-              to: userEmail,
-              subject: `Order Confirmation - ${orderId}`,
-              html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #d4af37;">Thank you for your order, ${userName}!</h2>
-                  <p>We are thrilled to confirm that your payment was successful and your order <strong>#${orderId}</strong> is now being processed.</p>
-                  <p>We will send you another update as soon as your items have shipped.</p>
-                  <p>Warm regards,<br>The Textile Jaipur Team</p>
-                </div>
-              `
-            });
-            console.log('Order confirmation email sent to:', userEmail);
-          }
-        } catch (emailErr) {
-          console.error('Failed to send order confirmation email:', emailErr);
-          // Don't block the request if email fails
+      // Deduct JaiCoins from user profile if applicable
+      const { data: order } = await supabaseAdmin.from('orders').select('user_id').eq('id', orderId).single();
+      if (order?.user_id && (coinsUsed > 0 || coinsEarned > 0)) {
+        const { data: profile } = await supabaseAdmin.from('profiles').select('jai_coins').eq('id', order.user_id).single();
+        if (profile) {
+          const newBalance = Math.max(0, profile.jai_coins - (coinsUsed || 0)) + (coinsEarned || 0);
+          await supabaseAdmin.from('profiles').update({ jai_coins: newBalance }).eq('id', order.user_id);
         }
       }
+
+      // Centralized success handler
+      await handlePaymentSuccess(orderId, supabaseAdmin);
 
       return NextResponse.json({ success: true, status: captureStatus }, { status: 200 });
     } else {

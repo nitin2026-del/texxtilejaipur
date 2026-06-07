@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { handlePaymentSuccess } from '@/lib/paymentSuccessHandler';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder';
 const stripe = new Stripe(stripeKey, { apiVersion: '2024-04-10' as any });
@@ -38,11 +39,8 @@ export async function POST(req: NextRequest) {
       const orderId = paymentIntent.metadata?.orderId;
       
       if (orderId) {
-        // Update Order Status to PAID
-        await supabaseAdmin
-          .from('orders')
-          .update({ status: 'PAID' })
-          .eq('id', orderId);
+        // Centralized success handler
+        await handlePaymentSuccess(orderId, supabaseAdmin);
           
         // Update Payment record
         await supabaseAdmin
