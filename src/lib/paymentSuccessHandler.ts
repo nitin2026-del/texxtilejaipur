@@ -19,7 +19,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
     // 2. Decrement Inventory & Fetch details for PDF
     const { data: orderItems, error: itemsError } = await supabaseAdmin
       .from('order_items')
-      .select('*, products(name_en)')
+      .select('*, products(name)')
       .eq('order_id', orderId);
 
     if (itemsError) {
@@ -31,7 +31,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
         // Fetch current stock
         const { data: product, error: productError } = await supabaseAdmin
           .from('products')
-          .select('stock_qty')
+          .select('stock')
           .eq('id', item.product_id)
           .single();
 
@@ -41,12 +41,12 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
         }
 
         // Calculate new stock (prevent going below 0)
-        const newStock = Math.max(0, (product.stock_qty || 0) - item.quantity);
+        const newStock = Math.max(0, (product.stock || 0) - item.quantity);
 
         // Update product stock
         const { error: updateError } = await supabaseAdmin
           .from('products')
-          .update({ stock_qty: newStock })
+          .update({ stock: newStock })
           .eq('id', item.product_id);
 
         if (updateError) {
@@ -69,7 +69,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
             // Map items for PDF generator
             const mappedItems = (orderItems || []).map((item: any) => ({
               ...item,
-              product_name: item.products?.name_en
+              product_name: item.products?.name
             }));
             pdfBuffer = await generateInvoiceBuffer(order, mappedItems, { ...userData, email: userEmail });
           } catch (pdfErr) {
