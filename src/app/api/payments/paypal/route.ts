@@ -66,18 +66,36 @@ export async function POST(req: NextRequest) {
         // Don't throw — main order is already marked paid
       }
 
-      // Deduct JaiCoins from user profile if applicable
-      const { data: order } = await supabaseAdmin.from('orders').select('user_id').eq('id', orderId).single();
-      if (order?.user_id && (coinsUsed > 0 || coinsEarned > 0)) {
-        const { data: profile } = await supabaseAdmin.from('profiles').select('jai_coins').eq('id', order.user_id).single();
+      // Fetch Order to validate JaiCoins
+      const { data: order } = await supabaseAdmin.from('orders').select('user_id, total').eq('id', orderId).single();
+      
+      let actualCoinsUsed = 0;
+      let actualCoinsEarned = 0;
+      let profile = null;
+
+      if (order?.user_id) {
+        const { data: userProfile } = await supabaseAdmin.from('profiles').select('jai_coins').eq('id', order.user_id).single();
+        profile = userProfile;
+        
         if (profile) {
-          const newBalance = Math.max(0, profile.jai_coins - (coinsUsed || 0)) + (coinsEarned || 0);
-          await supabaseAdmin.from('profiles').update({ jai_coins: newBalance }).eq('id', order.user_id);
+          const orderTotalInr = order.total || 0;
+          // Security: The user might have requested to use JaiCoins, but we only deduct if the client asked AND the user has them.
+          // Wait, the client's `coinsUsed` request is an intent to use coins. We cap it securely.
+          actualCoinsUsed = Math.min(coinsUsed || 0, profile.jai_coins, orderTotalInr);
+          
+          const remainingTotal = Math.max(0, orderTotalInr - actualCoinsUsed);
+          actualCoinsEarned = Math.round(remainingTotal * 0.05);
         }
       }
 
       // Centralized success handler
       await handlePaymentSuccess(orderId, supabaseAdmin);
+
+      // Deduct JaiCoins from user profile after success
+      if (order?.user_id && profile) {
+        const newBalance = Math.max(0, profile.jai_coins - actualCoinsUsed) + actualCoinsEarned;
+        await supabaseAdmin.from('profiles').update({ jai_coins: newBalance }).eq('id', order.user_id);
+      }
 
       return NextResponse.json({ success: true, status: captureStatus }, { status: 200 });
     } else {
