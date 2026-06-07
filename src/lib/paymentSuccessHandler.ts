@@ -1,6 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { generateInvoiceBuffer } from './invoiceGenerator';
-import { sendWhatsAppNotification } from './whatsappSender';
 
 export async function handlePaymentSuccess(orderId: string, supabaseAdmin: SupabaseClient) {
   try {
@@ -63,12 +62,6 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
         const userEmail = userData?.email;
         const userName = userData?.full_name || 'Valued Customer';
         
-        // WhatsApp Notification
-        const phone = order?.shipping_addresses?.phone;
-        if (phone) {
-          await sendWhatsAppNotification(phone, orderId, userName);
-        }
-
         // Email & PDF Invoice
         if (userEmail && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
           let pdfBuffer: Buffer | null = null;
