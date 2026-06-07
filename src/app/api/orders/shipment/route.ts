@@ -79,15 +79,15 @@ export async function POST(req: NextRequest) {
             <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com'}/track" style="display: inline-block; background: #d4af37; color: #000; text-decoration: none; padding: 12px 30px; font-weight: bold; border-radius: 4px;">Track Package Online</a>
           </p>
           <p style="color: #666; font-size: 12px; text-align: center; margin-top: 40px;">
-            Thank you for choosing Hiya Wear for your export needs.
+            Thank you for choosing Textile Jaipur for your export needs.
           </p>
         </div>
       `;
 
       const info = await mailer.sendMail({
-        from: '"Hiya Wear Dispatch" <shipping@hiyawear.com>',
+        from: `"Textile Jaipur Dispatch" <${process.env.SMTP_USER}>`,
         to: finalEmail,
-        subject: `Your Hiya Wear Order has Shipped! (${trackingNumber})`,
+        subject: `Your Textile Jaipur Order has Shipped! (${trackingNumber})`,
         html: emailHtml,
       });
 

@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     `;
 
     await mailer.sendMail({
-      from: '"Textile Jaipur Support" <support@textilejaipur.com>',
+      from: `"Textile Jaipur Support" <${process.env.SMTP_USER}>`,
       to: finalEmail,
       subject: `Your Return Link for Order ${orderId}`,
       html: emailHtml,
