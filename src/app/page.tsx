@@ -264,10 +264,22 @@ export default function Home() {
     // Blur the button so that if it gets unmounted, the browser doesn't auto-scroll to the next focusable element
     e.currentTarget.blur();
     
+    // Track current scroll position
+    const containerId = `carousel-${categoryName.replace(/\s+/g, '-')}`;
+    const container = document.getElementById(containerId);
+    const scrollPos = container ? container.scrollLeft : 0;
+    
     setCategoryTiers(prev => ({
       ...prev,
       [categoryName]: (prev[categoryName] || 1) + 1
     }));
+
+    // Force restore scroll position after DOM update to completely prevent snap-jumping
+    if (container) {
+      setTimeout(() => {
+        container.scrollLeft = scrollPos;
+      }, 50);
+    }
   };
 
   // Determine which categories to render sections for
@@ -533,7 +545,7 @@ export default function Home() {
                   </div>
 
                   {/* Horizontal Scrolling Carousel */}
-                  <div className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar snap-x snap-mandatory [overflow-anchor:none]">
+                  <div id={`carousel-${catName.replace(/\s+/g, '-')}`} className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar snap-x snap-mandatory [overflow-anchor:none]">
                     {visibleCatProducts.map((prod) => (
                       <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0 snap-start">
                         <ProductCard product={prod} />
@@ -542,7 +554,7 @@ export default function Home() {
                     
                     {/* Load More Button at the end of carousel */}
                     {hasMoreProducts && (
-                      <div className="w-[280px] sm:w-[320px] shrink-0 snap-start flex items-center justify-center">
+                      <div key={`load-more-${catName}-${currentTier}`} className="w-[280px] sm:w-[320px] shrink-0 snap-start flex items-center justify-center">
                         <button
                           onClick={(e) => handleLoadMore(catName, e)}
                           className="px-8 py-6 border border-zinc-900 text-zinc-900 font-bold tracking-widest uppercase text-xs hover:bg-zinc-900 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col items-center gap-2"
