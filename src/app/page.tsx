@@ -91,7 +91,7 @@ export default function Home() {
 
       // Fetch Categories
       try {
-        const catRes = await fetch(`${url}/rest/v1/categories?select=id,name,parent_id&order=name.asc`, {
+        const catRes = await fetch(`${url}/rest/v1/categories?select=id,name,parent_id,display_order&order=display_order.asc.nullsfirst,name.asc`, {
           headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
         });
         if (catRes.ok) {
