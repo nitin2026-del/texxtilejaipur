@@ -13,18 +13,27 @@ export async function POST(req: NextRequest) {
     const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address } = body;
 
     const authHeader = req.headers.get('Authorization');
+    let supabaseClient = supabaseAdmin;
     let finalUserId = user_id || null;
 
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
+      // Attach the user's token so RLS policies know who the user is
+      supabaseClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+        {
+          global: {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        }
+      );
+      
       const { data: { user } } = await supabaseAdmin.auth.getUser(token);
       if (user) {
         finalUserId = user.id; // securely override user_id from trusted token
       }
     }
-    
-    // Always use supabaseAdmin for secure server-side inserts to prevent RLS failures
-    const supabaseClient = supabaseAdmin;
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
