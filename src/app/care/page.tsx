@@ -65,7 +65,7 @@ export default function CareGuidePage() {
             </div>
             <h3 className="text-xl font-bold mb-3">1. Cold Water Only</h3>
             <p className="text-zinc-600 leading-relaxed">
-              Always wash your block-printed clothes in cold water. Hot water causes natural dyes to bleed rapidly and can shrink pure cotton fabrics. Hand washing is strongly preferred.
+              Always wash your block-printed clothes in cold water. Hot water causes natural dyes to bleed rapidly and can shrink pure cotton fabrics. Hand washing is preferred, but a gentle machine wash on a cold cycle is also an option.
             </p>
           </div>
 
