@@ -9,8 +9,8 @@ import Footer from '../components/Footer';
  */
 export default function MainLayout({
   children,
-  title = 'Gupta International — Premium Global Clothing Exporter',
-  description = 'Luxury ethnic wear, fusion clothing, and fabrics directly exported from India to a global audience.',
+  title = 'Textile Jaipur — Premium Global Clothing Exporter from India',
+  description = 'Discover luxury ethnic wear, fusion clothing, and premium fabrics exported directly from India. Shop Textile Jaipur online!',
   keywords = 'Indian ethnic wear, global clothing export, sustainable fashion, designer sarees, wholesale kurtas',
   canonicalUrl = window.location.href,
   ogImage = 'https://images.unsplash.com/photo-1594912952549-fb93be3d5fc4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',

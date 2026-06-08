@@ -109,22 +109,22 @@ export default function Navbar() {
 
           {/* RIGHT — Icons */}
           <div className={`flex-1 flex items-center justify-end gap-5 ${scrolled ? 'text-[var(--color-charcoal)] dark:text-[#f0ede8]' : 'text-current'}`}>
-            <button onClick={() => setSearchOpen(true)} className="hover:text-[var(--color-bronze)] transition-colors" aria-label="Search">
+            <button onClick={() => setSearchOpen(true)} className="p-2 -m-2 hover:text-[var(--color-bronze)] transition-colors" aria-label="Search">
               <MagnifyingGlassIcon className="w-5 h-5 stroke-[1.5]" />
             </button>
-            <button onClick={toggleTheme} className="hover:text-[var(--color-bronze)] transition-colors hidden sm:block" aria-label="Theme">
+            <button onClick={toggleTheme} className="p-2 -m-2 hover:text-[var(--color-bronze)] transition-colors hidden sm:block" aria-label="Theme">
               {theme === 'light' ? <MoonIcon className="w-5 h-5 stroke-[1.5]" /> : <SunIcon className="w-5 h-5 stroke-[1.5]" />}
             </button>
-            <Link to="/wishlist" className="hover:text-[var(--color-bronze)] transition-colors hidden sm:block" aria-label="Wishlist">
+            <Link to="/wishlist" className="p-2 -m-2 hover:text-[var(--color-bronze)] transition-colors hidden sm:block" aria-label="Wishlist">
               <HeartIcon className="w-5 h-5 stroke-[1.5]" />
             </Link>
-            <Link to="/cart" className="relative hover:text-[var(--color-bronze)] transition-colors flex items-center gap-2" aria-label="Cart">
+            <Link to="/cart" className="relative p-2 -m-2 hover:text-[var(--color-bronze)] transition-colors flex items-center gap-2" aria-label="Cart">
               <ShoppingBagIcon className="w-5 h-5 stroke-[1.5]" />
               {cartCount > 0 && (
                 <span className="text-xs font-medium">{cartCount}</span>
               )}
             </Link>
-            <Link to={auth?.user ? '/dashboard' : '/login'} className="hover:text-[var(--color-bronze)] transition-colors" aria-label="Account">
+            <Link to={auth?.user ? '/dashboard' : '/login'} className="p-2 -m-2 hover:text-[var(--color-bronze)] transition-colors" aria-label="Account">
               <UserIcon className="w-5 h-5 stroke-[1.5]" />
             </Link>
           </div>

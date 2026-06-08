@@ -34,8 +34,13 @@ export default function Footer() {
           </a>
 
           <div className="flex gap-4">
-            {['Instagram', 'Pinterest', 'Facebook'].map(s => (
-              <a key={s} href="#" className="text-xs text-gray-500 hover:text-white transition-colors">{s}</a>
+            {[
+              { name: 'Instagram', url: 'https://instagram.com/textilejaipur' },
+              { name: 'Pinterest', url: 'https://pinterest.com/textilejaipur' },
+              { name: 'Facebook', url: 'https://facebook.com/textilejaipur' },
+              { name: 'X', url: 'https://x.com/textilejaipur' }
+            ].map(s => (
+              <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" className="p-2 -m-2 text-xs text-gray-500 hover:text-white transition-colors">{s.name}</a>
             ))}
           </div>
         </div>
@@ -56,7 +61,7 @@ export default function Footer() {
               { name: 'Skirts', link: '/category/skirts' }
             ].map(item => (
               <li key={item.name}>
-                <Link to={item.link} className="text-sm hover:text-white transition-colors">{item.name}</Link>
+                <Link to={item.link} className="inline-block py-1.5 text-sm hover:text-white transition-colors">{item.name}</Link>
               </li>
             ))}
           </ul>
@@ -72,7 +77,7 @@ export default function Footer() {
               { label: 'Wholesale', to: '/wholesale' },
             ].map(({ label, to }) => (
               <li key={label}>
-                <Link to={to} className="text-sm hover:text-white transition-colors">{label}</Link>
+                <Link to={to} className="inline-block py-1.5 text-sm hover:text-white transition-colors">{label}</Link>
               </li>
             ))}
           </ul>
@@ -97,7 +102,7 @@ export default function Footer() {
               { label: 'Wholesale Inquiry', to: '/wholesale' },
             ].map(({ label, to }) => (
               <li key={label}>
-                <Link to={to} className="text-sm hover:text-white transition-colors">{label}</Link>
+                <Link to={to} className="inline-block py-1.5 text-sm hover:text-white transition-colors">{label}</Link>
               </li>
             ))}
           </ul>
@@ -108,9 +113,9 @@ export default function Footer() {
       <div className="border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-600">© 2024 Gupta International. All rights reserved. Proudly Made in India 🇮🇳</p>
-          <div className="flex gap-6">
+          <div className="flex gap-6 flex-wrap mt-4 md:mt-0">
             {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map(item => (
-              <a key={item} href="#" className="text-xs text-gray-600 hover:text-white transition-colors">{item}</a>
+              <a key={item} href="#" className="p-2 -m-2 text-xs text-gray-600 hover:text-white transition-colors">{item}</a>
             ))}
           </div>
         </div>
