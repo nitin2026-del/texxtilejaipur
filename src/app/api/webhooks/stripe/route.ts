@@ -57,8 +57,14 @@ export async function POST(req: NextRequest) {
       if (failedIntent.metadata?.orderId) {
         await supabaseAdmin
           .from('orders')
-          .update({ status: 'PAYMENT_FAILED' })
+          .update({ status: 'cancelled', payment_status: 'failed' })
           .eq('id', failedIntent.metadata.orderId);
+          
+        await supabaseAdmin
+          .from('payments')
+          .update({ status: 'failed', raw_response: failedIntent as any })
+          .eq('order_id', failedIntent.metadata.orderId)
+          .eq('gateway', 'stripe');
       }
       break;
     default:

@@ -125,9 +125,7 @@ export default function AdminPortal() {
   const [isBypassed, setIsBypassed] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.search.includes('bypass=true')) {
-      setIsBypassed(true);
-    }
+    // Admin access strictly requires profile role to be 'admin'
   }, []);
 
   // Access Denied countdown state
@@ -852,9 +850,14 @@ export default function AdminPortal() {
     setActionLoading(true);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const res = await fetch('/api/orders/shipment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': session ? `Bearer ${session.access_token}` : ''
+        },
         body: JSON.stringify({
           orderId: selectedOrder.id,
           trackingNumber: trackingNumberInput,
@@ -894,8 +897,8 @@ export default function AdminPortal() {
     );
   }
 
-  // 🔒 ACCESS DENIED GATE (Bypassed if URL has ?bypass=true)
-  if (!isBypassed && (!user || profile?.role !== 'admin')) {
+  // 🔒 ACCESS DENIED GATE
+  if (!user || profile?.role !== 'admin') {
     if (!user) {
       return (
         <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 flex items-center justify-center p-6 relative overflow-hidden">
