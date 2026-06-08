@@ -600,14 +600,21 @@ export default function AdminPortal() {
 
       // Base payload — slug is added only for new products
       const basePayload = {
-        sku: formSku,
         name: formName,
         description: formDescription,
-        price_inr: price,
+        price: price,
+        stock: stockInt,
         stock_quantity: stockInt,
-        is_active: true,
+        status: 'active',
         category_id: categoryId,
-        is_featured: formIsFeatured
+        is_featured: formIsFeatured,
+        display_rank: formDisplayRank ? parseInt(formDisplayRank) : 999,
+        details: {
+          material: formMaterial,
+          origin: formOrigin,
+          care: formCare,
+          video_url: formVideoUrl
+        }
       };
 
       let productId = editingProductId;
