@@ -75,9 +75,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
 
             <a href="/" className="flex items-center gap-2 group cursor-pointer">
               <Sparkles className="h-5 w-5 text-brand-600 animate-pulse group-hover:scale-105 transition-transform" />
-              <h1 className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900 hidden sm:block">
+              <div className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900 hidden sm:block">
                 TEXTILE <span className="text-brand-600 font-light">JAIPUR</span>
-              </h1>
+              </div>
             </a>
           </div>
 

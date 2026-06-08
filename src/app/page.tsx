@@ -326,10 +326,10 @@ export default function Home() {
 
           {/* Bottom content — headline & CTA */}
           <div className="space-y-3 sm:space-y-6 sm:mt-0">
-            <h2 className="text-[2.6rem] sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1.05] text-white drop-shadow-2xl max-w-4xl">
+            <h1 className="text-[2.6rem] sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1.05] text-white drop-shadow-2xl max-w-4xl">
               Modern <br />
               <span className="font-light italic text-brand-200">Bohemian</span> Luxe.
-            </h2>
+            </h1>
             
             <p className="text-white/80 text-xs sm:text-lg max-w-xs sm:max-w-xl leading-relaxed font-medium drop-shadow-lg border-l-2 border-brand-400 pl-3 sm:pl-4">
               Handcrafted by master artisans in Jaipur for 400+ years. Delivered anywhere in the world — fully tracked &amp; guaranteed.
@@ -726,7 +726,7 @@ export default function Home() {
               { icon: '🤝', title: '14-Day No-Questions Returns', desc: 'Not happy? Return your item within 14 days for a full refund — no questions asked. We want you to love every piece you order.' },
               { icon: '🛃', title: 'We Handle All Customs & Duties', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork and customs declarations. You receive the package — we handle the rest.' },
               { icon: '🧵', title: '100% Genuinely Handcrafted', desc: 'Every product is hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur, Rajasthan. No factory production — ever.' },
-              { icon: '💬', title: 'Real Customer Support', desc: 'Questions before you buy? Email us at support@textilejaipur.com or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
+              { icon: '💬', title: 'Real Customer Support', desc: 'Questions before you buy? Email us at support[at]textilejaipur.com or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
             ].map((item) => (
               <div key={item.title} className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                 <span className="text-3xl block mb-3">{item.icon}</span>

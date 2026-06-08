@@ -34,9 +34,9 @@ export const Footer: React.FC = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-2 group cursor-pointer">
               <Sparkles className="h-6 w-6 text-brand-700 animate-pulse" />
-              <h1 className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900">
+              <div className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900">
                 TEXTILE <span className="text-brand-700 font-light">JAIPUR</span>
-              </h1>
+              </div>
             </div>
             <p className="text-sm text-zinc-600 leading-relaxed font-medium">
               Redefining premium ethnic wear. Handcrafted in Jaipur, combining timeless heritage with contemporary luxury for the global stage.
@@ -78,11 +78,19 @@ export const Footer: React.FC = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-brand-700 shrink-0" />
-                <span className="text-sm text-zinc-600 font-medium">priyanshug863@gmail.com</span>
+                <span className="text-sm text-zinc-600 font-medium">priyanshug863[at]gmail.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <AtSign className="h-4 w-4 text-brand-700 shrink-0" />
                 <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-600 font-medium hover:text-brand-800 transition-colors">@textileofjaipur</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Globe className="h-4 w-4 text-brand-700 shrink-0" />
+                <a href="https://youtube.com/@textilejaipur" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-600 font-medium hover:text-brand-800 transition-colors">YouTube</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <Globe className="h-4 w-4 text-brand-700 shrink-0" />
+                <a href="https://linkedin.com/company/textilejaipur" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-600 font-medium hover:text-brand-800 transition-colors">LinkedIn</a>
               </li>
             </ul>
           </div>

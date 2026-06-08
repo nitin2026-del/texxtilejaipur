@@ -9,8 +9,8 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Texxtile Jaipur | Handcrafted Indian Ethnic Wear | Worldwide Shipping',
-  description: 'Shop authentic handcrafted Indian textiles direct from Jaipur — embroidered jackets, Boho dresses, Banarasi silk, suzani masterpieces. Free UPS Express worldwide shipping. 3,200+ happy customers across 30+ countries. 14-day returns guaranteed.',
+  title: 'Texxtile Jaipur | Handcrafted Indian Ethnic Wear',
+  description: 'Shop authentic handcrafted Indian textiles direct from Jaipur. Buy embroidered jackets, Boho dresses & Banarasi silk. Free global shipping!',
   keywords: [
     'Indian ethnic wear online', 'buy Indian textiles USA', 'handmade embroidered jacket', 'suzani jacket Europe',
     'boho dress India export', 'Jaipur textile online shop', 'Indian export clothing UK', 'authentic Rajasthani clothing',
@@ -109,7 +109,9 @@ const organizationSchema = {
   },
   sameAs: [
     'https://instagram.com/textileofjaipur',
-    'https://www.facebook.com/textileofjaipur'
+    'https://www.facebook.com/textileofjaipur',
+    'https://youtube.com/@textilejaipur',
+    'https://linkedin.com/company/textilejaipur'
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
