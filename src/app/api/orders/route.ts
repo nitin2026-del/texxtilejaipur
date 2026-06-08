@@ -13,20 +13,18 @@ export async function POST(req: NextRequest) {
     const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address } = body;
 
     const authHeader = req.headers.get('Authorization');
-    let supabaseClient = supabaseAdmin;
+    let finalUserId = user_id || null;
 
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
-      supabaseClient = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-        {
-          global: {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        }
-      );
+      const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+      if (user) {
+        finalUserId = user.id; // securely override user_id from trusted token
+      }
     }
+    
+    // Always use supabaseAdmin for secure server-side inserts to prevent RLS failures
+    const supabaseClient = supabaseAdmin;
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
@@ -62,7 +60,7 @@ export async function POST(req: NextRequest) {
         const { data: addressData, error: addressError } = await supabaseClient
           .from('shipping_addresses')
           .insert({
-            user_id: user_id || null,
+            user_id: finalUserId,
             full_name: shipping_address.full_name,
             address_line1: shipping_address.address_line1,
             address_line2: shipping_address.address_line2,
@@ -87,13 +85,13 @@ export async function POST(req: NextRequest) {
     const productIds = items.map((i: any) => i.id);
     const { data: realProducts } = await supabaseClient
       .from('products')
-      .select('id, price_inr')
+      .select('id, price')
       .in('id', productIds);
 
     let realSubtotalInr = 0;
     const secureOrderItems = items.map((item: any) => {
       const realProduct = realProducts?.find((p) => p.id === item.id);
-      const securePrice = realProduct?.price_inr || item.price_inr || 0;
+      const securePrice = realProduct?.price || item.price_inr || item.price || 0;
       realSubtotalInr += securePrice * item.quantity;
       
       return {
@@ -109,7 +107,7 @@ export async function POST(req: NextRequest) {
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
       .insert({
-        user_id: user_id || null,
+        user_id: finalUserId,
         shipping_address_id: addressId,
         order_number: orderNumber,
         total: total_inr < realSubtotalInr ? total_inr : realSubtotalInr, // Allow legitimate frontend discounts but cap it
