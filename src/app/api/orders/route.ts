@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
           
         if (addressError) {
           console.error('Failed to create address:', addressError);
-          return NextResponse.json({ error: 'Failed to save address' }, { status: 500 });
+          return NextResponse.json({ error: `Failed to save address: ${addressError.message}` }, { status: 500 });
         }
         addressId = addressData.id;
       }
