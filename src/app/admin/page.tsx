@@ -1270,31 +1270,6 @@ export default function AdminPortal() {
                                 >
                                   Edit Tracking
                                 </button>
-                                {order.payment_status !== 'completed' && order.payment_status !== 'paid' && (
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        const token = (await supabase.auth.getSession()).data.session?.access_token;
-                                        const res = await fetch('/api/admin/force-payment', {
-                                          method: 'POST',
-                                          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                                          body: JSON.stringify({ orderId: order.id })
-                                        });
-                                        if (res.ok) {
-                                          showNotification('Payment simulated successfully!');
-                                          fetchAdminData();
-                                        } else {
-                                          throw new Error((await res.json()).error || 'Unknown error');
-                                        }
-                                      } catch(e:any) {
-                                        setErrorMessage(e.message);
-                                      }
-                                    }}
-                                    className="px-2.5 py-1.5 rounded-lg bg-green-50 border border-green-200 hover:bg-green-100 text-green-700 transition-colors text-[10px] font-semibold"
-                                  >
-                                    Simulate Payment
-                                  </button>
-                                )}
                               </div>
                             </td>
                           </tr>

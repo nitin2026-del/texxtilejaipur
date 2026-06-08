@@ -389,12 +389,12 @@ export default function Home() {
             ))}
           </div>
         ) : products.length > 0 ? (
-          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar snap-x snap-mandatory [overflow-anchor:none]">
+          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar [overflow-anchor:none]">
             {(products.filter(p => p.is_featured).length > 0
               ? products.filter(p => p.is_featured)
               : products
             ).slice(0, 4).map((prod) => (
-              <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0 snap-start">
+              <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0">
                 <ProductCard product={prod} />
               </div>
             ))}
@@ -545,16 +545,16 @@ export default function Home() {
                   </div>
 
                   {/* Horizontal Scrolling Carousel */}
-                  <div id={`carousel-${catName.replace(/\s+/g, '-')}`} className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar snap-x snap-mandatory [overflow-anchor:none]">
+                  <div id={`carousel-${catName.replace(/\s+/g, '-')}`} className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar [overflow-anchor:none]">
                     {visibleCatProducts.map((prod) => (
-                      <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0 snap-start">
+                      <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0">
                         <ProductCard product={prod} />
                       </div>
                     ))}
                     
                     {/* Load More Button at the end of carousel */}
                     {hasMoreProducts && (
-                      <div key={`load-more-${catName}-${currentTier}`} className="w-[280px] sm:w-[320px] shrink-0 snap-start flex items-center justify-center">
+                      <div key={`load-more-${catName}-${currentTier}`} className="w-[280px] sm:w-[320px] shrink-0 flex items-center justify-center">
                         <button
                           onClick={(e) => handleLoadMore(catName, e)}
                           className="px-8 py-6 border border-zinc-900 text-zinc-900 font-bold tracking-widest uppercase text-xs hover:bg-zinc-900 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col items-center gap-2"
