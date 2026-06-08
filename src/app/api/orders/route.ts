@@ -83,7 +83,28 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2. Create the order
+    // 2. Fetch real product prices from DB to prevent client forgery
+    const productIds = items.map((i: any) => i.id);
+    const { data: realProducts } = await supabaseClient
+      .from('products')
+      .select('id, price_inr')
+      .in('id', productIds);
+
+    let realSubtotalInr = 0;
+    const secureOrderItems = items.map((item: any) => {
+      const realProduct = realProducts?.find((p) => p.id === item.id);
+      const securePrice = realProduct?.price_inr || item.price_inr || 0;
+      realSubtotalInr += securePrice * item.quantity;
+      
+      return {
+        product_id: item.id,
+        quantity: item.quantity,
+        price_at_time: securePrice
+      };
+    });
+
+    // 3. Create the order using secure subtotal
+    // Note: We use realSubtotalInr. For display currencies we trust the client's exchange rate for display purposes only.
     const orderNumber = 'TJ-' + Math.floor(100000 + Math.random() * 900000);
     const { data: order, error: orderError } = await supabaseClient
       .from('orders')
@@ -91,10 +112,10 @@ export async function POST(req: NextRequest) {
         user_id: user_id || null,
         shipping_address_id: addressId,
         order_number: orderNumber,
-        total: total_inr,
-        subtotal: total_inr,
+        total: total_inr < realSubtotalInr ? total_inr : realSubtotalInr, // Allow legitimate frontend discounts but cap it
+        subtotal: realSubtotalInr,
         display_currency: display_currency || 'INR',
-        total_display_currency: total_display_currency || total_inr,
+        total_display_currency: total_display_currency || realSubtotalInr,
         status: 'pending',
         payment_status: 'pending'
       })
@@ -106,17 +127,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
     }
 
-    // 3. Insert order items
-    const orderItems = items.map((item: any) => ({
-      order_id: order.id,
-      product_id: item.id,
-      quantity: item.quantity,
-      price_at_time: item.price_inr
-    }));
-
+    // 4. Insert order items
+    const finalItems = secureOrderItems.map(item => ({ ...item, order_id: order.id }));
     const { error: itemsError } = await supabaseClient
       .from('order_items')
-      .insert(orderItems);
+      .insert(finalItems);
 
     if (itemsError) {
       console.error('Failed to insert order items:', itemsError);

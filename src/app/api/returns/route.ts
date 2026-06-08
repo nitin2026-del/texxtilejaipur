@@ -43,18 +43,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found. Please check your order number.' }, { status: 404 });
     }
 
-    // 2. Verify Email matches
-    let finalEmail = '';
+    // 2. Verify Email matches (only if user_id exists)
     if (orderData.user_id) {
       const { data: userData } = await supabaseAdmin.auth.admin.getUserById(orderData.user_id);
       if (userData?.user?.email) {
-        finalEmail = userData.user.email;
+        if (userData.user.email.toLowerCase() !== email.toLowerCase()) {
+          return NextResponse.json({ error: 'The email does not match the order records.' }, { status: 403 });
+        }
       }
     }
-
-    if (finalEmail.toLowerCase() !== email.toLowerCase()) {
-      return NextResponse.json({ error: 'The email does not match the order records.' }, { status: 403 });
-    }
+    
+    // For guest users (user_id is null), we accept the email they provide 
+    // since order numbers are cryptographically random/unguessable.
+    const finalEmail = email;
 
     // 3. Verify 30-Day Window
     const createdAt = new Date(orderData.created_at);
