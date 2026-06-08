@@ -6,7 +6,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
     // 1. Standardize Order Status
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
-      .update({ payment_status: 'paid', status: 'processing' })
+      .update({ payment_status: 'completed', status: 'processing' })
       .eq('id', orderId)
       .select('*, shipping_addresses(phone)')
       .single();
@@ -31,7 +31,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
         // Fetch current stock
         const { data: product, error: productError } = await supabaseAdmin
           .from('products')
-          .select('stock')
+          .select('stock_quantity')
           .eq('id', item.product_id)
           .single();
 
@@ -41,12 +41,12 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
         }
 
         // Calculate new stock (prevent going below 0)
-        const newStock = Math.max(0, (product.stock || 0) - item.quantity);
+        const newStock = Math.max(0, (product.stock_quantity || 0) - item.quantity);
 
         // Update product stock
         const { error: updateError } = await supabaseAdmin
           .from('products')
-          .update({ stock: newStock })
+          .update({ stock_quantity: newStock })
           .eq('id', item.product_id);
 
         if (updateError) {

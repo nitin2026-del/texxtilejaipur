@@ -42,10 +42,9 @@ export async function POST(req: NextRequest) {
         // Centralized success handler
         await handlePaymentSuccess(orderId, supabaseAdmin);
           
-        // Update Payment record
         await supabaseAdmin
           .from('payments')
-          .update({ status: 'succeeded', raw_response: paymentIntent as any })
+          .update({ status: 'completed', raw_response: paymentIntent as any })
           .eq('order_id', orderId)
           .eq('gateway', 'stripe');
           

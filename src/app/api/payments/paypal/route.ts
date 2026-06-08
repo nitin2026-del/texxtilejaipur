@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       // Update payment record in payments table
       const { error: paymentError } = await supabaseAdmin
         .from('payments')
-        .update({ status: 'succeeded' })
+        .update({ status: 'completed' })
         .eq('order_id', orderId)
         .eq('gateway', 'paypal');
         

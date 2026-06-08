@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         gateway: 'stripe',
         amount: amount,
         currency: currency,
-        status: 'intent_created',
+        status: 'pending',
         raw_response: paymentIntent,
       });
 

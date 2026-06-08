@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         gateway: 'jaicoins',
         amount: 0,
         currency: 'USD',
-        status: 'succeeded'
+        status: 'completed'
       });
 
     return NextResponse.json({ success: true });
