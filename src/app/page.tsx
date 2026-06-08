@@ -377,7 +377,7 @@ export default function Home() {
             ))}
           </div>
         ) : products.length > 0 ? (
-          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar snap-x snap-mandatory">
+          <div className="flex gap-6 overflow-x-auto pb-8 custom-scrollbar snap-x snap-mandatory [overflow-anchor:none]">
             {(products.filter(p => p.is_featured).length > 0
               ? products.filter(p => p.is_featured)
               : products
@@ -533,7 +533,7 @@ export default function Home() {
                   </div>
 
                   {/* Horizontal Scrolling Carousel */}
-                  <div className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar snap-x snap-mandatory">
+                  <div className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar snap-x snap-mandatory [overflow-anchor:none]">
                     {visibleCatProducts.map((prod) => (
                       <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0 snap-start">
                         <ProductCard product={prod} />
