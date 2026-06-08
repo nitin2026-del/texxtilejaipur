@@ -95,13 +95,7 @@ interface Blog {
   created_at: string;
 }
 
-const CATEGORIES = [
-  'Ethnic Wear',
-  'Sarees',
-  'Fusion Apparel',
-  'Fabrics',
-  'Home Textiles'
-];
+
 
 export default function AdminPortal() {
   const { user, profile, loading: authLoading, signOut } = useAuth();
@@ -134,7 +128,7 @@ export default function AdminPortal() {
   // Database states
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [dbCategories, setDbCategories] = useState<string[]>(CATEGORIES);
+  const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null, display_order?: number}[]>([]);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -152,7 +146,7 @@ export default function AdminPortal() {
   const [formSku, setFormSku] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formPriceInr, setFormPriceInr] = useState('');
-  const [formCategory, setFormCategory] = useState('Ethnic Wear');
+  const [formCategory, setFormCategory] = useState('');
   const [formStock, setFormStock] = useState('50');
   const [formImageUrl, setFormImageUrl] = useState('');
   const [formMaterial, setFormMaterial] = useState('');
@@ -406,7 +400,7 @@ export default function AdminPortal() {
             name: item.name,
             description: item.description || '',
             price_inr: item.price || 0,
-            category: item.categories?.name || 'Ethnic Wear',
+            category: item.categories?.name || 'Uncategorized',
             images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
             stock: item.stock_quantity || item.stock || 0,
             details: {
@@ -685,7 +679,7 @@ export default function AdminPortal() {
     setFormSku(prod.sku || '');
     setFormDescription(prod.description || '');
     setFormPriceInr(prod.price_inr?.toString() || '');
-    setFormCategory(prod.category || 'Ethnic Wear');
+    setFormCategory(prod.category || '');
     setFormStock(prod.stock?.toString() || '0');
     setFormImageUrl(prod.images?.join(', ') || '');
     setFormMaterial(prod.details?.material || '');
@@ -724,7 +718,7 @@ export default function AdminPortal() {
     setFormSku('');
     setFormDescription('');
     setFormPriceInr('');
-    setFormCategory('Ethnic Wear');
+    setFormCategory('');
     setFormStock('50');
     setFormImageUrl('');
     setFormMaterial('');
