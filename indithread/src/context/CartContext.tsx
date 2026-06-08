@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 export interface CartItem {
   id: string;
@@ -9,6 +10,13 @@ export interface CartItem {
   price_inr: number;
   images: string[];
   quantity: number;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number;
 }
 
 export interface CartContextProduct {
@@ -50,19 +58,25 @@ interface CartContextType {
   clearCart: () => void;
   setCurrency: (currency: Currency) => void;
   formatPrice: (priceInr: number) => string;
+  getCartSubtotalInr: () => number;
   getCartTotalInr: () => number;
   getCartTotalDisplay: () => number;
+  appliedCoupon: Coupon | null;
+  applyCoupon: (code: string) => { success: boolean; message: string };
+  removeCoupon: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { tierDiscountPercentage } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currency, setCurrencyState] = useState<Currency>('USD'); // Default to international USD
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   useEffect(() => {
     // Load guest cart from localStorage
-    const savedCart = localStorage.getItem('indithread_cart');
+    const savedCart = localStorage.getItem('textilejaipur_cart');
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -74,7 +88,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Geolocation detection mock
     const detectCurrency = async () => {
       try {
-        // In real app, call a geoip API. For now mock by locale or browser settings
         const userLocale = navigator.language;
         if (userLocale.includes('IN')) {
           setCurrencyState('INR');
@@ -93,12 +106,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrencyState('USD');
       }
     };
-    detectCurrency();
+
+    // Check if user has a saved preference first
+    const savedCurrency = localStorage.getItem('textilejaipur_currency') as Currency;
+    if (savedCurrency && FX_RATES[savedCurrency]) {
+      setCurrencyState(savedCurrency);
+    } else {
+      detectCurrency();
+    }
   }, []);
 
   const saveCart = (newCart: CartItem[]) => {
     setCart(newCart);
-    localStorage.setItem('indithread_cart', JSON.stringify(newCart));
+    localStorage.setItem('textilejaipur_cart', JSON.stringify(newCart));
+    localStorage.setItem('textilejaipur_cart_updated_at', Date.now().toString());
   };
 
   const addToCart = (product: CartContextProduct, quantity = 1) => {
@@ -143,6 +164,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const setCurrency = (curr: Currency) => {
     setCurrencyState(curr);
+    localStorage.setItem('textilejaipur_currency', curr);
   };
 
   const formatPrice = (priceInr: number) => {
@@ -152,13 +174,59 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return `${symbol}${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
-  const getCartTotalInr = () => {
+  const getCartSubtotalInr = () => {
     return cart.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
+  };
+
+  const getCartTotalInr = () => {
+    let subtotal = getCartSubtotalInr();
+    
+    // 1. Apply Tier Discount first
+    if (tierDiscountPercentage > 0) {
+      subtotal = subtotal - (subtotal * (tierDiscountPercentage / 100));
+    }
+
+    if (!appliedCoupon) return Math.max(0, subtotal);
+    
+    // 2. Apply Promo Code Discount
+    let total = subtotal;
+    if (appliedCoupon.type === 'percent') {
+      total = subtotal - (subtotal * (appliedCoupon.value / 100));
+    } else {
+      total = subtotal - appliedCoupon.value;
+    }
+    return Math.max(0, total);
   };
 
   const getCartTotalDisplay = () => {
     const rate = FX_RATES[currency];
     return getCartTotalInr() * rate;
+  };
+
+  const applyCoupon = (code: string) => {
+    const cleanCode = code.trim().toUpperCase();
+    const savedCoupons1 = localStorage.getItem('textilejaipur_admin_coupons');
+    const savedCoupons2 = localStorage.getItem('hiyawear_admin_coupons');
+    
+    let allCoupons: Coupon[] = [];
+    try {
+      if (savedCoupons1) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons1)];
+      if (savedCoupons2) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons2)];
+    } catch (e) {
+      console.error('Error parsing coupons', e);
+    }
+    
+    const found = allCoupons.find(c => c?.code && c.code.trim().toUpperCase() === cleanCode);
+    if (found) {
+      setAppliedCoupon(found);
+      return { success: true, message: `Coupon applied successfully!` };
+    }
+    
+    return { success: false, message: 'Invalid or expired coupon code.' };
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
   };
 
   return (
@@ -173,8 +241,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearCart,
         setCurrency,
         formatPrice,
+        getCartSubtotalInr,
         getCartTotalInr,
         getCartTotalDisplay,
+        appliedCoupon,
+        applyCoupon,
+        removeCoupon,
       }}
     >
       {children}

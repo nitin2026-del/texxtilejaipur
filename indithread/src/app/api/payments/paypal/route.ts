@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import paypal from '@paypal/checkout-server-sdk';
 import { createClient } from '@supabase/supabase-js';
+import { handlePaymentSuccess } from '@/lib/paymentSuccessHandler';
 
 // Initialize PayPal — switches between Sandbox and Live via env variable
 const clientId = process.env.PAYPAL_CLIENT_ID || '';
@@ -22,32 +23,35 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, paypalOrderId, orderId, amount, currency, landingPage } = body;
+    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned } = body;
 
     if (action === 'capture') {
       if (!paypalOrderId || !orderId) {
         return NextResponse.json({ error: 'Missing required parameters for capture' }, { status: 400 });
       }
 
-      // Capture the PayPal order
-      const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
-      request.requestBody({});
-      const response = await client.execute(request);
-
-      // Check if capture was successful
-      const status = response.result.status;
-      if (status !== 'COMPLETED') {
-        throw new Error(`PayPal payment not completed: ${status}`);
+      let captureStatus = '';
+      try {
+        // Capture the PayPal order
+        const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
+        request.requestBody({});
+        const response = await client.execute(request);
+        captureStatus = response.result.status;
+      } catch (captureError: any) {
+        // If already captured (back button / duplicate request), treat as success
+        const isAlreadyCaptured =
+          captureError?.statusCode === 422 ||
+          JSON.stringify(captureError).includes('ORDER_ALREADY_CAPTURED');
+        if (isAlreadyCaptured) {
+          captureStatus = 'COMPLETED'; // Already captured — order is paid
+        } else {
+          throw captureError; // Real error — re-throw
+        }
       }
 
-      // Update the order payment status in Supabase to paid
-      const { error: orderError } = await supabaseAdmin
-        .from('orders')
-        .update({ payment_status: 'paid' })
-        .eq('id', orderId);
-        
-      if (orderError) {
-        throw new Error(`Failed to update order status: ${orderError.message}`);
+      // Check if capture was successful
+      if (captureStatus !== 'COMPLETED') {
+        throw new Error(`PayPal payment not completed: ${captureStatus}`);
       }
 
       // Update payment record in payments table
@@ -59,10 +63,41 @@ export async function POST(req: NextRequest) {
         
       if (paymentError) {
         console.error('Failed to update payments table:', paymentError);
-        // We don't throw here because the main order was marked as paid, but we log it.
+        // Don't throw — main order is already marked paid
       }
 
-      return NextResponse.json({ success: true, status }, { status: 200 });
+      // Fetch Order to validate JaiCoins
+      const { data: order } = await supabaseAdmin.from('orders').select('user_id, total').eq('id', orderId).single();
+      
+      let actualCoinsUsed = 0;
+      let actualCoinsEarned = 0;
+      let profile = null;
+
+      if (order?.user_id) {
+        const { data: userProfile } = await supabaseAdmin.from('profiles').select('jai_coins').eq('id', order.user_id).single();
+        profile = userProfile;
+        
+        if (profile) {
+          const orderTotalInr = order.total || 0;
+          // Security: The user might have requested to use JaiCoins, but we only deduct if the client asked AND the user has them.
+          // Wait, the client's `coinsUsed` request is an intent to use coins. We cap it securely.
+          actualCoinsUsed = Math.min(coinsUsed || 0, profile.jai_coins, orderTotalInr);
+          
+          const remainingTotal = Math.max(0, orderTotalInr - actualCoinsUsed);
+          actualCoinsEarned = Math.round(remainingTotal * 0.05);
+        }
+      }
+
+      // Centralized success handler
+      await handlePaymentSuccess(orderId, supabaseAdmin);
+
+      // Deduct JaiCoins from user profile after success
+      if (order?.user_id && profile) {
+        const newBalance = Math.max(0, profile.jai_coins - actualCoinsUsed) + actualCoinsEarned;
+        await supabaseAdmin.from('profiles').update({ jai_coins: newBalance }).eq('id', order.user_id);
+      }
+
+      return NextResponse.json({ success: true, status: captureStatus }, { status: 200 });
     } else {
       // Default: Create PayPal Order
       if (!orderId || !amount || !currency) {
@@ -82,12 +117,12 @@ export async function POST(req: NextRequest) {
           }
         }],
         application_context: {
-          return_url: `${siteUrl}/dashboard?payment=success&order_id=${orderId}`,
+          return_url: `${siteUrl}/payment/success?order_id=${orderId}`,
           cancel_url: `${siteUrl}/?payment=cancelled`,
-          brand_name: 'Texxtile Jaipur',
+          brand_name: 'Textile Jaipur',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'PAY_NOW',
-          landing_page: landingPage === 'BILLING' ? 'BILLING' : 'LOGIN'
+          landing_page: landingPage === 'LOGIN' ? 'LOGIN' : 'BILLING'
         }
       });
 

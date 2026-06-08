@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
-import { ShoppingCart, Star, Globe } from 'lucide-react';
+import { ShoppingCart, Star, Globe, Check, Heart, Share2, Shield, Flame } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -13,6 +15,7 @@ interface Product {
   category: string;
   images: string[];
   stock: number;
+  is_featured?: boolean;
   details: { material?: string; origin?: string; care?: string };
 }
 
@@ -21,73 +24,227 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { addToCart, formatPrice } = useCart();
+  const { cart, addToCart, formatPrice } = useCart();
+  const isInCart = cart.some((item) => item.id === product.id);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [shareToast, setShareToast] = useState(false);
+
+  // Load wishlist state from localStorage
+  useEffect(() => {
+    try {
+      const wl = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
+      setWishlisted(wl.includes(product.id));
+    } catch {}
+  }, [product.id]);
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const wl: string[] = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
+      const updated = wishlisted
+        ? wl.filter((id) => id !== product.id)
+        : [...wl, product.id];
+      localStorage.setItem('textilejaipur_wishlist', JSON.stringify(updated));
+      // Store full product data for wishlist page
+      const wlProducts: Record<string, Product> = JSON.parse(localStorage.getItem('textilejaipur_wishlist_products') || '{}');
+      if (!wishlisted) wlProducts[product.id] = product;
+      else delete wlProducts[product.id];
+      localStorage.setItem('textilejaipur_wishlist_products', JSON.stringify(wlProducts));
+      setWishlisted(!wishlisted);
+    } catch {}
+  };
+
+  const handleWhatsAppShare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.origin}/product/${product.id}`;
+    const text = `Check out this beautiful Jaipur textile! 🎨\n*${product.name}*\n${formatPrice(product.price_inr)}\n\n${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    setShareToast(true);
+    setTimeout(() => setShareToast(false), 2000);
+  };
+
+  // Track recently viewed
+  useEffect(() => {
+    try {
+      const rv: string[] = JSON.parse(localStorage.getItem('textilejaipur_recently_viewed') || '[]');
+      const updated = [product.id, ...rv.filter((id) => id !== product.id)].slice(0, 10);
+      localStorage.setItem('textilejaipur_recently_viewed', JSON.stringify(updated));
+      const rvProducts: Record<string, Product> = JSON.parse(localStorage.getItem('textilejaipur_rv_products') || '{}');
+      rvProducts[product.id] = product;
+      localStorage.setItem('textilejaipur_rv_products', JSON.stringify(rvProducts));
+    } catch {}
+  }, [product.id]);
+
+  // Stock badge logic
+  const isLowStock = product.stock > 0 && product.stock <= 4;
+  const isSellingFast = product.stock > 4 && product.stock <= 10;
 
   return (
-    <div className="relative rounded-2xl glass-card overflow-hidden flex flex-col h-full group">
-      <div className="h-64 overflow-hidden relative bg-zinc-900 shrink-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img 
-          src={product.images?.[0] || 'https://via.placeholder.com/400x300'} 
+    <div className="relative bg-white flex flex-col h-full group transition-all duration-500">
+      <Link href={`/product/${product.id}`} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
+        <Image 
+          src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
           alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
         
-        {/* Category Badge */}
-        <span className="absolute top-4 left-4 bg-zinc-950/80 backdrop-blur-md text-zinc-300 text-[10px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded-full border border-zinc-800/80">
-          {product.category}
-        </span>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-        {/* Global Export Origin details */}
+        {/* Top-right: Brand Logo Overlay */}
+        <div className="absolute top-4 right-4 z-20 opacity-90 drop-shadow-md">
+          <img src="/icon.png" alt="Texxtile Jaipur" className="h-7 w-7 rounded-md object-cover border border-white/30 shadow-lg" />
+        </div>
+
+        {/* Top-left: Badges */}
+        <div className="absolute top-4 left-4 flex flex-col items-start gap-2 z-10">
+          {product.is_featured && (
+            <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800 animate-pulse">
+              New Arrival
+            </span>
+          )}
+          <span className="bg-white text-zinc-900 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-zinc-100">
+            {product.category}
+          </span>
+        </div>
+
+        {/* Right-side: Wishlist + Share buttons */}
+        <div className="absolute top-14 right-4 flex flex-col gap-2 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+          <button
+            onClick={toggleWishlist}
+            className={`p-2 rounded-full shadow-md backdrop-blur-sm transition-all duration-200 ${
+              wishlisted ? 'bg-red-500 text-white' : 'bg-white/90 text-zinc-600 hover:text-red-500'
+            }`}
+            title={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          >
+            <Heart className={`h-3.5 w-3.5 ${wishlisted ? 'fill-white' : ''}`} />
+          </button>
+          <button
+            onClick={handleWhatsAppShare}
+            className="p-2 rounded-full bg-white/90 text-zinc-600 hover:text-green-600 shadow-md backdrop-blur-sm transition-all duration-200"
+            title="Share on WhatsApp"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        {/* Stock urgency badges */}
+        {isLowStock && (
+          <span className="absolute bottom-4 right-4 bg-red-600 text-white text-[9px] font-bold px-2 py-1 rounded-full z-10 flex items-center gap-1 shadow-lg animate-pulse">
+            <Flame className="h-2.5 w-2.5" /> Only {product.stock} left!
+          </span>
+        )}
+        {isSellingFast && (
+          <span className="absolute bottom-4 right-4 bg-amber-500 text-white text-[9px] font-bold px-2 py-1 rounded-full z-10 flex items-center gap-1 shadow-lg">
+            <Flame className="h-2.5 w-2.5" /> Selling Fast
+          </span>
+        )}
+
+        {/* Origin badge */}
         {product.details?.origin && (
-          <span className="absolute bottom-4 left-4 bg-violet-950/80 backdrop-blur-md text-violet-300 text-[9px] font-medium px-2 py-0.5 rounded-md border border-violet-800/50 flex items-center gap-1">
-            <Globe className="h-3 w-3" />
+          <span className="absolute bottom-4 left-4 bg-zinc-900/90 backdrop-blur-sm text-white text-[9px] font-bold px-2 py-1.5 flex items-center gap-1.5 tracking-widest uppercase shadow-sm z-10 transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+            <Globe className="h-3 w-3 text-brand-300" />
             {product.details.origin}
           </span>
         )}
-      </div>
+
+        {/* Share toast */}
+        {shareToast && (
+          <div className="absolute inset-0 flex items-center justify-center z-20">
+            <span className="bg-green-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-xl">
+              Opening WhatsApp...
+            </span>
+          </div>
+        )}
+      </Link>
 
       {/* Product Info */}
-      <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+      <div className="pt-5 flex-1 flex flex-col justify-between space-y-3 bg-white">
         <div className="space-y-1.5">
-          <div className="flex justify-between items-center text-xs text-zinc-500">
-            <span className="font-mono tracking-wider">{product.sku}</span>
+          {/* GI Tag + Rating row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase">
+                <Shield className="h-2.5 w-2.5" />
+                GI Certified
+              </span>
+            </div>
             <div className="flex items-center gap-1">
-              <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-              <span className="text-zinc-400 font-semibold">4.8</span>
+              <Star className="h-3 w-3 fill-gold text-gold" />
+              <span className="text-zinc-600 font-semibold text-[10px]">4.8</span>
             </div>
           </div>
-          <h4 className="text-lg font-bold text-white tracking-tight line-clamp-1 group-hover:text-violet-400 transition-colors">
-            {product.name}
-          </h4>
-          <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
-            {product.description}
-          </p>
 
-          {/* Details like material */}
-          {product.details?.material && (
-            <p className="text-[10px] text-gold font-medium">
-              ✨ Craftsmanship: {product.details.material}
-            </p>
-          )}
+          <Link href={`/product/${product.id}`} className="block">
+            <h4 className="text-lg font-serif text-zinc-900 tracking-wide line-clamp-1 group-hover:text-brand-700 transition-colors duration-300">
+              {product.name}
+            </h4>
+          </Link>
+
+          {/* SKU + material */}
+          <div className="flex items-center gap-2 text-[9px] text-zinc-400">
+            <span className="font-mono tracking-wider">{product.sku}</span>
+            {product.details?.material && (
+              <>
+                <span>·</span>
+                <span className="font-bold tracking-widest uppercase text-zinc-500">{product.details.material}</span>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Price & Action */}
-        <div className="flex items-center justify-between pt-2 border-t border-zinc-900/60">
-          <div className="flex flex-col">
-            <span className="text-xs text-zinc-500 font-medium">Global Price</span>
-            <span className="text-xl font-extrabold text-white">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between pt-3 gap-3">
+          <div className="flex flex-col shrink-0">
+            <span className="text-lg font-serif text-zinc-900">
               {formatPrice(product.price_inr)}
             </span>
           </div>
 
-          <button
-            onClick={() => addToCart(product)}
-            className="p-2.5 rounded-xl bg-zinc-900 hover:bg-violet-600 text-zinc-300 hover:text-white border border-zinc-800 hover:border-violet-500 transition-all shadow-md flex items-center justify-center gap-1.5 group/btn"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="text-xs font-semibold px-0.5">Add</span>
-          </button>
+          <div className="flex gap-2 w-full xl:w-auto">
+            {isInCart ? (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  addToCart(product);
+                }}
+                className="flex-1 xl:flex-none px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
+              >
+                <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5 stroke-[3]" /> Added
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  addToCart(product);
+                }}
+                disabled={product.stock === 0}
+                className={`flex-1 xl:flex-none px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border border-zinc-900 ${
+                  product.stock === 0
+                    ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed'
+                    : 'bg-transparent text-zinc-900 hover:bg-zinc-900 hover:text-white'
+                }`}
+              >
+                <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                <span className="truncate">{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
+              </button>
+            )}
+
+            <Link
+              href={`/product/${product.id}?buy=true`}
+              className={`flex-1 xl:flex-none px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center border border-brand-700 ${
+                product.stock === 0
+                  ? 'bg-brand-50 text-brand-300 border-brand-200 cursor-not-allowed pointer-events-none'
+                  : 'bg-brand-700 text-white hover:bg-brand-800 shadow-md'
+              }`}
+            >
+              Buy Now
+            </Link>
+          </div>
         </div>
       </div>
     </div>

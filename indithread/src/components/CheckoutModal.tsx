@@ -51,12 +51,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
   // Compute effective totals accounting for JaiCoins
   const effectiveInr = useJaiCoins ? Math.max(0, getCartTotalInr() - JAI_COINS_VALUE_INR) : getCartTotalInr();
-  const FX_RATES: Record<string, number> = { INR: 1, USD: 0.012 * 1.03, EUR: 0.011 * 1.03, GBP: 0.0095 * 1.03, AED: 0.044 * 1.03, AUD: 0.018 * 1.03 };
-  const effectiveDisplay = effectiveInr * (FX_RATES[currency] || 0.012 * 1.03);
-  // PayPal always charges in USD — use the EXACT same rate CartContext uses for USD display
-  // This guarantees PayPal Amount = Total Charges (when displayed in USD)
-  const CART_USD_RATE = 0.012 * 1.03; // Must stay in sync with CartContext FX_RATES USD
-  const paypalUsdAmount = Number((effectiveInr * CART_USD_RATE).toFixed(2));
+  // PayPal always charges in USD — 1 INR = 0.012 USD with 3% markup (kept in sync with CartContext)
+  const USD_RATE = 0.012 * 1.03;
+  const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
+  // Display total in user's chosen currency (uses CartContext FX_RATES directly)
+  const effectiveDisplay = effectiveInr * (effectiveInr > 0 ? (getCartTotalDisplay() / Math.max(getCartTotalInr(), 1)) : USD_RATE);
 
   // Reset createdOrderId and step on every open to avoid stale state (BUG-006)
   useEffect(() => {
@@ -103,6 +102,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           }
         });
         if (err) throw err;
+        
+        // Trigger Welcome Email (fire and forget)
+        fetch('/api/auth/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name: name })
+        }).catch(console.error);
+
         setRegisterSuccess(true);
       }
     } catch (e) {
@@ -163,16 +170,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     }
   };
 
-  const handlePaymentSuccess = (orderId: string) => {
-    // Credit JaiCoins earned (5% of order value)
+  const handlePaymentSuccess = async (orderId: string) => {
+    // Free order handling - securely process via backend
     const coinsEarned = Math.round(getCartTotalInr() * 0.05);
-    // Deduct used JaiCoins and add earned ones
-    const newBalance = Math.max(0, jaiCoins - (useJaiCoins ? JAI_COINS_VALUE_INR : 0)) + coinsEarned;
-    setJaiCoins(newBalance);
-
-    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-    setStep('success');
-    clearCart();
+    const coinsUsed = useJaiCoins ? JAI_COINS_VALUE_INR : 0;
+    
+    setLoading(true);
+    try {
+      await fetch('/api/payments/free-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, coinsUsed, coinsEarned })
+      });
+      // Update local context
+      const newBalance = Math.max(0, jaiCoins - coinsUsed) + coinsEarned;
+      setJaiCoins(newBalance);
+      
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+      setStep('success');
+      clearCart();
+    } catch(err) {
+      setError("Failed to confirm free order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -513,19 +534,39 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
 
 
-              {paymentMethod === 'paypal' && (
-                <PayPalPaymentForm 
-                  orderId={createdOrderId} 
-                  amount={paypalUsdAmount}
-                  currency="USD" 
-                  onSuccess={handlePaymentSuccess} 
-                  onError={setError} 
-                />
-              )}
+              {paymentMethod === 'paypal' && (() => {
+                // Save temp state for PayPal redirect to read
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('temp_jaicoins_used', useJaiCoins ? JAI_COINS_VALUE_INR.toString() : '0');
+                  localStorage.setItem('temp_jaicoins_earned', Math.round(getCartTotalInr() * 0.05).toString());
+                }
+                return (
+                  <PayPalPaymentForm 
+                    orderId={createdOrderId} 
+                    amount={paypalUsdAmount}
+                    currency="USD" 
+                    onSuccess={handlePaymentSuccess} 
+                    onError={setError} 
+                  />
+                );
+              })()}
 
-              <div className="flex items-center gap-1.5 justify-center text-[10px] text-zinc-500 mt-4">
-                <ShieldCheck className="h-4 w-4 text-gold" />
-                <span>Encrypted & Protected by 3D-Secure 2.0</span>
+              {/* Payment help */}
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center gap-1.5 justify-center text-[10px] text-zinc-500">
+                  <ShieldCheck className="h-4 w-4 text-gold" />
+                  <span>Encrypted &amp; Protected by 3D-Secure 2.0</span>
+                </div>
+                <p className="text-center text-[10px] text-zinc-400 leading-relaxed">
+                  Having trouble paying?{' '}
+                  <a href="mailto:support@textilejaipur.com" className="text-amber-500 underline underline-offset-2 hover:text-amber-400">
+                    Write to us
+                  </a>{' '}or{' '}
+                  <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-500 underline underline-offset-2 hover:text-green-400">
+                    WhatsApp us
+                  </a>
+                  {' '}— we handle all payment issues personally.
+                </p>
               </div>
             </div>
           )}
@@ -533,34 +574,45 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           {/* STEP 4: ORDER SUCCESS */}
           {step === 'success' && (
             <div className="text-center py-6 space-y-4">
-              <div className="h-16 w-16 bg-emerald-950/30 border border-emerald-800/60 rounded-full flex items-center justify-center mx-auto mb-2 animate-bounce">
+              <div className="h-16 w-16 bg-emerald-50 border-2 border-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2">
                 <CheckCircle2 className="h-8 w-8 text-emerald-500" />
               </div>
-              <h3 className="text-xl font-bold text-zinc-900 font-serif">Order Confirmed!</h3>
+              <h3 className="text-xl font-bold text-zinc-900 font-serif">Order Confirmed! 🎉</h3>
               <div className="text-xs text-zinc-600 space-y-1">
-                <p>Thank you for purchasing with Textile Jaipur!</p>
-                <p className="mt-2 text-zinc-500">Order ID: <span className="font-mono text-zinc-800">{createdOrderId}</span></p>
-                <p className="text-zinc-500">Our Jaipur logistics hub has queued your shipment.</p>
+                <p className="font-medium">Thank you for shopping with Textile Jaipur!</p>
+                <p className="mt-1 text-zinc-500">Order ID: <span className="font-mono text-zinc-800 font-bold">{createdOrderId}</span></p>
+                <p className="text-zinc-500">Your order has been received and our Jaipur team will dispatch it shortly.</p>
               </div>
 
-              <div className="bg-amber-950/30 border border-amber-900/50 p-3 rounded text-center my-3">
-                <p className="text-xs font-bold text-amber-500">✨ You earned {Math.round(getCartTotalInr() * 0.05)} JaiCoins from this purchase!</p>
+              <div className="bg-amber-50 border border-amber-200 p-3 rounded text-center">
+                <p className="text-xs font-bold text-amber-700">✨ You earned {Math.round(getCartTotalInr() * 0.05)} JaiCoins from this purchase!</p>
               </div>
 
-              <div className="bg-white border border-zinc-300 p-4 rounded text-left max-w-sm mx-auto text-xs space-y-1.5 mt-4">
+              <div className="bg-zinc-50 border border-zinc-200 p-4 rounded text-left max-w-sm mx-auto text-xs space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Delivery Address:</span>
-                  <span className="text-zinc-800 text-right">{city}, {country}</span>
+                  <span className="text-zinc-500">Delivery to:</span>
+                  <span className="text-zinc-800 font-medium text-right">{city}, {country}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Tracking Ref:</span>
-                  <span className="text-gold font-semibold font-mono">Pending Dispatch</span>
+                  <span className="text-zinc-500">Tracking:</span>
+                  <span className="text-amber-600 font-semibold font-mono">Will be emailed to you</span>
+                </div>
+              </div>
+
+              {/* Support note */}
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700 leading-relaxed">
+                <p className="font-semibold mb-1">💬 Need help with your order?</p>
+                <p>If you face any issue — wrong item, delay, or payment concern — just reach out to us directly. We'll take care of everything from our side.</p>
+                <div className="flex gap-3 mt-2 justify-center">
+                  <a href="mailto:support@textilejaipur.com" className="text-blue-600 underline underline-offset-2 font-medium">Email Us</a>
+                  <span className="text-blue-300">|</span>
+                  <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-600 underline underline-offset-2 font-medium">WhatsApp</a>
                 </div>
               </div>
 
               <button
                 onClick={onClose}
-                className="py-2.5 px-6 rounded text-xs font-bold text-zinc-950 btn-premium mt-6"
+                className="py-2.5 px-6 rounded text-xs font-bold text-zinc-950 btn-premium mt-2"
               >
                 Continue Shopping
               </button>

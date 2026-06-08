@@ -69,6 +69,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       return;
     }
 
+    const nameParts = name.trim().split(/\s+/);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
     try {
       // Register via Supabase with user metadata
       const { error: err } = await supabase.auth.signUp({
@@ -76,6 +80,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         password,
         options: {
           data: {
+            first_name: firstName,
+            last_name: lastName,
             name: name
           }
         }
@@ -84,6 +90,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       if (err) {
         setError(err.message);
       } else {
+        // Trigger Welcome Email (fire and forget)
+        fetch('/api/auth/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name: name })
+        }).catch(console.error);
+
         setSuccess('Registration successful! Please check your email for confirmation.');
         setTimeout(() => {
           setActiveTab('login');
@@ -111,10 +124,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
 
         {/* Logo Section */}
         <div className="mb-6 text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight">
-            Indi<span className="text-violet-500">Thread</span>
+          <h2 className="text-3xl font-serif font-bold tracking-wide">
+            TEXTILE <span className="text-gold font-light">WEAR</span>
           </h2>
-          <p className="mt-1 text-sm text-zinc-400">Jaipur Garment Exporters Store</p>
+          <p className="mt-1 text-xs text-zinc-400 tracking-widest uppercase">Luxury Ethnic Clothing Exporters</p>
         </div>
 
         {/* Tab Controls */}
@@ -122,23 +135,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <button
             onClick={() => { setActiveTab('login'); setError(''); setSuccess(''); }}
             className={`flex-1 pb-3 text-center text-sm font-semibold transition-colors relative ${
-              activeTab === 'login' ? 'text-violet-500' : 'text-zinc-400 hover:text-zinc-200'
+              activeTab === 'login' ? 'text-gold' : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
             Sign In
             {activeTab === 'login' && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-violet-500" />
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold" />
             )}
           </button>
           <button
             onClick={() => { setActiveTab('register'); setError(''); setSuccess(''); }}
             className={`flex-1 pb-3 text-center text-sm font-semibold transition-colors relative ${
-              activeTab === 'register' ? 'text-violet-500' : 'text-zinc-400 hover:text-zinc-200'
+              activeTab === 'register' ? 'text-gold' : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
             Create Account
             {activeTab === 'register' && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-violet-500" />
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold" />
             )}
           </button>
         </div>
@@ -172,7 +185,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   placeholder="name@domain.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors"
+                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
             </div>
@@ -189,7 +202,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors"
+                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
             </div>
@@ -216,7 +229,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   placeholder="Sarah Mitchell"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors"
+                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
             </div>
@@ -233,7 +246,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   placeholder="name@domain.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors"
+                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
             </div>
@@ -250,7 +263,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors"
+                  className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-gold transition-colors"
                 />
               </div>
               
