@@ -114,8 +114,6 @@ export async function POST(req: NextRequest) {
         order_number: orderNumber,
         total: total_inr < realSubtotalInr ? total_inr : realSubtotalInr, // Allow legitimate frontend discounts but cap it
         subtotal: realSubtotalInr,
-        display_currency: display_currency || 'INR',
-        total_display_currency: total_display_currency || realSubtotalInr,
         status: 'pending',
         payment_status: 'pending'
       })
