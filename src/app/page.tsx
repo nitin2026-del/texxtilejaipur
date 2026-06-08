@@ -260,7 +260,10 @@ export default function Home() {
     setCategoryTiers({});
   }, [selectedMainCategory, selectedSubCategory]);
 
-  const handleLoadMore = (categoryName: string) => {
+  const handleLoadMore = (categoryName: string, e: React.MouseEvent<HTMLButtonElement>) => {
+    // Blur the button so that if it gets unmounted, the browser doesn't auto-scroll to the next focusable element
+    e.currentTarget.blur();
+    
     setCategoryTiers(prev => ({
       ...prev,
       [categoryName]: (prev[categoryName] || 1) + 1
@@ -541,7 +544,7 @@ export default function Home() {
                     {hasMoreProducts && (
                       <div className="w-[280px] sm:w-[320px] shrink-0 snap-start flex items-center justify-center">
                         <button
-                          onClick={() => handleLoadMore(catName)}
+                          onClick={(e) => handleLoadMore(catName, e)}
                           className="px-8 py-6 border border-zinc-900 text-zinc-900 font-bold tracking-widest uppercase text-xs hover:bg-zinc-900 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col items-center gap-2"
                         >
                           <span>View More</span>
