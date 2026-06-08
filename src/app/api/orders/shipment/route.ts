@@ -55,8 +55,7 @@ export async function POST(req: NextRequest) {
       .from('orders')
       .update({
         tracking_number: trackingNumber,
-        status: status,
-        shipping_provider: shippingProvider
+        status: status
       })
       .eq('id', orderId)
       .select('user_id, shipping_addresses(full_name)');
