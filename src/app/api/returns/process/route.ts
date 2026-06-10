@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
       await mailer.sendMail({
         from: '"Textile Jaipur Returns" <' + process.env.SMTP_USER + '>',
         to: finalEmail,
-        subject: \`Return Request Confirmed - \${orderId}\`,
+        subject: `Return Request Confirmed - ${orderId}`,
         html: emailHtml,
       });
     }

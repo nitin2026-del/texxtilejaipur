@@ -146,7 +146,7 @@ function ReturnProcessContent() {
                   items.map((item) => (
                     <label 
                       key={item.id} 
-                      className={\`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all \${selectedItems[item.id] ? 'border-brand-500 bg-brand-50/50' : 'border-zinc-200 hover:border-zinc-300'}\`}
+                      className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${selectedItems[item.id] ? 'border-brand-500 bg-brand-50/50' : 'border-zinc-200 hover:border-zinc-300'}`}
                     >
                       <input 
                         type="checkbox" 
