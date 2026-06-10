@@ -18,30 +18,14 @@ export async function POST(req: NextRequest) {
 
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
-      // Attach the user's token so RLS policies know who the user is
-      supabaseClient = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-        {
-          global: {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        }
-      );
       
       const { data: { user } } = await supabaseAdmin.auth.getUser(token);
       if (user) {
         finalUserId = user.id; // securely override user_id from trusted token
-      } else {
-        // If the token is invalid/expired, fall back to guest
-        supabaseClient = supabaseAdmin;
       }
     }
 
-    if (!finalUserId) {
-       // Ensure guests always use the admin client to bypass RLS for creating orders
-       supabaseClient = supabaseAdmin;
-    }
+
 
     if (!items || items.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
@@ -52,7 +36,7 @@ export async function POST(req: NextRequest) {
     // 1. Check or Insert Shipping Address if provided
     if (shipping_address) {
       // Deduplicate address
-      let query = supabaseClient
+      let query = supabaseAdmin
         .from('shipping_addresses')
         .select('id')
         .eq('full_name', shipping_address.full_name)
@@ -74,7 +58,7 @@ export async function POST(req: NextRequest) {
       if (existingAddress) {
         addressId = existingAddress.id;
       } else {
-        const { data: addressData, error: addressError } = await supabaseClient
+        const { data: addressData, error: addressError } = await supabaseAdmin
           .from('shipping_addresses')
           .insert({
             user_id: finalUserId,
@@ -100,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Fetch real product prices from DB to prevent client forgery
     const productIds = items.map((i: any) => i.id);
-    const { data: realProducts } = await supabaseClient
+    const { data: realProducts } = await supabaseAdmin
       .from('products')
       .select('id, price')
       .in('id', productIds);
@@ -121,7 +105,7 @@ export async function POST(req: NextRequest) {
     // 3. Create the order using secure subtotal
     // Note: We use realSubtotalInr. For display currencies we trust the client's exchange rate for display purposes only.
     const orderNumber = 'TJ-' + Math.floor(100000 + Math.random() * 900000);
-    const { data: order, error: orderError } = await supabaseClient
+    const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
         user_id: finalUserId,
@@ -143,7 +127,7 @@ export async function POST(req: NextRequest) {
 
     // 4. Insert order items
     const finalItems = secureOrderItems.map((item: any) => ({ ...item, order_id: order.id }));
-    const { error: itemsError } = await supabaseClient
+    const { error: itemsError } = await supabaseAdmin
       .from('order_items')
       .insert(finalItems);
 
