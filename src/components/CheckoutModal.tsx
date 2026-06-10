@@ -62,14 +62,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     if (isOpen) {
       setCreatedOrderId(null);
       setError('');
+      setStep('shipping');
       if (user) {
-        setStep('shipping');
         if (profile) {
           setFullName(profile.full_name || '');
           setPhone(profile.phone || '');
         }
-      } else {
-        setStep('auth');
       }
     }
   }, [isOpen, user, profile]);
@@ -82,36 +80,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     setError('');
 
     try {
-      if (authTab === 'login') {
-        const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) throw err;
-      } else {
-        const nameParts = name.trim().split(/\s+/);
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
-
-        const { error: err } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              first_name: firstName,
-              last_name: lastName,
-              name: name
-            }
-          }
-        });
-        if (err) throw err;
-        
-        // Trigger Welcome Email (fire and forget)
-        fetch('/api/auth/welcome', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, name: name })
-        }).catch(console.error);
-
-        setRegisterSuccess(true);
-      }
+      const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+      if (err) throw err;
     } catch (e) {
       const err = e as Error;
       setError(err.message || 'Authentication failed');
@@ -126,8 +96,61 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     setError('');
 
     try {
+      let finalUserId = user?.id;
+      let usedTempSignupCoins = false;
+
+      // Guest creates an account using password field during checkout
+      if (!user && email && password) {
+        const nameParts = fullName.trim().split(/\s+/);
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              name: fullName
+            }
+          }
+        });
+        
+        if (authError) {
+          throw new Error(`Account creation failed: ${authError.message}`);
+        }
+        
+        if (authData.user) {
+          finalUserId = authData.user.id;
+          usedTempSignupCoins = true;
+          setJaiCoins(500);
+          setUseJaiCoins(true);
+          
+          fetch('/api/auth/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, name: fullName })
+          }).catch(console.error);
+        }
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
+
+      let orderTotalInr = getCartTotalInr();
+      if (useJaiCoins && user) {
+        orderTotalInr = Math.max(0, orderTotalInr - JAI_COINS_VALUE_INR);
+      } else if (usedTempSignupCoins) {
+        orderTotalInr = Math.max(0, orderTotalInr - 500);
+      }
+
+      let orderTotalDisplay = getCartTotalDisplay();
+      if (usedTempSignupCoins || (useJaiCoins && user)) {
+        const coinsValue = usedTempSignupCoins ? 500 : JAI_COINS_VALUE_INR;
+        const discountRatio = Math.max(0, getCartTotalInr() - coinsValue) / Math.max(getCartTotalInr(), 1);
+        orderTotalDisplay = getCartTotalDisplay() * discountRatio;
+      }
 
       // 1. Create order via our API
       const orderRes = await fetch('/api/orders', {
@@ -137,11 +160,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
-          user_id: user?.id,
+          user_id: finalUserId,
+          guest_email: email,
           items: cart,
-          total_inr: getCartTotalInr(),
+          total_inr: orderTotalInr,
           display_currency: currency,
-          total_display_currency: getCartTotalDisplay(),
+          total_display_currency: orderTotalDisplay,
           shipping_address: {
             full_name: fullName,
             address_line1: addressLine1,
@@ -227,44 +251,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
             <div className="space-y-4">
               <div className="text-center p-4 bg-white rounded border border-zinc-300 mb-4">
                 <ShoppingBag className="h-8 w-8 text-gold mx-auto mb-2" />
-                <p className="text-sm font-semibold text-zinc-900">Create your Account</p>
-                <p className="text-xs text-zinc-600 mt-1">Please sign in or register to complete your order securely.</p>
-              </div>
-
-              {/* Login / Register Toggle */}
-              <div className="flex border-b border-zinc-900">
-                <button
-                  onClick={() => setAuthTab('login')}
-                  className={`flex-1 pb-2 text-center text-xs font-semibold ${
-                    authTab === 'login' ? 'text-gold border-b-2 border-gold' : 'text-zinc-500'
-                  }`}
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => setAuthTab('register')}
-                  className={`flex-1 pb-2 text-center text-xs font-semibold ${
-                    authTab === 'register' ? 'text-gold border-b-2 border-gold' : 'text-zinc-500'
-                  }`}
-                >
-                  Create Account
-                </button>
+                <p className="text-sm font-semibold text-zinc-900">Sign In</p>
+                <p className="text-xs text-zinc-600 mt-1">Log in to your account to securely complete your checkout.</p>
               </div>
 
               <form onSubmit={handleAuthSubmit} className="space-y-4 pt-2">
-                {authTab === 'register' && (
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1">Full Name</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Sarah Mitchell"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
-                    />
-                  </div>
-                )}
                 <div>
                   <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address</label>
                   <input
@@ -294,14 +285,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   className="w-full py-2.5 rounded text-xs font-bold text-zinc-950 btn-premium flex items-center justify-center gap-2"
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {authTab === 'login' ? 'Proceed with Login' : 'Register Account'}
+                  Sign In to Continue
                 </button>
               </form>
-              {registerSuccess && (
-                <div className="mt-3 p-3 bg-emerald-950/30 border border-emerald-800/50 rounded text-xs text-emerald-400 text-center">
-                  ✅ Verification email sent! Check your inbox, then sign in to continue.
-                </div>
-              )}
+              <div className="text-center mt-4 border-t border-zinc-200 pt-4">
+                 <button type="button" onClick={() => setStep('shipping')} className="text-xs font-bold text-zinc-600 hover:text-zinc-900">
+                    Continue as Guest
+                 </button>
+              </div>
             </div>
           )}
 
@@ -309,8 +300,60 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           {step === 'shipping' && (
             <form onSubmit={handleShippingSubmit} className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-800 flex items-center gap-1.5 mb-2 font-serif">
-                <MapPin className="h-4 w-4 text-gold" /> Shipping Destination
+                <MapPin className="h-4 w-4 text-gold" /> Delivery Details
               </h3>
+
+              {!user && (
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between items-center bg-zinc-50 border border-zinc-200 rounded p-3">
+                    <span className="text-xs text-zinc-600">Already have an account?</span>
+                    <button 
+                      type="button" 
+                      onClick={() => setStep('auth')} 
+                      className="text-xs font-bold text-gold hover:underline"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address (For order tracking & receipts)</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="name@domain.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
+                    />
+                  </div>
+
+                  <div className="bg-amber-50 border border-amber-200 rounded p-4 shadow-sm">
+                    <h4 className="text-sm font-bold text-zinc-900 flex items-center gap-2 mb-2">
+                      <span className="text-amber-500">🎁</span> You are checking out as a Guest.
+                    </h4>
+                    <p className="text-xs text-zinc-700 mb-3 leading-relaxed">
+                      By not creating a free account, you will miss out on:
+                    </p>
+                    <ul className="text-xs text-zinc-600 space-y-1.5 mb-4 list-disc list-inside">
+                      <li>🚫 <strong className="text-zinc-800">Losing 500 Jai Coins ($5 Value):</strong> You won't get your sign-up bonus applied to this order.</li>
+                      <li>🚫 <strong className="text-zinc-800">No Order History:</strong> You won't be able to easily track past purchases.</li>
+                      <li>🚫 <strong className="text-zinc-800">Slower Checkouts:</strong> We won't save your shipping details for next time.</li>
+                    </ul>
+                    
+                    <div className="pt-3 border-t border-amber-200/50">
+                      <label className="block text-xs font-bold text-amber-800 mb-1">Create a Password to claim 500 Jai Coins instantly! (Optional)</label>
+                      <input
+                        type="password"
+                        placeholder="Set a password..."
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-white border border-amber-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+                      />
+                      <p className="text-[10px] text-amber-600 mt-1.5">Leave blank to continue as a guest.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-600 mb-1">Full Name</label>

@@ -10,7 +10,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address } = body;
+    const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address, guest_email } = body;
 
     const authHeader = req.headers.get('Authorization');
     let supabaseClient = supabaseAdmin;
@@ -122,7 +122,8 @@ export async function POST(req: NextRequest) {
         total: total_inr < realSubtotalInr ? total_inr : realSubtotalInr, // Allow legitimate frontend discounts but cap it
         subtotal: realSubtotalInr,
         status: 'pending',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        notes: (!finalUserId && guest_email) ? `Guest Checkout Email: ${guest_email}` : null
       })
       .select('id')
       .single();
