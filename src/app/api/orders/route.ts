@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Insert order items
-    const finalItems = secureOrderItems.map(item => ({ ...item, order_id: order.id }));
+    const finalItems = secureOrderItems.map((item: any) => ({ ...item, order_id: order.id }));
     const { error: itemsError } = await supabaseClient
       .from('order_items')
       .insert(finalItems);
