@@ -135,7 +135,7 @@ export default function ProductPage() {
                 product_images (url, is_primary)
               `)
               .neq('id', item.id)
-              .limit(4);
+              .limit(20);
               
             // If category exists, try fetching from same category first
             if (item.category_id) {
@@ -149,7 +149,9 @@ export default function ProductPage() {
                     category: p.categories?.name || 'Ethnic Wear',
                     image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
                  }));
-                 setRelatedProducts(formatted);
+                 // Shuffle randomly and take 4
+                 const shuffled = formatted.sort(() => 0.5 - Math.random()).slice(0, 4);
+                 setRelatedProducts(shuffled);
                  return;
               }
             }
@@ -163,16 +165,19 @@ export default function ProductPage() {
                 product_images (url, is_primary)
               `)
               .neq('id', item.id)
-              .limit(4);
+              .limit(20);
 
             if (relatedData) {
-              setRelatedProducts(relatedData.map((p: any) => ({
+              const formatted = relatedData.map((p: any) => ({
                 id: p.id,
                 name: p.name,
                 price_inr: p.price,
                 category: p.categories?.name || 'Ethnic Wear',
                 image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
-              })));
+              }));
+              // Shuffle randomly and take 4
+              const shuffled = formatted.sort(() => 0.5 - Math.random()).slice(0, 4);
+              setRelatedProducts(shuffled);
             }
           } catch (e) {
             console.error('Error fetching related products:', e);
