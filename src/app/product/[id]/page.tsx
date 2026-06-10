@@ -9,7 +9,7 @@ import { CheckoutModal } from '@/components/CheckoutModal';
 import { useCart } from '@/context/CartContext';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -20,7 +20,7 @@ interface Product {
   category: string;
   images: string[];
   stock_quantity: number;
-  details: { material?: string; origin?: string; care?: string; sizes?: string[] };
+  details: { material?: string; origin?: string; care?: string; sizes?: string[]; video_url?: string };
 }
 
 export default function ProductPage() {
@@ -29,6 +29,7 @@ export default function ProductPage() {
   const { cart, addToCart, formatPrice } = useCart();
   
   const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -119,9 +120,36 @@ export default function ProductPage() {
               material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
               origin: 'Jaipur, Rajasthan',
               care: 'Dry clean only',
-              sizes: ['S', 'M', 'L', 'XL']
+              sizes: ['S', 'M', 'L', 'XL'],
+              video_url: item.details?.video_url
             }
           });
+
+          // Fetch related products
+          try {
+            const { data: relatedData } = await supabase
+              .from('products')
+              .select(`
+                id, name, price,
+                categories (name),
+                product_images (url, is_primary)
+              `)
+              .eq('category_id', item.category_id)
+              .neq('id', item.id)
+              .limit(4);
+              
+            if (relatedData) {
+              setRelatedProducts(relatedData.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                price_inr: p.price,
+                category: p.categories?.name || 'Ethnic Wear',
+                image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
+              })));
+            }
+          } catch (e) {
+            console.error('Error fetching related products:', e);
+          }
         }
       } catch (err) {
         console.error('Error fetching product:', err);
@@ -219,6 +247,25 @@ export default function ProductPage() {
                       </div>
                     </button>
                   ))}
+                </div>
+              )}
+              
+              {product.details?.video_url && (
+                <div className="mt-4 border border-zinc-200 rounded-lg overflow-hidden bg-black/5 aspect-video relative">
+                  {product.details.video_url.includes('youtube.com') || product.details.video_url.includes('youtu.be') ? (
+                    <iframe 
+                      src={product.details.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')} 
+                      className="absolute inset-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  ) : (
+                    <video 
+                      src={product.details.video_url} 
+                      className="absolute inset-0 w-full h-full object-cover" 
+                      controls 
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -426,6 +473,36 @@ export default function ProductPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* You May Also Like Section */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-20 pt-16 border-t border-zinc-200">
+            <div className="flex items-center gap-2 mb-8">
+              <Sparkles className="h-6 w-6 text-brand-600" />
+              <h3 className="text-2xl font-serif text-zinc-900 font-bold">You May Also Like</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {relatedProducts.map((rp) => (
+                <a key={rp.id} href={`/product/${rp.id}`} className="group block bg-white border border-zinc-200 rounded-xl overflow-hidden hover:border-brand-300 hover:shadow-xl transition-all">
+                  <div className="aspect-[4/5] relative bg-zinc-100 overflow-hidden">
+                    <Image 
+                      src={rp.image} 
+                      alt={rp.name}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wider mb-1">{rp.category}</p>
+                    <h4 className="text-sm font-semibold text-zinc-900 line-clamp-1 group-hover:text-brand-700 transition-colors">{rp.name}</h4>
+                    <p className="text-zinc-900 font-bold mt-2 font-serif">{formatPrice(rp.price_inr)}</p>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         )}

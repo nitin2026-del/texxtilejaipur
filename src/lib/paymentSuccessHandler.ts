@@ -58,9 +58,11 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
     // 3 & 4 & 5. WhatsApp & PDF Invoice & Email Notification
     if (order?.user_id) {
       try {
-        const { data: userData } = await supabaseAdmin.from('users').select('email, full_name').eq('id', order.user_id).single();
-        const userEmail = userData?.email;
-        const userName = userData?.full_name || 'Valued Customer';
+        const { data: authData } = await supabaseAdmin.auth.admin.getUserById(order.user_id);
+        const { data: profileData } = await supabaseAdmin.from('profiles').select('full_name').eq('id', order.user_id).single();
+        const userEmail = authData?.user?.email;
+        const userName = profileData?.full_name || 'Valued Customer';
+        const userData = { email: userEmail, full_name: userName };
         
         // Email & PDF Invoice
         if (userEmail && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
