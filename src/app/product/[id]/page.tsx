@@ -127,6 +127,34 @@ export default function ProductPage() {
 
           // Fetch related products
           try {
+            let query = supabase
+              .from('products')
+              .select(`
+                id, name, price,
+                categories (name),
+                product_images (url, is_primary)
+              `)
+              .neq('id', item.id)
+              .limit(4);
+              
+            // If category exists, try fetching from same category first
+            if (item.category_id) {
+              const { data: categoryData } = await query.eq('category_id', item.category_id);
+              if (categoryData && categoryData.length >= 2) {
+                 // Use category data if we have at least 2 products
+                 const formatted = categoryData.map((p: any) => ({
+                    id: p.id,
+                    name: p.name,
+                    price_inr: p.price,
+                    category: p.categories?.name || 'Ethnic Wear',
+                    image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
+                 }));
+                 setRelatedProducts(formatted);
+                 return;
+              }
+            }
+            
+            // Fallback: fetch any products
             const { data: relatedData } = await supabase
               .from('products')
               .select(`
@@ -134,10 +162,9 @@ export default function ProductPage() {
                 categories (name),
                 product_images (url, is_primary)
               `)
-              .eq('category_id', item.category_id)
               .neq('id', item.id)
               .limit(4);
-              
+
             if (relatedData) {
               setRelatedProducts(relatedData.map((p: any) => ({
                 id: p.id,
