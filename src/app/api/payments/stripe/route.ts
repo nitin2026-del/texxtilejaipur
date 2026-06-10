@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     // Update the order in Supabase with the payment intent ID
     await supabaseAdmin
       .from('orders')
-      .update({ payment_intent_id: paymentIntent.id, gateway: 'stripe' })
+      .update({ payment_id: paymentIntent.id, payment_method: 'stripe' })
       .eq('id', orderId);
 
     // Record the payment attempt in the payments table
@@ -45,10 +45,11 @@ export async function POST(req: NextRequest) {
       .insert({
         order_id: orderId,
         gateway: 'stripe',
+        provider: 'stripe',
+        provider_transaction_id: paymentIntent.id,
         amount: amount,
         currency: currency,
-        status: 'pending',
-        raw_response: paymentIntent,
+        status: 'pending'
       });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret }, { status: 200 });

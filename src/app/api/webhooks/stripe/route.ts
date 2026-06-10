@@ -44,9 +44,9 @@ export async function POST(req: NextRequest) {
           
         await supabaseAdmin
           .from('payments')
-          .update({ status: 'completed', raw_response: paymentIntent as any })
+          .update({ status: 'completed' })
           .eq('order_id', orderId)
-          .eq('gateway', 'stripe');
+          .eq('provider', 'stripe');
           
         // Here you would trigger the Email / WhatsApp notifications
       }
@@ -61,9 +61,9 @@ export async function POST(req: NextRequest) {
           
         await supabaseAdmin
           .from('payments')
-          .update({ status: 'failed', raw_response: failedIntent as any })
+          .update({ status: 'failed' })
           .eq('order_id', failedIntent.metadata.orderId)
-          .eq('gateway', 'stripe');
+          .eq('provider', 'stripe');
       }
       break;
     default:
