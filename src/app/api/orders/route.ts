@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const productIds = items.map((i: any) => i.id);
     const { data: realProducts } = await supabaseAdmin
       .from('products')
-      .select('id, price')
+      .select('id, price_inr, price, name, sku')
       .in('id', productIds);
 
     let realSubtotalInr = 0;
@@ -97,8 +97,11 @@ export async function POST(req: NextRequest) {
       
       return {
         product_id: item.id,
+        product_name: realProduct?.name || item.name || 'Unknown Product',
+        sku: realProduct?.sku || item.sku || 'N/A',
         quantity: item.quantity,
-        price_at_time: securePrice
+        price_at_time: securePrice,
+        currency: 'INR'
       };
     });
 
@@ -111,8 +114,8 @@ export async function POST(req: NextRequest) {
         user_id: finalUserId,
         shipping_address_id: addressId,
         order_number: orderNumber,
-        total: total_inr < realSubtotalInr ? total_inr : realSubtotalInr, // Allow legitimate frontend discounts but cap it
-        subtotal: realSubtotalInr,
+        total_amount: total_inr < realSubtotalInr ? total_inr : realSubtotalInr, // Allow legitimate frontend discounts but cap it
+        currency: 'INR',
         status: 'pending',
         payment_status: 'pending',
         notes: (!finalUserId && guest_email) ? `Guest Checkout Email: ${guest_email}` : null
