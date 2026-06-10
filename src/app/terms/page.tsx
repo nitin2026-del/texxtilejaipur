@@ -23,7 +23,7 @@ export default function TermsOfServicePage() {
           
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">1. Acceptance of Terms</h2>
           <p>
-            By accessing and using Textile Jaipur's website, you accept and agree to be bound by the terms and provision of this agreement.
+            By accessing and using Textile Jaipur&apos;s website, you accept and agree to be bound by the terms and provision of this agreement.
           </p>
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">2. Handcrafted Goods Disclaimer</h2>
@@ -33,7 +33,7 @@ export default function TermsOfServicePage() {
           
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">3. Prices and Payments</h2>
           <p>
-            All prices are subject to change without notice. We make every effort to provide you with the most accurate, up-to-date pricing. However, pricing errors may occasionally occur. If an item's correct price is higher than our stated price, we will, at our discretion, either contact you for instructions before shipping or cancel your order and notify you of such cancellation.
+            All prices are subject to change without notice. We make every effort to provide you with the most accurate, up-to-date pricing. However, pricing errors may occasionally occur. If an item&apos;s correct price is higher than our stated price, we will, at our discretion, either contact you for instructions before shipping or cancel your order and notify you of such cancellation.
           </p>
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">4. Shipping and Duties</h2>

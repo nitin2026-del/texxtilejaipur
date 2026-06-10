@@ -335,9 +335,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                       By not creating a free account, you will miss out on:
                     </p>
                     <ul className="text-xs text-zinc-600 space-y-1.5 mb-4 list-disc list-inside">
-                      <li>🚫 <strong className="text-zinc-800">Losing 500 Jai Coins ($5 Value):</strong> You won't get your sign-up bonus applied to this order.</li>
-                      <li>🚫 <strong className="text-zinc-800">No Order History:</strong> You won't be able to easily track past purchases.</li>
-                      <li>🚫 <strong className="text-zinc-800">Slower Checkouts:</strong> We won't save your shipping details for next time.</li>
+                      <li>🚫 <strong className="text-zinc-800">Losing 500 Jai Coins ($5 Value):</strong> You won&apos;t get your sign-up bonus applied to this order.</li>
+                      <li>🚫 <strong className="text-zinc-800">No Order History:</strong> You won&apos;t be able to easily track past purchases.</li>
+                      <li>🚫 <strong className="text-zinc-800">Slower Checkouts:</strong> We won&apos;t save your shipping details for next time.</li>
                     </ul>
                     
                     <div className="pt-3 border-t border-amber-200/50">
@@ -645,7 +645,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               {/* Support note */}
               <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700 leading-relaxed">
                 <p className="font-semibold mb-1">💬 Need help with your order?</p>
-                <p>If you face any issue — wrong item, delay, or payment concern — just reach out to us directly. We'll take care of everything from our side.</p>
+                <p>If you face any issue — wrong item, delay, or payment concern — just reach out to us directly. We&apos;ll take care of everything from our side.</p>
                 <div className="flex gap-3 mt-2 justify-center">
                   <a href="mailto:support@textilejaipur.com" className="text-blue-600 underline underline-offset-2 font-medium">Email Us</a>
                   <span className="text-blue-300">|</span>
