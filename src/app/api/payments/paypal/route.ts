@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
       // Update the order in Supabase with the PayPal order ID
       await supabaseAdmin
         .from('orders')
-        .update({ payment_intent_id: createdPaypalOrderId, gateway: 'paypal' })
+        .update({ payment_id: createdPaypalOrderId, payment_method: 'paypal' })
         .eq('id', orderId);
 
       // Record the payment attempt in the payments table
@@ -144,10 +144,11 @@ export async function POST(req: NextRequest) {
         .insert({
           order_id: orderId,
           gateway: 'paypal',
+          provider: 'paypal',
+          provider_transaction_id: createdPaypalOrderId,
           amount: amount,
           currency: currency,
-          status: 'intent_created',
-          raw_response: response.result,
+          status: 'intent_created'
         });
 
       return NextResponse.json({ id: createdPaypalOrderId, approvalUrl }, { status: 200 });
