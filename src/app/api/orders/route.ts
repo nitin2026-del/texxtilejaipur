@@ -32,7 +32,15 @@ export async function POST(req: NextRequest) {
       const { data: { user } } = await supabaseAdmin.auth.getUser(token);
       if (user) {
         finalUserId = user.id; // securely override user_id from trusted token
+      } else {
+        // If the token is invalid/expired, fall back to guest
+        supabaseClient = supabaseAdmin;
       }
+    }
+
+    if (!finalUserId) {
+       // Ensure guests always use the admin client to bypass RLS for creating orders
+       supabaseClient = supabaseAdmin;
     }
 
     if (!items || items.length === 0) {
