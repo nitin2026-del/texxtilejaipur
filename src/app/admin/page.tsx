@@ -1455,7 +1455,7 @@ export default function AdminPortal() {
                 <Database className="h-4 w-4 text-brand-700" /> Active Slub & Silk Product Ledger
               </h3>
               <div className="flex items-center gap-3">
-                {products.filter(p => !p.description || p.description.length < 20).length > 0 && (
+                {products.filter(p => !p.description || p.description.length < 20 || !p.details?.translations).length > 0 && (
                   <button
                     onClick={handleBulkGenerateDescriptions}
                     disabled={isBulkAiGenerating}
@@ -1463,8 +1463,8 @@ export default function AdminPortal() {
                   >
                     {isBulkAiGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : '✨'}
                     {isBulkAiGenerating 
-                      ? `Writing (${bulkAiProgress}/${products.filter(p => !p.description || p.description.length < 20).length})...` 
-                      : `Auto-Write ${products.filter(p => !p.description || p.description.length < 20).length} Descriptions`}
+                      ? `Writing (${bulkAiProgress}/${products.filter(p => !p.description || p.description.length < 20 || !p.details?.translations).length})...` 
+                      : `Auto-Write ${products.filter(p => !p.description || p.description.length < 20 || !p.details?.translations).length} Descriptions`}
                   </button>
                 )}
                 <button
