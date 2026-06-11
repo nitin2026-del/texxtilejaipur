@@ -51,6 +51,10 @@ export default function ProductPage() {
   const [shareToast, setShareToast] = useState(false);
   const [expandedQa, setExpandedQa] = useState<number | null>(null);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+  const [inquiryEmail, setInquiryEmail] = useState('');
+  const [inquiryQuestion, setInquiryQuestion] = useState('');
+  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
+  const [inquiryError, setInquiryError] = useState('');
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<string | null>(null);
   
@@ -698,20 +702,30 @@ export default function ProductPage() {
                   </div>
                 ) : (
                   <div className="space-y-3 bg-zinc-50 p-5 rounded-xl border border-zinc-200">
+                    <input 
+                      type="email"
+                      placeholder="Your email address (so we can reply)" 
+                      value={inquiryEmail}
+                      onChange={(e) => setInquiryEmail(e.target.value)}
+                      className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
+                    />
                     <textarea 
                       placeholder="Type your question here..." 
+                      value={inquiryQuestion}
+                      onChange={(e) => setInquiryQuestion(e.target.value)}
                       className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
                       rows={3}
                     ></textarea>
+                    {inquiryError && (
+                      <p className="text-red-500 text-xs font-semibold">{inquiryError}</p>
+                    )}
                     <div className="flex gap-2">
                       <button 
-                        onClick={() => {
-                          setFormSubmitted('question');
-                          setTimeout(() => { setFormSubmitted(null); setShowQuestionForm(false); }, 3000);
-                        }}
-                        className="px-4 py-2 bg-brand-700 text-white font-bold rounded-lg text-xs"
+                        onClick={handleInquirySubmit}
+                        disabled={isSubmittingInquiry}
+                        className="px-4 py-2 bg-brand-700 text-white font-bold rounded-lg text-xs disabled:opacity-50"
                       >
-                        Submit
+                        {isSubmittingInquiry ? 'Submitting...' : 'Submit'}
                       </button>
                       <button 
                         onClick={() => setShowQuestionForm(false)}

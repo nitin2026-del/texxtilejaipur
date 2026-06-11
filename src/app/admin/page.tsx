@@ -10,7 +10,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion
 } from 'lucide-react';
 
 interface Product {
@@ -95,6 +95,15 @@ interface Blog {
   created_at: string;
 }
 
+interface Inquiry {
+  id: string;
+  product_id: string;
+  customer_email: string;
+  question: string;
+  status: string;
+  created_at: string;
+  products?: { name: string, sku: string };
+}
 
 
 export default function AdminPortal() {
@@ -107,7 +116,7 @@ export default function AdminPortal() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries'>('overview');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
@@ -177,6 +186,9 @@ export default function AdminPortal() {
   const [formCouponCode, setFormCouponCode] = useState('');
   const [formCouponType, setFormCouponType] = useState<'percent' | 'fixed'>('percent');
   const [formCouponValue, setFormCouponValue] = useState('');
+
+  // Inquiries states
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
 
   // Bulk Edit States
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
@@ -631,6 +643,18 @@ export default function AdminPortal() {
         try { setCoupons(JSON.parse(savedCoupons)); } catch (e) { console.error('Failed to parse coupons', e); }
       }
 
+      // 5. Fetch Inquiries
+      const { data: inquiryData, error: inquiryErr } = await supabase
+        .from('product_inquiries')
+        .select(`
+          *,
+          products (name, sku)
+        `)
+        .order('created_at', { ascending: false });
+      if (!inquiryErr && inquiryData) {
+        setInquiries(inquiryData as Inquiry[]);
+      }
+
     } catch (err) {
       console.error('Error fetching admin details:', err);
       showNotification('Error loading dashboard data.', true);
@@ -992,6 +1016,21 @@ export default function AdminPortal() {
     showNotification('Coupon created successfully!');
   };
 
+  const handleMarkInquiryReplied = async (inquiryId: string) => {
+    try {
+      const { error } = await supabase
+        .from('product_inquiries')
+        .update({ status: 'replied' })
+        .eq('id', inquiryId);
+      if (error) throw error;
+      setInquiries(inquiries.map(inq => inq.id === inquiryId ? { ...inq, status: 'replied' } : inq));
+      showNotification('Inquiry marked as replied');
+    } catch (err) {
+      console.error('Error updating inquiry status', err);
+      showNotification('Failed to update status', true);
+    }
+  };
+
   const handleDeleteCoupon = (id: string) => {
     if (!confirm('Are you sure you want to delete this coupon?')) return;
     const updatedCoupons = coupons.filter(c => c.id !== id);
@@ -1286,6 +1325,16 @@ export default function AdminPortal() {
               }`}
             >
               <Tag className="h-3.5 w-3.5" /> Coupons
+            </button>
+            <button
+              onClick={() => setActiveTab('inquiries')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'inquiries'
+                  ? 'bg-rose-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <MessageCircleQuestion className="h-3.5 w-3.5" /> Inquiries
             </button>
           </div>
         </div>
@@ -2425,6 +2474,79 @@ export default function AdminPortal() {
                   </table>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'inquiries' && (
+          <div className="space-y-6 animate-fadeIn">
+            <div className="flex justify-between items-center bg-white p-6 rounded-3xl border border-zinc-200">
+              <div>
+                <h2 className="text-2xl font-serif text-zinc-900 font-bold mb-1">Product Inquiries</h2>
+                <p className="text-zinc-500 text-sm">View and manage customer questions about products.</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-zinc-200 overflow-hidden">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-zinc-50 border-b border-zinc-200">
+                    <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Date</th>
+                    <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Product</th>
+                    <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Customer</th>
+                    <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Question</th>
+                    <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  {inquiries.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-8 text-center text-zinc-500 text-sm">
+                        No product inquiries found.
+                      </td>
+                    </tr>
+                  ) : (
+                    inquiries.map((inquiry) => (
+                      <tr key={inquiry.id} className="hover:bg-zinc-50/50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                          {new Date(inquiry.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-zinc-900 font-medium">
+                          {inquiry.products?.name || 'Unknown Product'}
+                          <div className="text-xs text-zinc-400 font-mono mt-0.5">{inquiry.products?.sku}</div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-zinc-900">
+                          <a href={`mailto:${inquiry.customer_email}?subject=Reply to your inquiry regarding ${inquiry.products?.name}`} className="text-brand-600 hover:underline">
+                            {inquiry.customer_email}
+                          </a>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-zinc-700 max-w-md">
+                          <p className="line-clamp-3">{inquiry.question}</p>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {inquiry.status === 'replied' ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              Replied
+                            </span>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                Pending
+                              </span>
+                              <button
+                                onClick={() => handleMarkInquiryReplied(inquiry.id)}
+                                className="text-xs text-brand-600 hover:text-brand-800 font-semibold"
+                              >
+                                Mark Replied
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
