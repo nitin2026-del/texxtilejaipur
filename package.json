@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@easypost/api": "^8.8.0",
+    "@google/generative-ai": "^0.24.1",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "@paypal/react-paypal-js": "^9.2.0",
     "@stripe/react-stripe-js": "^6.4.0",
