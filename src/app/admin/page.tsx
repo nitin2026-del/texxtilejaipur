@@ -173,6 +173,58 @@ export default function AdminPortal() {
   const [formCouponType, setFormCouponType] = useState<'percent' | 'fixed'>('percent');
   const [formCouponValue, setFormCouponValue] = useState('');
 
+  // Bulk Edit States
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [bulkPriceInput, setBulkPriceInput] = useState('');
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+
+  // Bulk Price Update Handler
+  const handleBulkPriceUpdate = async () => {
+    const price = parseFloat(bulkPriceInput);
+    if (isNaN(price) || price <= 0) {
+      showNotification('Please enter a valid positive price.', true);
+      return;
+    }
+    
+    if (!confirm(`Are you sure you want to update the price of ${selectedProductIds.length} products to ₹${price}?`)) {
+      return;
+    }
+
+    setIsBulkLoading(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ price: price })
+        .in('id', selectedProductIds);
+
+      if (error) throw error;
+      
+      showNotification(`Successfully updated ${selectedProductIds.length} products to ₹${price}!`);
+      setSelectedProductIds([]);
+      setBulkPriceInput('');
+      fetchDashboardData();
+    } catch (err: any) {
+      console.error('Bulk price update failed:', err);
+      showNotification(err.message || 'Bulk price update failed', true);
+    } finally {
+      setIsBulkLoading(false);
+    }
+  };
+
+  const handleToggleProductSelect = (id: string) => {
+    setSelectedProductIds(prev => 
+      prev.includes(id) ? prev.filter(pId => pId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedProductIds(products.map(p => p.id));
+    } else {
+      setSelectedProductIds([]);
+    }
+  };
+
   // Admin Authentication Actions
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1298,6 +1350,31 @@ export default function AdminPortal() {
               </button>
             </div>
 
+            {/* BULK ACTION TOOLBAR */}
+            {selectedProductIds.length > 0 && (
+              <div className="bg-brand-50 border-b border-brand-200 p-4 flex items-center justify-between">
+                <span className="text-sm font-semibold text-brand-700">
+                  {selectedProductIds.length} product(s) selected
+                </span>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    placeholder="New Price (INR)"
+                    value={bulkPriceInput}
+                    onChange={(e) => setBulkPriceInput(e.target.value)}
+                    className="border border-brand-200 rounded p-1.5 text-xs text-zinc-900 w-40"
+                  />
+                  <button
+                    onClick={handleBulkPriceUpdate}
+                    disabled={isBulkLoading}
+                    className="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded text-xs font-bold disabled:opacity-50"
+                  >
+                    {isBulkLoading ? 'Updating...' : 'Update Price'}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {loading ? (
               <div className="p-20 text-center space-y-3">
                 <Loader2 className="h-8 w-8 text-brand-700 animate-spin mx-auto" />
@@ -1314,6 +1391,14 @@ export default function AdminPortal() {
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-[#FDFBF7]/50 border-b border-zinc-200 text-zinc-600 font-medium">
+                      <th className="p-4 w-12 text-center">
+                        <input 
+                          type="checkbox" 
+                          checked={products.length > 0 && selectedProductIds.length === products.length}
+                          onChange={handleSelectAll}
+                          className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500 cursor-pointer w-4 h-4"
+                        />
+                      </th>
                       <th className="p-4">SKU & Image</th>
                       <th className="p-4">Product Name</th>
                       <th className="p-4">Category</th>
@@ -1325,7 +1410,15 @@ export default function AdminPortal() {
                   </thead>
                   <tbody className="divide-y divide-zinc-900/60">
                     {products.map((prod) => (
-                      <tr key={prod.id} className="hover:bg-white/10 transition-colors">
+                      <tr key={prod.id} className="hover:bg-zinc-50 transition-colors">
+                        <td className="p-4 text-center">
+                          <input 
+                            type="checkbox" 
+                            checked={selectedProductIds.includes(prod.id)}
+                            onChange={() => handleToggleProductSelect(prod.id)}
+                            className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500 cursor-pointer w-4 h-4"
+                          />
+                        </td>
                         <td className="p-4 flex items-center gap-3">
                           <div className="h-12 w-12 rounded-lg bg-white overflow-hidden border border-zinc-200 shrink-0">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
