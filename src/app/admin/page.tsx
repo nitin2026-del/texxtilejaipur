@@ -222,9 +222,9 @@ export default function AdminPortal() {
   };
 
   const handleBulkGenerateDescriptions = async () => {
-    const emptyProducts = products.filter(p => !p.description || p.description.length < 20);
+    const emptyProducts = products.filter(p => !p.description || p.description.length < 20 || !p.details?.translations);
     if (emptyProducts.length === 0) {
-      showNotification('All products already have descriptions!', true);
+      showNotification('All products already have AI descriptions and translations!', true);
       return;
     }
     
