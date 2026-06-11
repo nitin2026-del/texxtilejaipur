@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     let prompt = `
       You are an expert copywriter and cultural fashion advisor for a luxury ethnic clothing brand called 'Textile Jaipur'.
