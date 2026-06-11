@@ -272,8 +272,9 @@ export default function AdminPortal() {
       setBulkAiProgress(i + 1);
       
       // Delay to avoid Gemini Rate Limit (15 Requests Per Minute on Free Tier)
+      // 6000ms ensures we only make 10 requests per minute, perfectly safe!
       if (i < emptyProducts.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 4100));
+        await new Promise(resolve => setTimeout(resolve, 6000));
       }
     }
 
