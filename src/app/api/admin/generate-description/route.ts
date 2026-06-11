@@ -40,17 +40,24 @@ export async function POST(req: NextRequest) {
       
       try {
         const imageResp = await fetch(imageUrl);
-        const arrayBuffer = await imageResp.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const base64Data = buffer.toString('base64');
-        const mimeType = imageResp.headers.get('content-type') || 'image/jpeg';
-        
-        promptParts.push({
-          inlineData: {
-            data: base64Data,
-            mimeType
+        if (imageResp.ok) {
+          const mimeType = imageResp.headers.get('content-type') || '';
+          
+          if (mimeType.startsWith('image/')) {
+            const arrayBuffer = await imageResp.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const base64Data = buffer.toString('base64');
+            
+            promptParts.push({
+              inlineData: {
+                data: base64Data,
+                mimeType
+              }
+            });
+          } else {
+            console.warn(`Skipping image due to unsupported MIME type: ${mimeType}`);
           }
-        });
+        }
       } catch (err) {
         console.error("Failed to fetch image for AI:", err);
       }
