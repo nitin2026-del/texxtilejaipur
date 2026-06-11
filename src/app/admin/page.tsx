@@ -270,6 +270,11 @@ export default function AdminPortal() {
         console.error('Failed for product:', p.name, err);
       }
       setBulkAiProgress(i + 1);
+      
+      // Delay to avoid Gemini Rate Limit (15 Requests Per Minute on Free Tier)
+      if (i < emptyProducts.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 4100));
+      }
     }
 
     setIsBulkAiGenerating(false);
