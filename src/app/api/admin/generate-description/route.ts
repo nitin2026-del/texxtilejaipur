@@ -12,11 +12,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Fallback securely encoded to bypass GitHub Secret Scanning & Vercel Dashboard issues
-    const fallbackKey = Buffer.from('QVEuQWI4Uk42S0JwTDhIZVBoQW1xSmYzVUZaRlN1ekdMVWNic2t2cDcxYmM3b201RERGM1E=', 'base64').toString('ascii');
-    const apiKey = process.env.GEMINI_API_KEY || fallbackKey;
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return NextResponse.json({ success: false, message: 'Gemini API Key is missing' }, { status: 500 });
+      return NextResponse.json({ success: false, message: 'Your personal GEMINI_API_KEY is missing in Vercel Environment Variables. Please add it to Vercel and Redeploy.' }, { status: 400 });
     }
 
     // Initialize Gemini
