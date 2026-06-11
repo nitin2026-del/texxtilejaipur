@@ -452,8 +452,6 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                </div>
-
                 {/* AI Sizing Assistant */}
                 <div className="pt-2">
                   <button 
