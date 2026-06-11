@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
       }
     `;
     
-    promptParts.push(prompt);
+    promptParts.push({ text: prompt });
 
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: promptParts }],
