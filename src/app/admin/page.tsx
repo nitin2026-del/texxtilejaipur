@@ -193,7 +193,13 @@ export default function AdminPortal() {
       const res = await fetch('/api/admin/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formName, category: formCategory, material: formMaterial, origin: formOrigin })
+        body: JSON.stringify({ 
+          name: formName, 
+          category: formCategory, 
+          material: formMaterial, 
+          origin: formOrigin,
+          imageUrl: formImageUrl || null
+        })
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message || data.error);
@@ -228,7 +234,13 @@ export default function AdminPortal() {
         const res = await fetch('/api/admin/generate-description', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: p.name, category: p.category, material: p.details?.material, origin: p.details?.origin })
+          body: JSON.stringify({ 
+            name: p.name, 
+            category: p.category, 
+            material: p.details?.material, 
+            origin: p.details?.origin,
+            imageUrl: p.image_url || null
+          })
         });
         const data = await res.json();
         
