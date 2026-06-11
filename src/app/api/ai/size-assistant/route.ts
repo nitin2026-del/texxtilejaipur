@@ -11,15 +11,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Fallback securely encoded to bypass GitHub Secret Scanning & Vercel Dashboard issues
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKeys = process.env.GEMINI_API_KEY?.split(',').map(k => k.trim()).filter(k => k) || [];
 
-    if (!apiKey) {
+    if (apiKeys.length === 0) {
       return NextResponse.json({ success: false, message: 'Your personal GEMINI_API_KEY is missing in Vercel Environment Variables.' }, { status: 400 });
     }
-
-    // Initialize Gemini
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
     const prompt = `
       You are an expert luxury fashion tailor and sizing consultant for an Indian ethnic wear brand called 'Textile Jaipur'.
@@ -36,10 +32,24 @@ export async function POST(req: NextRequest) {
       Keep the response concise, professional, and directly address the customer (e.g., "Based on your size..."). Do not use markdown headers, just plain text or simple bullet points.
     `;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    let lastError = null;
 
-    return NextResponse.json({ success: true, recommendation: responseText.trim() }, { status: 200 });
+    for (const apiKey of apiKeys) {
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+
+        return NextResponse.json({ success: true, recommendation: responseText.trim() }, { status: 200 });
+      } catch (error: any) {
+        console.error(`Size API Key ${apiKey.substring(0, 5)}... failed:`, error.message);
+        lastError = error;
+      }
+    }
+
+    return NextResponse.json({ success: false, error: lastError?.message || 'All API keys failed.' }, { status: 500 });
   } catch (error: any) {
     console.error('Failed to generate size recommendation:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

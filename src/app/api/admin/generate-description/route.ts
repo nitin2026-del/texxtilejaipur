@@ -12,15 +12,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Fallback securely encoded to bypass GitHub Secret Scanning & Vercel Dashboard issues
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKeys = process.env.GEMINI_API_KEY?.split(',').map(k => k.trim()).filter(k => k) || [];
 
-    if (!apiKey) {
+    if (apiKeys.length === 0) {
       return NextResponse.json({ success: false, message: 'Your personal GEMINI_API_KEY is missing in Vercel Environment Variables. Please add it to Vercel and Redeploy.' }, { status: 400 });
     }
-
-    // Initialize Gemini
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
     let prompt = `
       You are an expert copywriter and cultural fashion advisor for a luxury ethnic clothing brand called 'Textile Jaipur'.
@@ -90,17 +86,32 @@ export async function POST(req: NextRequest) {
     
     promptParts.push({ text: prompt });
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: promptParts }],
-      generationConfig: {
-        responseMimeType: "application/json"
-      }
-    });
-    
-    const responseText = result.response.text();
-    const data = JSON.parse(responseText);
+    let lastError = null;
 
-    return NextResponse.json({ success: true, ...data }, { status: 200 });
+    for (const apiKey of apiKeys) {
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+
+        const result = await model.generateContent({
+          contents: [{ role: 'user', parts: promptParts }],
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        });
+        
+        const responseText = result.response.text();
+        const data = JSON.parse(responseText);
+
+        return NextResponse.json({ success: true, ...data }, { status: 200 });
+      } catch (error: any) {
+        console.error(`API Key ${apiKey.substring(0, 5)}... failed:`, error.message);
+        lastError = error;
+      }
+    }
+
+    // If all keys fail, return the last error
+    return NextResponse.json({ success: false, error: lastError?.message || 'All API keys failed.' }, { status: 500 });
   } catch (error: any) {
     console.error('Failed to generate description:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
