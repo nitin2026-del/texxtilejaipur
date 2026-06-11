@@ -39,7 +39,11 @@ export async function POST(req: NextRequest) {
       prompt += `\n\nI have provided an image of the product. Please closely examine the image and extract the exact colors, the embroidery, and the design patterns. Weave these visual details seamlessly into the description.`;
       
       try {
-        const imageResp = await fetch(imageUrl);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const imageResp = await fetch(imageUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         if (imageResp.ok) {
           const mimeType = imageResp.headers.get('content-type') || '';
           
