@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     let prompt = `
-      You are an expert copywriter for a luxury ethnic clothing brand called 'Textile Jaipur'.
-      Write a beautiful, highly-converting, and SEO-optimized e-commerce product description for the following item:
+      You are an expert copywriter and cultural fashion advisor for a luxury ethnic clothing brand called 'Textile Jaipur'.
+      Your task is to generate a beautiful product description, cultural context, styling advice for international buyers, and translations.
       
       Product Name: ${name}
       Category: ${category || 'Ethnic Wear'}
@@ -59,19 +59,38 @@ export async function POST(req: NextRequest) {
     prompt += `
       
       Requirements:
-      - Exactly 2 short paragraphs.
-      - First paragraph: Focus on the visual beauty, the exact colors/designs seen in the image, elegance, and how it makes the wearer feel.
-      - Second paragraph: Focus on the craftsmanship, the fabric (${material || 'fabric'}), and the authentic origin (${origin || 'Jaipur'}).
-      - Tone: Luxurious, authentic, poetic, and compelling.
-      - Do NOT include any intro/outro text like "Here is the description", just return the pure description text.
+      1. 'description': Exactly 2 short paragraphs in English. First paragraph: visual beauty, exact colors/designs. Second paragraph: craftsmanship, fabric (${material || 'fabric'}), and origin (${origin || 'Jaipur'}). Tone: Luxurious, poetic.
+      2. 'culturalContext': 2-3 sentences explaining the Indian heritage, craft, or terminology associated with this product (e.g. what is block print, slub, zari) to educate international buyers.
+      3. 'stylingAdvice': 2-3 sentences advising a Western/International buyer on how to style this piece (e.g. fusion wear, pairing with denim or minimalist jewelry).
+      4. 'translations': An object containing the EXACT 'description' translated into French, Spanish, Arabic, and German. The translations MUST capture the luxurious, poetic nuance.
+      
+      Output ONLY valid JSON matching this schema:
+      {
+        "description": "string",
+        "culturalContext": "string",
+        "stylingAdvice": "string",
+        "translations": {
+          "fr": "string",
+          "es": "string",
+          "ar": "string",
+          "de": "string"
+        }
+      }
     `;
     
     promptParts.push(prompt);
 
-    const result = await model.generateContent(promptParts);
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: promptParts }],
+      generationConfig: {
+        responseMimeType: "application/json"
+      }
+    });
+    
     const responseText = result.response.text();
+    const data = JSON.parse(responseText);
 
-    return NextResponse.json({ success: true, description: responseText.trim() }, { status: 200 });
+    return NextResponse.json({ success: true, ...data }, { status: 200 });
   } catch (error: any) {
     console.error('Failed to generate description:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

@@ -20,7 +20,21 @@ interface Product {
   category: string;
   images: string[];
   stock_quantity: number;
-  details: { material?: string; origin?: string; care?: string; sizes?: string[]; video_url?: string };
+  details: { 
+    material?: string; 
+    origin?: string; 
+    care?: string; 
+    sizes?: string[]; 
+    video_url?: string;
+    culturalContext?: string;
+    stylingAdvice?: string;
+    translations?: {
+      fr?: string;
+      es?: string;
+      ar?: string;
+      de?: string;
+    }
+  };
 }
 
 export default function ProductPage() {
@@ -39,6 +53,13 @@ export default function ProductPage() {
   const [showQuestionForm, setShowQuestionForm] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<string | null>(null);
+  
+  // International AI features
+  const [language, setLanguage] = useState<'en' | 'fr' | 'es' | 'ar' | 'de'>('en');
+  const [sizingOpen, setSizingOpen] = useState(false);
+  const [sizingInput, setSizingInput] = useState('');
+  const [sizingResult, setSizingResult] = useState('');
+  const [sizingLoading, setSizingLoading] = useState(false);
   
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
@@ -117,11 +138,15 @@ export default function ProductPage() {
             images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
             stock_quantity: item.stock_quantity || item.stock || 0,
             details: {
-              material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
-              origin: 'Jaipur, Rajasthan',
-              care: 'Dry clean only',
-              sizes: ['S', 'M', 'L', 'XL'],
-              video_url: item.details?.video_url
+              ...item.details,
+              material: item.details?.material || (item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric'),
+              origin: item.details?.origin || 'Jaipur, Rajasthan',
+              care: item.details?.care || 'Dry clean only',
+              sizes: item.details?.sizes || ['S', 'M', 'L', 'XL'],
+              video_url: item.details?.video_url,
+              culturalContext: item.details?.culturalContext,
+              stylingAdvice: item.details?.stylingAdvice,
+              translations: item.details?.translations
             }
           });
 
@@ -192,6 +217,35 @@ export default function ProductPage() {
 
     fetchProduct();
   }, [id]);
+
+  const handleSizingRequest = async () => {
+    if (!product || !sizingInput.trim()) return;
+    setSizingLoading(true);
+    setSizingResult('');
+    try {
+      const res = await fetch('/api/ai/size-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userSize: sizingInput,
+          brand: 'standard western brands',
+          productName: product.name,
+          material: product.details?.material,
+          category: product.category
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSizingResult(data.recommendation);
+      } else {
+        setSizingResult("Sorry, I couldn't determine the size right now. Please check our standard size chart.");
+      }
+    } catch (err) {
+      setSizingResult("Sorry, I couldn't determine the size right now. Please check our standard size chart.");
+    } finally {
+      setSizingLoading(false);
+    }
+  };
 
   const handleAddToCart = () => {
     if (product) {
@@ -354,13 +408,24 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                <div className="text-3xl font-serif font-bold text-zinc-900 py-4 border-y border-zinc-200">
-                  {formatPrice(product.price_inr)}
-
+                <div className="flex items-center justify-between py-4 border-y border-zinc-200">
+                  <div className="text-3xl font-serif font-bold text-zinc-900">
+                    {formatPrice(product.price_inr)}
+                  </div>
+                  
+                  {product.details?.translations && Object.keys(product.details.translations).length > 0 && (
+                    <div className="flex gap-1.5">
+                      <button onClick={() => setLanguage('en')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'en' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>EN</button>
+                      {product.details.translations.fr && <button onClick={() => setLanguage('fr')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'fr' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>FR</button>}
+                      {product.details.translations.es && <button onClick={() => setLanguage('es')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'es' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>ES</button>}
+                      {product.details.translations.de && <button onClick={() => setLanguage('de')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'de' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>DE</button>}
+                      {product.details.translations.ar && <button onClick={() => setLanguage('ar')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'ar' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>AR</button>}
+                    </div>
+                  )}
                 </div>
 
-                <p className="text-zinc-600 font-light leading-relaxed">
-                  {product.description}
+                <p className="text-zinc-600 font-light leading-relaxed whitespace-pre-wrap" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {language === 'en' ? product.description : (product.details?.translations?.[language as keyof typeof product.details.translations] || product.description)}
                 </p>
 
                 {/* Details list */}
@@ -383,6 +448,53 @@ export default function ProductPage() {
                     <div className="flex justify-between text-sm">
                       <span className="text-zinc-500">Care Instructions</span>
                       <span className="text-zinc-900 text-right">{product.details.care}</span>
+                    </div>
+                  )}
+                </div>
+
+                </div>
+
+                {/* AI Sizing Assistant */}
+                <div className="pt-2">
+                  <button 
+                    onClick={() => setSizingOpen(!sizingOpen)}
+                    className="flex items-center gap-2 text-sm font-bold text-brand-700 hover:text-brand-800 transition-colors"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Unsure about sizing? Ask our AI Tailor
+                  </button>
+                  
+                  {sizingOpen && (
+                    <div className="mt-4 p-5 bg-gradient-to-br from-brand-50 to-white border border-brand-200 rounded-xl shadow-inner">
+                      <h4 className="text-sm font-bold text-zinc-900 mb-2">Find your perfect Indian size</h4>
+                      <p className="text-xs text-zinc-600 mb-4 leading-relaxed">
+                        Tell us your usual size in western brands (e.g. "I wear US Size 6 at Zara"), and our AI will recommend the exact size to buy based on the stretch of this {product.details?.material || 'fabric'}.
+                      </p>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          value={sizingInput}
+                          onChange={(e) => setSizingInput(e.target.value)}
+                          placeholder="e.g. US Size 6, Zara" 
+                          className="flex-1 text-sm px-3 py-2 border border-zinc-200 rounded-lg focus:outline-none focus:border-brand-500"
+                        />
+                        <button 
+                          onClick={handleSizingRequest}
+                          disabled={sizingLoading || !sizingInput.trim()}
+                          className="px-4 py-2 bg-brand-700 text-white font-bold text-xs rounded-lg disabled:opacity-50 flex items-center justify-center min-w-[100px]"
+                        >
+                          {sizingLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Find Size'}
+                        </button>
+                      </div>
+                      
+                      {sizingResult && (
+                        <div className="mt-4 p-4 bg-white border border-brand-100 rounded-lg shadow-sm">
+                          <p className="text-sm text-zinc-800 leading-relaxed font-medium">
+                            <span className="font-bold text-brand-700 block mb-1">Recommendation:</span>
+                            {sizingResult}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -504,6 +616,30 @@ export default function ProductPage() {
                     </span>
                   </div>
                 </div>
+
+                {/* AI Heritage & Styling Guide */}
+                {(product.details?.culturalContext || product.details?.stylingAdvice) && (
+                  <div className="mt-6 border border-brand-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                    <div className="bg-brand-50 px-5 py-3 border-b border-brand-200 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-brand-700" />
+                      <h4 className="text-sm font-bold text-brand-900">The Heritage & Styling Guide</h4>
+                    </div>
+                    <div className="p-5 space-y-4">
+                      {product.details.culturalContext && (
+                        <div>
+                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Cultural Context</h5>
+                          <p className="text-sm text-zinc-600 leading-relaxed">{product.details.culturalContext}</p>
+                        </div>
+                      )}
+                      {product.details.stylingAdvice && (
+                        <div className={product.details.culturalContext ? "pt-4 border-t border-zinc-100" : ""}>
+                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">How to Style</h5>
+                          <p className="text-sm text-zinc-600 leading-relaxed">{product.details.stylingAdvice}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

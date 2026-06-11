@@ -155,6 +155,11 @@ export default function AdminPortal() {
   const [formVideoUrl, setFormVideoUrl] = useState('');
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [formDisplayRank, setFormDisplayRank] = useState('');
+  
+  // International AI features
+  const [formCulturalContext, setFormCulturalContext] = useState('');
+  const [formStylingAdvice, setFormStylingAdvice] = useState('');
+  const [formTranslations, setFormTranslations] = useState('');
 
   // Blog states
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -203,8 +208,11 @@ export default function AdminPortal() {
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message || data.error);
-      setFormDescription(data.description);
-      showNotification('Description generated successfully! ✨');
+      setFormDescription(data.description || '');
+      if (data.culturalContext) setFormCulturalContext(data.culturalContext);
+      if (data.stylingAdvice) setFormStylingAdvice(data.stylingAdvice);
+      if (data.translations) setFormTranslations(JSON.stringify(data.translations, null, 2));
+      showNotification('AI completely generated all descriptions, context, and translations! ✨');
     } catch (err: any) {
       console.error(err);
       showNotification(err.message || 'Failed to generate description', true);
@@ -245,7 +253,17 @@ export default function AdminPortal() {
         const data = await res.json();
         
         if (data.success && data.description) {
-          await supabase.from('products').update({ description: data.description }).eq('id', p.id);
+          const updatedDetails = {
+            ...p.details,
+            culturalContext: data.culturalContext || p.details?.culturalContext,
+            stylingAdvice: data.stylingAdvice || p.details?.stylingAdvice,
+            translations: data.translations || p.details?.translations
+          };
+          
+          await supabase.from('products').update({ 
+            description: data.description,
+            details: updatedDetails
+          }).eq('id', p.id);
           successCount++;
         }
       } catch (err) {
@@ -537,9 +555,10 @@ export default function AdminPortal() {
             images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
             stock: item.stock_quantity || item.stock || 0,
             details: {
-              material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
-              origin: 'Jaipur, Rajasthan',
-              care: 'Dry clean only'
+              ...item.details,
+              material: item.details?.material || (item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric'),
+              origin: item.details?.origin || 'Jaipur, Rajasthan',
+              care: item.details?.care || 'Dry clean only'
             },
             is_featured: item.is_featured || false,
             display_rank: item.display_rank
@@ -725,7 +744,13 @@ export default function AdminPortal() {
         }
       }
 
-      // Base payload — slug is added only for new products
+      let parsedTranslations = null;
+      try {
+        if (formTranslations) parsedTranslations = JSON.parse(formTranslations);
+      } catch (e) {
+        console.error("Invalid translations JSON", e);
+      }
+
       const basePayload = {
         name: formName,
         description: formDescription,
@@ -740,7 +765,10 @@ export default function AdminPortal() {
           material: formMaterial,
           origin: formOrigin,
           care: formCare,
-          video_url: formVideoUrl
+          video_url: formVideoUrl,
+          culturalContext: formCulturalContext,
+          stylingAdvice: formStylingAdvice,
+          translations: parsedTranslations
         }
       };
 
@@ -821,6 +849,9 @@ export default function AdminPortal() {
     setFormVideoUrl(prod.details?.video_url || '');
     setFormIsFeatured(prod.is_featured || false);
     setFormDisplayRank(prod.display_rank?.toString() || '');
+    setFormCulturalContext(prod.details?.culturalContext || '');
+    setFormStylingAdvice(prod.details?.stylingAdvice || '');
+    setFormTranslations(prod.details?.translations ? JSON.stringify(prod.details.translations, null, 2) : '');
     setActiveTab('form');
   };
 
@@ -1651,6 +1682,43 @@ export default function AdminPortal() {
                   className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none"
                 />
               </div>
+
+              {(formCulturalContext || formStylingAdvice || formTranslations) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-amber-50/50 border border-amber-200/50 p-4 rounded-2xl">
+                  <div className="col-span-1 md:col-span-2">
+                    <h3 className="text-xs font-bold text-amber-900 mb-2 flex items-center gap-1.5">
+                      ✨ AI-Generated International Context
+                    </h3>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Cultural Context</label>
+                    <textarea
+                      rows={3}
+                      value={formCulturalContext}
+                      onChange={(e) => setFormCulturalContext(e.target.value)}
+                      className="w-full bg-white border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 focus:outline-none focus:border-violet-500 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Styling Advice</label>
+                    <textarea
+                      rows={3}
+                      value={formStylingAdvice}
+                      onChange={(e) => setFormStylingAdvice(e.target.value)}
+                      className="w-full bg-white border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 focus:outline-none focus:border-violet-500 resize-none"
+                    />
+                  </div>
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Translations (JSON)</label>
+                    <textarea
+                      rows={3}
+                      value={formTranslations}
+                      onChange={(e) => setFormTranslations(e.target.value)}
+                      className="w-full bg-white border border-zinc-200 rounded-xl py-2 px-3.5 text-xs font-mono text-zinc-900 focus:outline-none focus:border-violet-500 resize-none"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
