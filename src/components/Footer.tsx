@@ -14,7 +14,7 @@ const FAQS = [
   },
   {
     question: "What is your return policy?",
-    answer: "We accept returns within 14 days of delivery for unworn items in their original condition with tags attached. Custom orders are final sale."
+    answer: "We accept returns within 30 days of delivery for unworn items in their original condition with tags attached. Custom orders are final sale."
   },
   {
     question: "Can I request custom sizing?",

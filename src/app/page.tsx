@@ -723,7 +723,7 @@ export default function Home() {
             {[
               { icon: '🚀', title: 'UPS Express — Delivered Worldwide', desc: 'All orders ship via UPS Express Worldwide. Fast, fully tracked delivery to every country on the globe. Full tracking number provided on dispatch.' },
               { icon: '🔒', title: 'Secure & Trusted Payments', desc: 'Pay by Visa, Mastercard, Amex or PayPal. All transactions are 256-bit SSL encrypted and PayPal buyer-protected. No hidden fees.' },
-              { icon: '🤝', title: '14-Day No-Questions Returns', desc: 'Not happy? Return your item within 14 days for a full refund — no questions asked. We want you to love every piece you order.' },
+              { icon: '🤝', title: '30-Day No-Questions Returns', desc: 'Not happy? Return your item within 30 days for a full refund — no questions asked. We want you to love every piece you order.' },
               { icon: '🛃', title: 'We Handle All Customs & Duties', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork and customs declarations. You receive the package — we handle the rest.' },
               { icon: '🧵', title: '100% Genuinely Handcrafted', desc: 'Every product is hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur, Rajasthan. No factory production — ever.' },
               { icon: '💬', title: 'Real Customer Support', desc: 'Questions before you buy? Email us at support[at]textilejaipur.com or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
