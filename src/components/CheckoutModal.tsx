@@ -602,7 +602,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 </div>
                 <p className="text-center text-[10px] text-zinc-400 leading-relaxed">
                   Having trouble paying?{' '}
-                  <a href="mailto:support@textilejaipur.com" className="text-amber-500 underline underline-offset-2 hover:text-amber-400">
+                  <a href="mailto:priyanshug863@gmail.com" className="text-amber-500 underline underline-offset-2 hover:text-amber-400">
                     Write to us
                   </a>{' '}or{' '}
                   <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-500 underline underline-offset-2 hover:text-green-400">
@@ -647,7 +647,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <p className="font-semibold mb-1">💬 Need help with your order?</p>
                 <p>If you face any issue — wrong item, delay, or payment concern — just reach out to us directly. We&apos;ll take care of everything from our side.</p>
                 <div className="flex gap-3 mt-2 justify-center">
-                  <a href="mailto:support@textilejaipur.com" className="text-blue-600 underline underline-offset-2 font-medium">Email Us</a>
+                  <a href="mailto:priyanshug863@gmail.com" className="text-blue-600 underline underline-offset-2 font-medium">Email Us</a>
                   <span className="text-blue-300">|</span>
                   <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-600 underline underline-offset-2 font-medium">WhatsApp</a>
                 </div>

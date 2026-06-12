@@ -182,7 +182,7 @@ export default function ReturnsPage() {
             
             <div className="mt-4 pt-6 border-t border-zinc-200">
               <p className="text-sm text-zinc-500">
-                Need help? <a href="mailto:support@textilejaipur.com" className="text-brand-700 font-bold hover:underline">Contact Support</a>
+                Need help? <a href="mailto:priyanshug863@gmail.com" className="text-brand-700 font-bold hover:underline">Contact Support</a>
               </p>
             </div>
           </div>

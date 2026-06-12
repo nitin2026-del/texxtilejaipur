@@ -104,7 +104,7 @@ const organizationSchema = {
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer service',
-    email: 'support@textilejaipur.com',
+    email: 'priyanshug863@gmail.com',
     availableLanguage: ['English', 'Hindi']
   },
   sameAs: [

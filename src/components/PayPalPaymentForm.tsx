@@ -89,7 +89,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
         </div>
         <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed">
           If this page takes too long, don’t worry —{' '}
-          <a href="mailto:support@textilejaipur.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
+          <a href="mailto:priyanshug863@gmail.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
           <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>.
           We will confirm your payment and order from our side.
         </p>
@@ -219,7 +219,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       {/* Support */}
       <p className="text-center text-[10px] text-zinc-400 leading-relaxed">
         Payment issue?{' '}
-        <a href="mailto:support@textilejaipur.com" className="text-amber-500 underline underline-offset-2">Email us</a>{' '}or{' '}
+        <a href="mailto:priyanshug863@gmail.com" className="text-amber-500 underline underline-offset-2">Email us</a>{' '}or{' '}
         <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-500 underline underline-offset-2">WhatsApp</a>
         {' '}— we’ll resolve it from our side.
       </p>

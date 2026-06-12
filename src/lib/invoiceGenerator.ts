@@ -20,7 +20,7 @@ export async function generateInvoiceBuffer(order: any, orderItems: any[], user:
         .fontSize(10)
         .text('Textile Jaipur Export House', 200, 50, { align: 'right' })
         .text('Jaipur, Rajasthan, India', 200, 65, { align: 'right' })
-        .text('support@textilejaipur.com', 200, 80, { align: 'right' })
+        .text('priyanshug863@gmail.com', 200, 80, { align: 'right' })
         .moveDown();
 
       const hrPos = 110;
