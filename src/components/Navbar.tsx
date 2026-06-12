@@ -79,6 +79,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 TEXTILE <span className="text-brand-600 font-light">JAIPUR</span>
               </div>
             </a>
+            
+            <div className="hidden lg:flex items-center gap-6 ml-4 border-l border-zinc-200 pl-6">
+              <a href="/collection" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
+                <ShoppingBag className="h-4 w-4" />
+                Shop All
+              </a>
+            </div>
           </div>
 
           {/* Action Controls */}
@@ -350,9 +357,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             Home
           </a>
 
-          <a href="/#new-arrivals" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
+          <a href="/collection" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
             <ShoppingBag className="h-5 w-5 text-zinc-500" />
-            Shop / Products
+            Shop All Collections
           </a>
 
           {user && (
