@@ -51,6 +51,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       localStorage.setItem('pending_order_id', orderId);
       localStorage.setItem('pending_jaicoins_used', coinsUsed);
       localStorage.setItem('pending_jaicoins_earned', coinsEarned);
+      localStorage.setItem('pending_usd_amount', usdAmount.toString());
 
       const res = await fetch('/api/payments/paypal', {
         method: 'POST',

@@ -36,6 +36,7 @@ function PaymentCaptureHandler() {
 
     const coinsUsed = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_jaicoins_used') || 0) : 0;
     const coinsEarned = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_jaicoins_earned') || 0) : 0;
+    const usdAmount = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_usd_amount') || 0) : 0;
 
     // Capture the PayPal payment server-side
     fetch('/api/payments/paypal', {
@@ -57,8 +58,17 @@ function PaymentCaptureHandler() {
         localStorage.removeItem('pending_order_id');
         localStorage.removeItem('pending_jaicoins_used');
         localStorage.removeItem('pending_jaicoins_earned');
+        localStorage.removeItem('pending_usd_amount');
 
         if (data.success) {
+          // Fire Facebook Pixel Purchase Event
+          if (typeof window !== 'undefined' && (window as any).fbq && usdAmount > 0) {
+            (window as any).fbq('track', 'Purchase', {
+              value: usdAmount,
+              currency: 'USD'
+            });
+          }
+
           // Redirect to dashboard with success flag — will show success banner
           router.replace(`/dashboard?payment=captured&order_id=${orderId}`);
         } else {
