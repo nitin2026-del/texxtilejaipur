@@ -456,49 +456,64 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                {/* AI Sizing Assistant */}
-                <div className="pt-2">
-                  <button 
-                    onClick={() => setSizingOpen(!sizingOpen)}
-                    className="flex items-center gap-2 text-sm font-bold text-brand-700 hover:text-brand-800 transition-colors"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Unsure about sizing? Ask our AI Tailor
-                  </button>
-                  
-                  {sizingOpen && (
-                    <div className="mt-4 p-5 bg-gradient-to-br from-brand-50 to-white border border-brand-200 rounded-xl shadow-inner">
-                      <h4 className="text-sm font-bold text-zinc-900 mb-2">Find your perfect Indian size</h4>
-                      <p className="text-xs text-zinc-600 mb-4 leading-relaxed">
-                        Tell us your usual size in western brands (e.g. "I wear US Size 6 at Zara"), and our AI will recommend the exact size to buy based on the stretch of this {product.details?.material || 'fabric'}.
-                      </p>
-                      <div className="flex gap-2">
-                        <input 
-                          type="text" 
-                          value={sizingInput}
-                          onChange={(e) => setSizingInput(e.target.value)}
-                          placeholder="e.g. US Size 6, Zara" 
-                          className="flex-1 text-sm px-3 py-2 border border-zinc-200 rounded-lg focus:outline-none focus:border-brand-500"
-                        />
-                        <button 
-                          onClick={handleSizingRequest}
-                          disabled={sizingLoading || !sizingInput.trim()}
-                          className="px-4 py-2 bg-brand-700 text-white font-bold text-xs rounded-lg disabled:opacity-50 flex items-center justify-center min-w-[100px]"
-                        >
-                          {sizingLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Find Size'}
-                        </button>
-                      </div>
-                      
-                      {sizingResult && (
-                        <div className="mt-4 p-4 bg-white border border-brand-100 rounded-lg shadow-sm">
-                          <p className="text-sm text-zinc-800 leading-relaxed font-medium">
-                            <span className="font-bold text-brand-700 block mb-1">Recommendation:</span>
-                            {sizingResult}
-                          </p>
+                {/* AI Sizing Assistant - Highlighted */}
+                <div className="pt-4 pb-2">
+                  <div className={`transition-all duration-500 overflow-hidden rounded-xl border ${sizingOpen ? 'border-brand-300 shadow-lg shadow-brand-500/10' : 'border-zinc-200 hover:border-brand-300'}`}>
+                    {/* Header Button (Always visible) */}
+                    <button 
+                      onClick={() => setSizingOpen(!sizingOpen)}
+                      className={`w-full flex items-center justify-between p-4 transition-colors ${sizingOpen ? 'bg-gradient-to-r from-brand-50 to-white' : 'bg-white hover:bg-zinc-50'}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-brand-700">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-20"></span>
+                          <Sparkles className="h-4 w-4 relative z-10" />
                         </div>
-                      )}
+                        <div className="text-left">
+                          <span className="text-sm font-bold text-zinc-900 block font-serif tracking-wide">
+                            AI TAILOR ✨
+                          </span>
+                          <span className="text-xs text-zinc-500">Unsure about your size? Let AI decide.</span>
+                        </div>
+                      </div>
+                      <ChevronDown className={`h-5 w-5 text-zinc-400 transition-transform duration-300 ${sizingOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Expandable Content */}
+                    <div className={`transition-all duration-500 ease-in-out ${sizingOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="p-5 border-t border-brand-100 bg-gradient-to-br from-white to-brand-50/50">
+                        <p className="text-xs text-zinc-600 mb-4 leading-relaxed">
+                          Tell us your usual size in western brands (e.g. "I wear US Size 6 at Zara"), and our AI will calculate the exact Indian size to buy based on the stretch and cut of this {product.details?.material || 'fabric'}.
+                        </p>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            value={sizingInput}
+                            onChange={(e) => setSizingInput(e.target.value)}
+                            placeholder="e.g. US Size 6, Zara" 
+                            className="flex-1 text-sm px-4 py-2.5 border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all shadow-sm"
+                          />
+                          <button 
+                            onClick={handleSizingRequest}
+                            disabled={sizingLoading || !sizingInput.trim()}
+                            className="px-5 py-2.5 bg-zinc-900 text-white font-bold text-xs rounded-lg disabled:opacity-50 flex items-center justify-center min-w-[110px] hover:bg-brand-900 transition-colors shadow-md active:scale-95"
+                          >
+                            {sizingLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Calculate Size'}
+                          </button>
+                        </div>
+                        
+                        {sizingResult && (
+                          <div className="mt-5 p-4 bg-white border border-brand-200 rounded-lg shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-brand-500"></div>
+                            <p className="text-sm text-zinc-800 leading-relaxed font-medium pl-2">
+                              <span className="font-bold text-brand-700 block mb-1 uppercase tracking-wider text-[10px]">AI Recommendation</span>
+                              {sizingResult}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* Add to Cart Actions */}
