@@ -151,44 +151,79 @@ export default function CollectionPage() {
         <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-brand-400" /> 100% Secure Checkout</span>
       </div>
 
-      <div className="pt-12 pb-24 max-w-7xl mx-auto px-4 md:px-6">
+      <div className="pt-8 pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
         
-        {/* PREMIUM HERO SECTION */}
-        <div className="mb-12 rounded-3xl bg-gradient-to-br from-brand-50 via-white to-brand-100/50 p-8 md:p-12 border border-brand-200/60 shadow-sm relative overflow-hidden">
-          {/* Subtle background decoration */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-brand-200 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
+        {/* ULTRA-PREMIUM HERO SECTION */}
+        <div className="mb-14 rounded-[2rem] relative overflow-hidden shadow-2xl min-h-[500px] md:min-h-[600px] flex items-center border border-zinc-200/50">
           
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex text-amber-500">
+          {/* Stunning Background Image (Unsplash) */}
+          <div 
+            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+              backgroundImage: 'url("https://images.unsplash.com/photo-1583391733958-69279b90c7f1?auto=format&fit=crop&q=100&w=2000")',
+            }}
+          >
+            {/* Elegant dark overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+          </div>
+          
+          <div className="relative z-10 w-full p-8 md:p-16 lg:p-20 flex flex-col md:flex-row items-center justify-between gap-12">
+            
+            <div className="max-w-2xl w-full text-left">
+              {/* Trust Badge - Glassmorphism */}
+              <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+                <div className="flex text-amber-400">
                   <Star className="h-4 w-4 fill-current" />
                   <Star className="h-4 w-4 fill-current" />
                   <Star className="h-4 w-4 fill-current" />
                   <Star className="h-4 w-4 fill-current" />
                   <Star className="h-4 w-4 fill-current" />
                 </div>
-                <span className="text-xs font-bold text-zinc-700">4.9/5 Average Rating (1,200+ Reviews)</span>
+                <span className="text-xs font-bold text-white tracking-wide">4.9/5 Average Rating (1,200+ Reviews)</span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-zinc-900 mb-4 tracking-tight">
-                The Jaipur Heritage Collection
+              
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-white mb-6 leading-[1.1] tracking-tight drop-shadow-lg">
+                The Jaipur <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">Heritage</span> Collection
               </h1>
-              <p className="text-zinc-600 text-lg leading-relaxed">
-                Authentic, hand-stitched ethnic wear directly from the artisan clusters of Rajasthan. Elevate your wardrobe with pieces loved by women worldwide.
+              
+              <p className="text-zinc-200 text-lg md:text-xl leading-relaxed max-w-xl mb-10 drop-shadow-md font-light">
+                Authentic, hand-stitched ethnic wear directly from the royal artisan clusters of Rajasthan. Elevate your wardrobe with premium pieces loved by women worldwide.
               </p>
+
+              {/* Call to Action Buttons */}
+              <div className="flex flex-wrap items-center gap-4">
+                <button 
+                  onClick={() => window.scrollTo({ top: 800, behavior: 'smooth' })}
+                  className="px-8 py-4 bg-white text-zinc-900 font-bold rounded-full hover:bg-zinc-100 transition-all shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)] flex items-center gap-2 transform hover:-translate-y-1"
+                >
+                  Explore Collection <ChevronDown className="h-4 w-4" />
+                </button>
+              </div>
             </div>
             
-            {/* Trust Badges Cluster */}
-            <div className="grid grid-cols-2 gap-4 shrink-0 w-full md:w-auto">
-              <div className="bg-white p-3 rounded-xl border border-zinc-100 shadow-sm flex items-center gap-3">
-                <div className="bg-brand-50 p-2 rounded-lg text-brand-700"><Sparkles className="h-5 w-5" /></div>
-                <div><p className="text-xs font-bold text-zinc-900">100% Handcrafted</p><p className="text-[10px] text-zinc-500">Direct from Jaipur</p></div>
+            {/* Floating Trust Cards - Right Side */}
+            <div className="hidden lg:flex flex-col gap-5 shrink-0 w-80">
+              <div className="bg-black/40 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl transform transition hover:-translate-y-1 group">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/10 p-3 rounded-xl text-amber-400 group-hover:scale-110 transition-transform"><Sparkles className="h-6 w-6" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-white tracking-wide">100% Handcrafted</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">Sourced directly from Jaipur</p>
+                  </div>
+                </div>
               </div>
-              <div className="bg-white p-3 rounded-xl border border-zinc-100 shadow-sm flex items-center gap-3">
-                <div className="bg-emerald-50 p-2 rounded-lg text-emerald-700"><ShieldCheck className="h-5 w-5" /></div>
-                <div><p className="text-xs font-bold text-zinc-900">Premium Quality</p><p className="text-[10px] text-zinc-500">Authentic Fabrics</p></div>
+
+              <div className="bg-black/40 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl transform transition hover:-translate-y-1 group">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/10 p-3 rounded-xl text-emerald-400 group-hover:scale-110 transition-transform"><ShieldCheck className="h-6 w-6" /></div>
+                  <div>
+                    <p className="text-sm font-bold text-white tracking-wide">Premium Quality</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">Authentic, pure fabrics only</p>
+                  </div>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
 
