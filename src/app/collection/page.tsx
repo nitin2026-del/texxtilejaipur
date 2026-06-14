@@ -6,8 +6,9 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 import { CartSidebar } from '@/components/CartSidebar';
-import { Filter, ChevronDown, Loader2, Star, ShieldCheck, Truck, Undo2, Sparkles, Flame } from 'lucide-react';
+import { Filter, ChevronDown, Loader2, Star, ShieldCheck, Truck, Undo2, Sparkles, Flame, ArrowLeft } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import Link from 'next/link';
 
 interface Product {
   id: string;
@@ -188,6 +189,16 @@ export default function CollectionPage() {
 
       <div className="pt-6 md:pt-8 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
         
+        {/* Back to Home Button */}
+        <Link 
+          href="/" 
+          prefetch={true}
+          className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-900 font-medium mb-4 md:mb-6 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
+        </Link>
+
         {/* ULTRA-PREMIUM HERO SECTION */}
         <div className="mb-8 md:mb-14 rounded-[2rem] relative overflow-hidden shadow-2xl min-h-[400px] md:min-h-[600px] flex items-center border border-zinc-200/50">
           
