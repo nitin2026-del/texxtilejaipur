@@ -297,9 +297,9 @@ export default function CollectionPage() {
           </div>
 
           {/* Product Grid */}
-          <div className="flex-1">
+          <div className="flex-1 min-h-[100vh]">
             {loading ? (
-              <div className="py-20 flex flex-col items-center justify-center gap-4">
+              <div className="py-32 flex flex-col items-center justify-center gap-4">
                 <Loader2 className="h-10 w-10 text-brand-500 animate-spin" />
                 <p className="text-zinc-500 font-medium">Loading collection...</p>
               </div>
