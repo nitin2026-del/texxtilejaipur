@@ -7,9 +7,9 @@ import { Footer } from '@/components/Footer';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import { useCart } from '@/context/CartContext';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -39,12 +39,44 @@ interface Product {
 
 export default function ProductPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const { cart, addToCart, formatPrice } = useCart();
   
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<Product | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const found = parsed.find((p: any) => p.id === id);
+          if (found) {
+            // Need to map structure from collection cache to Product page structure
+            return {
+              ...found,
+              stock_quantity: found.stock || 0
+            };
+          }
+        }
+      } catch (e) {}
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed.find((p: any) => p.id === id)) return false;
+        }
+      } catch (e) {}
+    }
+    return true;
+  });
+  
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [wishlisted, setWishlisted] = useState(false);
@@ -105,7 +137,7 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) return;
-      setLoading(true);
+      if (!product) setLoading(true);
       try {
         const { data, error } = await supabase
           .from('products')
@@ -284,7 +316,15 @@ export default function ProductPage() {
     <main className="min-h-screen text-zinc-900 pb-16">
       <Navbar onCartOpen={() => setCartOpen(true)} />
 
-      <div className="pt-32 px-6 max-w-7xl mx-auto">
+      <div className="pt-24 md:pt-32 px-4 md:px-6 max-w-7xl mx-auto">
+        {/* Back Button */}
+        <button 
+          onClick={() => router.back()} 
+          className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 font-medium mb-6 md:mb-8 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Collection
+        </button>
         {loading ? (
           <div className="animate-pulse flex flex-col md:flex-row gap-12">
             <div className="w-full md:w-1/2 h-[600px] bg-zinc-100/50 rounded-lg" />

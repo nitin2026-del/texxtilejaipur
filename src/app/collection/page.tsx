@@ -26,9 +26,33 @@ interface Product {
 type SortOption = 'featured' | 'price-low-high' | 'price-high-low' | 'newest';
 
 export default function CollectionPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<string[]>(['All']);
+  const [products, setProducts] = useState<Product[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_cache');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return [];
+  });
+  
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('textilejaipur_collection_cache');
+    }
+    return true;
+  });
+
+  const [categories, setCategories] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_categories');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return ['All'];
+  });
+
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -38,12 +62,14 @@ export default function CollectionPage() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      setLoading(true);
+      // Don't set loading true if we already have cached products
+      if (products.length === 0) setLoading(true);
+      
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
       const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
       if (!url || !key) {
-        setLoading(false);
+        if (products.length === 0) setLoading(false);
         return;
       }
 
@@ -91,7 +117,16 @@ export default function CollectionPage() {
           
           // Extract unique categories
           const uniqueCats = Array.from(new Set(mapped.map(p => p.category))).filter(Boolean);
-          setCategories(['All', ...uniqueCats.sort()]);
+          const catList = ['All', ...uniqueCats.sort()];
+          setCategories(catList);
+          
+          // Cache to localStorage
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('textilejaipur_collection_cache', JSON.stringify(mapped));
+              localStorage.setItem('textilejaipur_collection_categories', JSON.stringify(catList));
+            } catch (e) {}
+          }
         }
       } catch (err) {
         console.error('Failed to fetch products', err);
