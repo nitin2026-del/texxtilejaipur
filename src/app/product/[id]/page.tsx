@@ -351,6 +351,7 @@ export default function ProductPage() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                   priority
+                  unoptimized={true}
                 />
                 
                 {/* Brand Logo Overlay */}
@@ -373,6 +374,7 @@ export default function ProductPage() {
                           fill
                           sizes="80px"
                           className="object-cover" 
+                          unoptimized={true}
                         />
                       </div>
                     </button>
