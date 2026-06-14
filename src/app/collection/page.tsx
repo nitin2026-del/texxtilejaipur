@@ -6,7 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 import { CartSidebar } from '@/components/CartSidebar';
-import { Filter, ChevronDown, Loader2 } from 'lucide-react';
+import { Filter, ChevronDown, Loader2, Star, ShieldCheck, Truck, Undo2, Sparkles, Flame } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 interface Product {
@@ -142,23 +142,69 @@ export default function CollectionPage() {
       <Navbar onCartOpen={() => setCartOpen(true)} />
       <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} onCheckout={() => {}} />
 
-      <div className="pt-32 pb-24 max-w-7xl mx-auto px-6">
-        {/* Page Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-zinc-900 mb-4">Shop All Collections</h1>
-          <p className="text-zinc-600 max-w-2xl text-lg">
-            Discover our complete range of handcrafted Indian ethnic wear, direct from the artisans of Jaipur.
-          </p>
+      {/* TOP TRUST BAR */}
+      <div className="bg-zinc-900 text-brand-100 text-[11px] md:text-xs font-semibold tracking-wider py-2.5 px-4 text-center flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 sticky top-[72px] z-30 shadow-md border-b border-zinc-800">
+        <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 text-brand-400" /> FREE Worldwide UPS Shipping</span>
+        <span className="hidden md:inline text-zinc-600">|</span>
+        <span className="flex items-center gap-1.5"><Undo2 className="h-3.5 w-3.5 text-brand-400" /> 30-Day No-Questions Returns</span>
+        <span className="hidden md:inline text-zinc-600">|</span>
+        <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-brand-400" /> 100% Secure Checkout</span>
+      </div>
+
+      <div className="pt-12 pb-24 max-w-7xl mx-auto px-4 md:px-6">
+        
+        {/* PREMIUM HERO SECTION */}
+        <div className="mb-12 rounded-3xl bg-gradient-to-br from-brand-50 via-white to-brand-100/50 p-8 md:p-12 border border-brand-200/60 shadow-sm relative overflow-hidden">
+          {/* Subtle background decoration */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-brand-200 rounded-full blur-3xl opacity-30 pointer-events-none"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex text-amber-500">
+                  <Star className="h-4 w-4 fill-current" />
+                  <Star className="h-4 w-4 fill-current" />
+                  <Star className="h-4 w-4 fill-current" />
+                  <Star className="h-4 w-4 fill-current" />
+                  <Star className="h-4 w-4 fill-current" />
+                </div>
+                <span className="text-xs font-bold text-zinc-700">4.9/5 Average Rating (1,200+ Reviews)</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-zinc-900 mb-4 tracking-tight">
+                The Jaipur Heritage Collection
+              </h1>
+              <p className="text-zinc-600 text-lg leading-relaxed">
+                Authentic, hand-stitched ethnic wear directly from the artisan clusters of Rajasthan. Elevate your wardrobe with pieces loved by women worldwide.
+              </p>
+            </div>
+            
+            {/* Trust Badges Cluster */}
+            <div className="grid grid-cols-2 gap-4 shrink-0 w-full md:w-auto">
+              <div className="bg-white p-3 rounded-xl border border-zinc-100 shadow-sm flex items-center gap-3">
+                <div className="bg-brand-50 p-2 rounded-lg text-brand-700"><Sparkles className="h-5 w-5" /></div>
+                <div><p className="text-xs font-bold text-zinc-900">100% Handcrafted</p><p className="text-[10px] text-zinc-500">Direct from Jaipur</p></div>
+              </div>
+              <div className="bg-white p-3 rounded-xl border border-zinc-100 shadow-sm flex items-center gap-3">
+                <div className="bg-emerald-50 p-2 rounded-lg text-emerald-700"><ShieldCheck className="h-5 w-5" /></div>
+                <div><p className="text-xs font-bold text-zinc-900">Premium Quality</p><p className="text-[10px] text-zinc-500">Authentic Fabrics</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* URGENCY BANNER */}
+        <div className="mb-8 flex items-center justify-center gap-2 text-sm font-bold text-red-600 bg-red-50 py-3 rounded-xl border border-red-100 animate-pulse">
+          <Flame className="h-4 w-4" /> High Demand: Many pieces are selling out fast due to limited handcrafted stock.
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Mobile Filter Toggle */}
           <button 
-            className="lg:hidden flex items-center justify-between w-full bg-white border border-zinc-200 p-4 rounded-xl font-medium text-zinc-800"
+            className="lg:hidden flex items-center justify-between w-full bg-white border border-brand-200 shadow-sm p-4 rounded-xl font-bold text-zinc-900"
             onClick={() => setIsFilterOpen(!isFilterOpen)}
           >
             <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-zinc-500" />
+              <Filter className="h-5 w-5 text-brand-600" />
               Filters & Categories
             </div>
             <ChevronDown className={`h-5 w-5 text-zinc-400 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
@@ -166,9 +212,14 @@ export default function CollectionPage() {
 
           {/* Sidebar Filters */}
           <div className={`lg:w-64 shrink-0 ${isFilterOpen ? 'block' : 'hidden lg:block'}`}>
-            <div className="bg-white border border-zinc-200 p-6 rounded-2xl sticky top-32">
-              <h3 className="font-bold text-zinc-900 mb-4">Categories</h3>
-              <div className="space-y-2">
+            <div className="bg-white border border-zinc-100 shadow-sm p-6 rounded-2xl sticky top-32">
+              <div className="flex items-center gap-2 font-bold text-zinc-900 mb-6 font-serif text-lg border-b border-zinc-100 pb-4">
+                <Filter className="h-5 w-5 text-brand-600" />
+                Refine Search
+              </div>
+              
+              <h3 className="font-bold text-zinc-800 text-sm uppercase tracking-wider mb-4">Categories</h3>
+              <div className="space-y-3">
                 {categories.map((cat) => (
                   <label key={cat} className="flex items-center gap-3 cursor-pointer group">
                     <input 
@@ -178,15 +229,15 @@ export default function CollectionPage() {
                       onChange={() => setSelectedCategory(cat)}
                       className="w-4 h-4 text-brand-600 focus:ring-brand-500 border-zinc-300"
                     />
-                    <span className={`text-sm transition-colors ${selectedCategory === cat ? 'text-brand-700 font-semibold' : 'text-zinc-600 group-hover:text-zinc-900'}`}>
+                    <span className={`text-sm transition-colors ${selectedCategory === cat ? 'text-brand-700 font-bold' : 'text-zinc-600 group-hover:text-zinc-900'}`}>
                       {cat}
                     </span>
                   </label>
                 ))}
               </div>
 
-              <h3 className="font-bold text-zinc-900 mt-8 mb-4">Sort By</h3>
-              <div className="space-y-2">
+              <h3 className="font-bold text-zinc-800 text-sm uppercase tracking-wider mt-8 mb-4">Sort By</h3>
+              <div className="space-y-3">
                 {[
                   { id: 'featured', label: 'Featured' },
                   { id: 'newest', label: 'New Arrivals' },
@@ -201,7 +252,7 @@ export default function CollectionPage() {
                       onChange={() => setSortBy(sort.id as SortOption)}
                       className="w-4 h-4 text-brand-600 focus:ring-brand-500 border-zinc-300"
                     />
-                    <span className={`text-sm transition-colors ${sortBy === sort.id ? 'text-brand-700 font-semibold' : 'text-zinc-600 group-hover:text-zinc-900'}`}>
+                    <span className={`text-sm transition-colors ${sortBy === sort.id ? 'text-brand-700 font-bold' : 'text-zinc-600 group-hover:text-zinc-900'}`}>
                       {sort.label}
                     </span>
                   </label>
@@ -234,6 +285,42 @@ export default function CollectionPage() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* WHY BUY FROM US - BOTTOM TRUST REINFORCEMENT */}
+      <div className="bg-white border-t border-zinc-200 py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-zinc-900 mb-3">Why Women Worldwide Choose Us</h2>
+            <p className="text-zinc-500 max-w-xl mx-auto">We bring the authentic heritage of Rajasthan directly to your doorstep with zero compromises on quality.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-brand-50/50 border border-brand-100 hover:shadow-md transition-shadow">
+              <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center text-brand-600 shadow-sm mb-4">
+                <Truck className="h-6 w-6" />
+              </div>
+              <h3 className="font-bold text-zinc-900 mb-2">Free Express Shipping</h3>
+              <p className="text-sm text-zinc-600">We partner with UPS to deliver your ethnic wear safely and fast, anywhere in the world.</p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-amber-50/50 border border-amber-100 hover:shadow-md transition-shadow">
+              <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center text-amber-500 shadow-sm mb-4">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <h3 className="font-bold text-zinc-900 mb-2">Authentic Handcrafted</h3>
+              <p className="text-sm text-zinc-600">Every piece is hand-stitched by skilled artisans in Jaipur, preserving centuries of Indian textile heritage.</p>
+            </div>
+
+            <div className="flex flex-col items-center text-center p-6 rounded-2xl bg-emerald-50/50 border border-emerald-100 hover:shadow-md transition-shadow">
+              <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center text-emerald-600 shadow-sm mb-4">
+                <Undo2 className="h-6 w-6" />
+              </div>
+              <h3 className="font-bold text-zinc-900 mb-2">30-Day Easy Returns</h3>
+              <p className="text-sm text-zinc-600">Don't love the fit? We offer a hassle-free 30-day return policy globally with no questions asked.</p>
+            </div>
           </div>
         </div>
       </div>
