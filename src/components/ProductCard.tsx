@@ -83,7 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <div className="relative bg-white flex flex-col h-full group transition-all duration-500">
-      <Link href={`/product/${product.id}`} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
+      <Link href={`/product/${product.id}`} prefetch={true} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
         <Image 
           src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
           alt={product.name}
@@ -179,7 +179,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          <Link href={`/product/${product.id}`} className="block">
+          <Link href={`/product/${product.id}`} prefetch={true} className="block">
             <h4 className="text-lg font-serif text-zinc-900 tracking-wide line-clamp-1 group-hover:text-brand-700 transition-colors duration-300">
               {product.name}
             </h4>
