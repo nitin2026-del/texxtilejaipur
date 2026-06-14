@@ -28,6 +28,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const isInCart = cart.some((item) => item.id === product.id);
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Load wishlist state from localStorage
   useEffect(() => {
