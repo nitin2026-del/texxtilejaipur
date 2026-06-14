@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
@@ -164,7 +165,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Meta Pixel Code */}
-        <script
+        <Script
+          id="meta-pixel"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               !function(f,b,e,v,n,t,s)
@@ -186,8 +189,14 @@ export default function RootLayout({
         {/* End Meta Pixel Code */}
 
         {/* Google tag (gtag.js) */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-PTT2P19231"></script>
-        <script
+        <Script
+          id="google-tag-src"
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-PTT2P19231"
+        />
+        <Script
+          id="google-tag-init"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -200,7 +209,9 @@ export default function RootLayout({
         {/* End Google tag */}
 
         {/* Microsoft Clarity */}
-        <script
+        <Script
+          id="microsoft-clarity"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               (function(c,l,a,r,i,t,y){
