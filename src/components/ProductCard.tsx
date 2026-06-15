@@ -83,16 +83,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const isSellingFast = product.stock > 4 && product.stock <= 10;
 
   return (
-    <div className="relative bg-white flex flex-col h-full group transition-all duration-500" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+    <div 
+      className="relative bg-white flex flex-col h-full group transition-all duration-500" 
+      onMouseEnter={() => setIsHovered(true)} 
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setIsHovered(false)}
+      onTouchCancel={() => setIsHovered(false)}
+    >
       <Link href={`/product/${product.id}`} prefetch={true} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
+        {/* Primary Image */}
         <Image 
-          src={product.images?.[isHovered && product.images?.length > 1 ? 1 : 0] || 'https://via.placeholder.com/400x500'} 
+          src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
           alt={product.name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110' : 'scale-100'}`}
+          className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
           unoptimized={true}
         />
+        
+        {/* Secondary Image (Crossfade) */}
+        {product.images && product.images.length > 1 && (
+          <Image 
+            src={product.images[1]} 
+            alt={`${product.name} alternate view`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className={`object-cover absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
+            unoptimized={true}
+          />
+        )}
         
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
