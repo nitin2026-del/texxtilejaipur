@@ -538,20 +538,9 @@ export default function Home() {
               
               if (catProducts.length === 0) return null;
 
-              // 2. Apply tier logic for THIS category
+              // 2. Apply pagination logic for THIS category
               const currentTier = categoryTiers[catName] || 1;
-              const visibleCatProducts = catProducts.filter((p) => {
-                const rank = p.display_rank ?? 999;
-                if (rank < 999) {
-                  return rank <= currentTier;
-                } else {
-                  const maxDefinedRank = Math.max(1, ...catProducts.filter(x => (x.display_rank ?? 999) < 999).map(x => x.display_rank ?? 999));
-                  if (currentTier <= maxDefinedRank) return false;
-                  const unrankedPages = currentTier - maxDefinedRank;
-                  const unrankedIndex = catProducts.filter(x => (x.display_rank ?? 999) === 999).indexOf(p);
-                  return unrankedIndex < (unrankedPages * 12);
-                }
-              });
+              const visibleCatProducts = catProducts.slice(0, currentTier * 12);
 
               const hasMoreProducts = visibleCatProducts.length < catProducts.length;
 
