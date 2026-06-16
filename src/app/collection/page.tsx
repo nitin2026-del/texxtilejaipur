@@ -178,30 +178,7 @@ export default function CollectionPage() {
       <Navbar onCartOpen={() => setCartOpen(true)} />
       <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} onCheckout={() => {}} />
 
-      {/* TOP TRUST BAR */}
-      <div className="bg-zinc-900 text-brand-100 text-[11px] md:text-xs font-semibold tracking-wider py-2.5 px-4 text-center flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 sticky top-[72px] z-30 shadow-md border-b border-zinc-800">
-        <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 text-brand-400" /> FREE Worldwide UPS Shipping</span>
-        <span className="hidden md:inline text-zinc-600">|</span>
-        <span className="flex items-center gap-1.5"><Undo2 className="h-3.5 w-3.5 text-brand-400" /> 30-Day No-Questions Returns</span>
-        <span className="hidden md:inline text-zinc-600">|</span>
-        <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-brand-400" /> 100% Secure Checkout</span>
-      </div>
-
       <div className="pt-4 md:pt-6 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
-        {/* SIMPLE HEADER FOR AD TRAFFIC */}
-        <div className="mb-6 lg:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-200/60 pb-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-zinc-900 tracking-tight">
-              The Collection
-            </h1>
-            <p className="text-zinc-500 text-sm mt-2 font-medium">
-              Authentic hand-stitched wear from Jaipur artisans.
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50/80 px-3 py-1.5 rounded-full border border-red-100">
-            <Flame className="h-3.5 w-3.5" /> High Demand
-          </div>
-        </div>
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Mobile Filter Toggle */}
