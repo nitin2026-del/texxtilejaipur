@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
+import { FloatingSupport } from '@/components/FloatingSupport';
 
 export const viewport = {
   width: 'device-width',
@@ -241,6 +242,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <div className="bg-mesh" />
+            <FloatingSupport />
             {children}
           </CartProvider>
         </AuthProvider>
