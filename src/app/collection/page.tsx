@@ -188,74 +188,19 @@ export default function CollectionPage() {
       </div>
 
       <div className="pt-4 md:pt-6 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
-        
-        {/* COMPACT HERO SECTION */}
-        <div className="mb-6 md:mb-10 rounded-[1.5rem] md:rounded-[2rem] relative overflow-hidden shadow-xl min-h-[200px] md:min-h-[320px] flex items-center border border-zinc-200/50">
-          
-          {/* Stunning Background Image (Unsplash) */}
-          <div 
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{ 
-              backgroundImage: 'url("https://images.unsplash.com/photo-1583391733958-69279b90c7f1?auto=format&fit=crop&q=100&w=2000")',
-            }}
-          >
-            {/* Elegant dark overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+        {/* SIMPLE HEADER FOR AD TRAFFIC */}
+        <div className="mb-6 lg:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-200/60 pb-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-zinc-900 tracking-tight">
+              The Collection
+            </h1>
+            <p className="text-zinc-500 text-sm mt-2 font-medium">
+              Authentic hand-stitched wear from Jaipur artisans.
+            </p>
           </div>
-          
-          <div className="relative z-10 w-full p-6 md:p-10 lg:p-14 flex flex-col md:flex-row items-center justify-between gap-8">
-            
-            <div className="max-w-xl w-full text-left">
-              {/* Trust Badge - Glassmorphism */}
-              <div className="inline-flex items-center gap-1.5 mb-2 md:mb-4 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
-                <div className="flex text-amber-400">
-                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
-                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
-                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
-                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
-                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
-                </div>
-                <span className="text-[9px] md:text-[10px] font-bold text-white tracking-wide">4.9/5 Rating</span>
-              </div>
-              
-              <h1 className="text-3xl md:text-5xl lg:text-5xl font-serif font-bold text-white mb-2 md:mb-4 leading-[1.1] tracking-tight drop-shadow-lg">
-                The Jaipur <br className="hidden md:block"/><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">Heritage</span> Collection
-              </h1>
-              
-              <p className="hidden md:block text-zinc-200 text-sm md:text-base leading-relaxed max-w-lg mb-6 drop-shadow-md font-light">
-                Authentic, hand-stitched ethnic wear directly from the royal artisan clusters of Rajasthan. Elevate your wardrobe with premium pieces loved by women worldwide.
-              </p>
-            </div>
-            
-            {/* Floating Trust Cards - Right Side */}
-            <div className="hidden lg:flex flex-col gap-5 shrink-0 w-80">
-              <div className="bg-black/40 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl transform transition hover:-translate-y-1 group">
-                <div className="flex items-center gap-4">
-                  <div className="bg-white/10 p-3 rounded-xl text-amber-400 group-hover:scale-110 transition-transform"><Sparkles className="h-6 w-6" /></div>
-                  <div>
-                    <p className="text-sm font-bold text-white tracking-wide">100% Handcrafted</p>
-                    <p className="text-xs text-zinc-400 mt-0.5">Sourced directly from Jaipur</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-black/40 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl transform transition hover:-translate-y-1 group">
-                <div className="flex items-center gap-4">
-                  <div className="bg-white/10 p-3 rounded-xl text-emerald-400 group-hover:scale-110 transition-transform"><ShieldCheck className="h-6 w-6" /></div>
-                  <div>
-                    <p className="text-sm font-bold text-white tracking-wide">Premium Quality</p>
-                    <p className="text-xs text-zinc-400 mt-0.5">Authentic, pure fabrics only</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+          <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-50/80 px-3 py-1.5 rounded-full border border-red-100">
+            <Flame className="h-3.5 w-3.5" /> High Demand
           </div>
-        </div>
-
-        {/* URGENCY BANNER */}
-        <div className="mb-8 flex items-center justify-center gap-2 text-sm font-bold text-red-600 bg-red-50 py-3 rounded-xl border border-red-100 animate-pulse">
-          <Flame className="h-4 w-4" /> High Demand: Many pieces are selling out fast due to limited handcrafted stock.
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10">
