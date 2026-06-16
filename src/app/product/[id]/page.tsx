@@ -394,8 +394,10 @@ export default function ProductPage() {
                   ) : (
                     <video 
                       src={product.details.video_url} 
-                      className="absolute inset-0 w-full h-full object-cover" 
+                      className="absolute inset-0 w-full h-full object-cover bg-black" 
                       controls 
+                      preload="none"
+                      poster={product.images?.[0] || undefined}
                     />
                   )}
                 </div>

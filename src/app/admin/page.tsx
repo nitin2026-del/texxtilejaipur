@@ -120,6 +120,7 @@ export default function AdminPortal() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [videoUploadLoading, setVideoUploadLoading] = useState(false);
   // Image reorder: click position number to edit
   const [editingPosIdx, setEditingPosIdx] = useState<number | null>(null);
   const [editingPosValue, setEditingPosValue] = useState('');
@@ -724,6 +725,41 @@ export default function AdminPortal() {
       showNotification(err.message || 'Error uploading images', true);
     } finally {
       setImageUploadLoading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setVideoUploadLoading(true);
+    
+    try {
+      const file = e.target.files[0];
+      // File size validation (e.g. limit to 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error('Video is too large. Please upload a file smaller than 50MB.');
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      
+      const { error } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, file, { contentType: file.type });
+        
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+        
+      setFormVideoUrl(publicUrl);
+      showNotification('Video uploaded successfully!');
+    } catch (err: any) {
+      console.error('Upload Error:', err);
+      showNotification(err.message || 'Error uploading video', true);
+    } finally {
+      setVideoUploadLoading(false);
       if (e.target) e.target.value = '';
     }
   };
@@ -2018,7 +2054,20 @@ export default function AdminPortal() {
                     </datalist>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Video URL (Optional)</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold text-zinc-600">Video URL (Optional)</label>
+                      <label className="cursor-pointer text-[10px] font-bold bg-violet-100 text-violet-700 hover:bg-violet-200 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
+                        {videoUploadLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <UploadCloud className="h-3 w-3" />}
+                        {videoUploadLoading ? 'Uploading...' : 'Upload Video'}
+                        <input 
+                          type="file" 
+                          accept="video/mp4,video/quicktime,video/webm" 
+                          onChange={handleVideoUpload} 
+                          disabled={videoUploadLoading}
+                          className="hidden" 
+                        />
+                      </label>
+                    </div>
                     <input
                       type="url"
                       placeholder="E.g., YouTube or direct MP4 link"
