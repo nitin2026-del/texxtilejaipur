@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart, Currency } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { InfoModal } from './InfoModal';
@@ -22,6 +23,37 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [showCoinsInfo, setShowCoinsInfo] = useState(false);
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
   const [isPromoDismissed, setIsPromoDismissed] = useState(false);
+  const [navCategories, setNavCategories] = useState<string[]>([
+    'Embroidered Jackets',
+    'Boho Dresses',
+    'Banarasi Silk',
+    'Sarees'
+  ]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_categories');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) {
+            setNavCategories(parsed.filter((c: string) => c !== 'All'));
+          }
+        }
+      } catch (e) {}
+
+      try {
+        const { data } = await supabase.from('categories').select('name').order('name');
+        if (data && data.length > 0) {
+          const catList = data.map(d => d.name).filter(Boolean);
+          setNavCategories(catList);
+        }
+      } catch (err) {
+        console.error('Failed to fetch navbar categories', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
@@ -391,15 +423,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
 
             {categoriesExpanded && (
               <div className="pl-12 pr-4 py-2 flex flex-wrap gap-2 animate-fade-in">
-                {[
-                  'Embroidered Jackets',
-                  'Boho Dresses',
-                  'Banarasi Silk',
-                  'Sarees',
-                  'Kurtas',
-                  'Lehengas',
-                  'Sherwanis'
-                ].map((cat) => (
+                {navCategories.map((cat) => (
                   <button 
                     key={cat}
                     onClick={() => {
