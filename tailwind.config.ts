@@ -39,6 +39,7 @@ const config: Config = {
         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
         'slow-zoom': 'slowZoom 10s linear infinite alternate',
         'marquee': 'marquee 25s linear infinite',
+        'float': 'float 3s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -56,6 +57,10 @@ const config: Config = {
         marquee: {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
         }
       }
     },

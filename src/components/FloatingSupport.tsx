@@ -10,7 +10,7 @@ export const FloatingSupport = () => {
   const email = "textileofrajasthan.info@gmail.com";
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-3 animate-float">
       {/* Support Menu */}
       {isOpen && (
         <div className="bg-white rounded-2xl shadow-2xl border border-zinc-100 p-3 mb-2 animate-fadeIn flex flex-col gap-2 w-64 origin-bottom-right">
@@ -51,13 +51,13 @@ export const FloatingSupport = () => {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="h-14 w-14 bg-zinc-900 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-zinc-800 hover:scale-105 transition-all focus:outline-none"
+        className="h-14 w-14 bg-zinc-900 text-white rounded-full shadow-[0_0_20px_rgba(0,0,0,0.3)] flex items-center justify-center hover:bg-zinc-800 hover:scale-105 transition-all focus:outline-none"
         aria-label="Customer Support"
       >
         {isOpen ? (
-          <X className="h-6 w-6 animate-fadeIn" />
+          <X className="h-6 w-6" />
         ) : (
-          <MessageCircle className="h-6 w-6 animate-fadeIn" />
+          <MessageCircle className="h-6 w-6" />
         )}
       </button>
     </div>
