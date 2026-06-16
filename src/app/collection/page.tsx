@@ -187,10 +187,10 @@ export default function CollectionPage() {
         <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-brand-400" /> 100% Secure Checkout</span>
       </div>
 
-      <div className="pt-6 md:pt-8 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
+      <div className="pt-4 md:pt-6 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
         
-        {/* ULTRA-PREMIUM HERO SECTION */}
-        <div className="mb-8 md:mb-14 rounded-[2rem] relative overflow-hidden shadow-2xl min-h-[400px] md:min-h-[600px] flex items-center border border-zinc-200/50">
+        {/* COMPACT HERO SECTION */}
+        <div className="mb-6 md:mb-10 rounded-[1.5rem] md:rounded-[2rem] relative overflow-hidden shadow-xl min-h-[200px] md:min-h-[320px] flex items-center border border-zinc-200/50">
           
           {/* Stunning Background Image (Unsplash) */}
           <div 
@@ -203,38 +203,28 @@ export default function CollectionPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
           </div>
           
-          <div className="relative z-10 w-full p-6 md:p-16 lg:p-20 flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="relative z-10 w-full p-6 md:p-10 lg:p-14 flex flex-col md:flex-row items-center justify-between gap-8">
             
-            <div className="max-w-2xl w-full text-left">
+            <div className="max-w-xl w-full text-left">
               {/* Trust Badge - Glassmorphism */}
-              <div className="inline-flex items-center gap-2 mb-4 md:mb-6 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+              <div className="inline-flex items-center gap-1.5 mb-2 md:mb-4 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
                 <div className="flex text-amber-400">
-                  <Star className="h-3.5 w-3.5 md:h-4 md:w-4 fill-current" />
-                  <Star className="h-3.5 w-3.5 md:h-4 md:w-4 fill-current" />
-                  <Star className="h-3.5 w-3.5 md:h-4 md:w-4 fill-current" />
-                  <Star className="h-3.5 w-3.5 md:h-4 md:w-4 fill-current" />
-                  <Star className="h-3.5 w-3.5 md:h-4 md:w-4 fill-current" />
+                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
+                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
+                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
+                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
+                  <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-current" />
                 </div>
-                <span className="text-[10px] md:text-xs font-bold text-white tracking-wide">4.9/5 Rating</span>
+                <span className="text-[9px] md:text-[10px] font-bold text-white tracking-wide">4.9/5 Rating</span>
               </div>
               
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-white mb-3 md:mb-6 leading-[1.1] tracking-tight drop-shadow-lg">
-                The Jaipur <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">Heritage</span> Collection
+              <h1 className="text-3xl md:text-5xl lg:text-5xl font-serif font-bold text-white mb-2 md:mb-4 leading-[1.1] tracking-tight drop-shadow-lg">
+                The Jaipur <br className="hidden md:block"/><span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">Heritage</span> Collection
               </h1>
               
-              <p className="text-zinc-200 text-sm md:text-xl leading-relaxed max-w-xl mb-6 md:mb-10 drop-shadow-md font-light">
+              <p className="hidden md:block text-zinc-200 text-sm md:text-base leading-relaxed max-w-lg mb-6 drop-shadow-md font-light">
                 Authentic, hand-stitched ethnic wear directly from the royal artisan clusters of Rajasthan. Elevate your wardrobe with premium pieces loved by women worldwide.
               </p>
-
-              {/* Call to Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4">
-                <button 
-                  onClick={() => window.scrollTo({ top: window.innerWidth < 768 ? 500 : 800, behavior: 'smooth' })}
-                  className="px-6 py-3 md:px-8 md:py-4 bg-white text-zinc-900 font-bold rounded-full hover:bg-zinc-100 transition-all shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)] flex items-center gap-2 transform hover:-translate-y-1 text-sm md:text-base"
-                >
-                  Explore Collection <ChevronDown className="h-4 w-4" />
-                </button>
-              </div>
             </div>
             
             {/* Floating Trust Cards - Right Side */}
