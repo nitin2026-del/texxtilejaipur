@@ -92,18 +92,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       onTouchCancel={() => setIsHovered(false)}
     >
       <Link href={`/product/${product.id}`} prefetch={true} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
-        {/* Primary Image */}
-        <Image 
-          src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
-          alt={product.name}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
-          unoptimized={true}
-        />
+        {/* Primary Media (Image or Video) */}
+        {product.details?.video_url || product.images?.[0]?.match(/\.(mp4|webm|mov|ogg)$/i) ? (
+          <video 
+            src={product.details?.video_url || product.images?.[0]}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+          />
+        ) : (
+          <Image 
+            src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+            unoptimized={true}
+          />
+        )}
         
         {/* Secondary Image (Crossfade) */}
-        {product.images && product.images.length > 1 && (
+        {product.images && product.images.length > 1 && !product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) && (
           <Image 
             src={product.images[1]} 
             alt={`${product.name} alternate view`}
