@@ -184,20 +184,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getBundleDiscountInr = () => {
-    // Filter items that are "velvet suzani" or "tnt"
-    const eligibleItems = cart.filter(item => {
-      const nameMatch = item.name.toLowerCase().includes('velvet suzani') || item.name.toLowerCase().includes('tnt');
-      const catMatch = item.category?.toLowerCase().includes('velvet suzani') || item.category?.toLowerCase().includes('tnt');
-      return nameMatch || catMatch;
-    });
+    const subtotal = getCartSubtotalInr();
+    const usdValue = subtotal * FX_RATES['USD'];
     
-    // Count total quantity of eligible items
-    const eligibleQty = eligibleItems.reduce((acc, item) => acc + item.quantity, 0);
-    
-    // If >= 2, apply 25% off their subtotal
-    if (eligibleQty >= 2) {
-      const eligibleSubtotal = eligibleItems.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
-      return eligibleSubtotal * 0.25;
+    // If order is >= $150 USD, apply 25% flat discount
+    if (usdValue >= 150) {
+      return subtotal * 0.25;
     }
     
     return 0;
