@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart, Currency } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw } from 'lucide-react';
+import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw, Truck, Undo2, ShieldCheck } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { InfoModal } from './InfoModal';
 
@@ -23,6 +23,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [showCoinsInfo, setShowCoinsInfo] = useState(false);
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
   const [isPromoDismissed, setIsPromoDismissed] = useState(false);
+  const [trustIndex, setTrustIndex] = useState(0);
+  
+  const trustMessages = [
+    { icon: <Truck className="h-3.5 w-3.5" />, text: "Free Worldwide UPS Shipping" },
+    { icon: <Undo2 className="h-3.5 w-3.5" />, text: "30-Day No-Questions Returns" },
+    { icon: <ShieldCheck className="h-3.5 w-3.5" />, text: "100% Secure Checkout" }
+  ];
   const [navCategories, setNavCategories] = useState<string[]>([
     'Embroidered Jackets',
     'Boho Dresses',
@@ -69,6 +76,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
         }
       } catch (e) {}
     }
+
+    const interval = setInterval(() => {
+      setTrustIndex((prev) => (prev + 1) % 3);
+    }, 3500);
+    return () => clearInterval(interval);
   }, []);
 
   const cartCount = cart.reduce((a, b) => a + b.quantity, 0);
@@ -91,6 +103,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           </button>
         </div>
       )}
+
+      {/* Slim Rotating Trust Bar */}
+      <div className="bg-zinc-900 text-brand-100 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase py-1.5 px-4 text-center w-full flex items-center justify-center overflow-hidden border-b border-zinc-800">
+        <div className="flex items-center gap-2 animate-fade-in" key={trustIndex}>
+          <span className="text-brand-400">{trustMessages[trustIndex].icon}</span>
+          {trustMessages[trustIndex].text}
+        </div>
+      </div>
       <nav className="bg-white/90 backdrop-blur-md border-b border-zinc-200 px-6 py-4 w-full">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           

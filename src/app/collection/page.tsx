@@ -6,7 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 import { CartSidebar } from '@/components/CartSidebar';
-import { Filter, ChevronDown, Loader2, Star, ShieldCheck, Truck, Undo2, Sparkles, Flame, ArrowLeft } from 'lucide-react';
+import { Filter, ChevronDown, Loader2, Star, ShieldCheck, Truck, Undo2, Sparkles, Flame, ArrowLeft, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 
@@ -181,20 +181,81 @@ export default function CollectionPage() {
       <div className="pt-4 md:pt-6 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
 
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* Mobile Filter Toggle */}
-          <button 
-            className="lg:hidden flex items-center justify-between w-full bg-white border border-brand-200 shadow-sm p-4 rounded-xl font-bold text-zinc-900"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-          >
-            <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-brand-600" />
-              Filters & Categories
-            </div>
-            <ChevronDown className={`h-5 w-5 text-zinc-400 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
-          </button>
+          {/* Mobile Filter Toggle Pill */}
+          <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+            <button 
+              className="flex items-center gap-2 bg-zinc-900 text-white shadow-2xl px-6 py-3 rounded-full font-bold text-sm tracking-wide hover:scale-105 transition-transform border border-zinc-700"
+              onClick={() => setIsFilterOpen(true)}
+            >
+              <Filter className="h-4 w-4" />
+              Filters & Sort
+            </button>
+          </div>
 
-          {/* Sidebar Filters */}
-          <div className={`lg:w-64 shrink-0 ${isFilterOpen ? 'block' : 'hidden lg:block'}`}>
+          {/* Mobile Filter Modal */}
+          {isFilterOpen && (
+            <div className="lg:hidden fixed inset-0 z-[100] flex flex-col justify-end bg-black/60 backdrop-blur-sm animate-fade-in">
+              <div className="bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl animate-fade-in-up">
+                <div className="flex items-center justify-between mb-6 sticky top-0 bg-white z-10 pb-2 border-b border-zinc-100">
+                  <h3 className="font-serif text-xl font-bold text-zinc-900">Filters & Sort</h3>
+                  <button onClick={() => setIsFilterOpen(false)} className="p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors">
+                    <X className="h-5 w-5 text-zinc-600" />
+                  </button>
+                </div>
+                
+                <h3 className="font-bold text-zinc-800 text-sm uppercase tracking-wider mb-4">Categories</h3>
+                <div className="space-y-4">
+                  {categories.map((cat) => (
+                    <label key={cat} className="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="radio" 
+                        name="category-mobile" 
+                        checked={selectedCategory === cat}
+                        onChange={() => setSelectedCategory(cat)}
+                        className="w-5 h-5 text-brand-600 focus:ring-brand-500 border-zinc-300"
+                      />
+                      <span className={`text-base transition-colors ${selectedCategory === cat ? 'text-brand-700 font-bold' : 'text-zinc-600'}`}>
+                        {cat}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                <h3 className="font-bold text-zinc-800 text-sm uppercase tracking-wider mt-8 mb-4">Sort By</h3>
+                <div className="space-y-4 mb-8">
+                  {[
+                    { id: 'featured', label: 'Featured' },
+                    { id: 'newest', label: 'New Arrivals' },
+                    { id: 'price-low-high', label: 'Price: Low to High' },
+                    { id: 'price-high-low', label: 'Price: High to Low' },
+                  ].map((sort) => (
+                    <label key={sort.id} className="flex items-center gap-3 cursor-pointer group">
+                      <input 
+                        type="radio" 
+                        name="sort-mobile" 
+                        checked={sortBy === sort.id}
+                        onChange={() => setSortBy(sort.id as SortOption)}
+                        className="w-5 h-5 text-brand-600 focus:ring-brand-500 border-zinc-300"
+                      />
+                      <span className={`text-base transition-colors ${sortBy === sort.id ? 'text-brand-700 font-bold' : 'text-zinc-600'}`}>
+                        {sort.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                
+                <button 
+                  onClick={() => setIsFilterOpen(false)}
+                  className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold tracking-widest uppercase py-4 rounded-xl shadow-lg transition-colors"
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Sidebar Filters */}
+          <div className="hidden lg:block lg:w-64 shrink-0">
             <div className="bg-white border border-zinc-100 shadow-sm p-6 rounded-2xl sticky top-32">
               <div className="flex items-center gap-2 font-bold text-zinc-900 mb-6 font-serif text-lg border-b border-zinc-100 pb-4">
                 <Filter className="h-5 w-5 text-brand-600" />

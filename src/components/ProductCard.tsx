@@ -81,6 +81,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Stock badge logic
   const isLowStock = product.stock > 0 && product.stock <= 4;
   const isSellingFast = product.stock > 4 && product.stock <= 10;
+  
+  // Psychological Pricing
+  const originalPrice = product.price_inr * 1.30;
 
   return (
     <div 
@@ -135,12 +138,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Top-left: Badges */}
         <div className="absolute top-4 left-4 flex flex-col items-start gap-2 z-10">
+          <span className="bg-red-600 text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-lg border border-red-500 animate-pulse">
+            30% OFF
+          </span>
           {product.is_featured && (
-            <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800 animate-pulse">
+            <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800">
               New Arrival
             </span>
           )}
-          <span className="bg-white text-zinc-900 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-zinc-100">
+          <span className="bg-white/95 backdrop-blur-sm text-zinc-900 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-zinc-200">
             {product.category}
           </span>
         </div>
@@ -167,13 +173,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Stock urgency badges */}
         {isLowStock && (
-          <span className="absolute bottom-4 right-4 bg-red-600 text-white text-[9px] font-bold px-2 py-1 rounded-full z-10 flex items-center gap-1 shadow-lg animate-pulse">
-            <Flame className="h-2.5 w-2.5" /> Only {product.stock} left!
+          <span className="absolute bottom-4 right-4 bg-red-600/95 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-10 flex items-center gap-1.5 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse border border-red-400">
+            <Flame className="h-3 w-3" /> Only {product.stock} left!
           </span>
         )}
-        {isSellingFast && (
-          <span className="absolute bottom-4 right-4 bg-amber-500 text-white text-[9px] font-bold px-2 py-1 rounded-full z-10 flex items-center gap-1 shadow-lg">
-            <Flame className="h-2.5 w-2.5" /> Selling Fast
+        {!isLowStock && isSellingFast && (
+          <span className="absolute bottom-4 right-4 bg-amber-500/95 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-10 flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-300">
+            <Flame className="h-3 w-3" /> Selling Fast
           </span>
         )}
 
@@ -233,9 +239,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Price & Action */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between pt-3 gap-3">
           <div className="flex flex-col shrink-0">
-            <span className="text-lg font-serif text-zinc-900">
-              {formatPrice(product.price_inr)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-serif font-bold text-zinc-900">
+                {formatPrice(product.price_inr)}
+              </span>
+              <span className="text-xs text-zinc-400 line-through font-medium">
+                {formatPrice(originalPrice)}
+              </span>
+            </div>
           </div>
 
           <div className="flex gap-2 w-full xl:w-auto">
