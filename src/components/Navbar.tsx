@@ -86,6 +86,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const cartCount = cart.reduce((a, b) => a + b.quantity, 0);
 
   return (
+    <>
     <header className="fixed top-0 left-0 right-0 z-40 w-full flex flex-col shadow-sm">
       {activePromo && !isPromoDismissed && (
         <div className="bg-gradient-to-r from-brand-600 via-amber-500 to-brand-600 text-white text-[11px] sm:text-xs py-2 px-4 text-center font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(245,158,11,0.3)] border-b border-amber-400/50 w-full relative">
@@ -523,5 +524,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
         )}
       </div>
     </header>
+    {/* Spacer to prevent page content from being hidden under the fixed header */}
+    <div className={`w-full ${activePromo && !isPromoDismissed ? 'h-[116px] sm:h-[124px]' : 'h-[84px] sm:h-[92px]'}`} />
+    </>
   );
 };
