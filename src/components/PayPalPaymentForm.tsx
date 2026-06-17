@@ -56,7 +56,13 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       const res = await fetch('/api/payments/paypal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId, amount: usdAmount, currency: 'USD', landingPage }),
+        body: JSON.stringify({ 
+          orderId, 
+          amount: usdAmount, 
+          currency: 'USD', 
+          landingPage,
+          coinsUsed: Number(coinsUsed) 
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create order');

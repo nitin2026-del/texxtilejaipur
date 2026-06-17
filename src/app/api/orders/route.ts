@@ -109,6 +109,7 @@ export async function POST(req: NextRequest) {
       .from('orders')
       .insert({
         user_id: finalUserId,
+        guest_email: finalUserId ? null : guest_email,
         shipping_address_id: addressId,
         order_number: orderNumber,
         total: total_inr < realSubtotalInr ? total_inr : realSubtotalInr, // Allow legitimate frontend discounts but cap it

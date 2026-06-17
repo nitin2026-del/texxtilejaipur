@@ -100,8 +100,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, status: captureStatus }, { status: 200 });
     } else {
       // Default: Create PayPal Order
-      if (!orderId || !amount || !currency) {
+      if (!orderId || !currency) {
         return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+      }
+
+      // Secure amount validation
+      const { data: order } = await supabaseAdmin.from('orders').select('user_id, total').eq('id', orderId).single();
+      if (!order) {
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      }
+
+      let secureTotalInr = order.total || 0;
+      
+      if (order.user_id && coinsUsed > 0) {
+        const { data: profile } = await supabaseAdmin.from('profiles').select('jai_coins').eq('id', order.user_id).single();
+        const maxCoins = profile?.jai_coins || 0;
+        const validCoinsUsed = Math.min(coinsUsed, maxCoins, secureTotalInr);
+        secureTotalInr = Math.max(0, secureTotalInr - validCoinsUsed);
+      }
+      
+      const USD_RATE = 0.012 * 1.03;
+      const secureUsdAmount = Number((secureTotalInr * USD_RATE).toFixed(2));
+
+      if (secureUsdAmount <= 0) {
+        return NextResponse.json({ error: 'Invalid order amount for PayPal' }, { status: 400 });
       }
 
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com';
@@ -113,7 +135,7 @@ export async function POST(req: NextRequest) {
           reference_id: orderId,
           amount: {
             currency_code: currency.toUpperCase(),
-            value: Number(amount).toFixed(2),
+            value: secureUsdAmount.toString(),
           }
         }],
         application_context: {
