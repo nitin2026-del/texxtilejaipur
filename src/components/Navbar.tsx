@@ -26,6 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [trustIndex, setTrustIndex] = useState(0);
   
   const trustMessages = [
+    { icon: <Tags className="h-3.5 w-3.5 text-brand-400" />, text: "✨ FLAT 25% OFF AUTOMATICALLY ON ORDERS OVER $150 USD!" },
     { icon: <Truck className="h-3.5 w-3.5" />, text: "Free Worldwide UPS Shipping" },
     { icon: <Undo2 className="h-3.5 w-3.5" />, text: "30-Day No-Questions Returns" },
     { icon: <ShieldCheck className="h-3.5 w-3.5" />, text: "100% Secure Checkout" }
@@ -85,8 +86,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
     fetchPromo();
 
     const interval = setInterval(() => {
-      setTrustIndex((prev) => (prev + 1) % 3);
-    }, 3500);
+      setTrustIndex((prev) => (prev + 1) % 4);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
