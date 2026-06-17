@@ -639,9 +639,18 @@ export default function AdminPortal() {
       }
 
       // 4. Fetch Coupons
-      const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
-      if (savedCoupons) {
-        try { setCoupons(JSON.parse(savedCoupons)); } catch (e) { console.error('Failed to parse coupons', e); }
+      const { data: couponsData, error: couponsErr } = await supabase
+        .from('coupons')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!couponsErr && couponsData) {
+        const formattedCoupons = couponsData.map((c: any) => ({
+          id: c.id,
+          code: c.code,
+          type: c.discount_type === 'percentage' ? 'percent' : 'fixed',
+          value: c.discount_value
+        }));
+        setCoupons(formattedCoupons);
       }
 
       // 5. Fetch Inquiries
@@ -1031,25 +1040,35 @@ export default function AdminPortal() {
     }
   };
 
-  const handleSaveCoupon = (e: React.FormEvent) => {
+  const handleCreateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formCouponCode || !formCouponValue) {
-      showNotification('Please fill in all coupon fields.', true);
-      return;
+    if (!formCouponCode || !formCouponValue) return;
+
+    try {
+      const { data, error } = await supabase.from('coupons').insert({
+        code: formCouponCode.toUpperCase(),
+        discount_type: formCouponType === 'percent' ? 'percentage' : 'fixed',
+        discount_value: parseFloat(formCouponValue),
+        is_active: true
+      }).select().single();
+
+      if (error) throw error;
+
+      const newCoupon = {
+        id: data.id,
+        code: data.code,
+        type: formCouponType,
+        value: parseFloat(formCouponValue)
+      };
+      
+      setCoupons([newCoupon, ...coupons]);
+      setFormCouponCode('');
+      setFormCouponValue('');
+      showNotification('Coupon created successfully!');
+    } catch (err) {
+      console.error('Error creating coupon', err);
+      showNotification('Failed to create coupon', true);
     }
-    const newCoupon = {
-      id: Date.now().toString(),
-      code: formCouponCode.toUpperCase(),
-      type: formCouponType,
-      value: parseFloat(formCouponValue)
-    };
-    const updatedCoupons = [...coupons, newCoupon];
-    setCoupons(updatedCoupons);
-    localStorage.setItem('textilejaipur_admin_coupons', JSON.stringify(updatedCoupons));
-    
-    setFormCouponCode('');
-    setFormCouponValue('');
-    showNotification('Coupon created successfully!');
   };
 
   const handleMarkInquiryReplied = async (inquiryId: string) => {
@@ -1067,12 +1086,19 @@ export default function AdminPortal() {
     }
   };
 
-  const handleDeleteCoupon = (id: string) => {
+  const handleDeleteCoupon = async (id: string) => {
     if (!confirm('Are you sure you want to delete this coupon?')) return;
-    const updatedCoupons = coupons.filter(c => c.id !== id);
-    setCoupons(updatedCoupons);
-    localStorage.setItem('textilejaipur_admin_coupons', JSON.stringify(updatedCoupons));
-    showNotification('Coupon deleted.');
+    
+    try {
+      const { error } = await supabase.from('coupons').delete().eq('id', id);
+      if (error) throw error;
+      
+      setCoupons(coupons.filter(c => c.id !== id));
+      showNotification('Coupon deleted.');
+    } catch (err) {
+      console.error('Error deleting coupon', err);
+      showNotification('Failed to delete coupon', true);
+    }
   };
 
   // Shipping updates
@@ -2426,7 +2452,7 @@ export default function AdminPortal() {
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-3xl border border-zinc-200 p-6">
                   <h3 className="text-lg font-serif font-bold text-zinc-900 mb-6">Create New Coupon</h3>
-                  <form onSubmit={handleSaveCoupon} className="space-y-4">
+                  <form onSubmit={handleCreateCoupon} className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-zinc-700 mb-1.5">Coupon Code</label>
                       <input
