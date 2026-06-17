@@ -10,20 +10,7 @@ export const AbandonedCartSimulator: React.FC = () => {
   const [hasTriggered, setHasTriggered] = useState(false);
 
   useEffect(() => {
-    // Inject COMEBACK10 into local storage so it works globally
-    try {
-      const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
-      let coupons = savedCoupons ? JSON.parse(savedCoupons) : [];
-      if (!coupons.find((c: any) => c.code === 'COMEBACK10')) {
-        coupons.push({
-          id: 'abandoned-recovery',
-          code: 'COMEBACK10',
-          type: 'percent',
-          value: 10
-        });
-        localStorage.setItem('textilejaipur_admin_coupons', JSON.stringify(coupons));
-      }
-    } catch (e) {}
+    // (Coupon injection removed to allow admin deletion)
 
     // Check if we already showed it this session
     if (sessionStorage.getItem('hiyawear_recovery_shown')) {

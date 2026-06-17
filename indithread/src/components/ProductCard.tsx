@@ -28,6 +28,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const isInCart = cart.some((item) => item.id === product.id);
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Load wishlist state from localStorage
   useEffect(() => {
@@ -80,17 +81,52 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Stock badge logic
   const isLowStock = product.stock > 0 && product.stock <= 4;
   const isSellingFast = product.stock > 4 && product.stock <= 10;
+  
+  // Psychological Pricing
+  const originalPrice = product.price_inr * 1.30;
 
   return (
-    <div className="relative bg-white flex flex-col h-full group transition-all duration-500">
-      <Link href={`/product/${product.id}`} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
-        <Image 
-          src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
-          alt={product.name}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+    <div 
+      className="relative bg-white flex flex-col h-full group transition-all duration-500" 
+      onMouseEnter={() => setIsHovered(true)} 
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setIsHovered(false)}
+      onTouchCancel={() => setIsHovered(false)}
+    >
+      <Link href={`/product/${product.id}`} prefetch={true} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
+        {/* Primary Media (Image or Video) */}
+        {product.details?.video_url || product.images?.[0]?.match(/\.(mp4|webm|mov|ogg)$/i) ? (
+          <video 
+            src={product.details?.video_url || product.images?.[0]}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+          />
+        ) : (
+          <Image 
+            src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+            unoptimized={true}
+          />
+        )}
+        
+        {/* Secondary Image (Crossfade) */}
+        {product.images && product.images.length > 1 && !product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) && (
+          <Image 
+            src={product.images[1]} 
+            alt={`${product.name} alternate view`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className={`object-cover absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
+            unoptimized={true}
+          />
+        )}
         
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -102,12 +138,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Top-left: Badges */}
         <div className="absolute top-4 left-4 flex flex-col items-start gap-2 z-10">
+          <span className="bg-red-600 text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-lg border border-red-500 animate-pulse">
+            30% OFF
+          </span>
           {product.is_featured && (
-            <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800 animate-pulse">
+            <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800">
               New Arrival
             </span>
           )}
-          <span className="bg-white text-zinc-900 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-zinc-100">
+          <span className="bg-white/95 backdrop-blur-sm text-zinc-900 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-zinc-200">
             {product.category}
           </span>
         </div>
@@ -134,13 +173,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Stock urgency badges */}
         {isLowStock && (
-          <span className="absolute bottom-4 right-4 bg-red-600 text-white text-[9px] font-bold px-2 py-1 rounded-full z-10 flex items-center gap-1 shadow-lg animate-pulse">
-            <Flame className="h-2.5 w-2.5" /> Only {product.stock} left!
+          <span className="absolute bottom-4 right-4 bg-red-600/95 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-10 flex items-center gap-1.5 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse border border-red-400">
+            <Flame className="h-3 w-3" /> Only {product.stock} left!
           </span>
         )}
-        {isSellingFast && (
-          <span className="absolute bottom-4 right-4 bg-amber-500 text-white text-[9px] font-bold px-2 py-1 rounded-full z-10 flex items-center gap-1 shadow-lg">
-            <Flame className="h-2.5 w-2.5" /> Selling Fast
+        {!isLowStock && isSellingFast && (
+          <span className="absolute bottom-4 right-4 bg-amber-500/95 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-10 flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-300">
+            <Flame className="h-3 w-3" /> Selling Fast
           </span>
         )}
 
@@ -179,7 +218,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          <Link href={`/product/${product.id}`} className="block">
+          <Link href={`/product/${product.id}`} prefetch={true} className="block">
             <h4 className="text-lg font-serif text-zinc-900 tracking-wide line-clamp-1 group-hover:text-brand-700 transition-colors duration-300">
               {product.name}
             </h4>
@@ -198,21 +237,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Price & Action */}
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between pt-3 gap-3">
+        <div className="flex flex-col justify-between pt-3 gap-3">
           <div className="flex flex-col shrink-0">
-            <span className="text-lg font-serif text-zinc-900">
-              {formatPrice(product.price_inr)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-serif font-bold text-zinc-900">
+                {formatPrice(product.price_inr)}
+              </span>
+              <span className="text-xs text-zinc-400 line-through font-medium">
+                {formatPrice(originalPrice)}
+              </span>
+            </div>
           </div>
 
-          <div className="flex gap-2 w-full xl:w-auto">
+          <div className="flex gap-2 w-full">
             {isInCart ? (
               <button
                 onClick={(e) => {
                   e.preventDefault();
                   addToCart(product);
                 }}
-                className="flex-1 xl:flex-none px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
+                className="flex-1 px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
               >
                 <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5 stroke-[3]" /> Added
               </button>
@@ -223,7 +267,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   addToCart(product);
                 }}
                 disabled={product.stock === 0}
-                className={`flex-1 xl:flex-none px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border border-zinc-900 ${
+                className={`flex-1 px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border border-zinc-900 ${
                   product.stock === 0
                     ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed'
                     : 'bg-transparent text-zinc-900 hover:bg-zinc-900 hover:text-white'
@@ -236,7 +280,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
             <Link
               href={`/product/${product.id}?buy=true`}
-              className={`flex-1 xl:flex-none px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center border border-brand-700 ${
+              className={`flex-1 px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center border border-brand-700 ${
                 product.stock === 0
                   ? 'bg-brand-50 text-brand-300 border-brand-200 cursor-not-allowed pointer-events-none'
                   : 'bg-brand-700 text-white hover:bg-brand-800 shadow-md'

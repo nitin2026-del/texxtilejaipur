@@ -7,9 +7,9 @@ import { Footer } from '@/components/Footer';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import { useCart } from '@/context/CartContext';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -20,24 +20,82 @@ interface Product {
   category: string;
   images: string[];
   stock_quantity: number;
-  details: { material?: string; origin?: string; care?: string; sizes?: string[] };
+  details: { 
+    material?: string; 
+    origin?: string; 
+    care?: string; 
+    sizes?: string[]; 
+    video_url?: string;
+    culturalContext?: string;
+    stylingAdvice?: string;
+    translations?: {
+      fr?: string;
+      es?: string;
+      ar?: string;
+      de?: string;
+    }
+  };
 }
 
 export default function ProductPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const { cart, addToCart, formatPrice } = useCart();
   
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState<Product | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const found = parsed.find((p: any) => p.id === id);
+          if (found) {
+            // Need to map structure from collection cache to Product page structure
+            return {
+              ...found,
+              stock_quantity: found.stock || 0
+            };
+          }
+        }
+      } catch (e) {}
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed.find((p: any) => p.id === id)) return false;
+        }
+      } catch (e) {}
+    }
+    return true;
+  });
+  
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [expandedQa, setExpandedQa] = useState<number | null>(null);
   const [showQuestionForm, setShowQuestionForm] = useState(false);
+  const [inquiryEmail, setInquiryEmail] = useState('');
+  const [inquiryQuestion, setInquiryQuestion] = useState('');
+  const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
+  const [inquiryError, setInquiryError] = useState('');
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<string | null>(null);
+  
+  // International AI features
+  const [language, setLanguage] = useState<'en' | 'fr' | 'es' | 'ar' | 'de'>('en');
+  const [sizingOpen, setSizingOpen] = useState(false);
+  const [sizingInput, setSizingInput] = useState('');
+  const [sizingResult, setSizingResult] = useState('');
+  const [sizingLoading, setSizingLoading] = useState(false);
   
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
@@ -79,7 +137,7 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) return;
-      setLoading(true);
+      if (!product) setLoading(true);
       try {
         const { data, error } = await supabase
           .from('products')
@@ -116,12 +174,75 @@ export default function ProductPage() {
             images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
             stock_quantity: item.stock_quantity || item.stock || 0,
             details: {
-              material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
-              origin: 'Jaipur, Rajasthan',
-              care: 'Dry clean only',
-              sizes: ['S', 'M', 'L', 'XL']
+              ...item.details,
+              material: item.details?.material || (item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric'),
+              origin: item.details?.origin || 'Jaipur, Rajasthan',
+              care: item.details?.care || 'Dry clean only',
+              sizes: item.details?.sizes || ['S', 'M', 'L', 'XL'],
+              video_url: item.details?.video_url,
+              culturalContext: item.details?.culturalContext,
+              stylingAdvice: item.details?.stylingAdvice,
+              translations: item.details?.translations
             }
           });
+
+          // Fetch related products
+          try {
+            let query = supabase
+              .from('products')
+              .select(`
+                id, name, price,
+                categories (name),
+                product_images (url, is_primary)
+              `)
+              .neq('id', item.id)
+              .limit(20);
+              
+            // If category exists, try fetching from same category first
+            if (item.category_id) {
+              const { data: categoryData } = await query.eq('category_id', item.category_id);
+              if (categoryData && categoryData.length >= 2) {
+                 // Use category data if we have at least 2 products
+                 const formatted = categoryData.map((p: any) => ({
+                    id: p.id,
+                    name: p.name,
+                    price_inr: p.price,
+                    category: p.categories?.name || 'Ethnic Wear',
+                    image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
+                 }));
+                 // Shuffle randomly and take 4
+                 const shuffled = formatted.sort(() => 0.5 - Math.random()).slice(0, 4);
+                 setRelatedProducts(shuffled);
+                 return;
+              }
+            }
+            
+            // Fallback: fetch any products
+            const { data: relatedData } = await supabase
+              .from('products')
+              .select(`
+                id, name, price,
+                categories (name),
+                product_images (url, is_primary)
+              `)
+              .neq('id', item.id)
+              .limit(20);
+
+            if (relatedData) {
+              const formatted = relatedData.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                price_inr: p.price,
+                category: p.categories?.name || 'Ethnic Wear',
+                image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
+              }));
+              // Shuffle randomly and take 4
+              const shuffled = formatted.sort(() => 0.5 - Math.random()).slice(0, 4);
+              setRelatedProducts(shuffled);
+            }
+          } catch (e) {
+            console.error('Error fetching related products:', e);
+          }
         }
       } catch (err) {
         console.error('Error fetching product:', err);
@@ -133,6 +254,35 @@ export default function ProductPage() {
     fetchProduct();
   }, [id]);
 
+  const handleSizingRequest = async () => {
+    if (!product || !sizingInput.trim()) return;
+    setSizingLoading(true);
+    setSizingResult('');
+    try {
+      const res = await fetch('/api/ai/size-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userSize: sizingInput,
+          brand: 'standard western brands',
+          productName: product.name,
+          material: product.details?.material,
+          category: product.category
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSizingResult(data.recommendation);
+      } else {
+        setSizingResult("Sorry, I couldn't determine the size right now. Please check our standard size chart.");
+      }
+    } catch (err) {
+      setSizingResult("Sorry, I couldn't determine the size right now. Please check our standard size chart.");
+    } finally {
+      setSizingLoading(false);
+    }
+  };
+
   const handleAddToCart = () => {
     if (product) {
       addToCart({
@@ -140,7 +290,8 @@ export default function ProductPage() {
         name: product.name,
         price_inr: product.price_inr,
         images: product.images,
-        sku: product.sku
+        sku: product.sku,
+        category: product.category
       }, quantity);
       setCartOpen(true);
     }
@@ -154,7 +305,8 @@ export default function ProductPage() {
           name: product.name,
           price_inr: product.price_inr,
           images: product.images,
-          sku: product.sku
+          sku: product.sku,
+          category: product.category
         }, quantity);
       }
       setCartOpen(false);
@@ -166,7 +318,15 @@ export default function ProductPage() {
     <main className="min-h-screen text-zinc-900 pb-16">
       <Navbar onCartOpen={() => setCartOpen(true)} />
 
-      <div className="pt-32 px-6 max-w-7xl mx-auto">
+      <div className="pt-24 md:pt-32 px-4 md:px-6 max-w-7xl mx-auto">
+        {/* Back Button */}
+        <button 
+          onClick={() => router.back()} 
+          className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 font-medium mb-6 md:mb-8 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Collection
+        </button>
         {loading ? (
           <div className="animate-pulse flex flex-col md:flex-row gap-12">
             <div className="w-full md:w-1/2 h-[600px] bg-zinc-100/50 rounded-lg" />
@@ -193,6 +353,7 @@ export default function ProductPage() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                   priority
+                  unoptimized={true}
                 />
                 
                 {/* Brand Logo Overlay */}
@@ -215,10 +376,32 @@ export default function ProductPage() {
                           fill
                           sizes="80px"
                           className="object-cover" 
+                          unoptimized={true}
                         />
                       </div>
                     </button>
                   ))}
+                </div>
+              )}
+              
+              {product.details?.video_url && (
+                <div className="mt-4 border border-zinc-200 rounded-lg overflow-hidden bg-black/5 aspect-video relative">
+                  {product.details.video_url.includes('youtube.com') || product.details.video_url.includes('youtu.be') ? (
+                    <iframe 
+                      src={product.details.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')} 
+                      className="absolute inset-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  ) : (
+                    <video 
+                      src={product.details.video_url} 
+                      className="absolute inset-0 w-full h-full object-cover bg-black" 
+                      controls 
+                      preload="none"
+                      poster={product.images?.[0] || undefined}
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -275,13 +458,24 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                <div className="text-3xl font-serif font-bold text-zinc-900 py-4 border-y border-zinc-200">
-                  {formatPrice(product.price_inr)}
-
+                <div className="flex items-center justify-between py-4 border-y border-zinc-200">
+                  <div className="text-3xl font-serif font-bold text-zinc-900">
+                    {formatPrice(product.price_inr)}
+                  </div>
+                  
+                  {product.details?.translations && Object.keys(product.details.translations).length > 0 && (
+                    <div className="flex gap-1.5">
+                      <button onClick={() => setLanguage('en')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'en' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>EN</button>
+                      {product.details.translations.fr && <button onClick={() => setLanguage('fr')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'fr' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>FR</button>}
+                      {product.details.translations.es && <button onClick={() => setLanguage('es')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'es' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>ES</button>}
+                      {product.details.translations.de && <button onClick={() => setLanguage('de')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'de' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>DE</button>}
+                      {product.details.translations.ar && <button onClick={() => setLanguage('ar')} className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-colors ${language === 'ar' ? 'bg-brand-700 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>AR</button>}
+                    </div>
+                  )}
                 </div>
 
-                <p className="text-zinc-600 font-light leading-relaxed">
-                  {product.description}
+                <p className="text-zinc-600 font-light leading-relaxed whitespace-pre-wrap" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {language === 'en' ? product.description : (product.details?.translations?.[language as keyof typeof product.details.translations] || product.description)}
                 </p>
 
                 {/* Details list */}
@@ -306,6 +500,66 @@ export default function ProductPage() {
                       <span className="text-zinc-900 text-right">{product.details.care}</span>
                     </div>
                   )}
+                </div>
+
+                {/* AI Sizing Assistant - Highlighted */}
+                <div className="pt-4 pb-2">
+                  <div className={`transition-all duration-500 overflow-hidden rounded-xl border ${sizingOpen ? 'border-brand-300 shadow-lg shadow-brand-500/10' : 'border-zinc-200 hover:border-brand-300'}`}>
+                    {/* Header Button (Always visible) */}
+                    <button 
+                      onClick={() => setSizingOpen(!sizingOpen)}
+                      className={`w-full flex items-center justify-between p-4 transition-colors ${sizingOpen ? 'bg-gradient-to-r from-brand-50 to-white' : 'bg-white hover:bg-zinc-50'}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-brand-700">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-20"></span>
+                          <Sparkles className="h-4 w-4 relative z-10" />
+                        </div>
+                        <div className="text-left">
+                          <span className="text-sm font-bold text-zinc-900 block font-serif tracking-wide">
+                            AI TAILOR ✨
+                          </span>
+                          <span className="text-xs text-zinc-500">Unsure about your size? Let AI decide.</span>
+                        </div>
+                      </div>
+                      <ChevronDown className={`h-5 w-5 text-zinc-400 transition-transform duration-300 ${sizingOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Expandable Content */}
+                    <div className={`transition-all duration-500 ease-in-out ${sizingOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="p-5 border-t border-brand-100 bg-gradient-to-br from-white to-brand-50/50">
+                        <p className="text-xs text-zinc-600 mb-4 leading-relaxed">
+                          Tell us your usual size in western brands (e.g. "I wear US Size 6 at Zara"), and our AI will calculate the exact Indian size to buy based on the stretch and cut of this {product.details?.material || 'fabric'}.
+                        </p>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text" 
+                            value={sizingInput}
+                            onChange={(e) => setSizingInput(e.target.value)}
+                            placeholder="e.g. US Size 6, Zara" 
+                            className="flex-1 text-sm px-4 py-2.5 border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all shadow-sm"
+                          />
+                          <button 
+                            onClick={handleSizingRequest}
+                            disabled={sizingLoading || !sizingInput.trim()}
+                            className="px-5 py-2.5 bg-zinc-900 text-white font-bold text-xs rounded-lg disabled:opacity-50 flex items-center justify-center min-w-[110px] hover:bg-brand-900 transition-colors shadow-md active:scale-95"
+                          >
+                            {sizingLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Calculate Size'}
+                          </button>
+                        </div>
+                        
+                        {sizingResult && (
+                          <div className="mt-5 p-4 bg-white border border-brand-200 rounded-lg shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-brand-500"></div>
+                            <p className="text-sm text-zinc-800 leading-relaxed font-medium pl-2">
+                              <span className="font-bold text-brand-700 block mb-1 uppercase tracking-wider text-[10px]">AI Recommendation</span>
+                              {sizingResult}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Add to Cart Actions */}
@@ -425,7 +679,61 @@ export default function ProductPage() {
                     </span>
                   </div>
                 </div>
+
+                {/* AI Heritage & Styling Guide */}
+                {(product.details?.culturalContext || product.details?.stylingAdvice) && (
+                  <div className="mt-6 border border-brand-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                    <div className="bg-brand-50 px-5 py-3 border-b border-brand-200 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-brand-700" />
+                      <h4 className="text-sm font-bold text-brand-900">The Heritage & Styling Guide</h4>
+                    </div>
+                    <div className="p-5 space-y-4">
+                      {product.details.culturalContext && (
+                        <div>
+                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Cultural Context</h5>
+                          <p className="text-sm text-zinc-600 leading-relaxed">{product.details.culturalContext}</p>
+                        </div>
+                      )}
+                      {product.details.stylingAdvice && (
+                        <div className={product.details.culturalContext ? "pt-4 border-t border-zinc-100" : ""}>
+                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">How to Style</h5>
+                          <p className="text-sm text-zinc-600 leading-relaxed">{product.details.stylingAdvice}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* You May Also Like Section */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-20 pt-16 border-t border-zinc-200">
+            <div className="flex items-center gap-2 mb-8">
+              <Sparkles className="h-6 w-6 text-brand-600" />
+              <h3 className="text-2xl font-serif text-zinc-900 font-bold">You May Also Like</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {relatedProducts.map((rp) => (
+                <a key={rp.id} href={`/product/${rp.id}`} className="group block bg-white border border-zinc-200 rounded-xl overflow-hidden hover:border-brand-300 hover:shadow-xl transition-all">
+                  <div className="aspect-[4/5] relative bg-zinc-100 overflow-hidden">
+                    <Image 
+                      src={rp.image} 
+                      alt={rp.name}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wider mb-1">{rp.category}</p>
+                    <h4 className="text-sm font-semibold text-zinc-900 line-clamp-1 group-hover:text-brand-700 transition-colors">{rp.name}</h4>
+                    <p className="text-zinc-900 font-bold mt-2 font-serif">{formatPrice(rp.price_inr)}</p>
+                  </div>
+                </a>
+              ))}
             </div>
           </div>
         )}
@@ -455,20 +763,30 @@ export default function ProductPage() {
                   </div>
                 ) : (
                   <div className="space-y-3 bg-zinc-50 p-5 rounded-xl border border-zinc-200">
+                    <input 
+                      type="email"
+                      placeholder="Your email address (so we can reply)" 
+                      value={inquiryEmail}
+                      onChange={(e) => setInquiryEmail(e.target.value)}
+                      className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
+                    />
                     <textarea 
                       placeholder="Type your question here..." 
+                      value={inquiryQuestion}
+                      onChange={(e) => setInquiryQuestion(e.target.value)}
                       className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
                       rows={3}
                     ></textarea>
+                    {inquiryError && (
+                      <p className="text-red-500 text-xs font-semibold">{inquiryError}</p>
+                    )}
                     <div className="flex gap-2">
                       <button 
-                        onClick={() => {
-                          setFormSubmitted('question');
-                          setTimeout(() => { setFormSubmitted(null); setShowQuestionForm(false); }, 3000);
-                        }}
-                        className="px-4 py-2 bg-brand-700 text-white font-bold rounded-lg text-xs"
+                        onClick={handleInquirySubmit}
+                        disabled={isSubmittingInquiry}
+                        className="px-4 py-2 bg-brand-700 text-white font-bold rounded-lg text-xs disabled:opacity-50"
                       >
-                        Submit
+                        {isSubmittingInquiry ? 'Submitting...' : 'Submit'}
                       </button>
                       <button 
                         onClick={() => setShowQuestionForm(false)}

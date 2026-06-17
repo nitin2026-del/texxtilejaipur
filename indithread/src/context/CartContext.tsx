@@ -10,6 +10,7 @@ export interface CartItem {
   price_inr: number;
   images: string[];
   quantity: number;
+  category?: string;
 }
 
 export interface Coupon {
@@ -25,6 +26,7 @@ export interface CartContextProduct {
   name: string;
   price_inr: number;
   images: string[];
+  category?: string;
 }
 
 export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD';
@@ -60,6 +62,7 @@ interface CartContextType {
   formatPrice: (priceInr: number) => string;
   getCartSubtotalInr: () => number;
   getCartTotalInr: () => number;
+  getBundleDiscountInr: () => number;
   getCartTotalDisplay: () => number;
   appliedCoupon: Coupon | null;
   applyCoupon: (code: string) => { success: boolean; message: string };
@@ -137,6 +140,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         price_inr: typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr,
         images: product.images,
         quantity: quantity,
+        category: product.category,
       };
       saveCart([...cart, newItem]);
     }
@@ -178,6 +182,26 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return cart.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
   };
 
+  const getBundleDiscountInr = () => {
+    // Filter items that are "velvet suzani" or "tnt"
+    const eligibleItems = cart.filter(item => {
+      const nameMatch = item.name.toLowerCase().includes('velvet suzani') || item.name.toLowerCase().includes('tnt');
+      const catMatch = item.category?.toLowerCase().includes('velvet suzani') || item.category?.toLowerCase().includes('tnt');
+      return nameMatch || catMatch;
+    });
+    
+    // Count total quantity of eligible items
+    const eligibleQty = eligibleItems.reduce((acc, item) => acc + item.quantity, 0);
+    
+    // If >= 2, apply 25% off their subtotal
+    if (eligibleQty >= 2) {
+      const eligibleSubtotal = eligibleItems.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
+      return eligibleSubtotal * 0.25;
+    }
+    
+    return 0;
+  };
+
   const getCartTotalInr = () => {
     let subtotal = getCartSubtotalInr();
     
@@ -185,6 +209,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (tierDiscountPercentage > 0) {
       subtotal = subtotal - (subtotal * (tierDiscountPercentage / 100));
     }
+
+    // Apply Bundle Discount
+    const bundleDiscount = getBundleDiscountInr();
+    subtotal = subtotal - bundleDiscount;
 
     if (!appliedCoupon) return Math.max(0, subtotal);
     
@@ -243,6 +271,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         formatPrice,
         getCartSubtotalInr,
         getCartTotalInr,
+        getBundleDiscountInr,
         getCartTotalDisplay,
         appliedCoupon,
         applyCoupon,
