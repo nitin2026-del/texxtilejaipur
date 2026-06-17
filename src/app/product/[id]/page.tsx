@@ -719,13 +719,24 @@ export default function ProductPage() {
               {relatedProducts.map((rp) => (
                 <a key={rp.id} href={`/product/${rp.id}`} className="group block bg-white border border-zinc-200 rounded-xl overflow-hidden hover:border-brand-300 hover:shadow-xl transition-all">
                   <div className="aspect-[4/5] relative bg-zinc-100 overflow-hidden">
-                    <Image 
-                      src={rp.image} 
-                      alt={rp.name}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    {rp.image.match(/\.(mp4|webm)$/i) ? (
+                      <video
+                        src={rp.image}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <Image 
+                        src={rp.image} 
+                        alt={rp.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    )}
                   </div>
                   <div className="p-4">
                     <p className="text-[10px] font-bold text-brand-600 uppercase tracking-wider mb-1">{rp.category}</p>
