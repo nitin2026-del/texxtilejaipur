@@ -24,7 +24,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-40 overflow-hidden">
+    <div className="fixed inset-0 z-[110] overflow-hidden">
       {/* Backdrop */}
       <div 
         onClick={onClose}
