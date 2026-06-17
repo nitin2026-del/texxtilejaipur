@@ -290,7 +290,8 @@ export default function ProductPage() {
         name: product.name,
         price_inr: product.price_inr,
         images: product.images,
-        sku: product.sku
+        sku: product.sku,
+        category: product.category
       }, quantity);
       setCartOpen(true);
     }
@@ -304,7 +305,8 @@ export default function ProductPage() {
           name: product.name,
           price_inr: product.price_inr,
           images: product.images,
-          sku: product.sku
+          sku: product.sku,
+          category: product.category
         }, quantity);
       }
       setCartOpen(false);

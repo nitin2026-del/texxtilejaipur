@@ -12,7 +12,7 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
-  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon } = useCart();
+  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, getBundleDiscountInr, appliedCoupon, applyCoupon, removeCoupon } = useCart();
   const { jaiCoins, userTier, tierDiscountPercentage } = useAuth();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
@@ -24,7 +24,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-40 overflow-hidden">
+    <div className="fixed inset-0 z-[110] overflow-hidden">
       {/* Backdrop */}
       <div 
         onClick={onClose}
@@ -144,6 +144,12 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                     <div className="flex justify-between text-xs text-brand-400 font-bold">
                       <span>VIP {userTier} Discount ({tierDiscountPercentage}%)</span>
                       <span>-{formatPrice(getCartSubtotalInr() * (tierDiscountPercentage / 100))}</span>
+                    </div>
+                  )}
+                  {getBundleDiscountInr() > 0 && (
+                    <div className="flex justify-between text-xs text-brand-400 font-bold">
+                      <span>Bundle Discount (25% Off Jackets)</span>
+                      <span>-{formatPrice(getBundleDiscountInr())}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-xs text-zinc-400">

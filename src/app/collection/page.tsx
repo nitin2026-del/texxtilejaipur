@@ -307,6 +307,19 @@ export default function CollectionPage() {
 
           {/* Product Grid */}
           <div className="flex-1 min-h-[100vh]">
+            {/* Promotional Banner */}
+            <div className="mb-8 bg-brand-900 text-white p-4 sm:p-6 rounded-2xl flex flex-col sm:flex-row items-center gap-4 shadow-xl border border-brand-800 animate-fade-in-up">
+              <div className="flex-shrink-0 bg-brand-800 p-3 rounded-full">
+                <Flame className="h-6 w-6 text-brand-300" />
+              </div>
+              <div className="text-center sm:text-left flex-1">
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-brand-50 mb-1">Special Offer!</h3>
+                <p className="text-brand-200 text-sm sm:text-base">
+                  Buy any <strong className="text-white">2 Velvet Suzani or TNT Suzani</strong> jackets and get a <strong className="text-white">flat 25% off</strong> their price automatically applied at checkout!
+                </p>
+              </div>
+            </div>
+
             {loading ? (
               <div className="py-32 flex flex-col items-center justify-center gap-4">
                 <Loader2 className="h-10 w-10 text-brand-500 animate-spin" />

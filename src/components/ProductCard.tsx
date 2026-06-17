@@ -237,7 +237,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Price & Action */}
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between pt-3 gap-3">
+        <div className="flex flex-col justify-between pt-3 gap-3">
           <div className="flex flex-col shrink-0">
             <div className="flex items-center gap-2">
               <span className="text-lg font-serif font-bold text-zinc-900">
@@ -249,14 +249,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          <div className="flex gap-2 w-full xl:w-auto">
+          <div className="flex gap-2 w-full">
             {isInCart ? (
               <button
                 onClick={(e) => {
                   e.preventDefault();
                   addToCart(product);
                 }}
-                className="flex-1 xl:flex-none px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
+                className="flex-1 px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
               >
                 <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5 stroke-[3]" /> Added
               </button>
@@ -267,7 +267,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   addToCart(product);
                 }}
                 disabled={product.stock === 0}
-                className={`flex-1 xl:flex-none px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border border-zinc-900 ${
+                className={`flex-1 px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border border-zinc-900 ${
                   product.stock === 0
                     ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed'
                     : 'bg-transparent text-zinc-900 hover:bg-zinc-900 hover:text-white'
@@ -280,7 +280,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
             <Link
               href={`/product/${product.id}?buy=true`}
-              className={`flex-1 xl:flex-none px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center border border-brand-700 ${
+              className={`flex-1 px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center border border-brand-700 ${
                 product.stock === 0
                   ? 'bg-brand-50 text-brand-300 border-brand-200 cursor-not-allowed pointer-events-none'
                   : 'bg-brand-700 text-white hover:bg-brand-800 shadow-md'
