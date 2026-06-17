@@ -173,9 +173,9 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                         className="bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-xs text-white w-full uppercase placeholder-zinc-500 focus:outline-none focus:border-amber-500 transition-colors"
                       />
                       <button 
-                        onClick={() => {
+                        onClick={async () => {
                           if(!couponCode) return;
-                          const res = applyCoupon(couponCode);
+                          const res = await applyCoupon(couponCode);
                           setCouponMsg({ type: res.success ? 'success' : 'error', text: res.message });
                           if(res.success) setCouponCode('');
                         }}

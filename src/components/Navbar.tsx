@@ -63,19 +63,26 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   }, []);
 
   useEffect(() => {
-    const savedCoupons = localStorage.getItem('textilejaipur_admin_coupons');
-    if (savedCoupons) {
+    const fetchPromo = async () => {
       try {
-        const coupons = JSON.parse(savedCoupons);
-        if (coupons.length > 0) {
-          const first = coupons[0];
+        const { data, error } = await supabase
+          .from('coupons')
+          .select('*')
+          .eq('is_active', true)
+          .limit(1)
+          .single();
+          
+        if (data && !error) {
           setActivePromo({
-            code: first.code,
-            value: first.type === 'percent' ? `${first.value}%` : `₹${first.value}`
+            code: data.code,
+            value: data.discount_type === 'percentage' ? `${data.discount_value}%` : `₹${data.discount_value}`
           });
         }
-      } catch (e) {}
-    }
+      } catch (e) {
+        console.error('Error fetching promo', e);
+      }
+    };
+    fetchPromo();
 
     const interval = setInterval(() => {
       setTrustIndex((prev) => (prev + 1) % 3);

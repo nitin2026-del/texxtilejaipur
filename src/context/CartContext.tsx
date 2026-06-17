@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { supabase } from '@/lib/supabase';
 
 export interface CartItem {
   id: string;
@@ -65,7 +66,7 @@ interface CartContextType {
   getBundleDiscountInr: () => number;
   getCartTotalDisplay: () => number;
   appliedCoupon: Coupon | null;
-  applyCoupon: (code: string) => { success: boolean; message: string };
+  applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
   removeCoupon: () => void;
 }
 
@@ -231,26 +232,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return getCartTotalInr() * rate;
   };
 
-  const applyCoupon = (code: string) => {
+  const applyCoupon = async (code: string) => {
     const cleanCode = code.trim().toUpperCase();
-    const savedCoupons1 = localStorage.getItem('textilejaipur_admin_coupons');
-    const savedCoupons2 = localStorage.getItem('hiyawear_admin_coupons');
     
-    let allCoupons: Coupon[] = [];
     try {
-      if (savedCoupons1) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons1)];
-      if (savedCoupons2) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons2)];
+      const { data: couponData, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', cleanCode)
+        .eq('is_active', true)
+        .single();
+
+      if (error || !couponData) {
+        return { success: false, message: 'Invalid or expired promo code.' };
+      }
+
+      // Check minimum order value
+      if (couponData.min_order_value && getCartSubtotalInr() < couponData.min_order_value) {
+        return { success: false, message: `Minimum order value of ₹${couponData.min_order_value} required.` };
+      }
+
+      const coupon: Coupon = {
+        id: couponData.id,
+        code: couponData.code,
+        type: couponData.discount_type === 'percentage' ? 'percent' : 'fixed',
+        value: couponData.discount_value
+      };
+
+      setAppliedCoupon(coupon);
+      return { success: true, message: 'Coupon applied successfully!' };
     } catch (e) {
-      console.error('Error parsing coupons', e);
+      console.error('Error validating coupon:', e);
+      return { success: false, message: 'Error applying coupon. Please try again.' };
     }
-    
-    const found = allCoupons.find(c => c?.code && c.code.trim().toUpperCase() === cleanCode);
-    if (found) {
-      setAppliedCoupon(found);
-      return { success: true, message: `Coupon applied successfully!` };
-    }
-    
-    return { success: false, message: 'Invalid or expired coupon code.' };
   };
 
   const removeCoupon = () => {
