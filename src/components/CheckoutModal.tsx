@@ -138,18 +138,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
+      // We pass the RAW cart total (including tier/coupon but NOT JaiCoins) to the backend.
+      // The backend will independently verify this total, but we send it for logging/fallback.
       let orderTotalInr = getCartTotalInr();
-      if (useJaiCoins && user) {
-        orderTotalInr = Math.max(0, orderTotalInr - JAI_COINS_VALUE_INR);
-      } else if (usedTempSignupCoins) {
-        orderTotalInr = Math.max(0, orderTotalInr - 500);
-      }
-
       let orderTotalDisplay = getCartTotalDisplay();
+
+      // We still need to calculate the discounted display value to show in the UI,
+      // but we do NOT mutate orderTotalInr which represents the subtotal before JaiCoins.
+      let displayTotalDisplay = orderTotalDisplay;
       if (usedTempSignupCoins || (useJaiCoins && user)) {
         const coinsValue = usedTempSignupCoins ? 500 : JAI_COINS_VALUE_INR;
         const discountRatio = Math.max(0, getCartTotalInr() - coinsValue) / Math.max(getCartTotalInr(), 1);
-        orderTotalDisplay = getCartTotalDisplay() * discountRatio;
+        displayTotalDisplay = getCartTotalDisplay() * discountRatio;
       }
 
       // 1. Create order via our API
@@ -163,9 +163,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           user_id: finalUserId,
           guest_email: email,
           items: cart,
+          coupon_code: appliedCoupon?.code,
           total_inr: orderTotalInr,
           display_currency: currency,
-          total_display_currency: orderTotalDisplay,
+          total_display_currency: orderTotalDisplay, // this is the display currency before JaiCoins
           shipping_address: {
             full_name: fullName,
             address_line1: addressLine1,
