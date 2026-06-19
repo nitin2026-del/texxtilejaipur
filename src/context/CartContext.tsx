@@ -32,8 +32,7 @@ export interface CartContextProduct {
 
 export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD';
 
-// Mock Exchange Rates with 3% markup applied (Base INR)
-const FX_RATES: Record<Currency, number> = {
+export const FX_RATES: Record<Currency, number> = {
   INR: 1,
   USD: 0.012 * 1.03, // Live rate roughly 0.012 + markup
   EUR: 0.011 * 1.03,

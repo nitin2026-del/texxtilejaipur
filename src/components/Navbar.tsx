@@ -13,7 +13,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
-  const { cart, currency, setCurrency } = useCart();
+  const { cart, currency, setCurrency, formatPrice } = useCart();
   const { user, profile, loading, signOut, jaiCoins, userTier, orderCount, setOrderCount } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [trustIndex, setTrustIndex] = useState(0);
   
   const trustMessages = [
-    { icon: <Tags className="h-3.5 w-3.5 text-brand-400" />, text: "✨ FLAT 25% OFF AUTOMATICALLY ON ORDERS OVER $150 USD!" },
+    { icon: <Tags className="h-3.5 w-3.5 text-brand-400" />, text: `✨ FLAT 25% OFF AUTOMATICALLY ON ORDERS OVER ${formatPrice(150 / 0.01236)}!` },
     { icon: <Truck className="h-3.5 w-3.5" />, text: "Free Worldwide UPS Shipping" },
     { icon: <Undo2 className="h-3.5 w-3.5" />, text: "30-Day No-Questions Returns" },
     { icon: <ShieldCheck className="h-3.5 w-3.5" />, text: "100% Secure Checkout" }
