@@ -719,7 +719,7 @@ export default function ProductPage() {
               {relatedProducts.map((rp) => (
                 <a key={rp.id} href={`/product/${rp.id}`} className="group block bg-white border border-zinc-200 rounded-xl overflow-hidden hover:border-brand-300 hover:shadow-xl transition-all">
                   <div className="aspect-[4/5] relative bg-zinc-100 overflow-hidden">
-                    {rp.image.match(/\.(mp4|webm)$/i) ? (
+                    {rp.image.match(/\.(mp4|webm)(\?.*)?$/i) ? (
                       <video
                         src={rp.image}
                         autoPlay
