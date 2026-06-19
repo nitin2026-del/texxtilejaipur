@@ -148,7 +148,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   )}
                   {getBundleDiscountInr() > 0 && (
                     <div className="flex justify-between text-xs text-brand-400 font-bold">
-                      <span>Volume Discount (25% Off Orders {'>'} {formatPrice(150 / 0.01236)})</span>
+                      <span>Volume Discount (25% Off Orders {'>'} {formatPrice(150 / 0.010769)})</span>
                       <span>-{formatPrice(getBundleDiscountInr())}</span>
                     </div>
                   )}

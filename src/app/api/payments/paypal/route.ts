@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
         secureTotalInr = Math.max(0, secureTotalInr - validCoinsUsed);
       }
       
-      const USD_RATE = 0.012 * 1.03;
+      const USD_RATE = 0.010769; // Calibrated: 6500 INR = $70 USD
       const secureUsdAmount = Number((secureTotalInr * USD_RATE).toFixed(2));
 
       if (secureUsdAmount <= 0) {

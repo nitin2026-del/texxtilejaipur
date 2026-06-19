@@ -1699,7 +1699,7 @@ export default function AdminPortal() {
                         </td>
                         <td className="p-4 text-right">
                           <span className="font-extrabold text-zinc-900">₹{prod.price_inr?.toLocaleString() || '0'}</span>
-                          <span className="text-[9px] text-zinc-500 block mt-0.5">${(prod.price_inr * 0.01236).toFixed(2)} USD (Auto)</span>
+                          <span className="text-[9px] text-zinc-500 block mt-0.5">${(prod.price_inr * 0.010769).toFixed(2)} USD (Auto)</span>
                           <span className="text-[9px] text-zinc-500 block mt-0.5">£{(prod.price_inr * 0.009579).toFixed(2)} GBP (Auto)</span>
                         </td>
                         <td className="p-4">
