@@ -34,11 +34,11 @@ export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD';
 
 export const FX_RATES: Record<Currency, number> = {
   INR: 1,
-  USD: 0.012 * 1.03, // Live rate roughly 0.012 + markup
-  EUR: 0.011 * 1.03,
-  GBP: 0.0093 * 1.03,
-  AED: 0.044 * 1.03,
-  AUD: 0.018 * 1.03,
+  USD: 0.010769, // Calibrated so 6500 INR = $70.00 USD
+  EUR: 0.009870, // Scaled proportionally (was €73.65, now €64.15)
+  GBP: 0.008340, // Scaled proportionally (£54.21)
+  AED: 0.039480, // Scaled proportionally
+  AUD: 0.016150, // Scaled proportionally
 };
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
