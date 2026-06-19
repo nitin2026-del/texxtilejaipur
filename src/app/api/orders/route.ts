@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const authHeader = req.headers.get('Authorization');
     let supabaseClient = supabaseAdmin;
-    let finalUserId = user_id || null;
+    let finalUserId = null; // Only trust the secure token, never the client payload
 
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');

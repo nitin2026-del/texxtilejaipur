@@ -118,8 +118,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const session = res?.data?.session;
       if (session) {
         setUser(session.user);
-        // Non-blocking fetch
-        fetchProfile(session.user.id, session.user.email);
+        // Non-blocking initialization of profile
+        fetch('/api/auth/init-profile', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        }).then(() => {
+          // Fetch profile after initialization
+          fetchProfile(session.user.id, session.user.email);
+        }).catch(console.error);
       } else {
         setUser(null);
         setProfile(null);
@@ -145,8 +151,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           if (session) {
             setUser(session.user);
-            // Non-blocking fetch
-            fetchProfile(session.user.id, session.user.email);
+            // Non-blocking initialization
+            fetch('/api/auth/init-profile', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${session.access_token}` }
+            }).then(() => {
+              fetchProfile(session.user.id, session.user.email);
+            }).catch(console.error);
           } else {
             setUser(null);
             setProfile(null);

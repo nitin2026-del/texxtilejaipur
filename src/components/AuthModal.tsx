@@ -97,11 +97,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           body: JSON.stringify({ email, name: name })
         }).catch(console.error);
 
-        setSuccess('Registration successful! Please check your email for confirmation.');
-        setTimeout(() => {
-          setActiveTab('login');
-          setSuccess('');
-        }, 3000);
+        if (data.session) {
+          setSuccess('Registration successful! Logging you in...');
+          setTimeout(() => {
+            onSuccess?.();
+            onClose();
+          }, 1000);
+        } else {
+          setSuccess('Registration successful! Please check your email for confirmation.');
+          setTimeout(() => {
+            setActiveTab('login');
+            setSuccess('');
+          }, 3000);
+        }
       }
     } catch (e) {
       const err = e as Error;
