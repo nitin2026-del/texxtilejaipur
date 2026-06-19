@@ -730,11 +730,12 @@ export default function ProductPage() {
                       />
                     ) : (
                       <Image 
-                        src={rp.image} 
+                        src={rp.image || 'https://via.placeholder.com/400x500'} 
                         alt={rp.name}
                         fill
                         sizes="(max-width: 768px) 50vw, 25vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        unoptimized={true}
                       />
                     )}
                   </div>
