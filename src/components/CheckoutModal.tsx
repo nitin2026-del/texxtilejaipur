@@ -42,6 +42,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [name, setName] = useState('');
 
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
+  const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
   
   const effectiveInr = getCartTotalInr();
@@ -130,8 +131,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       setLoading(false);
     }
   };
-
-  const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string | null>(null);
 
   const sendConfirmationEmail = async (orderId: string) => {
     try {
