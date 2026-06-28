@@ -264,7 +264,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                   <LogOut className="h-4 w-4" />
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </nav>
