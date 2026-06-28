@@ -99,41 +99,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       let finalUserId = user?.id;
       let usedTempSignupCoins = false;
 
-      // Guest creates an account using password field during checkout
-      if (!user && email && password) {
-        const nameParts = fullName.trim().split(/\s+/);
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
-
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              first_name: firstName,
-              last_name: lastName,
-              name: fullName
-            }
-          }
-        });
-        
-        if (authError) {
-          throw new Error(`Account creation failed: ${authError.message}`);
-        }
-        
-        if (authData.user) {
-          finalUserId = authData.user.id;
-          usedTempSignupCoins = true;
-          setJaiCoins(500);
-          setUseJaiCoins(true);
-          
-          fetch('/api/auth/welcome', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, name: fullName })
-          }).catch(console.error);
-        }
-      }
+      // Guest checkout — no account creation, just use email for order confirmation
 
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -183,6 +149,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.error);
       const orderId = orderData.orderId;
+      if (orderData.orderNumber) setConfirmedOrderNumber(orderData.orderNumber);
       setCreatedOrderId(orderId);
 
       // 2. Initialize Payment Intent via API (Removed Stripe logic)
@@ -192,6 +159,31 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       setError(err.message || 'Failed to initialize checkout');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string | null>(null);
+
+  const sendConfirmationEmail = async (orderId: string) => {
+    try {
+      const customerEmail = user?.email || email;
+      if (!customerEmail) return;
+      await fetch('/api/auth/order-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: customerEmail,
+          customerName: fullName,
+          orderNumber: confirmedOrderNumber || orderId,
+          orderId,
+          items: cart.map(item => ({ name: item.name, quantity: item.quantity, price_inr: item.price_inr })),
+          totalDisplay: `${currency} ${getCartTotalDisplay().toFixed(2)}`,
+          currency,
+          shippingAddress: { full_name: fullName, address_line1: addressLine1, address_line2: addressLine2, city, state, postal_code: postalCode, country }
+        })
+      });
+    } catch (e) {
+      console.error('Failed to send confirmation email:', e);
     }
   };
 
@@ -210,6 +202,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       // Update local context
       const newBalance = Math.max(0, jaiCoins - coinsUsed) + coinsEarned;
       setJaiCoins(newBalance);
+      
+      // Send confirmation email
+      sendConfirmationEmail(orderId);
       
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
       setStep('success');
@@ -305,54 +300,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               </h3>
 
               {!user && (
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between items-center bg-zinc-50 border border-zinc-200 rounded p-3">
-                    <span className="text-xs text-zinc-600">Already have an account?</span>
-                    <button 
-                      type="button" 
-                      onClick={() => setStep('auth')} 
-                      className="text-xs font-bold text-gold hover:underline"
-                    >
-                      Sign In
-                    </button>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address (For order tracking & receipts)</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@domain.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
-                    />
-                  </div>
-
-                  <div className="bg-amber-50 border border-amber-200 rounded p-4 shadow-sm">
-                    <h4 className="text-sm font-bold text-zinc-900 flex items-center gap-2 mb-2">
-                      <span className="text-amber-500">🎁</span> You are checking out as a Guest.
-                    </h4>
-                    <p className="text-xs text-zinc-700 mb-3 leading-relaxed">
-                      By not creating a free account, you will miss out on:
-                    </p>
-                    <ul className="text-xs text-zinc-600 space-y-1.5 mb-4 list-disc list-inside">
-                      <li>🚫 <strong className="text-zinc-800">Losing 500 Jai Coins ($5 Value):</strong> You won&apos;t get your sign-up bonus applied to this order.</li>
-                      <li>🚫 <strong className="text-zinc-800">No Order History:</strong> You won&apos;t be able to easily track past purchases.</li>
-                      <li>🚫 <strong className="text-zinc-800">Slower Checkouts:</strong> We won&apos;t save your shipping details for next time.</li>
-                    </ul>
-                    
-                    <div className="pt-3 border-t border-amber-200/50">
-                      <label className="block text-xs font-bold text-amber-800 mb-1">Create a Password to claim 500 Jai Coins instantly! (Optional)</label>
-                      <input
-                        type="password"
-                        placeholder="Set a password..."
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-white border border-amber-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-amber-500"
-                      />
-                      <p className="text-[10px] text-amber-600 mt-1.5">Leave blank to continue as a guest.</p>
-                    </div>
-                  </div>
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address <span className="text-zinc-400">(for order confirmation & tracking)</span></label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@domain.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
+                  />
+                  <p className="text-[10px] text-zinc-400 mt-1">We'll send your order summary and tracking link here.</p>
                 </div>
               )}
 
@@ -624,8 +582,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               <h3 className="text-xl font-bold text-zinc-900 font-serif">Order Confirmed! 🎉</h3>
               <div className="text-xs text-zinc-600 space-y-1">
                 <p className="font-medium">Thank you for shopping with Textile Jaipur!</p>
-                <p className="mt-1 text-zinc-500">Order ID: <span className="font-mono text-zinc-800 font-bold">{createdOrderId}</span></p>
+                <p className="mt-1 text-zinc-500">Order Number: <span className="font-mono text-zinc-800 font-bold text-sm">{confirmedOrderNumber || createdOrderId}</span></p>
                 <p className="text-zinc-500">Your order has been received and our Jaipur team will dispatch it shortly.</p>
+                <p className="text-zinc-500 mt-1">📧 A confirmation email with your order summary has been sent to <strong>{user?.email || email}</strong></p>
               </div>
 
               <div className="bg-amber-50 border border-amber-200 p-3 rounded text-center">
@@ -637,9 +596,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   <span className="text-zinc-500">Delivery to:</span>
                   <span className="text-zinc-800 font-medium text-right">{city}, {country}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Tracking:</span>
-                  <span className="text-amber-600 font-semibold font-mono">Will be emailed to you</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-500">Track Order:</span>
+                  <a 
+                    href={`/track-order?order=${encodeURIComponent(confirmedOrderNumber || '')}&email=${encodeURIComponent(user?.email || email)}`}
+                    className="text-amber-600 font-semibold underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Track My Order →
+                  </a>
                 </div>
               </div>
 

@@ -329,13 +329,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                   <LogOut className="h-4 w-4" />
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => setAuthModalOpen(true)}
-                className="px-4 py-2 rounded-lg text-xs font-bold text-white bg-brand-700 hover:bg-brand-800 transition-colors shadow-sm shrink-0"
-              >
-                Sign In
-              </button>
             )}
           </div>
         </div>
