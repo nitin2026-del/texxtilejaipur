@@ -51,7 +51,7 @@ export default function ReferPage() {
               Give ₹500, <span className="text-brand-700">Get ₹500</span>
             </h1>
             <p className="text-zinc-600 mb-10 max-w-lg mx-auto text-lg leading-relaxed">
-              Invite your friends to discover authentic Jaipur textiles. They get ₹500 off their first order, and you get ₹500 in JaiCoins when they shop!
+              Invite your friends to discover authentic Jaipur textiles. They get ₹500 off their first order, and you get a ₹500 discount code when they shop!
             </p>
 
             <div className="max-w-md mx-auto bg-zinc-50 border border-zinc-200 rounded-2xl p-6 mb-10 shadow-inner">
@@ -92,7 +92,7 @@ export default function ReferPage() {
             {[
               { icon: Share2, title: 'Share Your Link', desc: 'Send your unique referral link to friends and family.' },
               { icon: Sparkles, title: 'They Get ₹500 Off', desc: 'Your friends get ₹500 off their very first order with us.' },
-              { icon: IndianRupee, title: 'You Earn ₹500', desc: 'You receive 500 JaiCoins (₹500 value) when their order ships.' },
+              { icon: IndianRupee, title: 'You Earn ₹500', desc: 'You receive a ₹500 discount code when their order ships.' },
             ].map((step, i) => (
               <div key={i} className="text-center flex flex-col items-center">
                 <div className="w-16 h-16 bg-white border border-zinc-200 rounded-full flex items-center justify-center mb-6 shadow-sm relative">

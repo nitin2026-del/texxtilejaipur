@@ -34,8 +34,6 @@ function PaymentCaptureHandler() {
 
     hasCaptured.current = true;
 
-    const coinsUsed = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_jaicoins_used') || 0) : 0;
-    const coinsEarned = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_jaicoins_earned') || 0) : 0;
     const usdAmount = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_usd_amount') || 0) : 0;
 
     // Capture the PayPal payment server-side
@@ -46,18 +44,14 @@ function PaymentCaptureHandler() {
         action: 'capture',
         paypalOrderId: token,   // PayPal token = their order ID
         orderId: orderId,       // Our DB order ID to mark as paid
-        coinsUsed,
-        coinsEarned
       }),
     })
       .then((res) => res.json())
       .then((data) => {
         // Mark as captured in localStorage to prevent re-capture
         localStorage.setItem(captureKey, 'done');
-        // Clear pending JaiCoins data
+        // Clear pending data
         localStorage.removeItem('pending_order_id');
-        localStorage.removeItem('pending_jaicoins_used');
-        localStorage.removeItem('pending_jaicoins_earned');
         localStorage.removeItem('pending_usd_amount');
 
         if (data.success) {

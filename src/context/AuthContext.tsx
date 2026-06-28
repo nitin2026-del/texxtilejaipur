@@ -22,8 +22,6 @@ interface AuthContextType {
   loading: boolean;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
-  jaiCoins: number;
-  setJaiCoins: (coins: number) => void;
   userTier: 'Silver' | 'Gold' | 'Platinum';
   orderCount: number;
   setOrderCount: (count: number) => void;
@@ -44,16 +42,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [jaiCoins, setJaiCoinsState] = useState<number>(500);
   const [orderCount, setOrderCountState] = useState<number>(0);
 
   useEffect(() => {
-    // Only load/init JaiCoins from localStorage — guests start at 0
-    const savedCoins = localStorage.getItem('textilejaipur_jaicoins');
-    if (savedCoins !== null) {
-      setJaiCoinsState(parseInt(savedCoins, 10));
-    }
-    // Note: 500 welcome bonus is only given on first real login (handled in onAuthStateChange)
 
     const savedOrders = localStorage.getItem('textilejaipur_order_count');
     if (savedOrders) {
@@ -63,10 +54,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const setJaiCoins = (coins: number) => {
-    setJaiCoinsState(coins);
-    localStorage.setItem('textilejaipur_jaicoins', coins.toString());
-  };
 
   const setOrderCount = (count: number) => {
     setOrderCountState(count);
@@ -199,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signOut, refreshSession, jaiCoins, setJaiCoins, userTier, orderCount, setOrderCount, tierDiscountPercentage }}>
+    <AuthContext.Provider value={{ user, profile, loading, signOut, refreshSession, userTier, orderCount, setOrderCount, tierDiscountPercentage }}>
       {children}
     </AuthContext.Provider>
   );

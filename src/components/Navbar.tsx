@@ -14,13 +14,13 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const { cart, currency, setCurrency, formatPrice } = useCart();
-  const { user, profile, loading, signOut, jaiCoins, userTier, orderCount, setOrderCount } = useAuth();
+  const { user, profile, loading, signOut, userTier, orderCount, setOrderCount } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<'blog' | 'about' | 'contact' | null>(null);
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
-  const [showCoinsInfo, setShowCoinsInfo] = useState(false);
+  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
   const [isPromoDismissed, setIsPromoDismissed] = useState(false);
   const [trustIndex, setTrustIndex] = useState(0);
@@ -239,81 +239,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 )}
                 <div className="relative">
                   <div 
-                    onClick={() => setShowCoinsInfo(!showCoinsInfo)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border shadow-sm cursor-pointer transition-colors ${
                       userTier === 'Platinum' ? 'bg-zinc-900 border-zinc-700 text-white hover:bg-zinc-800' :
                       userTier === 'Gold' ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200' :
                       'bg-zinc-100 border-zinc-300 text-zinc-700 hover:bg-zinc-200'
                     }`}
-                    title="Your VIP Tier & JaiCoins"
+                    title="Your VIP Tier"
                   >
                     <Sparkles className={`h-3.5 w-3.5 shrink-0 ${userTier === 'Platinum' ? 'text-zinc-300' : userTier === 'Gold' ? 'text-amber-600' : 'text-zinc-500'}`} />
                     <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">{userTier} TIER</span>
-                    <span className="font-serif font-bold text-sm ml-0.5">{jaiCoins} <span className="text-[9px] font-sans opacity-70">coins</span></span>
                   </div>
-                  
-                  {showCoinsInfo && (
-                    <div className="absolute top-full right-0 mt-2 w-72 bg-zinc-900 border border-zinc-700 p-5 rounded-2xl shadow-2xl z-50 animate-fade-in-up">
-                      <div className="flex flex-col items-center justify-center mb-4 pb-4 border-b border-zinc-800">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-inner ${
-                          userTier === 'Platinum' ? 'bg-zinc-800 text-zinc-300 border border-zinc-600' :
-                          userTier === 'Gold' ? 'bg-amber-900/40 text-amber-500 border border-amber-700/50' :
-                          'bg-zinc-800 text-zinc-400 border border-zinc-700'
-                        }`}>
-                          <Sparkles className="h-6 w-6" />
-                        </div>
-                        <h4 className="text-white text-lg font-bold font-serif">{userTier} Member</h4>
-                        <p className="text-zinc-400 text-xs">Past Purchases: {orderCount}</p>
-                      </div>
-
-                      <div className="mb-4">
-                        <div className="flex justify-between text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-1.5">
-                          <span>Status Progress</span>
-                          <span>{userTier === 'Silver' ? '1 purchase for Gold' : userTier === 'Gold' ? '1 purchase for Platinum' : 'Max Tier'}</span>
-                        </div>
-                        <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden border border-zinc-700">
-                          <div 
-                            className={`h-full rounded-full transition-all ${userTier === 'Platinum' ? 'bg-zinc-400 w-full' : userTier === 'Gold' ? 'bg-amber-500 w-1/2' : 'bg-zinc-500 w-0'}`} 
-                          />
-                        </div>
-                      </div>
-
-                      <h5 className="text-white text-[10px] uppercase font-bold tracking-wider mb-2 text-brand-400">Your VIP Benefits</h5>
-                      <ul className="text-zinc-300 text-xs space-y-2 mb-4">
-                        <li className="flex items-start gap-2">
-                          <span className="text-brand-500">•</span>
-                          <span>Earn 5% Cashback in JaiCoins</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-brand-500">•</span>
-                          <span className="text-amber-400 font-bold">Sign-up Bonus: 500 JaiCoins to use on your 1st order!</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-brand-500">•</span>
-                          <span>Free Worldwide UPS Express Delivery</span>
-                        </li>
-                        {userTier === 'Gold' && (
-                          <li className="flex items-start gap-2">
-                            <span className="text-brand-500">•</span>
-                            <span className="text-amber-400 font-bold">10% Extra Discount on All Orders</span>
-                          </li>
-                        )}
-                        {userTier === 'Platinum' && (
-                          <li className="flex items-start gap-2">
-                            <span className="text-brand-500">•</span>
-                            <span className="text-zinc-200 font-bold">15% Extra Discount on All Orders</span>
-                          </li>
-                        )}
-                      </ul>
-
-                      <button
-                        onClick={() => setShowCoinsInfo(false)}
-                        className="w-full text-center text-[10px] text-zinc-500 hover:text-zinc-300 mt-1 transition-colors"
-                      >
-                        Close
-                      </button>
-                    </div>
-                  )}
                 </div>
                 <a
                   href="/dashboard"

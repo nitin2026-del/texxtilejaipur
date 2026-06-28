@@ -17,7 +17,7 @@ const COUNTRIES = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
   const { cart, formatPrice, getCartSubtotalInr, getCartTotalInr, getCartTotalDisplay, currency, clearCart, appliedCoupon } = useCart();
-  const { user, profile, jaiCoins, setJaiCoins, userTier, tierDiscountPercentage } = useAuth();
+  const { user, profile, userTier, tierDiscountPercentage } = useAuth();
 
   const [step, setStep] = useState<'auth' | 'shipping' | 'payment' | 'success'>('auth');
   const [loading, setLoading] = useState(false);
@@ -44,17 +44,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
   
-  const [useJaiCoins, setUseJaiCoins] = useState(false);
-  const [registerSuccess, setRegisterSuccess] = useState(false);
-  const JAI_COINS_BALANCE = jaiCoins || 0;
-  const JAI_COINS_VALUE_INR = JAI_COINS_BALANCE; // 1:1 ratio
-
-  // Compute effective totals accounting for JaiCoins
-  const effectiveInr = useJaiCoins ? Math.max(0, getCartTotalInr() - JAI_COINS_VALUE_INR) : getCartTotalInr();
-  // PayPal always charges in USD — calibrated so 6500 INR = $70 USD (kept in sync with CartContext)
+  const effectiveInr = getCartTotalInr();
   const USD_RATE = 0.010769;
   const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
-  // Display total in user's chosen currency (uses CartContext FX_RATES directly)
   const effectiveDisplay = effectiveInr * (effectiveInr > 0 ? (getCartTotalDisplay() / Math.max(getCartTotalInr(), 1)) : USD_RATE);
 
   // Reset createdOrderId and step on every open to avoid stale state (BUG-006)
@@ -104,19 +96,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      // We pass the RAW cart total (including tier/coupon but NOT JaiCoins) to the backend.
+      // We pass the RAW cart total (including tier/coupon) to the backend.
       // The backend will independently verify this total, but we send it for logging/fallback.
       let orderTotalInr = getCartTotalInr();
       let orderTotalDisplay = getCartTotalDisplay();
 
-      // We still need to calculate the discounted display value to show in the UI,
-      // but we do NOT mutate orderTotalInr which represents the subtotal before JaiCoins.
       let displayTotalDisplay = orderTotalDisplay;
-      if (usedTempSignupCoins || (useJaiCoins && user)) {
-        const coinsValue = usedTempSignupCoins ? 500 : JAI_COINS_VALUE_INR;
-        const discountRatio = Math.max(0, getCartTotalInr() - coinsValue) / Math.max(getCartTotalInr(), 1);
-        displayTotalDisplay = getCartTotalDisplay() * discountRatio;
-      }
 
       // 1. Create order via our API
       const orderRes = await fetch('/api/orders', {
@@ -189,8 +174,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
   const handlePaymentSuccess = async (orderId: string) => {
     // Free order handling - securely process via backend
-    const coinsEarned = Math.round(getCartTotalInr() * 0.05);
-    const coinsUsed = useJaiCoins ? JAI_COINS_VALUE_INR : 0;
+    const coinsEarned = 0;
+    const coinsUsed = 0;
     
     setLoading(true);
     try {
@@ -199,9 +184,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, coinsUsed, coinsEarned })
       });
-      // Update local context
-      const newBalance = Math.max(0, jaiCoins - coinsUsed) + coinsEarned;
-      setJaiCoins(newBalance);
       
       // Send confirmation email
       sendConfirmationEmail(orderId);
@@ -509,22 +491,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   </span>
                 </div>
                 
-                {JAI_COINS_BALANCE > 0 && (
-                  <label className="flex items-center justify-between py-2 border-t border-zinc-300 mt-2 cursor-pointer group">
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        checked={useJaiCoins} 
-                        onChange={(e) => setUseJaiCoins(e.target.checked)}
-                        className="accent-gold w-4 h-4 cursor-pointer"
-                      />
-                      <span className="text-xs text-amber-500 font-bold group-hover:text-amber-400 transition-colors">
-                        Apply {JAI_COINS_BALANCE} JaiCoins
-                      </span>
-                    </div>
-                    <span className="text-xs text-amber-500 font-mono">-₹{JAI_COINS_VALUE_INR}</span>
-                  </label>
-                )}
+
 
                 <div className="flex justify-between text-sm font-bold text-zinc-900 border-t border-zinc-300 pt-2 mt-2 font-serif">
                   <span>Total Charges</span>
@@ -537,11 +504,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
 
               {paymentMethod === 'paypal' && (() => {
-                // Save temp state for PayPal redirect to read
-                if (typeof window !== 'undefined') {
-                  localStorage.setItem('temp_jaicoins_used', useJaiCoins ? JAI_COINS_VALUE_INR.toString() : '0');
-                  localStorage.setItem('temp_jaicoins_earned', Math.round(getCartTotalInr() * 0.05).toString());
-                }
                 return (
                   <PayPalPaymentForm 
                     orderId={createdOrderId} 
@@ -587,9 +549,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <p className="text-zinc-500 mt-1">📧 A confirmation email with your order summary has been sent to <strong>{user?.email || email}</strong></p>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 p-3 rounded text-center">
-                <p className="text-xs font-bold text-amber-700">✨ You earned {Math.round(getCartTotalInr() * 0.05)} JaiCoins from this purchase!</p>
-              </div>
+
 
               <div className="bg-zinc-50 border border-zinc-200 p-4 rounded text-left max-w-sm mx-auto text-xs space-y-2">
                 <div className="flex justify-between">

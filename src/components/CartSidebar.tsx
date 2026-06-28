@@ -13,13 +13,9 @@ interface CartSidebarProps {
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
   const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, getBundleDiscountInr, appliedCoupon, applyCoupon, removeCoupon } = useCart();
-  const { jaiCoins, userTier, tierDiscountPercentage } = useAuth();
+  const { userTier, tierDiscountPercentage } = useAuth();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
-  const [useJaiCoins, setUseJaiCoins] = useState(false);
-  const [showInfo, setShowInfo] = useState(false);
-  const JAI_COINS_BALANCE = jaiCoins || 0;
-  const JAI_COINS_VALUE_INR = JAI_COINS_BALANCE;
 
   if (!isOpen) return null;
 
@@ -194,47 +190,8 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   <div className="flex justify-between text-base font-serif font-semibold text-white pt-2 border-t border-zinc-800">
                     <span>Total Amount</span>
                     <span className="text-gold font-bold">
-                      {useJaiCoins 
-                        ? formatPrice(Math.max(0, getCartTotalInr() - JAI_COINS_VALUE_INR)) 
-                        : formatPrice(getCartTotalInr())}
+                      {formatPrice(getCartTotalInr())}
                     </span>
-                  </div>
-                  
-                  {JAI_COINS_BALANCE > 0 && (
-                    <label className="flex items-center justify-between py-2 border-t border-zinc-800 mt-2 cursor-pointer group">
-                      <div className="flex items-center gap-2">
-                        <input 
-                          type="checkbox" 
-                          checked={useJaiCoins} 
-                          onChange={(e) => setUseJaiCoins(e.target.checked)}
-                          className="accent-gold w-4 h-4 cursor-pointer"
-                        />
-                        <span className="text-xs text-amber-500 font-bold group-hover:text-amber-400 transition-colors">
-                          Apply {JAI_COINS_BALANCE} JaiCoins (-₹{JAI_COINS_VALUE_INR})
-                        </span>
-                      </div>
-                    </label>
-                  )}
-
-                  <div className="flex justify-between text-[10px] text-amber-500 font-bold bg-amber-500/10 p-2 rounded border border-amber-500/20 mt-2 relative">
-                    <span className="flex items-center gap-1">
-                      ✨ Reward 
-                      <button onClick={() => setShowInfo(!showInfo)} className="hover:text-amber-300">
-                        <Info className="h-3 w-3" />
-                      </button>
-                    </span>
-                    <span>Earn {Math.round(getCartTotalInr() * 0.05)} JaiCoins</span>
-                    
-                    {showInfo && (
-                      <div className="absolute bottom-full left-0 mb-2 w-full bg-zinc-900 border border-zinc-700 p-3 rounded-lg shadow-xl z-50">
-                        <p className="text-white text-xs mb-2">How to earn JaiCoins:</p>
-                        <ul className="text-zinc-400 font-normal space-y-1 list-disc pl-4">
-                          <li>Get 5% back on all purchases</li>
-                          <li>Earn 500 when a referred friend makes their first purchase</li>
-                          <li>Earn 100 for uploading a photo review</li>
-                        </ul>
-                      </div>
-                    )}
                   </div>
                 </div>
 

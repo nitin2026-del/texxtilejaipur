@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (!existingProfile) {
-      // Create new profile with 500 JaiCoins sign-up bonus
+      // Create new profile
       const { error: insertError } = await supabaseAdmin
         .from('profiles')
         .insert({
@@ -31,8 +31,7 @@ export async function POST(req: NextRequest) {
           email: user.email,
           first_name: user.user_metadata?.first_name || '',
           last_name: user.user_metadata?.last_name || '',
-          full_name: user.user_metadata?.name || '',
-          jai_coins: 500
+          full_name: user.user_metadata?.name || ''
         });
 
       if (insertError) {

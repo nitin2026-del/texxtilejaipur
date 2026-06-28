@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
           <h2 style="color: #d4af37;">Welcome to Textile Jaipur!</h2>
           <p>Hi ${firstName},</p>
           <p>Your account has been successfully created with the email: <strong>${email}</strong>.</p>
-          <p>You can now log in to track your orders, earn JaiCoins, and save your favorite luxury ethnic clothing.</p>
+          <p>You can now log in to track your orders and save your favorite luxury ethnic clothing.</p>
           <p>We are thrilled to have you with us!</p>
           <p>Warm regards,<br><strong>The Textile Jaipur Team</strong></p>
         </div>
