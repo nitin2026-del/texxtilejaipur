@@ -502,6 +502,32 @@ export default function ProductPage() {
                   )}
                 </div>
 
+                {/* Specific Category Sizing Details */}
+                {product.category && ['cotton suzani jacket', 'tnt suzani jacket', 'velvet suzani jacket'].includes(product.category.toLowerCase()) && (
+                  <div className="bg-zinc-50 border border-zinc-200 p-6 rounded-lg text-sm text-zinc-700 mt-4">
+                    <h3 className="font-bold text-zinc-900 mb-2 font-serif text-lg">Size: XL</h3>
+                    
+                    <p className="font-bold text-zinc-900 mt-4 mb-2">Best Fit For:</p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Recommended for women who usually wear <strong>US XL (16–18)</strong> or <strong>UK XL (18–20)</strong>.</li>
+                      <li>Suitable for a <strong>bust measurement of 44–46 inches (112–117 cm)</strong>.</li>
+                      <li>Ideal for those who prefer a comfortable, relaxed fit.</li>
+                    </ul>
+
+                    <p className="font-bold text-zinc-900 mt-4 mb-2">Garment Measurements:</p>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Chest: 46 in (117 cm)</li>
+                      <li>Shoulder: 19 in (48 cm)</li>
+                      <li>Sleeve Length: 24.5 in (62 cm)</li>
+                      <li>Jacket Length: 29 in (74 cm)</li>
+                    </ul>
+
+                    <p className="mt-4 text-xs italic text-zinc-500">
+                      *Please allow a 1–2 cm variation, as each jacket is handmade.
+                    </p>
+                  </div>
+                )}
+
                 {/* AI Sizing Assistant - Highlighted */}
                 <div className="pt-4 pb-2">
                   <div className={`transition-all duration-500 overflow-hidden rounded-xl border ${sizingOpen ? 'border-brand-300 shadow-lg shadow-brand-500/10' : 'border-zinc-200 hover:border-brand-300'}`}>
