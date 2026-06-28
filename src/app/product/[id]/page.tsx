@@ -503,7 +503,9 @@ export default function ProductPage() {
                 </div>
 
                 {/* Specific Category Sizing Details */}
-                {product.category && ['cotton suzani jacket', 'tnt suzani jacket', 'velvet suzani jacket'].includes(product.category.toLowerCase()) && (
+                {((product.category && product.category.toLowerCase().includes('suzani jacket')) || 
+                  (product.category && product.category.toLowerCase().includes('suani jacket')) ||
+                  (product.name && product.name.toLowerCase().includes('suzani jacket'))) && (
                   <div className="bg-zinc-50 border border-zinc-200 p-6 rounded-lg text-sm text-zinc-700 mt-4">
                     <h3 className="font-bold text-zinc-900 mb-2 font-serif text-lg">Size: XL</h3>
                     

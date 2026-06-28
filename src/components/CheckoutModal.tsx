@@ -19,7 +19,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const { cart, formatPrice, getCartSubtotalInr, getCartTotalInr, getCartTotalDisplay, currency, clearCart, appliedCoupon } = useCart();
   const { user, profile, userTier, tierDiscountPercentage } = useAuth();
 
-  const [step, setStep] = useState<'auth' | 'shipping' | 'payment' | 'success'>('auth');
+  const [step, setStep] = useState<'shipping' | 'payment' | 'success'>('shipping');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -65,22 +65,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   }, [isOpen, user, profile]);
 
   if (!isOpen) return null;
-
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-      if (err) throw err;
-    } catch (e) {
-      const err = e as Error;
-      setError(err.message || 'Authentication failed');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleShippingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,57 +208,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
         {/* Steps container */}
         <div className="flex-1 overflow-y-auto pr-1">
-          {/* STEP 1: AUTHENTICATION GATE */}
-          {step === 'auth' && (
-            <div className="space-y-4">
-              <div className="text-center p-4 bg-white rounded border border-zinc-300 mb-4">
-                <ShoppingBag className="h-8 w-8 text-gold mx-auto mb-2" />
-                <p className="text-sm font-semibold text-zinc-900">Sign In</p>
-                <p className="text-xs text-zinc-600 mt-1">Log in to your account to securely complete your checkout.</p>
-              </div>
-
-              <form onSubmit={handleAuthSubmit} className="space-y-4 pt-2">
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="name@domain.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-600 mb-1">Password</label>
-                  <input
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-2.5 rounded text-xs font-bold text-zinc-950 btn-premium flex items-center justify-center gap-2"
-                >
-                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Sign In to Continue
-                </button>
-              </form>
-              <div className="text-center mt-4 border-t border-zinc-200 pt-4">
-                 <button type="button" onClick={() => setStep('shipping')} className="text-xs font-bold text-zinc-600 hover:text-zinc-900">
-                    Continue as Guest
-                 </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2: SHIPPING DETAILS */}
+          {/* STEP 1: SHIPPING DETAILS */}
           {step === 'shipping' && (
             <form onSubmit={handleShippingSubmit} className="space-y-4">
               <h3 className="text-sm font-semibold text-zinc-800 flex items-center gap-1.5 mb-2 font-serif">

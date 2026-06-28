@@ -49,9 +49,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: false, error: lastError?.message || 'All API keys failed.' }, { status: 500 });
+    // Fallback logic if AI fails (e.g. invalid API key)
+    const sizeMap: Record<string, string> = {
+      's': '36', 'm': '38', 'l': '40', 'xl': '42', 'xxl': '44',
+      '2': '34', '4': '36', '6': '38', '8': '40', '10': '42', '12': '44', '14': '46',
+      'small': '36', 'medium': '38', 'large': '40',
+    };
+    
+    const lowerInput = userSize.toLowerCase();
+    let estimatedSize = '38 (Medium)';
+    
+    for (const [key, val] of Object.entries(sizeMap)) {
+      if (lowerInput.includes(key)) {
+        estimatedSize = val;
+      }
+    }
+
+    const fallbackRecommendation = `Based on your stated size of "${userSize}", we recommend trying an Indian Size ${estimatedSize}. Since ${material || 'this fabric'} typically offers a comfortable fit, this should provide the right balance of drape and ease. If you prefer a looser fit, consider sizing up.`;
+
+    return NextResponse.json({ success: true, recommendation: fallbackRecommendation, isFallback: true }, { status: 200 });
   } catch (error: any) {
-    console.error('Failed to generate size recommendation:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
