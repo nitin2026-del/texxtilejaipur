@@ -16,7 +16,7 @@ interface Product {
   images: string[];
   stock: number;
   is_featured?: boolean;
-  details: { material?: string; origin?: string; care?: string };
+  details: { material?: string; origin?: string; care?: string; video_url?: string };
 }
 
 interface ProductCardProps {

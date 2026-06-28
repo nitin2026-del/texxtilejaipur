@@ -22,9 +22,10 @@ interface Product {
   category: string;
   images: string[];
   stock: number;
-  details: { material?: string; origin?: string; care?: string; video_url?: string };
+  details: { material?: string; origin?: string; care?: string; video_url?: string; translations?: any; culturalContext?: string; stylingAdvice?: string };
   is_featured?: boolean;
   display_rank?: number;
+  image_url?: string;
 }
 
 interface OrderItem {

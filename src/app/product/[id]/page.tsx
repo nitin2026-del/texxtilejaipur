@@ -89,6 +89,21 @@ export default function ProductPage() {
   const [inquiryError, setInquiryError] = useState('');
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<string | null>(null);
+
+  const handleInquirySubmit = async () => {
+    setIsSubmittingInquiry(true);
+    setInquiryError('');
+    try {
+      // Simulate submission
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setShowQuestionForm(false);
+      setInquiryQuestion('');
+    } catch (err) {
+      setInquiryError('Failed to submit. Try again.');
+    } finally {
+      setIsSubmittingInquiry(false);
+    }
+  };
   
   // International AI features
   const [language, setLanguage] = useState<'en' | 'fr' | 'es' | 'ar' | 'de'>('en');
