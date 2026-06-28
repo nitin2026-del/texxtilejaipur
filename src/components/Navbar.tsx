@@ -20,7 +20,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<'blog' | 'about' | 'contact' | null>(null);
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
-  const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
   const [isPromoDismissed, setIsPromoDismissed] = useState(false);
   const [trustIndex, setTrustIndex] = useState(0);
