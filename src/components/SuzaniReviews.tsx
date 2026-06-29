@@ -3,6 +3,7 @@
 import React from 'react';
 
 export type ReviewData = {
+  id?: string;
   initial?: string;
   name: string;
   location?: string;

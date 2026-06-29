@@ -18,7 +18,7 @@ import { UniqueTntSuzaniReviews } from '@/components/UniqueTntSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2 } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -149,6 +149,17 @@ export default function ProductPage() {
     }
   };
   
+  const handleDeleteReview = async (reviewId: string) => {
+    try {
+      const { error } = await supabase.from('reviews').delete().eq('id', reviewId);
+      if (error) throw error;
+      setDynamicReviews(prev => prev.filter(r => r.id !== reviewId));
+    } catch (err) {
+      console.error('Failed to delete review:', err);
+      alert('Failed to delete review');
+    }
+  };
+  
   // International AI features
   const [language, setLanguage] = useState<'en' | 'fr' | 'es' | 'ar' | 'de'>('en');
   const [sizingOpen, setSizingOpen] = useState(false);
@@ -256,6 +267,7 @@ export default function ProductPage() {
               
             if (!reviewsError && reviewsData) {
               setDynamicReviews(reviewsData.map(r => ({
+                id: r.id,
                 initial: r.reviewer_name ? r.reviewer_name.charAt(0).toUpperCase() : 'A',
                 name: r.reviewer_name || 'Anonymous',
                 location: r.reviewer_location || undefined,
@@ -962,6 +974,30 @@ export default function ProductPage() {
               </div>
             )}
           </div>
+
+          {dynamicReviews.length > 0 && (
+            <div className="mt-8 mb-20 max-w-2xl mx-auto p-6 bg-red-50 border border-red-100 rounded-2xl">
+              <h3 className="font-bold text-red-800 mb-4 flex items-center gap-2">
+                <Trash2 className="h-5 w-5" /> Admin: Manage Reviews
+              </h3>
+              <div className="space-y-3">
+                {dynamicReviews.map((r, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-red-100">
+                    <div>
+                      <p className="font-bold text-sm text-zinc-800">{r.name}</p>
+                      <p className="text-xs text-zinc-500 line-clamp-1">{r.body}</p>
+                    </div>
+                    <button
+                      onClick={() => r.id && handleDeleteReview(r.id)}
+                      className="px-3 py-1.5 bg-red-100 text-red-600 hover:bg-red-200 text-xs font-bold rounded-md transition-colors shrink-0 ml-4"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           </>
         )}
 
