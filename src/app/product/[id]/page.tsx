@@ -36,6 +36,7 @@ import { CottonTntEmbroideryReviews } from '@/components/CottonTntEmbroideryRevi
 import { EmbroideredVelvetSuzaniReviews } from '@/components/EmbroideredVelvetSuzaniReviews';
 import { HandcraftedVelvetCoatReviews } from '@/components/HandcraftedVelvetCoatReviews';
 import { RedCottonSuzaniReviews } from '@/components/RedCottonSuzaniReviews';
+import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -1010,6 +1011,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-91807C13' ? (
             <div className="mt-20 border-t border-zinc-200">
               <RedCottonSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-52B60A68' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <EmeraldBohoVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
