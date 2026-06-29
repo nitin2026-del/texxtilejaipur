@@ -11,6 +11,7 @@ import { BlueFloralReviews } from '@/components/BlueFloralReviews';
 import { PinkVelvetReviews } from '@/components/PinkVelvetReviews';
 import { CottonSuzaniReviews } from '@/components/CottonSuzaniReviews';
 import { RustVelvetReviews } from '@/components/RustVelvetReviews';
+import { BohemianEleganceReviews } from '@/components/BohemianEleganceReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -839,6 +840,10 @@ export default function ProductPage() {
           ) : (product.name.toLowerCase().includes('rust velvet suzani jacket') || product.sku === 'HT-20D55B39') ? (
             <div className="mt-20 border-t border-zinc-200">
               <RustVelvetReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : (product.name.toLowerCase().includes('artisan embroidered bohemian elegance') || product.sku === 'HT-97C9E512') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <BohemianEleganceReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
