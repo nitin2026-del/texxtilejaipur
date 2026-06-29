@@ -870,39 +870,39 @@ export default function ProductPage() {
         {/* Photo Reviews Section */}
         {product && (
           <>
-          {((product.name.toLowerCase().includes('velvet suzani jacket') && !product.name.toLowerCase().includes('rust') && !product.name.toLowerCase().includes('vintage-inspired')) || product.sku === 'HT-F355E192') ? (
+          {product.sku === 'HT-F355E192' ? (
             <div className="mt-20 border-t border-zinc-200">
               <SuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes('bohemian suzani embroidered jacket') || product.sku === 'HT-24DD340C') ? (
+          ) : product.sku === 'HT-24DD340C' ? (
             <div className="mt-20 border-t border-zinc-200">
               <BlueFloralReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes('handmade suzani quilted jacket') || product.sku === 'HT-4E174E27') ? (
+          ) : product.sku === 'HT-4E174E27' ? (
             <div className="mt-20 border-t border-zinc-200">
               <PinkVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes('cotton suzani jacket') || product.sku === 'HT-EADEC91A') ? (
+          ) : product.sku === 'HT-EADEC91A' ? (
             <div className="mt-20 border-t border-zinc-200">
               <CottonSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes('rust velvet suzani jacket') || product.sku === 'HT-20D55B39') ? (
+          ) : product.sku === 'HT-20D55B39' ? (
             <div className="mt-20 border-t border-zinc-200">
               <RustVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes('artisan embroidered bohemian elegance') || product.sku === 'HT-97C9E512') ? (
+          ) : product.sku === 'HT-97C9E512' ? (
             <div className="mt-20 border-t border-zinc-200">
               <BohemianEleganceReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes('cotton tnt suzani jacket') || product.sku === 'HT-4934F30C') ? (
+          ) : product.sku === 'HT-4934F30C' ? (
             <div className="mt-20 border-t border-zinc-200">
               <TntSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes('vintage-inspired embroidered outerwear') || product.sku === 'HT-DC120E55') ? (
+          ) : product.sku === 'HT-DC120E55' ? (
             <div className="mt-20 border-t border-zinc-200">
               <VintageSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
-          ) : (product.name.toLowerCase().includes("unique handmade embroidered design") || product.sku === 'HT-D55D59E3') ? (
+          ) : product.sku === 'HT-D55D59E3' ? (
             <div className="mt-20 border-t border-zinc-200">
               <UniqueTntSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
