@@ -26,6 +26,7 @@ import { LuxuryBrownVelvetReviews } from '@/components/LuxuryBrownVelvetReviews'
 import { TraditionalBlackVelvetReviews } from '@/components/TraditionalBlackVelvetReviews';
 import { EthnicBlackVelvetReviews } from '@/components/EthnicBlackVelvetReviews';
 import { BlueTntSuzaniReviews } from '@/components/BlueTntSuzaniReviews';
+import { GreenVelvetSuzaniReviews } from '@/components/GreenVelvetSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -960,6 +961,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-6ECC305C' ? (
             <div className="mt-20 border-t border-zinc-200">
               <BlueTntSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-62DFD632' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <GreenVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
