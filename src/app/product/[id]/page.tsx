@@ -14,6 +14,7 @@ import { RustVelvetReviews } from '@/components/RustVelvetReviews';
 import { BohemianEleganceReviews } from '@/components/BohemianEleganceReviews';
 import { TntSuzaniReviews } from '@/components/TntSuzaniReviews';
 import { VintageSuzaniReviews } from '@/components/VintageSuzaniReviews';
+import { UniqueTntSuzaniReviews } from '@/components/UniqueTntSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -854,6 +855,10 @@ export default function ProductPage() {
           ) : (product.name.toLowerCase().includes('vintage-inspired embroidered outerwear') || product.sku === 'HT-DC120E55') ? (
             <div className="mt-20 border-t border-zinc-200">
               <VintageSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : (product.name.toLowerCase().includes("unique handmade embroidered design") || product.sku === 'HT-D55D59E3') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <UniqueTntSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
