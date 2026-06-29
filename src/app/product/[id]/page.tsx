@@ -818,7 +818,8 @@ export default function ProductPage() {
 
         {/* Photo Reviews Section */}
         {product && (
-          (product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
+          <>
+          {(product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
             <div className="mt-20 border-t border-zinc-200">
               <SuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
@@ -842,81 +843,9 @@ export default function ProductPage() {
                   <Heart className="h-6 w-6 text-brand-600 fill-brand-600" />
                   Customer Experiences
                 </h3>
-                {!showReviewForm ? (
-                  <button 
-                    onClick={() => setShowReviewForm(true)}
-                    className="px-6 py-3 bg-zinc-900 text-white font-bold rounded-xl hover:bg-zinc-800 transition-colors shadow-lg text-sm w-full md:w-auto mb-6"
-                  >
-                    Share Your Experience
-                  </button>
-                ) : formSubmitted === 'review' ? (
-                  <div className="p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 text-sm font-bold flex items-center gap-2">
-                    <Check className="h-4 w-4" /> Review submitted for moderation!
-                  </div>
-                ) : (
-                  <div className="space-y-3 bg-zinc-50 p-5 rounded-xl border border-zinc-200">
-                    <div className="grid grid-cols-2 gap-3">
-                      <input 
-                        type="text" 
-                        placeholder="Your Name *" 
-                        value={reviewFormData.name}
-                        onChange={(e) => setReviewFormData({...reviewFormData, name: e.target.value})}
-                        className="w-full p-2.5 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="Location (e.g. Dallas, TX)" 
-                        value={reviewFormData.location}
-                        onChange={(e) => setReviewFormData({...reviewFormData, location: e.target.value})}
-                        className="w-full p-2.5 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-zinc-700">Rating:</span>
-                      <select 
-                        value={reviewFormData.rating}
-                        onChange={(e) => setReviewFormData({...reviewFormData, rating: Number(e.target.value)})}
-                        className="p-1.5 rounded border border-zinc-200 text-sm focus:outline-none"
-                      >
-                        <option value="5">5 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="3">3 Stars</option>
-                        <option value="2">2 Stars</option>
-                        <option value="1">1 Star</option>
-                      </select>
-                    </div>
-                    <input 
-                      type="text" 
-                      placeholder="Review Title" 
-                      value={reviewFormData.title}
-                      onChange={(e) => setReviewFormData({...reviewFormData, title: e.target.value})}
-                      className="w-full p-2.5 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
-                    />
-                    <textarea 
-                      placeholder="Share your experience... *" 
-                      value={reviewFormData.comment}
-                      onChange={(e) => setReviewFormData({...reviewFormData, comment: e.target.value})}
-                      className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
-                      rows={3}
-                    ></textarea>
-                    {reviewError && <p className="text-red-500 text-xs font-medium">{reviewError}</p>}
-                    <div className="flex gap-2 pt-2">
-                      <button 
-                        onClick={handleReviewSubmit}
-                        disabled={isSubmittingReview}
-                        className="px-4 py-2 bg-zinc-900 text-white font-bold rounded-lg text-xs disabled:opacity-50"
-                      >
-                        {isSubmittingReview ? 'Submitting...' : 'Share Experience'}
-                      </button>
-                      <button 
-                        onClick={() => setShowReviewForm(false)}
-                        className="px-4 py-2 bg-white border border-zinc-200 text-zinc-600 font-bold rounded-lg text-xs"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <p className="text-zinc-600 text-sm mb-6">
+                  Share your experience with this beautiful piece. We'd love to hear from you!
+                </p>
               </div>
               <div className="w-full md:w-2/3 flex items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 h-full min-h-[300px]">
                 <div className="text-center">
@@ -926,9 +855,91 @@ export default function ProductPage() {
                 </div>
               </div>
             </div>
-            </div>
-          )
+          </div>
+          )}
+          
+          {/* Review Form (Appears below either the custom or generic review section) */}
+          <div className="mt-8 mb-20 flex justify-center">
+            {!showReviewForm ? (
+              <button 
+                onClick={() => setShowReviewForm(true)}
+                className="px-8 py-4 bg-zinc-900 text-white font-bold rounded-xl hover:bg-zinc-800 transition-colors shadow-lg text-sm"
+              >
+                Share Your Experience
+              </button>
+            ) : formSubmitted === 'review' ? (
+              <div className="p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 text-sm font-bold flex items-center gap-2">
+                <Check className="h-4 w-4" /> Review submitted for moderation!
+              </div>
+            ) : (
+              <div className="w-full max-w-2xl space-y-4 bg-zinc-50 p-8 rounded-2xl border border-zinc-200 shadow-sm">
+                <h4 className="font-serif text-xl font-bold text-zinc-900 mb-4">Share Your Experience</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <input 
+                    type="text" 
+                    placeholder="Your Name *" 
+                    value={reviewFormData.name}
+                    onChange={(e) => setReviewFormData({...reviewFormData, name: e.target.value})}
+                    className="w-full p-3 rounded-xl border border-zinc-200 text-sm focus:outline-none focus:border-brand-500 bg-white shadow-sm"
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Location (e.g. Dallas, TX)" 
+                    value={reviewFormData.location}
+                    onChange={(e) => setReviewFormData({...reviewFormData, location: e.target.value})}
+                    className="w-full p-3 rounded-xl border border-zinc-200 text-sm focus:outline-none focus:border-brand-500 bg-white shadow-sm"
+                  />
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-sm font-medium text-zinc-700">Rating:</span>
+                  <select 
+                    value={reviewFormData.rating}
+                    onChange={(e) => setReviewFormData({...reviewFormData, rating: Number(e.target.value)})}
+                    className="p-2 rounded-lg border border-zinc-200 text-sm focus:outline-none bg-white shadow-sm"
+                  >
+                    <option value="5">5 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="2">2 Stars</option>
+                    <option value="1">1 Star</option>
+                  </select>
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Review Title" 
+                  value={reviewFormData.title}
+                  onChange={(e) => setReviewFormData({...reviewFormData, title: e.target.value})}
+                  className="w-full p-3 rounded-xl border border-zinc-200 text-sm focus:outline-none focus:border-brand-500 bg-white shadow-sm"
+                />
+                <textarea 
+                  placeholder="Share your experience... *" 
+                  value={reviewFormData.comment}
+                  onChange={(e) => setReviewFormData({...reviewFormData, comment: e.target.value})}
+                  className="w-full p-4 rounded-xl border border-zinc-200 text-sm focus:outline-none focus:border-brand-500 bg-white shadow-sm"
+                  rows={4}
+                ></textarea>
+                {reviewError && <p className="text-red-500 text-xs font-medium">{reviewError}</p>}
+                <div className="flex gap-3 pt-4">
+                  <button 
+                    onClick={handleReviewSubmit}
+                    disabled={isSubmittingReview}
+                    className="px-6 py-3 bg-zinc-900 text-white font-bold rounded-xl text-sm disabled:opacity-50 hover:bg-zinc-800 shadow-md transition-all"
+                  >
+                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                  <button 
+                    onClick={() => setShowReviewForm(false)}
+                    className="px-6 py-3 bg-white border border-zinc-200 text-zinc-600 font-bold rounded-xl text-sm hover:bg-zinc-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          </>
         )}
+
 
         {/* You May Also Like Section */}
         {relatedProducts.length > 0 && (
