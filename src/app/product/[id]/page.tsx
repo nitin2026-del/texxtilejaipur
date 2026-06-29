@@ -130,7 +130,7 @@ export default function ProductPage() {
         rating: reviewFormData.rating,
         title: reviewFormData.title,
         comment: reviewFormData.comment,
-        is_approved: false
+        status: 'pending'
       });
       if (error) throw error;
       setFormSubmitted('review');
@@ -246,7 +246,7 @@ export default function ProductPage() {
               .from('reviews')
               .select('*')
               .eq('product_id', item.id)
-              .eq('is_approved', true)
+              .eq('status', 'approved')
               .order('created_at', { ascending: false });
               
             if (!reviewsError && reviewsData) {

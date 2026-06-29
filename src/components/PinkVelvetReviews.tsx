@@ -3,8 +3,6 @@
 import React from 'react';
 import { ReviewData } from './SuzaniReviews';
 
-import React from 'react';
-
 const reviewsData = [
   {
     initial: 'S',

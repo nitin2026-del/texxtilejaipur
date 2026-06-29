@@ -14,8 +14,6 @@ export type ReviewData = {
   isVerified?: boolean;
 };
 
-import React from 'react';
-
 const reviewsData = [
   {
     initial: 'M',
