@@ -13,6 +13,7 @@ import { CottonSuzaniReviews } from '@/components/CottonSuzaniReviews';
 import { RustVelvetReviews } from '@/components/RustVelvetReviews';
 import { BohemianEleganceReviews } from '@/components/BohemianEleganceReviews';
 import { TntSuzaniReviews } from '@/components/TntSuzaniReviews';
+import { VintageSuzaniReviews } from '@/components/VintageSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -849,6 +850,10 @@ export default function ProductPage() {
           ) : (product.name.toLowerCase().includes('cotton tnt suzani jacket') || product.sku === 'HT-4934F30C') ? (
             <div className="mt-20 border-t border-zinc-200">
               <TntSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : (product.name.toLowerCase().includes('vintage-inspired embroidered outerwear') || product.sku === 'HT-DC120E55') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <VintageSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
