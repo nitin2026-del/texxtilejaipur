@@ -30,6 +30,7 @@ import { GreenVelvetSuzaniReviews } from '@/components/GreenVelvetSuzaniReviews'
 import { CyanVelvetSuzaniReviews } from '@/components/CyanVelvetSuzaniReviews';
 import { BohemianVelvetReviews } from '@/components/BohemianVelvetReviews';
 import { EvilEyeVelvetReviews } from '@/components/EvilEyeVelvetReviews';
+import { DarkPaisleyVelvetReviews } from '@/components/DarkPaisleyVelvetReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -980,6 +981,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-BFB1B936' ? (
             <div className="mt-20 border-t border-zinc-200">
               <EvilEyeVelvetReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-745FF4DE' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <DarkPaisleyVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
