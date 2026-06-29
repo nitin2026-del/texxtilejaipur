@@ -823,7 +823,7 @@ export default function ProductPage() {
         {/* Photo Reviews Section */}
         {product && (
           <>
-          {(product.name.toLowerCase().includes('velvet suzani jacket') && !product.name.toLowerCase().includes('rust')) || product.sku === 'HT-F355E192' ? (
+          {((product.name.toLowerCase().includes('velvet suzani jacket') && !product.name.toLowerCase().includes('rust') && !product.name.toLowerCase().includes('vintage-inspired')) || product.sku === 'HT-F355E192') ? (
             <div className="mt-20 border-t border-zinc-200">
               <SuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
