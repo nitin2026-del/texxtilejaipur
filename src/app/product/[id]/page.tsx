@@ -10,6 +10,7 @@ import { SuzaniReviews } from '@/components/SuzaniReviews';
 import { BlueFloralReviews } from '@/components/BlueFloralReviews';
 import { PinkVelvetReviews } from '@/components/PinkVelvetReviews';
 import { CottonSuzaniReviews } from '@/components/CottonSuzaniReviews';
+import { RustVelvetReviews } from '@/components/RustVelvetReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -819,7 +820,7 @@ export default function ProductPage() {
         {/* Photo Reviews Section */}
         {product && (
           <>
-          {(product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
+          {(product.name.toLowerCase().includes('velvet suzani jacket') && !product.name.toLowerCase().includes('rust')) || product.sku === 'HT-F355E192' ? (
             <div className="mt-20 border-t border-zinc-200">
               <SuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
@@ -834,6 +835,10 @@ export default function ProductPage() {
           ) : (product.name.toLowerCase().includes('cotton suzani jacket') || product.sku === 'HT-EADEC91A') ? (
             <div className="mt-20 border-t border-zinc-200">
               <CottonSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : (product.name.toLowerCase().includes('rust velvet suzani jacket') || product.sku === 'HT-20D55B39') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <RustVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
