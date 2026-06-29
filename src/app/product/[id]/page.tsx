@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
+import { SuzaniReviews } from '@/components/SuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -898,6 +899,11 @@ export default function ProductPage() {
 
         {/* Photo Reviews Section */}
         {product && (
+          (product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <SuzaniReviews />
+            </div>
+          ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
             <div className="flex flex-col md:flex-row gap-12">
               <div className="w-full md:w-1/3">
@@ -956,7 +962,8 @@ export default function ProductPage() {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          )
         )}
       </div>
 
