@@ -836,12 +836,11 @@ export default function ProductPage() {
 
                 {/* Payment & Social */}
                 <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-zinc-50 border border-zinc-100 rounded-xl">
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Guaranteed Safe Checkout</span>
-                    <div className="flex items-center gap-2 text-zinc-700">
-                      <CreditCard className="h-5 w-5 text-zinc-400" />
-                      <span className="text-xs font-semibold">Visa, Mastercard, Amex & PayPal Accepted</span>
-                    </div>
+                  <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-zinc-200 shadow-sm">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3.5 object-contain" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 object-contain" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" className="h-4 object-contain rounded-sm" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
                   </div>
                   <a href="https://instagram.com/texxtilejaipur" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white rounded-lg hover:shadow-md transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
