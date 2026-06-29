@@ -128,28 +128,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     }
   };
 
-  const sendConfirmationEmail = async (orderId: string) => {
-    try {
-      const customerEmail = user?.email || email;
-      if (!customerEmail) return;
-      await fetch('/api/auth/order-confirmation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: customerEmail,
-          customerName: fullName,
-          orderNumber: confirmedOrderNumber || orderId,
-          orderId,
-          items: cart.map(item => ({ name: item.name, quantity: item.quantity, price_inr: item.price_inr })),
-          totalDisplay: `${currency} ${getCartTotalDisplay().toFixed(2)}`,
-          currency,
-          shippingAddress: { full_name: fullName, address_line1: addressLine1, address_line2: addressLine2, city, state, postal_code: postalCode, country }
-        })
-      });
-    } catch (e) {
-      console.error('Failed to send confirmation email:', e);
-    }
-  };
+
 
   const handlePaymentSuccess = async (orderId: string) => {
     // Free order handling - securely process via backend
@@ -164,8 +143,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         body: JSON.stringify({ orderId, coinsUsed, coinsEarned })
       });
       
-      // Send confirmation email
-      sendConfirmationEmail(orderId);
+
       
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
       setStep('success');

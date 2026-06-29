@@ -8,7 +8,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
       .from('orders')
       .update({ payment_status: 'completed', status: 'processing' })
       .eq('id', orderId)
-      .select('*, shipping_addresses(phone)')
+      .select('*, shipping_addresses(*)')
       .single();
 
     if (orderError) {
@@ -76,12 +76,11 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
         // Email & PDF Invoice
         if (userEmail && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
           let pdfBuffer: Buffer | null = null;
+          const mappedItems = (orderItems || []).map((item: any) => ({
+            ...item,
+            product_name: item.products?.name
+          }));
           try {
-            // Map items for PDF generator
-            const mappedItems = (orderItems || []).map((item: any) => ({
-              ...item,
-              product_name: item.products?.name
-            }));
             pdfBuffer = await generateInvoiceBuffer(order, mappedItems, { ...userData, email: userEmail });
           } catch (pdfErr) {
             console.error(`[handlePaymentSuccess] Failed to generate PDF for order ${orderId}:`, pdfErr);
@@ -98,17 +97,94 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
             },
           });
 
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com';
+          const orderNumber = order.order_number || orderId;
+          const trackingUrl = `${siteUrl}/track-order?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(userEmail)}`;
+          const firstName = userName ? userName.split(' ')[0] : 'there';
+          const currency = order.display_currency || 'INR';
+          const currencySymbols: Record<string, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', AUD: 'A$' };
+          const symbol = currencySymbols[currency] || '₹';
+
+          const itemsHtml = mappedItems.map((item: any) => `
+            <tr>
+              <td style="padding: 10px 0; border-bottom: 1px solid #f0ebe0; font-size: 14px; color: #333;">
+                ${item.product_name || 'Product'} <span style="color: #888;">x${item.quantity}</span>
+              </td>
+              <td style="padding: 10px 0; border-bottom: 1px solid #f0ebe0; font-size: 14px; color: #333; text-align: right;">
+                ${symbol}${(item.price_at_time * item.quantity).toLocaleString()}
+              </td>
+            </tr>
+          `).join('');
+
+          const sa = order.shipping_addresses;
+          const shippingHtml = sa ? `
+            <div style="margin-bottom: 28px;">
+              <h3 style="font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; font-family: Arial, sans-serif;">Shipping To</h3>
+              <p style="font-size: 14px; color: #333; line-height: 1.6; margin: 0; font-family: Arial, sans-serif;">
+                ${sa.full_name || userName}<br/>
+                ${sa.address_line1 || ''}${sa.address_line2 ? ', ' + sa.address_line2 : ''}<br/>
+                ${sa.city || ''}, ${sa.state || ''} ${sa.postal_code || ''}<br/>
+                ${sa.country || ''}
+              </p>
+            </div>
+          ` : '';
+
           const mailOptions: any = {
             from: `"Textile Jaipur" <${process.env.SMTP_USER}>`,
             to: userEmail,
-            subject: `Order Confirmation - ${order.order_number || orderId}`,
+            subject: `✅ Order Confirmed — ${orderNumber} | Textile Jaipur`,
             html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #d4af37;">Thank you for your order, ${userName}!</h2>
-                <p>We are thrilled to confirm that your payment was successful and your order <strong>#${order.order_number || orderId}</strong> is now being processed.</p>
-                <p>We have attached your official invoice to this email.</p>
-                <p>We will send you another update as soon as your items have shipped.</p>
-                <p>Warm regards,<br>The Textile Jaipur Team</p>
+              <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #fffdf7; border: 1px solid #e8dfc8;">
+                <!-- Header -->
+                <div style="background: #1a1a1a; padding: 30px 40px; text-align: center;">
+                  <h1 style="color: #d4af37; margin: 0; font-size: 24px; letter-spacing: 2px;">TEXTILE JAIPUR</h1>
+                  <p style="color: #999; margin: 6px 0 0; font-size: 12px; letter-spacing: 1px; font-family: Arial, sans-serif;">HANDCRAFTED LUXURY FROM RAJASTHAN</p>
+                </div>
+                <!-- Body -->
+                <div style="padding: 40px;">
+                  <h2 style="color: #1a1a1a; font-size: 20px; margin: 0 0 8px;">Thank you, ${firstName}! 🎉</h2>
+                  <p style="color: #555; font-size: 14px; line-height: 1.6; margin: 0 0 24px; font-family: Arial, sans-serif;">
+                    Your order has been confirmed and our artisans in Jaipur are preparing your beautiful pieces. 
+                    You will receive a shipping notification once your package is dispatched.
+                  </p>
+                  <!-- Order Number -->
+                  <div style="background: #f5f0e8; border: 1px solid #e8dfc8; border-radius: 6px; padding: 16px 20px; margin-bottom: 28px;">
+                    <p style="margin: 0; font-size: 12px; color: #888; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: 1px;">Order Number</p>
+                    <p style="margin: 4px 0 0; font-size: 22px; font-weight: bold; color: #1a1a1a; letter-spacing: 2px;">${orderNumber}</p>
+                  </div>
+                  <!-- Items -->
+                  <h3 style="font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px; font-family: Arial, sans-serif;">Your Items</h3>
+                  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    ${itemsHtml}
+                    <tr>
+                      <td style="padding: 14px 0 0; font-size: 15px; font-weight: bold; color: #1a1a1a;">Total Paid</td>
+                      <td style="padding: 14px 0 0; font-size: 15px; font-weight: bold; color: #d4af37; text-align: right;">${order.total_display_currency || symbol + order.total}</td>
+                    </tr>
+                  </table>
+                  <!-- Shipping -->
+                  ${shippingHtml}
+                  <!-- Track Button -->
+                  <div style="text-align: center; margin: 32px 0;">
+                    <a href="${trackingUrl}" style="display: inline-block; background: #d4af37; color: #1a1a1a; text-decoration: none; padding: 14px 36px; font-weight: bold; font-size: 14px; letter-spacing: 1px; font-family: Arial, sans-serif; border-radius: 3px;">
+                      📦 TRACK MY ORDER
+                    </a>
+                    <p style="margin: 12px 0 0; font-size: 11px; color: #aaa; font-family: Arial, sans-serif;">
+                      Or visit <a href="${siteUrl}/track-order" style="color: #d4af37;">${siteUrl}/track-order</a> and enter your order number: <strong>${orderNumber}</strong>
+                    </p>
+                  </div>
+                  <!-- Divider -->
+                  <div style="border-top: 1px solid #e8dfc8; margin: 28px 0;"></div>
+                  <p style="font-size: 13px; color: #888; line-height: 1.7; font-family: Arial, sans-serif; margin: 0;">
+                    Questions? Reply to this email or contact us at <a href="mailto:support@textilejaipur.com" style="color: #d4af37;">support@textilejaipur.com</a><br/>
+                    <em>Your official PDF invoice is attached to this email.</em>
+                  </p>
+                </div>
+                <!-- Footer -->
+                <div style="background: #1a1a1a; padding: 20px 40px; text-align: center;">
+                  <p style="color: #666; font-size: 11px; margin: 0; font-family: Arial, sans-serif; letter-spacing: 0.5px;">
+                    © Textile Jaipur • Handcrafted in Jaipur, Rajasthan, India
+                  </p>
+                </div>
               </div>
             `
           };
@@ -116,7 +192,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
           if (pdfBuffer) {
             mailOptions.attachments = [
               {
-                filename: `Invoice_${order.order_number || orderId}.pdf`,
+                filename: `Invoice_${orderNumber}.pdf`,
                 content: pdfBuffer,
                 contentType: 'application/pdf'
               }
