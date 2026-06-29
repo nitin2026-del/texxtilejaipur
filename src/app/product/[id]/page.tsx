@@ -9,6 +9,7 @@ import { CheckoutModal } from '@/components/CheckoutModal';
 import { SuzaniReviews } from '@/components/SuzaniReviews';
 import { BlueFloralReviews } from '@/components/BlueFloralReviews';
 import { PinkVelvetReviews } from '@/components/PinkVelvetReviews';
+import { CottonSuzaniReviews } from '@/components/CottonSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -767,6 +768,10 @@ export default function ProductPage() {
           ) : (product.name.toLowerCase().includes('handmade suzani quilted jacket') || product.sku === 'HT-4E174E27') ? (
             <div className="mt-20 border-t border-zinc-200">
               <PinkVelvetReviews />
+            </div>
+          ) : (product.name.toLowerCase().includes('cotton suzani jacket') || product.sku === 'HT-EADEC91A') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <CottonSuzaniReviews />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
