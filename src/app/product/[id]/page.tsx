@@ -40,7 +40,7 @@ import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews'
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2, CreditCard } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2, CreditCard, Info } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -1078,6 +1078,18 @@ export default function ProductPage() {
           </div>
           )}
           
+          {/* Review Disclaimer */}
+          <div className="mt-12 mb-4 flex justify-center px-4">
+            <div className="max-w-2xl flex items-start gap-3 p-4 bg-zinc-50 border border-zinc-100 rounded-xl text-left">
+              <div className="shrink-0 pt-0.5">
+                <Info className="h-4 w-4 text-zinc-400" />
+              </div>
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                <span className="font-semibold text-zinc-600">Disclaimer:</span> Some of the reviews displayed here may have been collected from our official Instagram page or other platforms where our shop operates, such as Etsy. We consolidate these reviews to provide a complete picture of our customers' experiences.
+              </p>
+            </div>
+          </div>
+
           {/* Review Form (Appears below either the custom or generic review section) */}
           <div className="mt-8 mb-20 flex justify-center">
             {!showReviewForm ? (
