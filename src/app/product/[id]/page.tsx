@@ -16,6 +16,7 @@ import { TntSuzaniReviews } from '@/components/TntSuzaniReviews';
 import { VintageSuzaniReviews } from '@/components/VintageSuzaniReviews';
 import { UniqueTntSuzaniReviews } from '@/components/UniqueTntSuzaniReviews';
 import { PremiumTntSuzaniReviews } from '@/components/PremiumTntSuzaniReviews';
+import { LuxeVelvetSuzaniReviews } from '@/components/LuxeVelvetSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -910,6 +911,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-ADC0D306' ? (
             <div className="mt-20 border-t border-zinc-200">
               <PremiumTntSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-3E213213' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <LuxeVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
