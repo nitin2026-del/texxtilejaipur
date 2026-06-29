@@ -7,6 +7,7 @@ import { Footer } from '@/components/Footer';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import { SuzaniReviews } from '@/components/SuzaniReviews';
+import { BlueFloralReviews } from '@/components/BlueFloralReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -757,6 +758,10 @@ export default function ProductPage() {
           (product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
             <div className="mt-20 border-t border-zinc-200">
               <SuzaniReviews />
+            </div>
+          ) : (product.name.toLowerCase().includes('bohemian suzani embroidered jacket') || product.sku === 'HT-24DD340C') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <BlueFloralReviews />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
