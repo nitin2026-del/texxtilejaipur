@@ -24,6 +24,7 @@ import { VintageRedVelvetReviews } from '@/components/VintageRedVelvetReviews';
 import { PurpleTntSuzaniReviews } from '@/components/PurpleTntSuzaniReviews';
 import { LuxuryBrownVelvetReviews } from '@/components/LuxuryBrownVelvetReviews';
 import { TraditionalBlackVelvetReviews } from '@/components/TraditionalBlackVelvetReviews';
+import { EthnicBlackVelvetReviews } from '@/components/EthnicBlackVelvetReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -950,6 +951,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-A7C17406' ? (
             <div className="mt-20 border-t border-zinc-200">
               <TraditionalBlackVelvetReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-70FAB166' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <EthnicBlackVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
