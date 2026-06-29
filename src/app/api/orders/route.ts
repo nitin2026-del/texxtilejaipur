@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
         .eq('country', shipping_address.country)
         .limit(1);
 
-      if (user_id) {
-        query = query.eq('user_id', user_id);
+      if (finalUserId) {
+        query = query.eq('user_id', finalUserId);
       } else {
         query = query.is('user_id', null);
       }
