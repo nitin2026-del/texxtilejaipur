@@ -19,6 +19,7 @@ import { PremiumTntSuzaniReviews } from '@/components/PremiumTntSuzaniReviews';
 import { LuxeVelvetSuzaniReviews } from '@/components/LuxeVelvetSuzaniReviews';
 import { ArtisanVelvetReviews } from '@/components/ArtisanVelvetReviews';
 import { ElegantVelvetReviews } from '@/components/ElegantVelvetReviews';
+import { OrangeVelvetReviews } from '@/components/OrangeVelvetReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -925,6 +926,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-9583C699' ? (
             <div className="mt-20 border-t border-zinc-200">
               <ElegantVelvetReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-AC3C5EFA' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <OrangeVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
