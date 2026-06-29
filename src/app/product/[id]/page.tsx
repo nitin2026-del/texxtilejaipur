@@ -752,6 +752,75 @@ export default function ProductPage() {
           </div>
         )}
 
+        {/* Photo Reviews Section */}
+        {product && (
+          (product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <SuzaniReviews />
+            </div>
+          ) : (
+          <div className="mt-20 pt-16 border-t border-zinc-200">
+            <div className="flex flex-col md:flex-row gap-12">
+              <div className="w-full md:w-1/3">
+                <h3 className="text-2xl font-serif text-zinc-900 font-bold mb-6 flex items-center gap-2">
+                  <Heart className="h-6 w-6 text-brand-600 fill-brand-600" />
+                  Customer Experiences
+                </h3>
+                {!showReviewForm ? (
+                  <button 
+                    onClick={() => setShowReviewForm(true)}
+                    className="px-6 py-3 bg-zinc-900 text-white font-bold rounded-xl hover:bg-zinc-800 transition-colors shadow-lg text-sm w-full md:w-auto mb-6"
+                  >
+                    Share Your Experience
+                  </button>
+                ) : formSubmitted === 'review' ? (
+                  <div className="p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 text-sm font-bold flex items-center gap-2">
+                    <Check className="h-4 w-4" /> Review submitted for moderation!
+                  </div>
+                ) : (
+                  <div className="space-y-3 bg-zinc-50 p-5 rounded-xl border border-zinc-200">
+                    <textarea 
+                      placeholder="Share your experience..." 
+                      className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
+                      rows={3}
+                    ></textarea>
+                    <div className="flex items-center gap-2 mb-3">
+                      <button className="px-3 py-1.5 bg-white border border-dashed border-zinc-300 text-zinc-500 rounded text-xs flex items-center gap-1">
+                        + Add Photo
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          setFormSubmitted('review');
+                          setTimeout(() => { setFormSubmitted(null); setShowReviewForm(false); }, 3000);
+                        }}
+                        className="px-4 py-2 bg-zinc-900 text-white font-bold rounded-lg text-xs"
+                      >
+                        Share Experience
+                      </button>
+                      <button 
+                        onClick={() => setShowReviewForm(false)}
+                        className="px-4 py-2 bg-white border border-zinc-200 text-zinc-600 font-bold rounded-lg text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="w-full md:w-2/3 flex items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 h-full min-h-[300px]">
+                <div className="text-center">
+                  <Heart className="h-10 w-10 text-zinc-300 mx-auto mb-3" />
+                  <p className="font-bold text-zinc-700 text-lg">No experiences shared yet</p>
+                  <p className="text-sm text-zinc-500 mt-1">Be the first to share your experience!</p>
+                </div>
+              </div>
+            </div>
+            </div>
+          )
+        )}
+
         {/* You May Also Like Section */}
         {relatedProducts.length > 0 && (
           <div className="mt-20 pt-16 border-t border-zinc-200">
@@ -897,74 +966,6 @@ export default function ProductPage() {
           </div>
         )}
 
-        {/* Photo Reviews Section */}
-        {product && (
-          (product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <SuzaniReviews />
-            </div>
-          ) : (
-          <div className="mt-20 pt-16 border-t border-zinc-200">
-            <div className="flex flex-col md:flex-row gap-12">
-              <div className="w-full md:w-1/3">
-                <h3 className="text-2xl font-serif text-zinc-900 font-bold mb-6 flex items-center gap-2">
-                  <Heart className="h-6 w-6 text-brand-600 fill-brand-600" />
-                  Customer Experiences
-                </h3>
-                {!showReviewForm ? (
-                  <button 
-                    onClick={() => setShowReviewForm(true)}
-                    className="px-6 py-3 bg-zinc-900 text-white font-bold rounded-xl hover:bg-zinc-800 transition-colors shadow-lg text-sm w-full md:w-auto mb-6"
-                  >
-                    Share Your Experience
-                  </button>
-                ) : formSubmitted === 'review' ? (
-                  <div className="p-4 bg-green-50 text-green-700 rounded-xl border border-green-200 text-sm font-bold flex items-center gap-2">
-                    <Check className="h-4 w-4" /> Review submitted for moderation!
-                  </div>
-                ) : (
-                  <div className="space-y-3 bg-zinc-50 p-5 rounded-xl border border-zinc-200">
-                    <textarea 
-                      placeholder="Share your experience..." 
-                      className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
-                      rows={3}
-                    ></textarea>
-                    <div className="flex items-center gap-2 mb-3">
-                      <button className="px-3 py-1.5 bg-white border border-dashed border-zinc-300 text-zinc-500 rounded text-xs flex items-center gap-1">
-                        + Add Photo
-                      </button>
-                    </div>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => {
-                          setFormSubmitted('review');
-                          setTimeout(() => { setFormSubmitted(null); setShowReviewForm(false); }, 3000);
-                        }}
-                        className="px-4 py-2 bg-zinc-900 text-white font-bold rounded-lg text-xs"
-                      >
-                        Share Experience
-                      </button>
-                      <button 
-                        onClick={() => setShowReviewForm(false)}
-                        className="px-4 py-2 bg-white border border-zinc-200 text-zinc-600 font-bold rounded-lg text-xs"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="w-full md:w-2/3 flex items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 h-full min-h-[300px]">
-                <div className="text-center">
-                  <Heart className="h-10 w-10 text-zinc-300 mx-auto mb-3" />
-                  <p className="font-bold text-zinc-700 text-lg">No experiences shared yet</p>
-                  <p className="text-sm text-zinc-500 mt-1">Be the first to share your experience!</p>
-                </div>
-              </div>
-            </div>
-            </div>
-          )
-        )}
       </div>
 
       <CartSidebar 
