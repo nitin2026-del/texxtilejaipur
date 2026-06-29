@@ -104,6 +104,7 @@ export default function ProductPage() {
   });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState('');
+  const [myReviews, setMyReviews] = useState<string[]>([]);
 
   const handleInquirySubmit = async () => {
     setIsSubmittingInquiry(true);
@@ -128,7 +129,7 @@ export default function ProductPage() {
     setIsSubmittingReview(true);
     setReviewError('');
     try {
-      const { error } = await supabase.from('reviews').insert({
+      const { data, error } = await supabase.from('reviews').insert({
         product_id: product.id,
         reviewer_name: reviewFormData.name,
         reviewer_location: reviewFormData.location,
@@ -136,8 +137,29 @@ export default function ProductPage() {
         title: reviewFormData.title,
         comment: reviewFormData.comment,
         status: 'approved'
-      });
+      }).select().single();
       if (error) throw error;
+      
+      if (data && data.id) {
+        const stored = JSON.parse(localStorage.getItem('textilejaipur_my_reviews') || '[]');
+        localStorage.setItem('textilejaipur_my_reviews', JSON.stringify([...stored, data.id]));
+        setMyReviews(prev => [...prev, data.id]);
+        
+        // Add to dynamic reviews immediately
+        setDynamicReviews(prev => [{
+          id: data.id,
+          initial: data.reviewer_name ? data.reviewer_name.charAt(0).toUpperCase() : 'A',
+          name: data.reviewer_name || 'Anonymous',
+          location: data.reviewer_location || undefined,
+          date: new Date(data.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+          stars: data.rating || 5,
+          title: data.title ? `"${data.title}"` : undefined,
+          body: data.comment || '',
+          reply: data.reply || undefined,
+          isVerified: data.is_verified_buyer || false
+        }, ...prev]);
+      }
+      
       setFormSubmitted('review');
       setReviewFormData({ name: '', location: '', rating: 5, title: '', comment: '' });
       setTimeout(() => { setFormSubmitted(null); setShowReviewForm(false); }, 3000);
@@ -154,6 +176,11 @@ export default function ProductPage() {
       const { error } = await supabase.from('reviews').delete().eq('id', reviewId);
       if (error) throw error;
       setDynamicReviews(prev => prev.filter(r => r.id !== reviewId));
+      
+      const stored = JSON.parse(localStorage.getItem('textilejaipur_my_reviews') || '[]');
+      const updated = stored.filter((id: string) => id !== reviewId);
+      localStorage.setItem('textilejaipur_my_reviews', JSON.stringify(updated));
+      setMyReviews(updated);
     } catch (err) {
       console.error('Failed to delete review:', err);
       alert('Failed to delete review');
@@ -172,6 +199,13 @@ export default function ProductPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const isInCart = product ? cart.some((item) => item.id === product.id) : false;
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('textilejaipur_my_reviews') || '[]');
+      setMyReviews(stored);
+    } catch {}
+  }, []);
 
   useEffect(() => {
     if (!product) return;
@@ -975,14 +1009,14 @@ export default function ProductPage() {
             )}
           </div>
 
-          {dynamicReviews.length > 0 && (
-            <div className="mt-8 mb-20 max-w-2xl mx-auto p-6 bg-red-50 border border-red-100 rounded-2xl">
-              <h3 className="font-bold text-red-800 mb-4 flex items-center gap-2">
-                <Trash2 className="h-5 w-5" /> Admin: Manage Reviews
+          {dynamicReviews.filter(r => r.id && myReviews.includes(r.id)).length > 0 && (
+            <div className="mt-8 mb-20 max-w-2xl mx-auto p-6 bg-brand-50 border border-brand-100 rounded-2xl">
+              <h3 className="font-bold text-brand-800 mb-4 flex items-center gap-2">
+                <Trash2 className="h-5 w-5" /> Manage Your Reviews
               </h3>
               <div className="space-y-3">
-                {dynamicReviews.map((r, i) => (
-                  <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-red-100">
+                {dynamicReviews.filter(r => r.id && myReviews.includes(r.id)).map((r, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-brand-100">
                     <div>
                       <p className="font-bold text-sm text-zinc-800">{r.name}</p>
                       <p className="text-xs text-zinc-500 line-clamp-1">{r.body}</p>
