@@ -11,8 +11,18 @@ const reviewsData = [
     date: 'June 18, 2026',
     stars: 5,
     title: '"Stunning embroidery and free delivery!"',
-    body: 'The colors on this cotton suzani jacket are so vibrant and beautiful. I was really impressed that it arrived so quickly and that delivery was completely free. A gorgeous handcrafted layer for the season.',
+    body: 'The colors on this cotton suzani jacket are so vibrant and beautiful. The intricate needlework on the soft, breathable cotton base is simply breathtaking. I was really impressed that it arrived so quickly and that delivery was completely free. A gorgeous handcrafted boho layer for the season.',
     reply: 'Thank you Emma! We love offering free delivery to our amazing customers. Enjoy your new boho layer! ✨'
+  },
+  {
+    initial: 'O',
+    name: 'Olivia S.',
+    location: '📍 London, UK',
+    date: 'June 5, 2026',
+    stars: 1,
+    title: '"Lost in transit, but saved by support"',
+    body: 'My package got completely lost in transit by the carrier, which was incredibly frustrating as it was meant to be a gift. However, I reached out to customer support and they were phenomenal. They immediately overnighted a replacement at no extra charge via a different carrier. The jacket itself is a beautiful cotton piece, but the customer service is what really impressed me.',
+    reply: 'Olivia, we are so sorry your original package was lost! We know how stressful that is. We are so glad our team could get a replacement to you in time for the gift! 🙏'
   },
   {
     initial: 'C',
@@ -21,7 +31,7 @@ const reviewsData = [
     date: 'June 2, 2026',
     stars: 5,
     title: '"The 25% off deal made this an absolute steal!"',
-    body: 'I bought this jacket along with a matching tote to get my cart over $150, and the automatic 25% off discount applied flawlessly. The jacket itself is incredibly soft breathable cotton and the needlework is flawless.',
+    body: 'I bought this jacket along with a matching tote to get my cart over $150, and the automatic 25% off discount applied flawlessly. The jacket itself is incredibly soft breathable cotton and the dimensional floral needlework is flawless. Highly recommend paying with PayPal for a quick checkout!',
     reply: 'Smart shopping, Chloe! 🛍️ We\'re so glad you took advantage of the discount. Thank you for the kind words about our artisans\' needlework!'
   },
   {
@@ -29,19 +39,19 @@ const reviewsData = [
     name: 'Sarah M.',
     location: '📍 Brooklyn, NY',
     date: 'May 24, 2026',
-    stars: 4,
-    title: '"Beautiful, and great customer support for sizing."',
-    body: 'I wasn\'t sure about the fit since it\'s a handcrafted piece, so I reached out to their customer support. They were incredibly helpful and guided me to the perfect size. The jacket is beautiful, though the sleeves are just a tiny bit long for me.',
-    reply: 'We\'re always here to help, Sarah! 💛 Thank you for reaching out to our support team. You can always cuff the sleeves for a relaxed, effortless look!'
+    stars: 3,
+    title: '"Beautiful, but sizing was tricky"',
+    body: 'The handcrafted floral embroidery on this cotton layer is stunning in person. However, I found the sizing across the bust to be a bit tighter than expected for my body type. Thankfully, their 14-day return policy is totally hassle-free. Customer support helped me process the exchange for a larger size immediately.',
+    reply: 'Thank you for your feedback, Sarah! Handcrafted cotton can occasionally have slight fit variations. We\'re so glad our support team could get that larger size sent out to you quickly! 💛'
   },
   {
     initial: 'M',
     name: 'Mia D.',
-    location: '📍 London, UK',
+    location: '📍 Sydney, AU',
     date: 'May 10, 2026',
     stars: 5,
     title: '"Secure and easy checkout with PayPal."',
-    body: 'Sometimes I get nervous buying directly from international artisan shops, but seeing they accept PayPal gave me total peace of mind. The transaction was seamless, and the jacket is honestly a work of art. 10/10.',
+    body: 'Sometimes I get nervous buying directly from international artisan shops, but seeing they accept PayPal gave me total peace of mind. The transaction was seamless. The boho layer is a work of art—the contrast stitching against the natural cotton is perfection. 10/10.',
     reply: 'Trust and security are incredibly important to us, Mia. We\'re thrilled you had a seamless experience and love your new jacket! 🙏'
   },
   {
@@ -49,20 +59,20 @@ const reviewsData = [
     name: 'Rachel K.',
     location: '📍 Toronto, ON',
     date: 'April 15, 2026',
-    stars: 5,
-    title: '"Love the 14-day return policy (even though I\'m keeping it!)"',
-    body: 'I\'m always hesitant to buy clothing online, but their 14-day easy return policy gave me the confidence to pull the trigger. I definitely won\'t be returning it though—the cotton is so comfortable and the boho pattern is stunning!',
-    reply: 'That\'s exactly why we have the 14-day return policy, Rachel! We want you to shop completely stress-free. So glad you\'re keeping it! 🥰'
+    stars: 2,
+    title: '"Small defect, handled perfectly"',
+    body: 'When my jacket arrived, there was a small discoloration spot on one of the embroidered sleeves. I was so disappointed because the 100% cotton material felt so nice. I emailed customer service with a photo, and they replied within an hour offering a full replacement or a generous partial refund. I took the refund (which hit my PayPal instantly) and easily got the spot out with a gentle wash. Excellent service!',
+    reply: 'Rachel, we are so sorry about that discoloration spot slipping past quality control! We are thrilled our team could resolve it quickly for you and that the jacket is perfect now! 🥰'
   },
   {
     initial: 'J',
     name: 'Jessica W.',
     location: '📍 Melbourne, AU',
     date: 'March 28, 2026',
-    stars: 4,
+    stars: 5,
     title: '"Gorgeous jacket, amazing perks."',
-    body: 'The embroidery is top-notch. Between the free shipping, the PayPal option, and the highly responsive customer service when I asked about care instructions, Textile Jaipur has won a loyal customer. Just wish there were a few more color options in this exact style!',
-    reply: 'Welcome to the TJ family, Jessica! 🌸 We\'re actually working on new colorways for the Cotton TNT Suzani line, so definitely stay tuned!'
+    body: 'The embroidery is top-notch. It really captures that authentic bohemian vibe on a comfortable cotton base. Between the free shipping, the PayPal option, and the highly responsive customer service when I asked about care instructions, Textile Jaipur has won a loyal customer!',
+    reply: 'Welcome to the TJ family, Jessica! 🌸 Enjoy your beautiful new handcrafted jacket!'
   }
 ];
 
@@ -93,13 +103,15 @@ export const TntSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }> = ({ 
           </div>
         </div>
         <h2 className="font-serif text-[clamp(26px,5vw,40px)] text-[#f0d080] tracking-wide mb-2">What Our Customers Say</h2>
-        <p className="text-[12px] tracking-[0.25em] text-[#c9a84c88] uppercase">Verified Reviews · Cotton TNT Suzani Boho Jacket</p>
+        <p className="text-[12px] tracking-[0.25em] text-[#c9a84c88] uppercase">Verified Reviews · Cotton TNT Suzani Boho Layer</p>
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-8 py-8 px-6 border-b border-[#c9a84c22]">
         <div className="font-serif text-[52px] font-semibold text-[#c9a84c] leading-none">{avgRating}</div>
         <div className="flex flex-col gap-1.5">
-          <div className="text-[20px] text-[#c9a84c] tracking-widest">★★★★☆</div>
+          <div className="text-[20px] text-[#c9a84c] tracking-widest">
+            {'★'.repeat(Math.round(Number(avgRating)))}{'☆'.repeat(5 - Math.round(Number(avgRating)))}
+          </div>
           <div className="text-[11px] tracking-[0.2em] text-[#c9a84c88] uppercase">Based on {totalReviews} reviews</div>
         </div>
         <div className="flex flex-col gap-1.5">

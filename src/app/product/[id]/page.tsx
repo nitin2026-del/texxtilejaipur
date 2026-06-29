@@ -135,7 +135,7 @@ export default function ProductPage() {
         rating: reviewFormData.rating,
         title: reviewFormData.title,
         comment: reviewFormData.comment,
-        status: 'pending'
+        status: 'approved'
       });
       if (error) throw error;
       setFormSubmitted('review');
