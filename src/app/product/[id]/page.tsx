@@ -31,6 +31,11 @@ import { CyanVelvetSuzaniReviews } from '@/components/CyanVelvetSuzaniReviews';
 import { BohemianVelvetReviews } from '@/components/BohemianVelvetReviews';
 import { EvilEyeVelvetReviews } from '@/components/EvilEyeVelvetReviews';
 import { DarkPaisleyVelvetReviews } from '@/components/DarkPaisleyVelvetReviews';
+import { WomensVelvetSuzaniReviews } from '@/components/WomensVelvetSuzaniReviews';
+import { CottonTntEmbroideryReviews } from '@/components/CottonTntEmbroideryReviews';
+import { EmbroideredVelvetSuzaniReviews } from '@/components/EmbroideredVelvetSuzaniReviews';
+import { HandcraftedVelvetCoatReviews } from '@/components/HandcraftedVelvetCoatReviews';
+import { RedCottonSuzaniReviews } from '@/components/RedCottonSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -985,6 +990,26 @@ export default function ProductPage() {
           ) : product.sku === 'HT-745FF4DE' ? (
             <div className="mt-20 border-t border-zinc-200">
               <DarkPaisleyVelvetReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-3CB2856C' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <WomensVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-2F2A2BCB' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <CottonTntEmbroideryReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-5046D569' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <EmbroideredVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-D6AE71F0' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <HandcraftedVelvetCoatReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-91807C13' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <RedCottonSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
