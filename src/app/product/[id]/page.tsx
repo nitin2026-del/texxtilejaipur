@@ -993,12 +993,37 @@ export default function ProductPage() {
                   Share your experience with this beautiful piece. We'd love to hear from you!
                 </p>
               </div>
-              <div className="w-full md:w-2/3 flex items-center justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 h-full min-h-[300px]">
-                <div className="text-center">
-                  <Heart className="h-10 w-10 text-zinc-300 mx-auto mb-3" />
-                  <p className="font-bold text-zinc-700 text-lg">No experiences shared yet</p>
-                  <p className="text-sm text-zinc-500 mt-1">Be the first to share your experience!</p>
-                </div>
+              <div className="w-full md:w-2/3 flex items-start justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 min-h-[300px]">
+                {dynamicReviews.length > 0 ? (
+                  <div className="space-y-6 w-full">
+                    {dynamicReviews.map((review, idx) => (
+                      <div key={idx} className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm text-left">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center font-serif text-[14px] font-bold border border-zinc-200 shrink-0">
+                            {review.initial || review.name.charAt(0)}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-bold text-[13px] text-zinc-900">{review.name}</div>
+                            <div className="text-[10px] text-zinc-500 uppercase">{review.date}</div>
+                          </div>
+                          <div className="text-[12px] text-brand-600 tracking-wider">
+                            {'★'.repeat(review.stars)}{'☆'.repeat(5 - review.stars)}
+                          </div>
+                        </div>
+                        {review.title && <div className="font-serif text-[14px] font-semibold text-zinc-900 mb-1.5">{review.title}</div>}
+                        <div className="text-[13px] leading-relaxed text-zinc-600">
+                          {review.body}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center self-center">
+                    <Heart className="h-10 w-10 text-zinc-300 mx-auto mb-3" />
+                    <p className="font-bold text-zinc-700 text-lg">No experiences shared yet</p>
+                    <p className="text-sm text-zinc-500 mt-1">Be the first to share your experience!</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
