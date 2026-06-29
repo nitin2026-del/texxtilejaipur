@@ -93,6 +93,12 @@ export default function ProductPage() {
   const [inquiryError, setInquiryError] = useState('');
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState<string | null>(null);
+  const [dynamicReviews, setDynamicReviews] = useState<any[]>([]);
+  const [reviewFormData, setReviewFormData] = useState({
+    name: '', location: '', rating: 5, title: '', comment: ''
+  });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   const handleInquirySubmit = async () => {
     setIsSubmittingInquiry(true);
@@ -106,6 +112,35 @@ export default function ProductPage() {
       setInquiryError('Failed to submit. Try again.');
     } finally {
       setIsSubmittingInquiry(false);
+    }
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!product || !reviewFormData.name || !reviewFormData.comment) {
+      setReviewError('Name and review comment are required.');
+      return;
+    }
+    setIsSubmittingReview(true);
+    setReviewError('');
+    try {
+      const { error } = await supabase.from('reviews').insert({
+        product_id: product.id,
+        reviewer_name: reviewFormData.name,
+        reviewer_location: reviewFormData.location,
+        rating: reviewFormData.rating,
+        title: reviewFormData.title,
+        comment: reviewFormData.comment,
+        is_approved: false
+      });
+      if (error) throw error;
+      setFormSubmitted('review');
+      setReviewFormData({ name: '', location: '', rating: 5, title: '', comment: '' });
+      setTimeout(() => { setFormSubmitted(null); setShowReviewForm(false); }, 3000);
+    } catch (err) {
+      console.error(err);
+      setReviewError('Failed to submit review. Try again.');
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
   
@@ -204,6 +239,32 @@ export default function ProductPage() {
               translations: item.details?.translations
             }
           });
+
+          // Fetch dynamic reviews
+          try {
+            const { data: reviewsData, error: reviewsError } = await supabase
+              .from('reviews')
+              .select('*')
+              .eq('product_id', item.id)
+              .eq('is_approved', true)
+              .order('created_at', { ascending: false });
+              
+            if (!reviewsError && reviewsData) {
+              setDynamicReviews(reviewsData.map(r => ({
+                initial: r.reviewer_name ? r.reviewer_name.charAt(0).toUpperCase() : 'A',
+                name: r.reviewer_name || 'Anonymous',
+                location: r.reviewer_location || undefined,
+                date: new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                stars: r.rating || 5,
+                title: r.title ? `"${r.title}"` : undefined,
+                body: r.comment || '',
+                reply: r.reply || undefined,
+                isVerified: r.is_verified_buyer || false
+              })));
+            }
+          } catch (e) {
+            console.error('Error fetching reviews:', e);
+          }
 
           // Fetch related products
           try {
@@ -759,19 +820,19 @@ export default function ProductPage() {
         {product && (
           (product.name.toLowerCase().includes('velvet suzani jacket') || product.sku === 'HT-F355E192') ? (
             <div className="mt-20 border-t border-zinc-200">
-              <SuzaniReviews />
+              <SuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (product.name.toLowerCase().includes('bohemian suzani embroidered jacket') || product.sku === 'HT-24DD340C') ? (
             <div className="mt-20 border-t border-zinc-200">
-              <BlueFloralReviews />
+              <BlueFloralReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (product.name.toLowerCase().includes('handmade suzani quilted jacket') || product.sku === 'HT-4E174E27') ? (
             <div className="mt-20 border-t border-zinc-200">
-              <PinkVelvetReviews />
+              <PinkVelvetReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (product.name.toLowerCase().includes('cotton suzani jacket') || product.sku === 'HT-EADEC91A') ? (
             <div className="mt-20 border-t border-zinc-200">
-              <CottonSuzaniReviews />
+              <CottonSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
@@ -794,25 +855,58 @@ export default function ProductPage() {
                   </div>
                 ) : (
                   <div className="space-y-3 bg-zinc-50 p-5 rounded-xl border border-zinc-200">
+                    <div className="grid grid-cols-2 gap-3">
+                      <input 
+                        type="text" 
+                        placeholder="Your Name *" 
+                        value={reviewFormData.name}
+                        onChange={(e) => setReviewFormData({...reviewFormData, name: e.target.value})}
+                        className="w-full p-2.5 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Location (e.g. Dallas, TX)" 
+                        value={reviewFormData.location}
+                        onChange={(e) => setReviewFormData({...reviewFormData, location: e.target.value})}
+                        className="w-full p-2.5 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium text-zinc-700">Rating:</span>
+                      <select 
+                        value={reviewFormData.rating}
+                        onChange={(e) => setReviewFormData({...reviewFormData, rating: Number(e.target.value)})}
+                        className="p-1.5 rounded border border-zinc-200 text-sm focus:outline-none"
+                      >
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                      </select>
+                    </div>
+                    <input 
+                      type="text" 
+                      placeholder="Review Title" 
+                      value={reviewFormData.title}
+                      onChange={(e) => setReviewFormData({...reviewFormData, title: e.target.value})}
+                      className="w-full p-2.5 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
+                    />
                     <textarea 
-                      placeholder="Share your experience..." 
+                      placeholder="Share your experience... *" 
+                      value={reviewFormData.comment}
+                      onChange={(e) => setReviewFormData({...reviewFormData, comment: e.target.value})}
                       className="w-full p-3 rounded-lg border border-zinc-200 text-sm focus:outline-none focus:border-brand-500"
                       rows={3}
                     ></textarea>
-                    <div className="flex items-center gap-2 mb-3">
-                      <button className="px-3 py-1.5 bg-white border border-dashed border-zinc-300 text-zinc-500 rounded text-xs flex items-center gap-1">
-                        + Add Photo
-                      </button>
-                    </div>
-                    <div className="flex gap-2">
+                    {reviewError && <p className="text-red-500 text-xs font-medium">{reviewError}</p>}
+                    <div className="flex gap-2 pt-2">
                       <button 
-                        onClick={() => {
-                          setFormSubmitted('review');
-                          setTimeout(() => { setFormSubmitted(null); setShowReviewForm(false); }, 3000);
-                        }}
-                        className="px-4 py-2 bg-zinc-900 text-white font-bold rounded-lg text-xs"
+                        onClick={handleReviewSubmit}
+                        disabled={isSubmittingReview}
+                        className="px-4 py-2 bg-zinc-900 text-white font-bold rounded-lg text-xs disabled:opacity-50"
                       >
-                        Share Experience
+                        {isSubmittingReview ? 'Submitting...' : 'Share Experience'}
                       </button>
                       <button 
                         onClick={() => setShowReviewForm(false)}

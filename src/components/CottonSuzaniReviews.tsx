@@ -1,6 +1,9 @@
 'use client';
 
 import React from 'react';
+import { ReviewData } from './SuzaniReviews';
+
+import React from 'react';
 
 const reviewsData = [
   {
@@ -75,7 +78,20 @@ const reviewsData = [
   }
 ];
 
-export const CottonSuzaniReviews: React.FC = () => {
+export const CottonSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }> = ({ dynamicReviews = [] }) => {
+  const allReviews = [...dynamicReviews, ...reviewsData];
+  const totalReviews = allReviews.length;
+  
+  const avgRating = totalReviews > 0 
+    ? (allReviews.reduce((sum, r) => sum + r.stars, 0) / totalReviews).toFixed(1)
+    : '0.0';
+    
+  const starsCount = [5, 4, 3, 2, 1].map(star => {
+    const count = allReviews.filter(r => r.stars === star).length;
+    const pct = totalReviews > 0 ? Math.round((count / totalReviews) * 100) : 0;
+    return { stars: star, pct: `${pct}%`, count };
+  });
+
   return (
     <div className="bg-[#111111] text-[#e8dfc8] font-light rounded-2xl overflow-hidden mt-12 mb-12 shadow-2xl">
       <div className="text-center py-12 px-6 border-b border-[#c9a84c33]">
@@ -93,19 +109,13 @@ export const CottonSuzaniReviews: React.FC = () => {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-8 py-8 px-6 border-b border-[#c9a84c22]">
-        <div className="font-serif text-[52px] font-semibold text-[#c9a84c] leading-none">4.1</div>
+        <div className="font-serif text-[52px] font-semibold text-[#c9a84c] leading-none">{avgRating}</div>
         <div className="flex flex-col gap-1.5">
           <div className="text-[20px] text-[#c9a84c] tracking-widest">★★★★☆</div>
-          <div className="text-[11px] tracking-[0.2em] text-[#c9a84c88] uppercase">Based on 7 reviews</div>
+          <div className="text-[11px] tracking-[0.2em] text-[#c9a84c88] uppercase">Based on {totalReviews} reviews</div>
         </div>
         <div className="flex flex-col gap-1.5">
-          {[
-            { stars: 5, pct: "57%", count: 4 },
-            { stars: 4, pct: "14%", count: 1 },
-            { stars: 3, pct: "14%", count: 1 },
-            { stars: 2, pct: "0%", count: 0 },
-            { stars: 1, pct: "14%", count: 1 },
-          ].map((bar) => (
+          {starsCount.map((bar) => (
             <div key={bar.stars} className="flex items-center gap-2.5 text-[11px] text-[#c9a84c99]">
               <span className="w-4 text-right">{bar.stars}★</span>
               <div className="w-[120px] max-w-[80px] sm:max-w-[120px] h-1 bg-[#2a2a2a] rounded-full overflow-hidden">
@@ -118,7 +128,7 @@ export const CottonSuzaniReviews: React.FC = () => {
       </div>
 
       <div className="max-w-[900px] mx-auto py-10 px-5 sm:px-10 flex flex-col">
-        {reviewsData.map((review, idx) => (
+        {allReviews.map((review, idx) => (
           <div key={idx} className="border-b border-[#c9a84c18] py-8 first:pt-0 last:border-b-0">
             <div className="flex items-start gap-3.5 mb-2.5">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1e1a10] to-[#3a2e10] border-[1.5px] border-[#c9a84c55] flex items-center justify-center font-serif text-[17px] text-[#c9a84c] font-semibold shrink-0">
