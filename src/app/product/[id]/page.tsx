@@ -27,6 +27,7 @@ import { TraditionalBlackVelvetReviews } from '@/components/TraditionalBlackVelv
 import { EthnicBlackVelvetReviews } from '@/components/EthnicBlackVelvetReviews';
 import { BlueTntSuzaniReviews } from '@/components/BlueTntSuzaniReviews';
 import { GreenVelvetSuzaniReviews } from '@/components/GreenVelvetSuzaniReviews';
+import { CyanVelvetSuzaniReviews } from '@/components/CyanVelvetSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -965,6 +966,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-62DFD632' ? (
             <div className="mt-20 border-t border-zinc-200">
               <GreenVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-4D240629' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <CyanVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
