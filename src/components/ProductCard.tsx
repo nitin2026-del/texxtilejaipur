@@ -76,7 +76,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       rvProducts[product.id] = product;
       localStorage.setItem('textilejaipur_rv_products', JSON.stringify(rvProducts));
     } catch {}
-  }, [product.id]);
+  }, [product]);
 
   // Stock badge logic
   const isLowStock = product.stock > 0 && product.stock <= 4;

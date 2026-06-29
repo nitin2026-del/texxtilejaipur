@@ -48,7 +48,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const effectiveInr = getCartTotalInr();
   const USD_RATE = 0.010769;
   const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
-  const effectiveDisplay = effectiveInr * (effectiveInr > 0 ? (getCartTotalDisplay() / Math.max(getCartTotalInr(), 1)) : USD_RATE);
 
   // Reset createdOrderId and step on every open to avoid stale state (BUG-006)
   useEffect(() => {
@@ -73,8 +72,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     setError('');
 
     try {
-      let finalUserId = user?.id;
-      let usedTempSignupCoins = false;
+      const finalUserId = user?.id;
 
       // Guest checkout — no account creation, just use email for order confirmation
 
@@ -83,10 +81,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
       // We pass the RAW cart total (including tier/coupon) to the backend.
       // The backend will independently verify this total, but we send it for logging/fallback.
-      let orderTotalInr = getCartTotalInr();
-      let orderTotalDisplay = getCartTotalDisplay();
-
-      let displayTotalDisplay = orderTotalDisplay;
+      const orderTotalInr = getCartTotalInr();
+      const orderTotalDisplay = getCartTotalDisplay();
 
       // 1. Create order via our API
       const orderRes = await fetch('/api/orders', {
