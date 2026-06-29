@@ -15,6 +15,7 @@ import { BohemianEleganceReviews } from '@/components/BohemianEleganceReviews';
 import { TntSuzaniReviews } from '@/components/TntSuzaniReviews';
 import { VintageSuzaniReviews } from '@/components/VintageSuzaniReviews';
 import { UniqueTntSuzaniReviews } from '@/components/UniqueTntSuzaniReviews';
+import { PremiumTntSuzaniReviews } from '@/components/PremiumTntSuzaniReviews';
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -905,6 +906,10 @@ export default function ProductPage() {
           ) : product.sku === 'HT-D55D59E3' ? (
             <div className="mt-20 border-t border-zinc-200">
               <UniqueTntSuzaniReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-ADC0D306' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <PremiumTntSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
