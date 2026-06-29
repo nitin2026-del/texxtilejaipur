@@ -40,7 +40,7 @@ import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews'
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2 } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2, CreditCard } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -832,6 +832,21 @@ export default function ProductPage() {
                       <p className="text-[10px] text-zinc-500 mt-0.5">Govt. of India verified origin.</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Payment & Social */}
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-zinc-50 border border-zinc-100 rounded-xl">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Guaranteed Safe Checkout</span>
+                    <div className="flex items-center gap-2 text-zinc-700">
+                      <CreditCard className="h-5 w-5 text-zinc-400" />
+                      <span className="text-xs font-semibold">Visa, Mastercard, Amex & PayPal Accepted</span>
+                    </div>
+                  </div>
+                  <a href="https://instagram.com/texxtilejaipur" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white rounded-lg hover:shadow-md transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+                    <span className="text-xs font-bold tracking-wide">@texxtilejaipur</span>
+                  </a>
                 </div>
 
                 {/* Artisan Story Section */}
