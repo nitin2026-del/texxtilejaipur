@@ -40,7 +40,7 @@ import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews'
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2, CreditCard, Info } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -109,7 +109,16 @@ export default function ProductPage() {
   
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
+
+  const mediaItems = useMemo(() => {
+    if (!product) return [];
+    const items = (product.images || []).map((url: string) => ({ type: 'image', url }));
+    if (product.details?.video_url) {
+      items.push({ type: 'video', url: product.details.video_url });
+    }
+    return items;
+  }, [product]);
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [expandedQa, setExpandedQa] = useState<number | null>(null);
@@ -496,35 +505,77 @@ export default function ProductPage() {
           </div>
         ) : (
           <div className="flex flex-col md:flex-row gap-12 lg:gap-20">
-            {/* Image Gallery */}
+            {/* Cinematic Media Gallery */}
             <div className="w-full md:w-1/2 space-y-4">
-              <div className="aspect-[4/5] rounded-lg overflow-hidden bg-zinc-100 border border-zinc-200 relative">
-                <Image 
-                  src={product.images?.[selectedImage] || 'https://via.placeholder.com/600x800'} 
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
-                  priority
-                  unoptimized={true}
-                />
+              <div className="aspect-[4/5] rounded-lg bg-zinc-100 border border-zinc-200 relative overflow-hidden group">
+                {mediaItems.length > 0 ? mediaItems.map((media: any, idx: number) => {
+                  const isActive = idx === selectedMediaIndex;
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${isActive ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}
+                    >
+                      {media.type === 'image' ? (
+                        <Image 
+                          src={media.url} 
+                          alt={`${product.name} view ${idx + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
+                          priority={idx === 0}
+                          unoptimized={true}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-black">
+                          {media.url.includes('youtube.com') || media.url.includes('youtu.be') ? (
+                            <iframe 
+                              src={media.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')} 
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            ></iframe>
+                          ) : (
+                            <video 
+                              src={media.url} 
+                              className="w-full h-full object-contain" 
+                              controls 
+                              poster={product.images?.[0] || undefined}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }) : (
+                  <Image 
+                    src="https://via.placeholder.com/600x800" 
+                    alt="Placeholder"
+                    fill
+                    className="object-cover"
+                  />
+                )}
                 
                 {/* Brand Logo Overlay */}
-                <div className="absolute top-4 right-4 z-10 opacity-90 drop-shadow-md">
+                <div className="absolute top-4 right-4 z-20 opacity-90 drop-shadow-md pointer-events-none">
                   <img src="/icon.png" alt="Texxtile Jaipur" className="h-10 w-10 rounded-lg object-cover border border-white/30 shadow-lg" />
                 </div>
               </div>
-              {product.images && product.images.length > 1 && (
-                <div className="flex gap-4 overflow-x-auto pb-2">
-                  {product.images.map((img, idx) => (
+
+              {mediaItems.length > 1 && (
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                  {mediaItems.map((media: any, idx: number) => (
                     <button 
                       key={idx}
-                      onClick={() => setSelectedImage(idx)}
-                      className={`h-24 w-20 shrink-0 rounded border ${selectedImage === idx ? 'border-gold' : 'border-zinc-200 opacity-60'} overflow-hidden transition-all`}
+                      onClick={() => setSelectedMediaIndex(idx)}
+                      className={`relative h-24 w-20 shrink-0 rounded border overflow-hidden transition-all duration-300 ${
+                        selectedMediaIndex === idx 
+                          ? 'border-gold ring-2 ring-gold/20' 
+                          : 'border-zinc-200 opacity-60 hover:opacity-100'
+                      }`}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="absolute inset-0">
                         <Image 
-                          src={img} 
+                          src={media.type === 'image' ? media.url : (product.images?.[0] || 'https://via.placeholder.com/80')} 
                           alt={`Thumbnail ${idx}`} 
                           fill
                           sizes="80px"
@@ -532,29 +583,13 @@ export default function ProductPage() {
                           unoptimized={true}
                         />
                       </div>
+                      {media.type === 'video' && (
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center backdrop-blur-[1px]">
+                          <Play className="h-6 w-6 text-white fill-white opacity-90 drop-shadow-md" />
+                        </div>
+                      )}
                     </button>
                   ))}
-                </div>
-              )}
-              
-              {product.details?.video_url && (
-                <div className="mt-4 border border-zinc-200 rounded-lg overflow-hidden bg-black/5 aspect-video relative">
-                  {product.details.video_url.includes('youtube.com') || product.details.video_url.includes('youtu.be') ? (
-                    <iframe 
-                      src={product.details.video_url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')} 
-                      className="absolute inset-0 w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  ) : (
-                    <video 
-                      src={product.details.video_url} 
-                      className="absolute inset-0 w-full h-full object-cover bg-black" 
-                      controls 
-                      preload="none"
-                      poster={product.images?.[0] || undefined}
-                    />
-                  )}
                 </div>
               )}
             </div>
