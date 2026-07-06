@@ -471,7 +471,7 @@ export default function ProductPage() {
       <div className="pt-4 md:pt-8 px-4 md:px-6 max-w-7xl mx-auto">
         {/* Back Button */}
         <Link 
-          href={`/collection#product-${product.id}`}
+          href={product ? `/collection#product-${product.id}` : '/collection'}
           className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 font-medium mb-6 md:mb-8 transition-colors w-max"
         >
           <ArrowLeft className="h-4 w-4" />
