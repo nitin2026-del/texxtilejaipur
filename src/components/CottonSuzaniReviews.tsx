@@ -175,3 +175,4 @@ export const CottonSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }> = 
     </div>
   );
 };
+

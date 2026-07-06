@@ -136,3 +136,4 @@ export const VintageSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }> =
     </div>
   );
 };
+

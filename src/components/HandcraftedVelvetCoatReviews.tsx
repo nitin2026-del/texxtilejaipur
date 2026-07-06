@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'G',
     name: 'Grace F.',
     location: '📍 London, UK',
-    date: 'August 22, 2026',
+    date: 'April 19, 2026',
     stars: 5,
     title: '"Unreal jewel tones"',
     body: 'The colors on this coat are absolutely unreal in person. The rich crimson, gold, and turquoise silk threads dance across the midnight-black velvet backdrop exactly as described. The intricate floral motifs and winding vines make it look like a museum piece.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'H',
     name: 'Hannah J.',
     location: '📍 San Diego, CA',
-    date: 'August 10, 2026',
+    date: 'April 19, 2026',
     stars: 5,
     title: '"Machine washable luxury!"',
     body: 'I was completely shocked to find out that a coat made from premium handloom fabric with this much regal elegance is actually machine washable. I washed it in cold water on a delicate cycle and the midnight-black velvet stayed plush and perfect.',
@@ -71,3 +71,4 @@ export const HandcraftedVelvetCoatReviews: React.FC<{ dynamicReviews?: ReviewDat
     </div>
   );
 };
+

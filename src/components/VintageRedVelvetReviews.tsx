@@ -134,3 +134,4 @@ export const VintageRedVelvetReviews: React.FC<{ dynamicReviews?: ReviewData[] }
     </div>
   );
 };
+

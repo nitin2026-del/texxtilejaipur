@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'C',
     name: 'Catherine V.',
     location: '📍 Chicago, IL',
-    date: 'August 12, 2026',
+    date: 'April 2, 2026',
     stars: 5,
     title: '"Stunning Handloom Cotton"',
     body: 'The handloom cotton fabric on this TNT embroidery jacket is out of this world. You can literally feel the ancestral weaving techniques they mention in the description. It has a beautiful, organic texture that mass-produced jackets just don\'t have.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'R',
     name: 'Rebecca H.',
     location: '📍 Denver, CO',
-    date: 'August 5, 2026',
+    date: 'April 2, 2026',
     stars: 5,
     title: '"Perfect for transitional weather"',
     body: 'Because it\'s cotton, it\'s incredibly breathable while still offering enough structure to act as a proper outer layer. Perfect for crisp autumn evenings. The floral motifs bloom beautifully across the dark base.',
@@ -28,7 +28,7 @@ const reviewsData = [
     initial: 'A',
     name: 'Anita P.',
     location: '📍 Toronto, ON',
-    date: 'July 28, 2026',
+    date: 'March 15, 2026',
     stars: 4,
     title: '"Beautiful but strict care instructions"',
     body: 'I absolutely love the jacket and the cross-cultural confluence of the Suzani technique. However, it is strict dry clean only. I accidentally got a spot of coffee on the cuff and was terrified to wash it. The dry cleaner handled it fine, though!',
@@ -38,7 +38,7 @@ const reviewsData = [
     initial: 'S',
     name: 'Samantha D.',
     location: '📍 Miami, FL',
-    date: 'July 20, 2026',
+    date: 'March 15, 2026',
     stars: 5,
     title: '"Looks amazing with dark wash denim"',
     body: 'I bought this specifically to wear with my dark-wash denim and gold hoops as suggested in the styling guide, and it is a total showstopper. The embroidery commands the room!',
@@ -48,7 +48,7 @@ const reviewsData = [
     initial: 'M',
     name: 'Monica G.',
     location: '📍 San Francisco, CA',
-    date: 'July 14, 2026',
+    date: 'March 15, 2026',
     stars: 3,
     title: '"Sleeves are a bit tight"',
     body: 'The artistry is undeniable—it truly looks like it came from a royal atelier in Rajasthan. However, the sleeves are tailored a bit tight near the biceps. If you have athletic arms, I strongly suggest sizing up.',
@@ -58,7 +58,7 @@ const reviewsData = [
     initial: 'K',
     name: 'Karen B.',
     location: '📍 Seattle, WA',
-    date: 'July 2, 2026',
+    date: 'March 15, 2026',
     stars: 5,
     title: '"A gift for my mother"',
     body: 'I gave this to my mother for her 60th birthday. She was moved to tears by the craftsmanship. It really is a masterpiece designed to be cherished for generations.',
@@ -121,3 +121,4 @@ export const CottonTntEmbroideryReviews: React.FC<{ dynamicReviews?: ReviewData[
     </div>
   );
 };
+

@@ -227,3 +227,4 @@ export const SuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }> = ({ dyn
     </div>
   );
 };
+

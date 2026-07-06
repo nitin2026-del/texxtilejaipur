@@ -204,3 +204,4 @@ export const ArtisanVelvetReviews: React.FC<{ dynamicReviews?: ReviewData[] }> =
     </div>
   );
 };
+

@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'I',
     name: 'Isabella C.',
     location: '📍 Montreal, QC',
-    date: 'August 20, 2026',
+    date: 'April 25, 2026',
     stars: 5,
     title: '"Deep cultural meaning"',
     body: 'I did some deep research before purchasing, and the vibrant red palette of this cotton jacket is considered highly auspicious in Indian culture, symbolizing passion and prosperity. Wearing it feels incredibly powerful and uplifting.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'F',
     name: 'Fiona M.',
     location: '📍 Sydney, AU',
-    date: 'August 11, 2026',
+    date: 'April 25, 2026',
     stars: 5,
     title: '"Premium, breathable cotton"',
     body: 'The premium cotton sourced from Jaipur is highly breathable, making it the perfect jacket for transitioning from casual daytime styling to elevated evening looks. The vivid character of the sweeping embroidery is breathtaking.',
@@ -28,7 +28,7 @@ const reviewsData = [
     initial: 'D',
     name: 'Diana P.',
     location: '📍 Chicago, IL',
-    date: 'July 28, 2026',
+    date: 'March 10, 2026',
     stars: 3,
     title: '"Strict Dry Clean Only / Very bright"',
     body: 'The jacket is beautiful, but I am leaving a mixed review. First, the dry clean only requirement on a cotton jacket is frustrating. Second, the striking red color palette is extremely vibrant—almost neon in direct sunlight. It can be a bit too bold for a conservative office setting.',
@@ -38,7 +38,7 @@ const reviewsData = [
     initial: 'C',
     name: 'Clara S.',
     location: '📍 Atlanta, GA',
-    date: 'July 15, 2026',
+    date: 'March 10, 2026',
     stars: 5,
     title: '"Truly one of a kind"',
     body: 'The artisanal details are spectacular. You can tell that no two pieces are exactly alike because of the meticulous hand-embroidery. It serves as a true centerpiece when layered over a crisp white dress.',
@@ -88,3 +88,4 @@ export const RedCottonSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }>
     </div>
   );
 };
+

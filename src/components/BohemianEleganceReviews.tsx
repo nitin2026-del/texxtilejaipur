@@ -146,3 +146,4 @@ export const BohemianEleganceReviews: React.FC<{ dynamicReviews?: ReviewData[] }
     </div>
   );
 };
+

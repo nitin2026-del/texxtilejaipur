@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'L',
     name: 'Lily O.',
     location: '📍 San Francisco, CA',
-    date: 'August 28, 2026',
+    date: 'April 26, 2026',
     stars: 5,
     title: '"Stunning emerald green velvet"',
     body: 'The deep emerald green velvet base is incredibly rich and shimmers beautifully in the light. The contrasting fuchsia and marigold floral medallions absolutely pop against it. It truly feels like a wearable art piece as described.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'M',
     name: 'Maria S.',
     location: '📍 Austin, TX',
-    date: 'August 15, 2026',
+    date: 'April 26, 2026',
     stars: 5,
     title: '"Amazing that it is machine washable"',
     body: 'I was very nervous about cleaning this because of the intricate hand-stitched vines and velvet base, but I followed the care instructions and machine washed it on a delicate, cold cycle. It came out looking brand new!',
@@ -28,7 +28,7 @@ const reviewsData = [
     initial: 'S',
     name: 'Sophia W.',
     location: '📍 Chicago, IL',
-    date: 'August 2, 2026',
+    date: 'April 26, 2026',
     stars: 4,
     title: '"Elevates any simple outfit"',
     body: 'I wear this exactly as the styling guide suggested—over a simple white tee and my favorite tailored denim. It instantly transforms a boring outfit into a statement of refined bohemian luxury. I took off one star because the sleeves run a tiny bit long on me.',
@@ -38,7 +38,7 @@ const reviewsData = [
     initial: 'E',
     name: 'Elena K.',
     location: '📍 New York, NY',
-    date: 'July 20, 2026',
+    date: 'March 6, 2026',
     stars: 5,
     title: '"Incredible Jaipur craftsmanship"',
     body: 'You can really feel the fusion of Central Asian Suzani inspiration with the traditional Jaipur handloom weaving. The texture of the handloom velvet has a unique depth that you just don\'t see in mass-produced clothing.',
@@ -95,3 +95,4 @@ export const EmeraldBohoVelvetReviews: React.FC<{ dynamicReviews?: ReviewData[] 
     </div>
   );
 };
+

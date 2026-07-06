@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'V',
     name: 'Vanessa T.',
     location: '📍 Los Angeles, CA',
-    date: 'August 2, 2026',
+    date: 'April 14, 2026',
     stars: 5,
     title: '"Wearable art!"',
     body: 'The evil eye design is an absolute showstopper! The green iris embroidery is incredibly detailed and pops beautifully against the dusty blue velvet. I get stopped in the street asking where I got this every single time I wear it. It is truly wearable art.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'R',
     name: 'Rebecca M.',
     location: '📍 Chicago, IL',
-    date: 'July 18, 2026',
+    date: 'March 15, 2026',
     stars: 2,
     title: '"Too boxy for my frame"',
     body: 'The design is bold and I love the evil eye concept, but the jacket itself is much boxier and shorter than I expected from the photos. It hits right at the widest part of my hips, which just isn\'t flattering on my curvy frame. I had to return it unfortunately.',
@@ -29,7 +29,7 @@ const reviewsData = [
     initial: 'S',
     name: 'Stella B.',
     location: '📍 Austin, TX',
-    date: 'July 5, 2026',
+    date: 'March 15, 2026',
     stars: 5,
     title: '"Perfect festival jacket"',
     body: 'I bought this specifically for a music festival and it was the perfect piece. The velvet is thick enough to keep me warm when the sun goes down, and the bold radiating eye motif gives it that perfect eclectic, bohemian vibe. Looks amazing paired with a simple slip dress or a maxi skirt.',
@@ -144,3 +144,4 @@ export const EvilEyeVelvetReviews: React.FC<{ dynamicReviews?: ReviewData[] }> =
     </div>
   );
 };
+

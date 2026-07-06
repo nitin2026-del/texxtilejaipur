@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'R',
     name: 'Rachel V.',
     location: '📍 Miami, FL',
-    date: 'July 18, 2026',
+    date: 'March 23, 2026',
     stars: 5,
     title: '"Vibrant cyan & bundle discount"',
     body: 'The bright cyan velvet is absolutely gorgeous in person, and the brown and white floral embroidery provides such a cool contrast. I bundled this with a matching tote bag and was thrilled to see the 25% off discount applied automatically at checkout!',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'K',
     name: 'Kaitlyn S.',
     location: '📍 Chicago, IL',
-    date: 'July 2, 2026',
+    date: 'March 23, 2026',
     stars: 4,
     title: '"AI sizing and easy to steam"',
     body: 'The AI Tailor tool suggested a Medium, and it fits exactly how I wanted. It arrived slightly creased from shipping, but the included care card instructed me to steam it on low heat inside-out, and the wrinkles fell right out. Beautiful craftsmanship.',
@@ -144,3 +144,4 @@ export const CyanVelvetSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }
     </div>
   );
 };
+

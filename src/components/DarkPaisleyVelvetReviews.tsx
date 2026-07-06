@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'E',
     name: 'Elena S.',
     location: '📍 Chicago, IL',
-    date: 'August 14, 2026',
+    date: 'April 22, 2026',
     stars: 5,
     title: '"Stunning contrast and drape"',
     body: 'The contrast of the bright red, green, and blue embroidery against the dark velvet is absolutely stunning in person. I wore this to an art gallery opening recently and received so many compliments. It also has a really nice weight to the fabric that makes it drape beautifully over the shoulders.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'C',
     name: 'Chloe B.',
     location: '📍 Boston, MA',
-    date: 'July 29, 2026',
+    date: 'March 21, 2026',
     stars: 4,
     title: '"Chic structured collar"',
     body: 'The mandarin-style collar gives this jacket a really chic, slightly structured look even though the embroidery gives it a bohemian vibe. I absolutely love wearing it over a simple black turtleneck and trousers. I took off one star because I personally wish the hem was just an inch or two longer, but it\'s still quickly become one of my favorite statement pieces.',
@@ -113,3 +113,4 @@ export const DarkPaisleyVelvetReviews: React.FC<{ dynamicReviews?: ReviewData[] 
     </div>
   );
 };
+

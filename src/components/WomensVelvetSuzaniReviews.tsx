@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'S',
     name: 'Sarah M.',
     location: '📍 Portland, OR',
-    date: 'August 10, 2026',
+    date: 'April 10, 2026',
     stars: 5,
     title: '"Surprisingly Machine Washable!"',
     body: 'I was hesitant to buy a velvet jacket with such intricate embroidery because I hate going to the dry cleaner. I was shocked to see the care instructions say machine washable! I ran it on a delicate, cold cycle inside a mesh bag and it came out perfectly. The premium fabric held up beautifully.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'L',
     name: 'Lauren K.',
     location: '📍 New York, NY',
-    date: 'August 2, 2026',
+    date: 'April 10, 2026',
     stars: 5,
     title: '"Incredible Jaipur Craftsmanship"',
     body: 'You can instantly feel the premium quality of the fabric when you touch it. Knowing this was tailored in the historic heart of Jaipur makes it feel so special. The hand-embroidered floral motifs are raised slightly off the fabric, giving it a stunning 3D texture.',
@@ -28,7 +28,7 @@ const reviewsData = [
     initial: 'M',
     name: 'Maya R.',
     location: '📍 Austin, TX',
-    date: 'July 18, 2026',
+    date: 'March 22, 2026',
     stars: 4,
     title: '"Beautiful contemporary structure"',
     body: 'Sometimes ethnic jackets can feel a bit boxy, but this one has a wonderful contemporary structure that flatters the shoulders. The floral motifs are bold but elegant. I took off one star because I wish the lining was silk, but it still feels great.',
@@ -38,7 +38,7 @@ const reviewsData = [
     initial: 'J',
     name: 'Jessica W.',
     location: '📍 London, UK',
-    date: 'July 5, 2026',
+    date: 'March 22, 2026',
     stars: 5,
     title: '"Perfect styling advice"',
     body: 'I followed the brand\'s styling advice and wore this over a minimalist silk slip dress. It looked absolutely breathtaking! The vibrant embroidery commanded the room just like they promised. A true statement piece.',
@@ -128,3 +128,4 @@ export const WomensVelvetSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[]
     </div>
   );
 };
+

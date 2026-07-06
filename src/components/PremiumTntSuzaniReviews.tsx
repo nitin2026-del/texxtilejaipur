@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'E',
     name: 'Elena M.',
     location: '📍 Portland, OR',
-    date: 'July 2, 2026',
+    date: 'March 12, 2026',
     stars: 5,
     title: '"Incredible detail and surprisingly versatile!"',
     body: 'This jacket is absolutely breathtaking in person. The deep burgundy cotton base provides the perfect backdrop for the large, vibrant red fan-shaped floral embroidery and delicate light green vines. I was completely surprised by the red and white striped inner lining—it adds such a fun, unexpected pop of contrast when you roll up the sleeves! The craftsmanship is top-tier, and the free delivery was just the cherry on top. A true statement piece.',
@@ -108,3 +108,4 @@ export const PremiumTntSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }
     </div>
   );
 };
+

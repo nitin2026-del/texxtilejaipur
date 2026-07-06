@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'C',
     name: 'Clara W.',
     location: '📍 Sedona, AZ',
-    date: 'July 25, 2026',
+    date: 'March 10, 2026',
     stars: 5,
     title: '"Surprisingly versatile!"',
     body: 'I bought this dusty rose jacket thinking it would be a statement piece for special occasions, but I actually wear it almost every day. It looks just as good thrown over a plain white tee and vintage jeans as it does over a black slip dress. The red pomegranate embroidery is so eye-catching without being overwhelming.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'N',
     name: 'Natalie P.',
     location: '📍 Brooklyn, NY',
-    date: 'July 12, 2026',
+    date: 'March 10, 2026',
     stars: 4,
     title: '"Perfect transitional weight"',
     body: 'This is the ideal jacket for that awkward weather between seasons. The velvet is plush but not suffocatingly heavy, and the striped lining breathes really well. I deducted one star because the hook-and-eye closure at the top is a bit tricky to fasten, but I usually wear it open anyway.',
@@ -123,3 +123,4 @@ export const BohemianVelvetReviews: React.FC<{ dynamicReviews?: ReviewData[] }> 
     </div>
   );
 };
+

@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'N',
     name: 'Nadia F.',
     location: '📍 Washington, D.C.',
-    date: 'August 18, 2026',
+    date: 'April 25, 2026',
     stars: 5,
     title: '"A historical masterpiece"',
     body: 'I am a textile historian, and the deep research behind this piece is evident. The Suzani technique historically celebrates life and fertility across Central Asia, and seeing it married with Jaipur\'s artisanal handloom weaving is a brilliant cross-cultural confluence.',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'P',
     name: 'Penelope G.',
     location: '📍 Paris, FR',
-    date: 'August 12, 2026',
+    date: 'April 25, 2026',
     stars: 5,
     title: '"Authentic Handloom Texture"',
     body: 'The base fabric is true handloom. You can feel the slight, beautiful irregularities in the weave that prove it wasn\'t made by a machine. It provides an incredible backdrop for the opulent tapestry of embroidery.',
@@ -28,7 +28,7 @@ const reviewsData = [
     initial: 'V',
     name: 'Victoria L.',
     location: '📍 Rome, IT',
-    date: 'August 1, 2026',
+    date: 'April 25, 2026',
     stars: 4,
     title: '"Delicate Threads"',
     body: 'The majestic symphony of colors is exactly as described. However, the silk threads used in the hand-embroidery are quite delicate. I caught one on a ring and it pulled slightly. You must handle this royal piece with care.',
@@ -38,7 +38,7 @@ const reviewsData = [
     initial: 'A',
     name: 'Amelia S.',
     location: '📍 Boston, MA',
-    date: 'July 25, 2026',
+    date: 'March 24, 2026',
     stars: 5,
     title: '"Fit for a royal atelier"',
     body: 'Putting this on makes you feel like you are wearing something straight out of the royal ateliers of Rajasthan. The contemporary structure keeps it from looking like a costume and makes it perfectly wearable for modern events.',
@@ -48,7 +48,7 @@ const reviewsData = [
     initial: 'Z',
     name: 'Zara H.',
     location: '📍 Dubai, UAE',
-    date: 'July 19, 2026',
+    date: 'March 24, 2026',
     stars: 5,
     title: '"Perfect over minimalist dresses"',
     body: 'I followed the site\'s suggestion to layer this over a minimalist silk slip dress. It completely transformed my simple outfit into a breathtaking ensemble. The contrast between plain silk and heavy Suzani embroidery is divine.',
@@ -58,7 +58,7 @@ const reviewsData = [
     initial: 'E',
     name: 'Eleanor B.',
     location: '📍 Vancouver, BC',
-    date: 'July 8, 2026',
+    date: 'March 24, 2026',
     stars: 3,
     title: '"Beautiful, but strict dry clean"',
     body: 'I gave it three stars only because the \'Dry clean only\' requirement is a bit annoying for someone who wears jackets frequently. The handloom fabric and dyes will bleed if you try to spot clean it yourself, so be warned.',
@@ -130,3 +130,4 @@ export const EmbroideredVelvetSuzaniReviews: React.FC<{ dynamicReviews?: ReviewD
     </div>
   );
 };
+

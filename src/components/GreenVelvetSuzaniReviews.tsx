@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'O',
     name: 'Olivia M.',
     location: '📍 Seattle, WA',
-    date: 'July 14, 2026',
+    date: 'March 18, 2026',
     stars: 5,
     title: '"Rich olive velvet & Bundle discount"',
     body: 'The olive green velvet is so rich and luxurious. I bundled this jacket with an embroidered tote and the 25% automatic discount was a fantastic surprise at checkout. Unbeatable value for artisan work!',
@@ -18,7 +18,7 @@ const reviewsData = [
     initial: 'S',
     name: 'Sophia K.',
     location: '📍 Toronto, ON',
-    date: 'July 5, 2026',
+    date: 'March 18, 2026',
     stars: 4,
     title: '"AI Tailor was right on"',
     body: 'I am always hesitant to buy boxy cuts, but the AI Tailor tool suggested a Large based on my measurements and it fits beautifully. I do wish it had side pockets, but the orange fan flowers make up for it.',
@@ -246,3 +246,4 @@ export const GreenVelvetSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] 
     </div>
   );
 };
+

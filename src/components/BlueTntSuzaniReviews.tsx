@@ -8,7 +8,7 @@ const reviewsData = [
     initial: 'K',
     name: 'Kelsey T.',
     location: '📍 Los Angeles, CA',
-    date: 'July 2, 2026',
+    date: 'March 9, 2026',
     stars: 5,
     title: '"Bundle discount worked perfectly!"',
     body: 'The light blue fabric with the red and yellow floral embroidery is even more gorgeous in person. I bundled it with a matching tote bag and was thrilled to see the 25% off discount applied automatically at checkout!',
@@ -165,3 +165,4 @@ export const BlueTntSuzaniReviews: React.FC<{ dynamicReviews?: ReviewData[] }> =
     </div>
   );
 };
+
