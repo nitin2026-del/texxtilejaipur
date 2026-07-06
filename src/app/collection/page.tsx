@@ -27,23 +27,44 @@ interface Product {
 type SortOption = 'featured' | 'price-low-high' | 'price-high-low' | 'newest';
 
 export default function CollectionPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<string[]>(['All']);
+  const [products, setProducts] = useState<Product[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('textilejaipur_collection_cache');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {}
+    }
+    return [];
+  });
+  
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('textilejaipur_collection_cache');
+    }
+    return true;
+  });
 
+  const [categories, setCategories] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedCats = localStorage.getItem('textilejaipur_collection_categories');
+        if (cachedCats) return JSON.parse(cachedCats);
+      } catch (e) {}
+    }
+    return ['All'];
+  });
+
+  // Ensure scroll restoration after initial load if hash is present
   useEffect(() => {
-    try {
-      const cached = localStorage.getItem('textilejaipur_collection_cache');
-      if (cached) {
-        setProducts(JSON.parse(cached));
-        setLoading(false);
-      }
-      const cachedCats = localStorage.getItem('textilejaipur_collection_categories');
-      if (cachedCats) {
-        setCategories(JSON.parse(cachedCats));
-      }
-    } catch (e) {}
-  }, []);
+    if (!loading && window.location.hash) {
+      setTimeout(() => {
+        const element = document.querySelector(window.location.hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'auto', block: 'center' });
+        }
+      }, 100);
+    }
+  }, [loading]);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
