@@ -38,21 +38,18 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('textilejaipur_home_cache');
-        if (cached) return JSON.parse(cached);
-      } catch (e) {}
-    }
-    return [];
-  });
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return !localStorage.getItem('textilejaipur_home_cache');
-    }
-    return true;
-  });
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('textilejaipur_home_cache');
+      if (cached) {
+        setProducts(JSON.parse(cached));
+        setLoading(false);
+      }
+    } catch (e) {}
+  }, []);
   const [searchTerm, setSearchTerm] = useState('');
   const [dbCategories, setDbCategories] = useState<{id: string, name: string, parent_id: string | null}[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState('All');

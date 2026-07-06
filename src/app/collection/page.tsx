@@ -27,32 +27,23 @@ interface Product {
 type SortOption = 'featured' | 'price-low-high' | 'price-high-low' | 'newest';
 
 export default function CollectionPage() {
-  const [products, setProducts] = useState<Product[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('textilejaipur_collection_cache');
-        if (cached) return JSON.parse(cached);
-      } catch (e) {}
-    }
-    return [];
-  });
-  
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return !localStorage.getItem('textilejaipur_collection_cache');
-    }
-    return true;
-  });
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<string[]>(['All']);
 
-  const [categories, setCategories] = useState<string[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('textilejaipur_collection_categories');
-        if (cached) return JSON.parse(cached);
-      } catch (e) {}
-    }
-    return ['All'];
-  });
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('textilejaipur_collection_cache');
+      if (cached) {
+        setProducts(JSON.parse(cached));
+        setLoading(false);
+      }
+      const cachedCats = localStorage.getItem('textilejaipur_collection_categories');
+      if (cachedCats) {
+        setCategories(JSON.parse(cachedCats));
+      }
+    } catch (e) {}
+  }, []);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('featured');

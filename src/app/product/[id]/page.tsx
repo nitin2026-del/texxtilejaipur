@@ -74,38 +74,25 @@ export default function ProductPage() {
   const id = params.id as string;
   const { cart, addToCart, formatPrice } = useCart();
   
-  const [product, setProduct] = useState<Product | null>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('textilejaipur_collection_cache');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          const found = parsed.find((p: any) => p.id === id);
-          if (found) {
-            // Need to map structure from collection cache to Product page structure
-            return {
-              ...found,
-              stock_quantity: found.stock || 0
-            };
-          }
-        }
-      } catch (e) {}
-    }
-    return null;
-  });
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('textilejaipur_collection_cache');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed.find((p: any) => p.id === id)) return false;
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('textilejaipur_collection_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        const found = parsed.find((p: any) => p.id === id);
+        if (found) {
+          setProduct({
+            ...found,
+            stock_quantity: found.stock || 0
+          });
+          setLoading(false);
         }
-      } catch (e) {}
-    }
-    return true;
-  });
+      }
+    } catch (e) {}
+  }, [id]);
   
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [quantity, setQuantity] = useState(1);
