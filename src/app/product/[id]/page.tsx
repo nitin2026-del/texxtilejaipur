@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -1255,13 +1255,10 @@ export default function ProductPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
-                      <Image 
+                      <img 
                         src={rp.image || 'https://via.placeholder.com/400x500'} 
                         alt={rp.name}
-                        fill
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        unoptimized={true}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     )}
                   </div>
