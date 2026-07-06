@@ -78,19 +78,11 @@ export const Footer: React.FC = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-brand-700 shrink-0" />
-                <span className="text-sm text-zinc-600 font-medium">priyanshug863[at]gmail.com</span>
+                <span className="text-sm text-zinc-600 font-medium">textileofrajasthan.info[at]gmail.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <AtSign className="h-4 w-4 text-brand-700 shrink-0" />
                 <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-600 font-medium hover:text-brand-800 transition-colors">@textileofjaipur</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Globe className="h-4 w-4 text-brand-700 shrink-0" />
-                <a href="https://youtube.com/@textilejaipur" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-600 font-medium hover:text-brand-800 transition-colors">YouTube</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <Globe className="h-4 w-4 text-brand-700 shrink-0" />
-                <a href="https://linkedin.com/company/textilejaipur" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-600 font-medium hover:text-brand-800 transition-colors">LinkedIn</a>
               </li>
             </ul>
           </div>

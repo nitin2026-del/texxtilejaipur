@@ -552,6 +552,7 @@ export default function ProductPage() {
                     alt="Placeholder"
                     fill
                     className="object-cover"
+                    unoptimized={true}
                   />
                 )}
                 
@@ -712,9 +713,32 @@ export default function ProductPage() {
                       <li>Jacket Length: 29 in (74 cm)</li>
                     </ul>
 
-                    <p className="mt-4 text-xs italic text-zinc-500">
+                    <p className="mt-4 text-xs italic text-zinc-500 mb-6">
                       *Please allow a 1–2 cm variation, as each jacket is handmade.
                     </p>
+                    
+                    <div className="p-4 bg-green-50 border border-green-100 rounded-lg">
+                      <p className="font-bold text-green-900 mb-1">Need help with sizing?</p>
+                      <p className="text-sm text-green-800 mb-4">
+                        Connect with us and we'll give you an answer for the size of your jacket in seconds!
+                      </p>
+                      <div className="flex gap-3">
+                        <a 
+                          href="https://wa.me/918764655537?text=Hi!%20I%20need%20help%20with%20sizing."
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-md font-semibold text-sm hover:bg-green-700 transition-colors"
+                        >
+                          WhatsApp Us
+                        </a>
+                        <a 
+                          href="mailto:textileofrajasthan.info@gmail.com?subject=Sizing%20Inquiry"
+                          className="flex items-center gap-1.5 px-4 py-2 bg-zinc-800 text-white rounded-md font-semibold text-sm hover:bg-black transition-colors"
+                        >
+                          Email Us
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 )}
 

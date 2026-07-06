@@ -734,7 +734,7 @@ export default function Home() {
               { icon: '🤝', title: '30-Day No-Questions Returns', desc: 'Not happy? Return your item within 30 days for a full refund — no questions asked. We want you to love every piece you order.' },
               { icon: '🛃', title: 'We Handle All Customs & Duties', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork and customs declarations. You receive the package — we handle the rest.' },
               { icon: '🧵', title: '100% Genuinely Handcrafted', desc: 'Every product is hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur, Rajasthan. No factory production — ever.' },
-              { icon: '💬', title: 'Real Customer Support', desc: 'Questions before you buy? Email us at priyanshug863[at]gmail.com or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
+              { icon: '💬', title: 'Real Customer Support', desc: 'Questions before you buy? Email us at textileofrajasthan.info[at]gmail.com or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
             ].map((item) => (
               <div key={item.title} className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                 <span className="text-3xl block mb-3">{item.icon}</span>
