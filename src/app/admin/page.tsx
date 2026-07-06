@@ -214,6 +214,14 @@ export default function AdminPortal() {
     if (index !== dragOverItemIndex) {
       setDragOverItemIndex(index);
     }
+
+    const SCROLL_SPEED = 15;
+    const SCROLL_THRESHOLD = 100;
+    if (e.clientY < SCROLL_THRESHOLD) {
+      window.scrollBy(0, -SCROLL_SPEED);
+    } else if (window.innerHeight - e.clientY < SCROLL_THRESHOLD) {
+      window.scrollBy(0, SCROLL_SPEED);
+    }
   };
 
   const handleDrop = async (e: React.DragEvent) => {
