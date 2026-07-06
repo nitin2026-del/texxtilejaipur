@@ -608,7 +608,7 @@ export default function AdminPortal() {
             display_order
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('display_rank', { ascending: true, nullsFirst: false });
       if (prodErr) throw prodErr;
 
       // 1.5 Fetch Categories from DB
