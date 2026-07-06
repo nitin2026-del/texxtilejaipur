@@ -706,7 +706,7 @@ export default function ProductPage() {
                       </p>
                       <div className="flex gap-3">
                         <a 
-                          href="https://wa.me/918764655537?text=Hi!%20I%20need%20help%20with%20sizing."
+                          href="https://wa.me/9461858955?text=Hi!%20I%20need%20help%20with%20sizing."
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-md font-semibold text-sm hover:bg-green-700 transition-colors"
