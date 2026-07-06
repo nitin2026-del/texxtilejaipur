@@ -40,7 +40,7 @@ import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews'
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play } from 'lucide-react';
+import { ShieldCheck, Truck, ShoppingCart, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Flame, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -545,6 +545,26 @@ export default function ProductPage() {
                 <div className="absolute top-4 right-4 z-20 opacity-90 drop-shadow-md pointer-events-none">
                   <img src="/icon.png" alt="Texxtile Jaipur" className="h-10 w-10 rounded-lg object-cover border border-white/30 shadow-lg" />
                 </div>
+                
+                {/* Navigation Arrows */}
+                {mediaItems.length > 1 && (
+                  <>
+                    <button 
+                      onClick={() => setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1)}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/80 hover:bg-white text-zinc-800 shadow-md backdrop-blur-sm transition-all hover:scale-110"
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button 
+                      onClick={() => setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/80 hover:bg-white text-zinc-800 shadow-md backdrop-blur-sm transition-all hover:scale-110"
+                      aria-label="Next image"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </>
+                )}
               </div>
 
               {mediaItems.length > 1 && (
