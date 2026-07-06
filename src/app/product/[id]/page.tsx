@@ -500,7 +500,7 @@ export default function ProductPage() {
                   return (
                     <div 
                       key={idx} 
-                      className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${isActive ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}
+                      className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
                     >
                       {media.type === 'image' ? (
                         <img 
@@ -520,8 +520,12 @@ export default function ProductPage() {
                           ) : (
                             <video 
                               src={media.url} 
+                              autoPlay 
+                              muted 
+                              loop 
+                              playsInline 
+                              controls={isActive}
                               className="w-full h-full object-contain" 
-                              controls 
                               poster={product.images?.[0] || undefined}
                             />
                           )}

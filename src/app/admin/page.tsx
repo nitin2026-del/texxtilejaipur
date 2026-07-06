@@ -215,12 +215,14 @@ export default function AdminPortal() {
       setDragOverItemIndex(index);
     }
 
-    const SCROLL_SPEED = 15;
-    const SCROLL_THRESHOLD = 100;
+    const SCROLL_SPEED = 20;
+    const SCROLL_THRESHOLD = 150;
+    
+    // Check if we need to scroll the window
     if (e.clientY < SCROLL_THRESHOLD) {
-      window.scrollBy(0, -SCROLL_SPEED);
+      window.scrollBy({ top: -SCROLL_SPEED, behavior: 'instant' });
     } else if (window.innerHeight - e.clientY < SCROLL_THRESHOLD) {
-      window.scrollBy(0, SCROLL_SPEED);
+      window.scrollBy({ top: SCROLL_SPEED, behavior: 'instant' });
     }
   };
 
