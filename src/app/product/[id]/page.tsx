@@ -37,6 +37,10 @@ import { EmbroideredVelvetSuzaniReviews } from '@/components/EmbroideredVelvetSu
 import { HandcraftedVelvetCoatReviews } from '@/components/HandcraftedVelvetCoatReviews';
 import { RedCottonSuzaniReviews } from '@/components/RedCottonSuzaniReviews';
 import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews';
+import { NavyFloralVelvetReviews } from '@/components/NavyFloralVelvetReviews';
+import { VelvetSuzaniHT5EB59E11Reviews } from '@/components/VelvetSuzaniHT5EB59E11Reviews';
+import { VelvetSuzaniHT7A15D83BReviews } from '@/components/VelvetSuzaniHT7A15D83BReviews';
+
 import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -1091,6 +1095,18 @@ export default function ProductPage() {
           ) : product.sku === 'HT-52B60A68' ? (
             <div className="mt-20 border-t border-zinc-200">
               <EmeraldBohoVelvetReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-9B8CB946' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <NavyFloralVelvetReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-5EB59E11' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <VelvetSuzaniHT5EB59E11Reviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-7A15D83B' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <VelvetSuzaniHT7A15D83BReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
