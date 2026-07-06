@@ -10,7 +10,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search
 } from 'lucide-react';
 
 interface Product {
@@ -196,6 +196,46 @@ export default function AdminPortal() {
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [bulkPriceInput, setBulkPriceInput] = useState('');
   const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredProducts = products.filter(p => 
+    (p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) || '') ||
+    (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || '')
+  );
+
+  const handleMoveProductRank = async (index: number, direction: 'up' | 'down') => {
+    if (searchQuery.trim() !== '') {
+      showNotification('Clear search query to reorder products.', true);
+      return;
+    }
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === products.length - 1) return;
+
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    const currentProd = products[index];
+    const swapProd = products[swapIndex];
+
+    const currentRank = currentProd.display_rank || 999;
+    const swapRank = swapProd.display_rank || 999;
+
+    const newCurrentRank = swapRank === currentRank ? currentRank + (direction === 'up' ? -1 : 1) : swapRank;
+    const newSwapRank = currentRank === swapRank ? swapRank + (direction === 'up' ? 1 : -1) : currentRank;
+
+    const updatedProducts = [...products];
+    updatedProducts[index] = { ...currentProd, display_rank: newCurrentRank };
+    updatedProducts[swapIndex] = { ...swapProd, display_rank: newSwapRank };
+    
+    updatedProducts.sort((a, b) => (a.display_rank || 999) - (b.display_rank || 999));
+    setProducts(updatedProducts);
+
+    try {
+      await supabase.from('products').update({ display_rank: newCurrentRank }).eq('id', currentProd.id);
+      await supabase.from('products').update({ display_rank: newSwapRank }).eq('id', swapProd.id);
+    } catch(err) {
+      console.error(err);
+      fetchDashboardData();
+    }
+  };
 
   // AI States
   const [isAiGenerating, setIsAiGenerating] = useState(false);
@@ -338,7 +378,7 @@ export default function AdminPortal() {
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedProductIds(products.map(p => p.id));
+      setSelectedProductIds(filteredProducts.map(p => p.id));
     } else {
       setSelectedProductIds([]);
     }
@@ -1283,7 +1323,7 @@ export default function AdminPortal() {
 
   // Calculate quick metrics
   const totalRevenue = orders
-    .filter(o => o.payment_status === 'paid')
+    .filter(o => o.payment_status === 'paid' || o.payment_status === 'completed')
     .reduce((sum, o) => sum + o.total, 0);
 
   const pendingShipmentsCount = orders.filter(o => {
@@ -1538,7 +1578,7 @@ export default function AdminPortal() {
                               <span className="block text-[9px] text-zinc-500 font-mono mt-1 select-all">
                                 {order.tracking_number || 'No tracking ref'}
                               </span>
-                              {order.payment_status !== 'paid' && (
+                              {(order.payment_status !== 'paid' && order.payment_status !== 'completed') && (
                                 <span className="block text-[9px] text-red-400 font-bold mt-1 tracking-widest uppercase">
                                   UNPAID
                                 </span>
@@ -1594,6 +1634,23 @@ export default function AdminPortal() {
               </div>
             </div>
 
+            {/* SEARCH BAR */}
+            <div className="bg-[#FDFBF7] border-b border-zinc-200 p-4 flex items-center gap-3">
+              <Search className="h-4 w-4 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Search by SKU or Name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent border-none text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:ring-0"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="text-zinc-400 hover:text-zinc-600">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
             {/* BULK ACTION TOOLBAR */}
             {selectedProductIds.length > 0 && (
               <div className="bg-brand-50 border-b border-brand-200 p-4 flex items-center justify-between">
@@ -1638,7 +1695,7 @@ export default function AdminPortal() {
                       <th className="p-4 w-12 text-center">
                         <input 
                           type="checkbox" 
-                          checked={products.length > 0 && selectedProductIds.length === products.length}
+                          checked={filteredProducts.length > 0 && selectedProductIds.length === filteredProducts.length}
                           onChange={handleSelectAll}
                           className="rounded border-zinc-300 text-brand-600 focus:ring-brand-500 cursor-pointer w-4 h-4"
                         />
@@ -1653,7 +1710,7 @@ export default function AdminPortal() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-900/60">
-                    {products.map((prod) => (
+                    {filteredProducts.map((prod, index) => (
                       <tr key={prod.id} className="hover:bg-zinc-50 transition-colors">
                         <td className="p-4 text-center">
                           <input 
@@ -1688,15 +1745,35 @@ export default function AdminPortal() {
                           </span>
                         </td>
                         <td className="p-4 text-center">
-                          {prod.display_rank && prod.display_rank < 999 ? (
-                            <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-brand-50 text-brand-700 border border-brand-200 font-bold text-[10px]">
-                              Tier {prod.display_rank}
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-zinc-100 text-zinc-500 font-medium text-[10px]">
-                              Standard
-                            </span>
-                          )}
+                          <div className="flex items-center justify-center gap-2">
+                            {prod.display_rank && prod.display_rank < 999 ? (
+                              <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-brand-50 text-brand-700 border border-brand-200 font-bold text-[10px]">
+                                Tier {prod.display_rank}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center justify-center px-2 py-1 rounded bg-zinc-100 text-zinc-500 font-medium text-[10px]">
+                                Standard
+                              </span>
+                            )}
+                            {!searchQuery && (
+                              <div className="flex flex-col gap-0.5 ml-2">
+                                <button 
+                                  onClick={() => handleMoveProductRank(index, 'up')}
+                                  disabled={index === 0}
+                                  className="text-zinc-400 hover:text-brand-600 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                                >
+                                  <ArrowUp className="h-4 w-4" />
+                                </button>
+                                <button 
+                                  onClick={() => handleMoveProductRank(index, 'down')}
+                                  disabled={index === filteredProducts.length - 1}
+                                  className="text-zinc-400 hover:text-brand-600 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                                >
+                                  <ArrowDown className="h-4 w-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="p-4 text-right">
                           <span className="font-extrabold text-zinc-900">₹{prod.price_inr?.toLocaleString() || '0'}</span>
