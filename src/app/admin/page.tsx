@@ -197,42 +197,61 @@ export default function AdminPortal() {
   const [bulkPriceInput, setBulkPriceInput] = useState('');
   const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null);
 
   const filteredProducts = products.filter(p => 
     (p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) || '') ||
     (p.name?.toLowerCase().includes(searchQuery.toLowerCase()) || '')
   );
 
-  const handleMoveProductRank = async (index: number, direction: 'up' | 'down') => {
-    if (searchQuery.trim() !== '') {
-      showNotification('Clear search query to reorder products.', true);
+  const handleDragStart = (index: number) => {
+    setDraggedItemIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (index !== dragOverItemIndex) {
+      setDragOverItemIndex(index);
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    if (draggedItemIndex === null || dragOverItemIndex === null || draggedItemIndex === dragOverItemIndex) {
+      setDraggedItemIndex(null);
+      setDragOverItemIndex(null);
       return;
     }
-    if (direction === 'up' && index === 0) return;
-    if (direction === 'down' && index === products.length - 1) return;
+    if (searchQuery.trim() !== '') {
+      showNotification('Clear search query to reorder products.', true);
+      setDraggedItemIndex(null);
+      setDragOverItemIndex(null);
+      return;
+    }
 
-    const swapIndex = direction === 'up' ? index - 1 : index + 1;
-    const currentProd = products[index];
-    const swapProd = products[swapIndex];
+    const newOrder = [...products];
+    const draggedItem = newOrder.splice(draggedItemIndex, 1)[0];
+    newOrder.splice(dragOverItemIndex, 0, draggedItem);
 
-    const currentRank = currentProd.display_rank || 999;
-    const swapRank = swapProd.display_rank || 999;
+    const updatedProducts = newOrder.map((prod, index) => ({
+      ...prod,
+      display_rank: index + 1
+    }));
 
-    const newCurrentRank = swapRank === currentRank ? currentRank + (direction === 'up' ? -1 : 1) : swapRank;
-    const newSwapRank = currentRank === swapRank ? swapRank + (direction === 'up' ? 1 : -1) : currentRank;
-
-    const updatedProducts = [...products];
-    updatedProducts[index] = { ...currentProd, display_rank: newCurrentRank };
-    updatedProducts[swapIndex] = { ...swapProd, display_rank: newSwapRank };
-    
-    updatedProducts.sort((a, b) => (a.display_rank || 999) - (b.display_rank || 999));
     setProducts(updatedProducts);
+    setDraggedItemIndex(null);
+    setDragOverItemIndex(null);
 
     try {
-      await supabase.from('products').update({ display_rank: newCurrentRank }).eq('id', currentProd.id);
-      await supabase.from('products').update({ display_rank: newSwapRank }).eq('id', swapProd.id);
+      const promises = updatedProducts.map(u => 
+        supabase.from('products').update({ display_rank: u.display_rank }).eq('id', u.id)
+      );
+      await Promise.all(promises);
+      showNotification('Product order saved successfully!');
     } catch(err) {
       console.error(err);
+      showNotification('Failed to save product order', true);
       fetchDashboardData();
     }
   };
@@ -1711,7 +1730,15 @@ export default function AdminPortal() {
                   </thead>
                   <tbody className="divide-y divide-zinc-900/60">
                     {filteredProducts.map((prod, index) => (
-                      <tr key={prod.id} className="hover:bg-zinc-50 transition-colors">
+                      <tr 
+                        key={prod.id} 
+                        draggable={!searchQuery}
+                        onDragStart={() => handleDragStart(index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDragLeave={() => setDragOverItemIndex(null)}
+                        onDrop={handleDrop}
+                        className={`hover:bg-zinc-50 transition-colors ${draggedItemIndex === index ? 'opacity-40 bg-brand-50' : ''} ${dragOverItemIndex === index && draggedItemIndex !== index ? 'border-t-2 border-brand-600 bg-brand-50/30' : ''}`}
+                      >
                         <td className="p-4 text-center">
                           <input 
                             type="checkbox" 
@@ -1756,21 +1783,8 @@ export default function AdminPortal() {
                               </span>
                             )}
                             {!searchQuery && (
-                              <div className="flex flex-col gap-0.5 ml-2">
-                                <button 
-                                  onClick={() => handleMoveProductRank(index, 'up')}
-                                  disabled={index === 0}
-                                  className="text-zinc-400 hover:text-brand-600 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
-                                >
-                                  <ArrowUp className="h-4 w-4" />
-                                </button>
-                                <button 
-                                  onClick={() => handleMoveProductRank(index, 'down')}
-                                  disabled={index === filteredProducts.length - 1}
-                                  className="text-zinc-400 hover:text-brand-600 disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
-                                >
-                                  <ArrowDown className="h-4 w-4" />
-                                </button>
+                              <div className="ml-2 cursor-grab active:cursor-grabbing text-zinc-300 hover:text-brand-600 transition-colors">
+                                <GripVertical className="h-5 w-5" />
                               </div>
                             )}
                           </div>
