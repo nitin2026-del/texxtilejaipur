@@ -503,14 +503,10 @@ export default function ProductPage() {
                       className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${isActive ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-95 z-0'}`}
                     >
                       {media.type === 'image' ? (
-                        <Image 
-                          src={media.url} 
+                        <img 
+                          src={media.url || 'https://via.placeholder.com/600x800'} 
                           alt={`${product.name} view ${idx + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          className="object-cover"
-                          priority={idx === 0}
-                          unoptimized={true}
+                          className="absolute inset-0 w-full h-full object-cover"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-black">
@@ -534,12 +530,10 @@ export default function ProductPage() {
                     </div>
                   );
                 }) : (
-                  <Image 
+                  <img 
                     src="https://via.placeholder.com/600x800" 
                     alt="Placeholder"
-                    fill
-                    className="object-cover"
-                    unoptimized={true}
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
                 
@@ -562,13 +556,10 @@ export default function ProductPage() {
                       }`}
                     >
                       <div className="absolute inset-0">
-                        <Image 
-                          src={media.type === 'image' ? media.url : (product.images?.[0] || 'https://via.placeholder.com/80')} 
+                        <img 
+                          src={media.type === 'image' ? (media.url || 'https://via.placeholder.com/80') : (product.images?.[0] || 'https://via.placeholder.com/80')} 
                           alt={`Thumbnail ${idx}`} 
-                          fill
-                          sizes="80px"
-                          className="object-cover" 
-                          unoptimized={true}
+                          className="absolute inset-0 w-full h-full object-cover" 
                         />
                       </div>
                       {media.type === 'video' && (
