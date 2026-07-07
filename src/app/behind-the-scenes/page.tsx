@@ -72,7 +72,8 @@ export default function BehindTheScenes() {
         ) : (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
             {items.map((item, index) => {
-              const isVideo = item.media_url.includes('.mp4') || item.media_url.includes('.mov');
+              const mediaUrl = item.media_url?.toLowerCase() || '';
+              const isVideo = mediaUrl.includes('.mp4') || mediaUrl.includes('.mov') || mediaUrl.includes('.webm');
               return (
                 <div 
                   key={item.id} 

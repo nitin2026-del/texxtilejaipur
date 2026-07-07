@@ -3020,7 +3020,7 @@ export default function AdminPortal() {
                   {behindTheScenesItems.map((item) => (
                     <div key={item.id} className="relative group rounded-xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
                       <div className="aspect-[4/5] bg-zinc-100 relative">
-                        {item.media_url?.includes('.mp4') || item.media_url?.includes('.mov') ? (
+                        {item.media_url?.toLowerCase().includes('.mp4') || item.media_url?.toLowerCase().includes('.mov') ? (
                           <video src={item.media_url} className="w-full h-full object-cover" muted loop autoPlay playsInline controls />
                         ) : (
                           <img src={item.media_url} alt={item.title} className="w-full h-full object-cover" />
