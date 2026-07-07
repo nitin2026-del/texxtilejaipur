@@ -609,20 +609,39 @@ export default function ProductPage() {
                   <h1 className="text-3xl md:text-[34px] font-serif font-medium text-[#111] leading-tight">
                     {product.name}
                   </h1>
-                  <div className="flex flex-wrap items-center gap-4 pt-1">
-                    <div className="text-xl font-bold text-[#111]">
-                      {formatPrice(product.price_inr)}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#1a1464] uppercase tracking-wider">
-                      <div className="flex">
-                        {'★'.repeat(5)}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
+                    <div className="flex items-center gap-4">
+                      <div className="text-xl font-bold text-[#111]">
+                        {formatPrice(product.price_inr)}
                       </div>
-                      <span>2950 REVIEWS</span>
+                      {dynamicReviews.length > 0 && (
+                        <div 
+                          className="flex items-center gap-1.5 text-[11px] font-bold text-[#1a1464] uppercase tracking-wider cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+                        >
+                          <div className="flex text-[14px] tracking-widest text-[#1a1464]">
+                            {'★'.repeat(Math.round(dynamicReviews.reduce((sum, rev) => sum + rev.rating, 0) / dynamicReviews.length))}
+                            {'☆'.repeat(5 - Math.round(dynamicReviews.reduce((sum, rev) => sum + rev.rating, 0) / dynamicReviews.length))}
+                          </div>
+                          <span className="underline underline-offset-2">{dynamicReviews.length} REVIEW{dynamicReviews.length !== 1 ? 'S' : ''}</span>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Language Selector */}
+                    {product.details?.translations && Object.keys(product.details.translations).length > 0 && (
+                      <div className="flex gap-1.5">
+                        <button onClick={() => setLanguage('en')} className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${language === 'en' ? 'bg-[#1a1464] text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>EN</button>
+                        {product.details.translations.fr && <button onClick={() => setLanguage('fr')} className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${language === 'fr' ? 'bg-[#1a1464] text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>FR</button>}
+                        {product.details.translations.es && <button onClick={() => setLanguage('es')} className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${language === 'es' ? 'bg-[#1a1464] text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>ES</button>}
+                        {product.details.translations.de && <button onClick={() => setLanguage('de')} className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${language === 'de' ? 'bg-[#1a1464] text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>DE</button>}
+                        {product.details.translations.ar && <button onClick={() => setLanguage('ar')} className={`px-2 py-1 text-[10px] font-bold rounded transition-colors ${language === 'ar' ? 'bg-[#1a1464] text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>AR</button>}
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <p className="text-[#555] text-[13px] leading-relaxed pr-4">
+                <p className="text-[#555] text-[13px] leading-relaxed pr-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                   {language === 'en' ? product.description : (product.details?.translations?.[language as keyof typeof product.details.translations] || product.description)}
                 </p>
 
@@ -657,9 +676,33 @@ export default function ProductPage() {
                     <div className="text-[11px] uppercase font-bold text-[#111] tracking-widest">
                       SIZE: XL
                     </div>
-                    <p className="text-[12px] text-[#555] bg-[#f5f5f7] p-3 rounded border border-zinc-200">
+                    
+                    <div className="text-[12px] text-[#444] bg-[#fdfbf7] p-4 rounded border border-brand-200 space-y-3 shadow-sm">
+                      <div>
+                        <strong className="text-[#1a1464]">Best Fit For:</strong>
+                        <ul className="list-disc pl-5 mt-1 space-y-0.5 text-zinc-600">
+                          <li>Recommended for women who usually wear <strong>US XL (16–18)</strong> or <strong>UK XL (18–20)</strong>.</li>
+                          <li>Suitable for a <strong>bust measurement of 44–46 inches (112–117 cm)</strong>.</li>
+                          <li>Ideal for those who prefer a comfortable, relaxed fit.</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <strong className="text-[#1a1464]">Garment Measurements:</strong>
+                        <ul className="list-disc pl-5 mt-1 space-y-0.5 text-zinc-600">
+                          <li>Chest: 46 in (117 cm)</li>
+                          <li>Shoulder: 19 in (48 cm)</li>
+                          <li>Sleeve Length: 24.5 in (62 cm)</li>
+                          <li>Jacket Length: 29 in (74 cm)</li>
+                        </ul>
+                      </div>
+                      <p className="text-xs italic text-zinc-500">
+                        Please allow a 1–2 cm variation, as each jacket is handmade.
+                      </p>
+                    </div>
+
+                    <p className="text-[12px] text-[#555] bg-[#f5f5f7] p-3 rounded border border-zinc-200 mt-2">
                       <strong>Custom Size / Need Help?</strong><br/>
-                      <a href="#" onClick={handleWhatsAppShare} className="text-[#1a1464] font-medium underline">Contact us on WhatsApp</a> for helping in the size and the length.
+                      <a href="https://wa.me/919461858955?text=Need%20help%20with%20sizing%20and%20length" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold underline underline-offset-2">Contact us on WhatsApp (+91 9461858955)</a> for helping in the size and the length.
                     </p>
                   </div>
                 </div>
