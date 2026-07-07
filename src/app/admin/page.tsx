@@ -1557,6 +1557,7 @@ export default function AdminPortal() {
                       <tr className="bg-[#FDFBF7]/50 border-b border-zinc-200 text-zinc-600 font-medium">
                         <th className="p-4">Order ID & Date</th>
                         <th className="p-4">Customer Details</th>
+                        <th className="p-4">Items</th>
                         <th className="p-4">Destination</th>
                         <th className="p-4">Amount</th>
                         <th className="p-4">UPS Status</th>
@@ -1582,6 +1583,18 @@ export default function AdminPortal() {
                               <span className="block font-bold text-zinc-700">
                                 {order.shipping_addresses?.full_name || `${order.profiles?.first_name || ''} ${order.profiles?.last_name || ''}`.trim() || 'Guest User'}
                               </span>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex flex-col gap-1 max-w-[200px]">
+                                {order.order_items?.map((item) => (
+                                  <div key={item.id} className="text-[10px] text-zinc-700 leading-tight">
+                                    • {item.products?.name || 'Handloom Garment'} <strong className="font-mono text-zinc-500 text-[9px]">(x{item.quantity})</strong>
+                                  </div>
+                                ))}
+                                {(!order.order_items || order.order_items.length === 0) && (
+                                  <span className="text-[10px] text-zinc-400 italic">No items found</span>
+                                )}
+                              </div>
                             </td>
                             <td className="p-4">
                               <span className="block font-medium text-zinc-700">
@@ -2783,11 +2796,14 @@ export default function AdminPortal() {
                 <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Garment Line Items</label>
                 <div className="space-y-2 max-h-32 overflow-y-auto bg-white/10 border border-zinc-200 p-2.5 rounded-xl">
                   {selectedOrder.order_items?.map((item) => (
-                    <div key={item.id} className="flex justify-between text-xs py-1 border-b border-zinc-200 last:border-b-0">
-                      <span className="text-zinc-600 truncate max-w-[200px]">
-                        {item.products?.name || 'Handloom Garment'} <strong className="text-zinc-600 font-normal">x{item.quantity}</strong>
-                      </span>
-                      <span className="text-zinc-500 font-mono">{item.products?.sku || 'N/A'}</span>
+                    <div key={item.id} className="flex flex-col gap-1 text-xs py-1.5 border-b border-zinc-200 last:border-b-0">
+                      <div className="flex justify-between w-full">
+                        <span className="text-zinc-800 font-semibold truncate max-w-[250px]">
+                          {item.products?.name || 'Handloom Garment'} 
+                        </span>
+                        <span className="text-zinc-600 font-bold ml-2">x{item.quantity}</span>
+                      </div>
+                      <span className="text-[9px] text-zinc-400 font-mono tracking-widest break-all">ID: {item.product_id}</span>
                     </div>
                   ))}
                 </div>
