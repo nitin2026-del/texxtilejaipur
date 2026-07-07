@@ -10,7 +10,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video
 } from 'lucide-react';
 
 interface Product {
@@ -105,7 +105,28 @@ interface Inquiry {
   created_at: string;
   products?: { name: string, sku: string };
 }
+interface Coupon {
+  id: string;
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number;
+  min_order_value?: number;
+  max_uses?: number;
+  uses: number;
+  is_active: boolean;
+  expires_at?: string;
+  created_at: string;
+}
 
+interface BehindTheScenesItem {
+  id: string;
+  title: string;
+  description?: string;
+  media_url?: string;
+  status: 'published' | 'draft';
+  display_order: number;
+  created_at: string;
+}
 
 export default function AdminPortal() {
   const { user, profile, loading: authLoading, signOut } = useAuth();
@@ -117,7 +138,7 @@ export default function AdminPortal() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes'>('overview');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
@@ -139,6 +160,10 @@ export default function AdminPortal() {
   // Database states
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [behindTheScenesItems, setBehindTheScenesItems] = useState<BehindTheScenesItem[]>([]);
+  const [btsUploadLoading, setBtsUploadLoading] = useState(false);
+  const [btsTitle, setBtsTitle] = useState('');
+  const [btsDescription, setBtsDescription] = useState('');
   const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null, display_order?: number}[]>([]);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -735,6 +760,16 @@ export default function AdminPortal() {
         setInquiries(inquiryData as Inquiry[]);
       }
 
+      // 6. Fetch Behind The Scenes Items
+      const { data: btsData, error: btsErr } = await supabase
+        .from('behind_the_scenes')
+        .select('*')
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false });
+      if (!btsErr && btsData) {
+        setBehindTheScenesItems(btsData);
+      }
+
     } catch (err) {
       console.error('Error fetching admin details:', err);
       showNotification('Error loading dashboard data.', true);
@@ -843,6 +878,72 @@ export default function AdminPortal() {
     }
   };
 
+  const handleBtsUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setBtsUploadLoading(true);
+    
+    try {
+      const file = e.target.files[0];
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error('File is too large. Please upload a file smaller than 50MB.');
+      }
+      if (!btsTitle.trim()) {
+        throw new Error('Please enter a title before uploading media.');
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      
+      const { error } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, file, { contentType: file.type });
+        
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+        
+      // Save to database
+      const { error: dbErr } = await supabase
+        .from('behind_the_scenes')
+        .insert({
+          title: btsTitle,
+          description: btsDescription,
+          media_url: publicUrl,
+          status: 'published',
+          display_order: behindTheScenesItems.length
+        });
+        
+      if (dbErr) throw dbErr;
+
+      showNotification('Behind the scenes item added successfully!');
+      setBtsTitle('');
+      setBtsDescription('');
+      fetchDashboardData();
+    } catch (err: any) {
+      console.error('BTS Upload Error:', err);
+      showNotification(err.message || 'Error uploading BTS item', true);
+    } finally {
+      setBtsUploadLoading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleBtsDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this Behind The Scenes item?')) return;
+    setActionLoading(true);
+    try {
+      const { error } = await supabase.from('behind_the_scenes').delete().eq('id', id);
+      if (error) throw error;
+      showNotification('Item deleted successfully.');
+      fetchDashboardData();
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to delete item', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setActionLoading(true);
@@ -1467,6 +1568,16 @@ export default function AdminPortal() {
               }`}
             >
               <MessageCircleQuestion className="h-3.5 w-3.5" /> Inquiries
+            </button>
+            <button
+              onClick={() => setActiveTab('behind_the_scenes')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'behind_the_scenes'
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Video className="h-3.5 w-3.5" /> Behind The Scenes
             </button>
           </div>
         </div>
@@ -2738,6 +2849,107 @@ export default function AdminPortal() {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+      </div>
+
+        {/* TAB 8: BEHIND THE SCENES */}
+        {activeTab === 'behind_the_scenes' && (
+          <div className="space-y-6">
+            <div className="glass-card p-6 rounded-3xl border border-zinc-200">
+              <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-zinc-900">
+                <UploadCloud className="h-4 w-4 text-emerald-600" /> Add New Moment
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Title</label>
+                  <input
+                    type="text"
+                    value={btsTitle}
+                    onChange={(e) => setBtsTitle(e.target.value)}
+                    placeholder="e.g. Block Printing in Jaipur"
+                    className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Description (Optional)</label>
+                  <input
+                    type="text"
+                    value={btsDescription}
+                    onChange={(e) => setBtsDescription(e.target.value)}
+                    placeholder="Brief details about this moment..."
+                    className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Upload Photo or Video (Max 50MB)</label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={handleBtsUpload}
+                    disabled={btsUploadLoading || actionLoading}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  />
+                  <div className={`w-full border-2 border-dashed border-emerald-200 bg-emerald-50/50 rounded-2xl p-6 text-center transition-colors ${btsUploadLoading ? 'opacity-50' : 'hover:bg-emerald-50'}`}>
+                    {btsUploadLoading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 className="h-6 w-6 text-emerald-600 animate-spin" />
+                        <span className="text-xs font-bold text-emerald-700">Uploading...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <UploadCloud className="h-6 w-6 text-emerald-600" />
+                        <span className="text-xs font-bold text-emerald-700">Click or drag file here</span>
+                        <span className="text-[10px] text-zinc-500">Supports JPG, PNG, WEBP, MP4, MOV</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass-card p-6 rounded-3xl border border-zinc-200">
+              <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-zinc-900">
+                <Video className="h-4 w-4 text-emerald-600" /> Published Moments
+              </h3>
+              {behindTheScenesItems.length === 0 ? (
+                <div className="text-center py-12 border border-zinc-200 border-dashed rounded-2xl bg-white/50">
+                  <Video className="h-8 w-8 mx-auto text-zinc-300 mb-2" />
+                  <p className="text-sm font-semibold text-zinc-600">No moments uploaded yet</p>
+                  <p className="text-xs text-zinc-500">Upload your first photo or video above.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {behindTheScenesItems.map((item) => (
+                    <div key={item.id} className="relative group rounded-xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
+                      <div className="aspect-[4/5] bg-zinc-100 relative">
+                        {item.media_url?.includes('.mp4') || item.media_url?.includes('.mov') ? (
+                          <video src={item.media_url} className="w-full h-full object-cover" muted loop autoPlay playsInline />
+                        ) : (
+                          <img src={item.media_url} alt={item.title} className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => handleBtsDelete(item.id)}
+                            disabled={actionLoading}
+                            className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                          <div className="absolute bottom-0 left-0 right-0 p-3">
+                            <p className="text-xs font-bold text-white truncate">{item.title}</p>
+                            {item.description && <p className="text-[10px] text-white/80 line-clamp-2 mt-0.5">{item.description}</p>}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
