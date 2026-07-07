@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import imageCompression from 'browser-image-compression';
 import { v4 as uuidv4 } from 'uuid';
+import { compressVideo } from '@/utils/videoCompression';
 import { 
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
@@ -854,12 +855,20 @@ export default function AdminPortal() {
         throw new Error('Video is too large. Please upload a file smaller than 50MB.');
       }
 
-      const fileExt = file.name.split('.').pop();
+      let fileToUpload = file;
+      if (file.type.startsWith('video/')) {
+        showNotification('Compressing video... This may take a minute.');
+        fileToUpload = await compressVideo(file, (progress) => {
+          console.log(`Video compression progress: ${Math.round(progress * 100)}%`);
+        });
+      }
+
+      const fileExt = fileToUpload.name.split('.').pop();
       const fileName = `${uuidv4()}.${fileExt}`;
       
       const { error } = await supabase.storage
         .from('product-images')
-        .upload(fileName, file, { contentType: file.type });
+        .upload(fileName, fileToUpload, { contentType: fileToUpload.type });
         
       if (error) throw error;
 
@@ -891,12 +900,20 @@ export default function AdminPortal() {
         throw new Error('Please enter a title before uploading media.');
       }
 
-      const fileExt = file.name.split('.').pop();
+      let fileToUpload = file;
+      if (file.type.startsWith('video/')) {
+        showNotification('Compressing video... This may take a minute.');
+        fileToUpload = await compressVideo(file, (progress) => {
+          console.log(`Video compression progress: ${Math.round(progress * 100)}%`);
+        });
+      }
+
+      const fileExt = fileToUpload.name.split('.').pop();
       const fileName = `${uuidv4()}.${fileExt}`;
       
       const { error } = await supabase.storage
         .from('product-images')
-        .upload(fileName, file, { contentType: file.type });
+        .upload(fileName, fileToUpload, { contentType: fileToUpload.type });
         
       if (error) throw error;
 

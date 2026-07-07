@@ -41,7 +41,7 @@ export default function BehindTheScenes() {
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] flex flex-col selection:bg-brand-200">
-      <Navbar />
+      <Navbar onCartOpen={() => {}} />
       
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden px-6">
