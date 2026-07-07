@@ -2853,8 +2853,6 @@ export default function AdminPortal() {
           </div>
         )}
 
-      </div>
-
         {/* TAB 8: BEHIND THE SCENES */}
         {activeTab === 'behind_the_scenes' && (
           <div className="space-y-6">
@@ -2955,7 +2953,6 @@ export default function AdminPortal() {
         )}
 
       </div>
-
       {/* TRACKING AND SHIPMENT EDIT MODAL */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs">
