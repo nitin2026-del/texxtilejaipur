@@ -76,8 +76,8 @@ interface Product {
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
-  const { cart, addToCart, formatPrice } = useCart();
+  const { id } = params;
+  const { cart, addToCart, formatPrice, updateQuantity } = useCart();
   
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -222,6 +222,8 @@ export default function ProductPage() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   const isInCart = product ? cart.some((item) => item.id === product.id) : false;
+  const cartItem = product ? cart.find((item) => item.id === product.id) : undefined;
+  const displayQuantity = cartItem ? cartItem.quantity : quantity;
 
   useEffect(() => {
     try {
@@ -702,7 +704,7 @@ export default function ProductPage() {
 
                     <p className="text-[12px] text-[#555] bg-[#f5f5f7] p-3 rounded border border-zinc-200 mt-2">
                       <strong>Custom Size / Need Help?</strong><br/>
-                      <a href="https://wa.me/919461858955?text=Need%20help%20with%20sizing%20and%20length" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold underline underline-offset-2">Contact us on WhatsApp (+91 9461858955)</a> for helping in the size and the length.
+                      <a href="https://api.whatsapp.com/send?phone=919461858955&text=Need%20help%20with%20sizing%20and%20length" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold underline underline-offset-2">Contact us on WhatsApp (+91 9461858955)</a> for helping in the size and the length.
                     </p>
                   </div>
                 </div>
@@ -730,14 +732,26 @@ export default function ProductPage() {
                     
                     <div className="flex items-center justify-between px-4 border-2 border-l-0 border-[#1a1464] bg-white text-[#1a1464] w-28 shrink-0">
                       <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        onClick={() => {
+                          if (cartItem && product) {
+                            updateQuantity(product.id, cartItem.quantity - 1);
+                          } else {
+                            setQuantity(Math.max(1, quantity - 1));
+                          }
+                        }}
                         className="text-[#1a1464] hover:opacity-70 transition-opacity p-2 -ml-2"
                       >
                         <Minus className="h-4 w-4" />
                       </button>
-                      <span className="font-bold text-[15px]">{quantity}</span>
+                      <span className="font-bold text-[15px]">{displayQuantity}</span>
                       <button
-                        onClick={() => setQuantity(Math.min(product.stock_quantity, quantity + 1))}
+                        onClick={() => {
+                          if (cartItem && product) {
+                            updateQuantity(product.id, cartItem.quantity + 1);
+                          } else {
+                            setQuantity(Math.min(product.stock_quantity, quantity + 1));
+                          }
+                        }}
                         className="text-[#1a1464] hover:opacity-70 transition-opacity p-2 -mr-2"
                       >
                         <Plus className="h-4 w-4" />
@@ -745,12 +759,19 @@ export default function ProductPage() {
                     </div>
                   </div>
                   
+                  {/* Payment Badges under Add to Cart */}
+                  <div className="mt-3 flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-zinc-200 shadow-sm max-w-max">
+                    <svg viewBox="0 0 256 83" className="h-3.5 object-contain" width="35" height="11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M111.4 81.36L129.28 0h30.06L140.48 81.36h-29.08zM242.06 8.35c-5.74-2.23-14.73-4.58-26.31-4.58-29.35 0-50.04 15.65-50.21 38.08-.18 16.59 14.88 25.86 26.23 31.42 11.69 5.75 15.63 9.4 15.6 14.51-.04 7.84-9.39 11.45-18.06 11.45-12.38 0-18.91-1.9-28.98-6.38l-4.08-1.91-4.22 26.23c6.88 3.19 19.67 5.96 32.96 6.11 31.06 0 51.48-15.35 51.71-39.11.21-13.4-8.08-23.75-25.26-31.95-10.45-5.32-15.02-8.83-15-13.79.03-4.69 5.34-9.59 17.06-9.59 9.8 0 16.73 2.12 21.95 4.54l2.67 1.25 4.24-26.26zM203.49 81.36h28.16L213.1 0h-23.94c-6.86 0-12.72 4.02-15.53 10.33l-34.99 71.03h29.68l5.92-16.48h36.31l3.43 16.48zm-19.98-38.38l12.44-34.33h.36l6.81 34.33h-19.61zM73.54 0L53.79 55.43 51.05 41.5C46.85 24.36 31.4 10.3 12.02 5.06l16.14 76.3h29.83l45.47-81.36H73.54z" fill="#1434CB"/><path d="M31.11 0C21.71 0 5.43 .72 .03 5.06c24.58 6.03 41.69 20.35 48.74 37.69l-7.39-36.9C39.77 2.37 36.39 0 31.11 0z" fill="#F2A900"/></svg>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 object-contain" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" className="h-4 object-contain rounded-sm" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
+                  </div>
                 </div>
 
                 {/* Info Banners */}
                 <div className="flex flex-col gap-2 max-w-md pt-3">
                   <div className="bg-[#f5f5f7] rounded p-3.5 text-center text-[12px] font-medium text-[#444]">
-                    Free shipping over $120 & free returns. <a href="#" className="text-[#1a1464] font-bold underline underline-offset-2">Details here</a> with 25% off on shop above $120
+                    Free global shipping & free returns. <a href="#" className="text-[#1a1464] font-bold underline underline-offset-2">Details here</a> with 25% off on shop above $120
                   </div>
                 </div>
 
@@ -812,17 +833,11 @@ export default function ProductPage() {
                 </div>
               </div>
 
-                {/* Payment & Social */}
-                <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-zinc-50 border border-zinc-100 rounded-xl">
-                  <div className="flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-zinc-200 shadow-sm">
-                    <svg viewBox="0 0 256 83" className="h-3.5 object-contain" width="35" height="11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M111.4 81.36L129.28 0h30.06L140.48 81.36h-29.08zM242.06 8.35c-5.74-2.23-14.73-4.58-26.31-4.58-29.35 0-50.04 15.65-50.21 38.08-.18 16.59 14.88 25.86 26.23 31.42 11.69 5.75 15.63 9.4 15.6 14.51-.04 7.84-9.39 11.45-18.06 11.45-12.38 0-18.91-1.9-28.98-6.38l-4.08-1.91-4.22 26.23c6.88 3.19 19.67 5.96 32.96 6.11 31.06 0 51.48-15.35 51.71-39.11.21-13.4-8.08-23.75-25.26-31.95-10.45-5.32-15.02-8.83-15-13.79.03-4.69 5.34-9.59 17.06-9.59 9.8 0 16.73 2.12 21.95 4.54l2.67 1.25 4.24-26.26zM203.49 81.36h28.16L213.1 0h-23.94c-6.86 0-12.72 4.02-15.53 10.33l-34.99 71.03h29.68l5.92-16.48h36.31l3.43 16.48zm-19.98-38.38l12.44-34.33h.36l6.81 34.33h-19.61zM73.54 0L53.79 55.43 51.05 41.5C46.85 24.36 31.4 10.3 12.02 5.06l16.14 76.3h29.83l45.47-81.36H73.54z" fill="#1434CB"/><path d="M31.11 0C21.71 0 5.43 .72 .03 5.06c24.58 6.03 41.69 20.35 48.74 37.69l-7.39-36.9C39.77 2.37 36.39 0 31.11 0z" fill="#F2A900"/></svg>
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 object-contain" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" className="h-4 object-contain rounded-sm" />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
-                  </div>
-                  <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white rounded-lg hover:shadow-md transition-all">
+                {/* Social */}
+                <div className="mt-4 flex flex-col sm:flex-row items-center justify-start gap-4 max-w-md">
+                  <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full gap-2 px-4 py-3 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white rounded-lg hover:shadow-md transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                    <span className="text-xs font-bold tracking-wide">@textileofjaipur</span>
+                    <span className="text-[13px] font-bold tracking-wide">Follow @textileofjaipur</span>
                   </a>
                 </div>
 
