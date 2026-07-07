@@ -5,16 +5,26 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { BottomNav } from '@/components/BottomNav';
 import { CartSidebar } from '@/components/CartSidebar';
+import { CheckoutModal } from '@/components/CheckoutModal';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 export default function RefundPolicyPage() {
   const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] text-zinc-900 pb-24">
       <Navbar onCartOpen={() => setCartOpen(true)} />
-      <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} onCheckout={() => {}} />
+      <CartSidebar 
+        isOpen={cartOpen} 
+        onClose={() => setCartOpen(false)} 
+        onCheckout={() => { setCartOpen(false); setCheckoutOpen(true); }} 
+      />
+      <CheckoutModal 
+        isOpen={checkoutOpen} 
+        onClose={() => setCheckoutOpen(false)} 
+      />
       <BottomNav onCartOpen={() => setCartOpen(true)} />
 
       <div className="pt-32 px-6 max-w-3xl mx-auto">

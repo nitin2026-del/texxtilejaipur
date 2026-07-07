@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 import { CartSidebar } from '@/components/CartSidebar';
+import { CheckoutModal } from '@/components/CheckoutModal';
 import { Filter, ChevronDown, Loader2, Star, ShieldCheck, Truck, Undo2, Sparkles, Flame, ArrowLeft, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
@@ -27,6 +28,7 @@ interface Product {
 type SortOption = 'featured' | 'price-low-high' | 'price-high-low' | 'newest';
 
 export default function CollectionPage() {
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -188,7 +190,15 @@ export default function CollectionPage() {
   return (
     <main className="min-h-screen bg-[#FDFBF7] selection:bg-brand-200 selection:text-brand-900">
       <Navbar onCartOpen={() => setCartOpen(true)} />
-      <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} onCheckout={() => {}} />
+      <CartSidebar 
+        isOpen={cartOpen} 
+        onClose={() => setCartOpen(false)} 
+        onCheckout={() => { setCartOpen(false); setCheckoutOpen(true); }} 
+      />
+      <CheckoutModal 
+        isOpen={checkoutOpen} 
+        onClose={() => setCheckoutOpen(false)} 
+      />
 
       <div className="pt-4 md:pt-6 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
 
