@@ -3025,8 +3025,8 @@ export default function AdminPortal() {
                         ) : (
                           <img src={item.media_url} alt={item.title} className="w-full h-full object-cover" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="absolute top-2 right-2 flex gap-2">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          <div className="absolute top-2 right-2 flex gap-2 pointer-events-auto">
                             <button
                               onClick={() => handleBtsEditClick(item)}
                               disabled={actionLoading}
