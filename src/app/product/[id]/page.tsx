@@ -647,42 +647,20 @@ export default function ProductPage() {
                       <Globe className="h-6 w-6 relative z-10" strokeWidth={1.5} />
                       <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#93c5fd] rounded-full -z-0"></div>
                     </div>
-                    <span className="text-[11px] text-[#444] font-medium text-center leading-tight">Global Shipping</span>
+                    <span className="text-[11px] text-[#444] font-medium text-center leading-tight">Free Global Shipping</span>
                   </div>
                 </div>
 
                 {/* Size Selector */}
                 <div className="space-y-3 pt-4">
-                  <div className="text-[11px] uppercase font-bold text-[#111] tracking-widest">
-                    SIZE: XL
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {['M', 'L', 'XL', 'Custom'].map((sz) => (
-                      <button
-                        key={sz}
-                        className={`px-5 py-2.5 border text-[13px] font-medium transition-all ${
-                          sz === 'XL' 
-                            ? 'border-[#1a1464] text-[#1a1464] bg-white ring-[0.5px] ring-[#1a1464]' 
-                            : 'border-[#e0e0e0] text-[#666] bg-white hover:border-[#1a1464] hover:text-[#1a1464]'
-                        }`}
-                      >
-                        {sz}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Purchase Type Selector */}
-                <div className="flex flex-col pt-4">
-                  <div className="border-[1.5px] border-[#1a1464] p-4 flex items-center gap-4 bg-white cursor-pointer group">
-                    <div className="w-5 h-5 flex items-center justify-center">
-                      <Check className="h-5 w-5 text-[#1a1464] stroke-[3]" />
+                  <div className="flex flex-col gap-2">
+                    <div className="text-[11px] uppercase font-bold text-[#111] tracking-widest">
+                      SIZE: XL
                     </div>
-                    <span className="font-bold text-[14px] text-[#111]">One Time Purchase</span>
-                  </div>
-                  <div className="border border-[#e0e0e0] border-t-0 p-4 flex items-center gap-4 bg-[#fcfcfc] opacity-70 cursor-pointer hover:bg-white hover:opacity-100 transition-all">
-                    <div className="w-5 h-5 border-[1.5px] border-[#ccc] bg-white"></div>
-                    <span className="font-medium text-[13px] text-[#666]">Subscribe...and shipping's on us!</span>
+                    <p className="text-[12px] text-[#555] bg-[#f5f5f7] p-3 rounded border border-zinc-200">
+                      <strong>Custom Size / Need Help?</strong><br/>
+                      <a href="#" onClick={handleWhatsAppShare} className="text-[#1a1464] font-medium underline">Contact us on WhatsApp</a> for helping in the size and the length.
+                    </p>
                   </div>
                 </div>
 
@@ -724,20 +702,12 @@ export default function ProductPage() {
                     </div>
                   </div>
                   
-                  <p className="text-[11px] font-medium text-[#666] mt-3 flex items-center gap-1">
-                    or 4 interest-free payments of {formatPrice(product.price_inr / 4)} with 
-                    <strong className="text-black font-bold">afterpay</strong> 
-                    <Info className="h-3 w-3 text-zinc-400" />
-                  </p>
                 </div>
 
                 {/* Info Banners */}
-                <div className="flex flex-col gap-2 max-w-md">
+                <div className="flex flex-col gap-2 max-w-md pt-3">
                   <div className="bg-[#f5f5f7] rounded p-3.5 text-center text-[12px] font-medium text-[#444]">
-                    Free shipping over $120 & free returns. <a href="#" className="text-[#1a1464] font-bold underline underline-offset-2">Details here</a>
-                  </div>
-                  <div className="bg-[#f5f5f7] rounded p-3.5 text-center text-[12px] font-medium text-[#444] flex items-center justify-center gap-1.5">
-                    Carbon Neutral option with <strong>EcoCart</strong> <Info className="h-3.5 w-3.5 text-zinc-400" />
+                    Free shipping over $120 & free returns. <a href="#" className="text-[#1a1464] font-bold underline underline-offset-2">Details here</a> with 25% off on shop above $120
                   </div>
                 </div>
 
