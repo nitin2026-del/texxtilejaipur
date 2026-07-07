@@ -74,7 +74,7 @@ interface Order {
   };
   created_at: string;
   profiles?: { first_name?: string; last_name?: string; phone?: string; };
-  shipping_addresses?: { full_name?: string; city?: string; country?: string; };
+  shipping_addresses?: { full_name?: string; address_line1?: string; address_line2?: string; city?: string; state?: string; postal_code?: string; country?: string; phone?: string; };
   order_items?: OrderItem[];
   payments?: {
     id: string;
@@ -2759,11 +2759,18 @@ export default function AdminPortal() {
                   <span className="text-zinc-500">Invoice Target:</span>
                   <span className="text-zinc-900 font-bold">{selectedOrder.shipping_addresses?.full_name || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Destination:</span>
-                  <span className="text-zinc-700 font-semibold text-right max-w-[200px] truncate">
-                    {selectedOrder.shipping_addresses?.city || 'N/A'}, {selectedOrder.shipping_addresses?.country || 'N/A'}
-                  </span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-zinc-500">Destination Address:</span>
+                  <div className="text-zinc-700 font-semibold bg-white p-2 rounded border border-zinc-200">
+                    <p>{selectedOrder.shipping_addresses?.full_name}</p>
+                    {selectedOrder.shipping_addresses?.address_line1 && <p>{selectedOrder.shipping_addresses.address_line1}</p>}
+                    {selectedOrder.shipping_addresses?.address_line2 && <p>{selectedOrder.shipping_addresses.address_line2}</p>}
+                    <p>
+                      {selectedOrder.shipping_addresses?.city}{selectedOrder.shipping_addresses?.state ? `, ${selectedOrder.shipping_addresses.state}` : ''} {selectedOrder.shipping_addresses?.postal_code}
+                    </p>
+                    <p>{selectedOrder.shipping_addresses?.country}</p>
+                    {selectedOrder.shipping_addresses?.phone && <p className="mt-1">Phone: {selectedOrder.shipping_addresses.phone}</p>}
+                  </div>
                 </div>
                 <div className="flex justify-between font-mono">
                   <span className="text-zinc-500">Tracking Reference:</span>
