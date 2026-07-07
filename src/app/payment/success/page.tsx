@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
 
 // This page handles the PayPal return for BOTH guest and logged-in users.
 // PayPal redirects to: /payment/success?token=PAYPAL_ORDER_ID&PayerID=xxx&order_id=xxx
 function PaymentCaptureHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { clearCart } = useCart();
   // Guard against double-capture (React StrictMode double-invoke / back-button re-visit)
   const hasCaptured = useRef(false);
 
@@ -55,6 +57,9 @@ function PaymentCaptureHandler() {
         localStorage.removeItem('pending_usd_amount');
 
         if (data.success) {
+          // Clear cart on success
+          clearCart();
+          
           // Fire Facebook Pixel Purchase Event
           if (typeof window !== 'undefined' && (window as any).fbq && usdAmount > 0) {
             (window as any).fbq('track', 'Purchase', {
