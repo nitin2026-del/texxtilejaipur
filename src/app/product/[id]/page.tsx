@@ -774,6 +774,16 @@ export default function ProductPage() {
                         onClick={() => {
                           if (cartItem && product) {
                             updateQuantity(product.id, cartItem.quantity + 1);
+                          } else if (quantity === 0 && product) {
+                            addToCart({
+                              id: product.id,
+                              name: product.name,
+                              price_inr: product.price_inr,
+                              images: product.images,
+                              sku: product.sku,
+                              category: product.category
+                            }, 1);
+                            setQuantity(1);
                           } else {
                             setQuantity(Math.min(product.stock_quantity, quantity + 1));
                           }
