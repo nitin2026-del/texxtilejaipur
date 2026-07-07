@@ -441,7 +441,7 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
-    if (quantity === 0) return;
+    const qtyToAdd = quantity === 0 ? 1 : quantity;
     if (product) {
       addToCart({
         id: product.id,
@@ -450,7 +450,8 @@ export default function ProductPage() {
         images: product.images,
         sku: product.sku,
         category: product.category
-      }, quantity);
+      }, qtyToAdd);
+      if (quantity === 0) setQuantity(1);
       setCartOpen(true);
     }
   };
