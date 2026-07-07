@@ -213,6 +213,7 @@ export default function ProductPage() {
   // International AI features
   const [language, setLanguage] = useState<'en' | 'fr' | 'es' | 'ar' | 'de'>('en');
   const [sizingOpen, setSizingOpen] = useState(false);
+  const [activeBadge, setActiveBadge] = useState<string | null>(null);
   const [sizingInput, setSizingInput] = useState('');
   const [sizingResult, setSizingResult] = useState('');
   const [sizingLoading, setSizingLoading] = useState(false);
@@ -440,6 +441,7 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
+    if (quantity === 0) return;
     if (product) {
       addToCart({
         id: product.id,
@@ -648,28 +650,52 @@ export default function ProductPage() {
                 </p>
 
                 {/* Circular Badges */}
-                <div className="flex items-center gap-10 py-2">
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative">
-                      <Award className="h-6 w-6 relative z-10" strokeWidth={1.5} />
-                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#ffe270] rounded-full -z-0"></div>
+                <div className="flex flex-col gap-3 py-2">
+                  <div className="flex items-center gap-10">
+                    <div className="flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setActiveBadge(activeBadge === 'gi' ? null : 'gi')}>
+                      <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative group-hover:bg-[#f5f5f7] transition-colors">
+                        <Award className="h-6 w-6 relative z-10" strokeWidth={1.5} />
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#ffe270] rounded-full -z-0"></div>
+                      </div>
+                      <span className="text-[11px] text-[#444] font-medium text-center leading-tight">GI Certified</span>
                     </div>
-                    <span className="text-[11px] text-[#444] font-medium text-center leading-tight">GI Certified</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative">
-                      <ShieldCheck className="h-6 w-6 relative z-10" strokeWidth={1.5} />
-                      <div className="absolute -bottom-1 -left-1 w-5 h-5 bg-[#a3e635] rounded-full -z-0"></div>
+                    
+                    <div className="flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setActiveBadge(activeBadge === 'material' ? null : 'material')}>
+                      <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative group-hover:bg-[#f5f5f7] transition-colors">
+                        <ShieldCheck className="h-6 w-6 relative z-10" strokeWidth={1.5} />
+                        <div className="absolute -bottom-1 -left-1 w-5 h-5 bg-[#a3e635] rounded-full -z-0"></div>
+                      </div>
+                      <span className="text-[11px] text-[#444] font-medium text-center leading-tight line-clamp-2 max-w-[60px]">{product.details?.material || 'Premium Fabric'}</span>
                     </div>
-                    <span className="text-[11px] text-[#444] font-medium text-center leading-tight">Handloom Mark</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative">
-                      <Globe className="h-6 w-6 relative z-10" strokeWidth={1.5} />
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#93c5fd] rounded-full -z-0"></div>
+
+                    <div className="flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setActiveBadge(activeBadge === 'shipping' ? null : 'shipping')}>
+                      <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative group-hover:bg-[#f5f5f7] transition-colors">
+                        <Globe className="h-6 w-6 relative z-10" strokeWidth={1.5} />
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#93c5fd] rounded-full -z-0"></div>
+                      </div>
+                      <span className="text-[11px] text-[#444] font-medium text-center leading-tight">Free Global Shipping</span>
                     </div>
-                    <span className="text-[11px] text-[#444] font-medium text-center leading-tight">Free Global Shipping</span>
                   </div>
+
+                  {/* Badge Info Expandable Area */}
+                  {activeBadge === 'gi' && (
+                    <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                      <strong className="text-[#1a1464] text-[13px] block mb-1">GI Certified (Geographical Indication)</strong>
+                      This product holds an authentic Geographical Indication tag, guaranteeing that it is genuinely handcrafted in its traditional region of origin (Jaipur, Rajasthan) using centuries-old heritage techniques.
+                    </div>
+                  )}
+                  {activeBadge === 'material' && (
+                    <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                      <strong className="text-[#1a1464] text-[13px] block mb-1">Material Details</strong>
+                      This garment is made using {product.details?.material || 'Premium Fabric'}. Our materials are carefully sourced to ensure maximum breathability, durability, and a luxurious feel against your skin.
+                    </div>
+                  )}
+                  {activeBadge === 'shipping' && (
+                    <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+                      <strong className="text-[#1a1464] text-[13px] block mb-1">Free Global Shipping</strong>
+                      We offer free, fully tracked worldwide shipping on all orders. Your handcrafted piece will be carefully packaged and delivered right to your doorstep via our premium courier partners.
+                    </div>
+                  )}
                 </div>
 
                 {/* Size Selector */}
@@ -704,7 +730,7 @@ export default function ProductPage() {
 
                     <p className="text-[12px] text-[#555] bg-[#f5f5f7] p-3 rounded border border-zinc-200 mt-2">
                       <strong>Custom Size / Need Help?</strong><br/>
-                      <a href="https://api.whatsapp.com/send?phone=919461858955&text=Need%20help%20with%20sizing%20and%20length" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold underline underline-offset-2">Contact us on WhatsApp (+91 9461858955)</a> for helping in the size and the length.
+                      <a href="https://api.whatsapp.com/send?phone=919461858955&text=Need%20help%20with%20sizing%20and%20length" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold underline underline-offset-2">Contact us on WhatsApp</a> for helping in the size and the length.
                     </p>
                   </div>
                 </div>
@@ -735,9 +761,8 @@ export default function ProductPage() {
                         onClick={() => {
                           if (cartItem && product) {
                             updateQuantity(product.id, cartItem.quantity - 1);
-                          } else {
-                            setQuantity(Math.max(1, quantity - 1));
                           }
+                          setQuantity(Math.max(0, quantity - 1));
                         }}
                         className="text-[#1a1464] hover:opacity-70 transition-opacity p-2 -ml-2"
                       >
@@ -771,7 +796,7 @@ export default function ProductPage() {
                 {/* Info Banners */}
                 <div className="flex flex-col gap-2 max-w-md pt-3">
                   <div className="bg-[#f5f5f7] rounded p-3.5 text-center text-[12px] font-medium text-[#444]">
-                    Free global shipping & free returns. <a href="#" className="text-[#1a1464] font-bold underline underline-offset-2">Details here</a> with 25% off on shop above $120
+                    <span className="font-bold text-[#1a1464]">25% off</span> on shop above $120. <a href="#" className="text-[#1a1464] font-bold underline underline-offset-2">Details here</a>
                   </div>
                 </div>
 
