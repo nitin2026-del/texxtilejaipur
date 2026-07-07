@@ -167,6 +167,7 @@ export default function AdminPortal() {
   const [btsDescription, setBtsDescription] = useState('');
   const [btsFile, setBtsFile] = useState<File | null>(null);
   const [btsUploadProgress, setBtsUploadProgress] = useState(0);
+  const [editingBtsId, setEditingBtsId] = useState<string | null>(null);
   const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null, display_order?: number}[]>([]);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -890,58 +891,85 @@ export default function AdminPortal() {
   };
 
   const handleBtsPublish = async () => {
-    if (!btsFile) return;
+    if (!editingBtsId && !btsFile) return;
+    if (!btsTitle.trim()) {
+      showNotification('Please enter a title.', true);
+      return;
+    }
     setBtsUploadLoading(true);
     
     try {
-      const file = btsFile;
-      if (file.size > 50 * 1024 * 1024) {
-        throw new Error('File is too large. Please upload a file smaller than 50MB.');
-      }
-      if (!btsTitle.trim()) {
-        throw new Error('Please enter a title before uploading media.');
-      }
+      let publicUrl = '';
 
-      let fileToUpload = file;
-      if (file.type.startsWith('video/')) {
-        showNotification('Compressing video... This may take a minute.');
-        setBtsUploadProgress(1); // Start at 1%
-        fileToUpload = await compressVideo(file, (progress) => {
-          setBtsUploadProgress(Math.round(progress * 100));
-        });
-        setBtsUploadProgress(0); // Reset after compression
-      }
+      if (btsFile) {
+        const file = btsFile;
+        if (file.size > 50 * 1024 * 1024) {
+          throw new Error('File is too large. Please upload a file smaller than 50MB.');
+        }
 
-      const fileExt = fileToUpload.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      
-      const { error } = await supabase.storage
-        .from('product-images')
-        .upload(fileName, fileToUpload, { contentType: fileToUpload.type });
+        let fileToUpload = file;
+        if (file.type.startsWith('video/')) {
+          showNotification('Compressing video... This may take a minute.');
+          setBtsUploadProgress(1); // Start at 1%
+          fileToUpload = await compressVideo(file, (progress) => {
+            setBtsUploadProgress(Math.round(progress * 100));
+          });
+          setBtsUploadProgress(0); // Reset after compression
+        }
+
+        const fileExt = fileToUpload.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
         
-      if (error) throw error;
+        const { error } = await supabase.storage
+          .from('product-images')
+          .upload(fileName, fileToUpload, { contentType: fileToUpload.type });
+          
+        if (error) throw error;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(fileName);
+        const { data: urlData } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(fileName);
+          
+        publicUrl = urlData.publicUrl;
+      }
         
-      // Save to database
-      const { error: dbErr } = await supabase
-        .from('behind_the_scenes')
-        .insert({
+      if (editingBtsId) {
+        // Update existing record
+        const updateData: any = {
           title: btsTitle,
           description: btsDescription,
-          media_url: publicUrl,
-          status: 'published',
-          display_order: behindTheScenesItems.length
-        });
-        
-      if (dbErr) throw dbErr;
+        };
+        if (publicUrl) {
+          updateData.media_url = publicUrl;
+        }
 
-      showNotification('Behind the scenes item added successfully!');
+        const { error: dbErr } = await supabase
+          .from('behind_the_scenes')
+          .update(updateData)
+          .eq('id', editingBtsId);
+          
+        if (dbErr) throw dbErr;
+        showNotification('Behind the scenes item updated successfully!');
+      } else {
+        // Create new record
+        const { error: dbErr } = await supabase
+          .from('behind_the_scenes')
+          .insert({
+            title: btsTitle,
+            description: btsDescription,
+            media_url: publicUrl,
+            status: 'published',
+            display_order: behindTheScenesItems.length
+          });
+          
+        if (dbErr) throw dbErr;
+        showNotification('Behind the scenes item added successfully!');
+      }
+
       setBtsTitle('');
       setBtsDescription('');
       setBtsFile(null);
+      setEditingBtsId(null);
       fetchDashboardData();
     } catch (err: any) {
       console.error('BTS Upload Error:', err);
@@ -949,6 +977,21 @@ export default function AdminPortal() {
     } finally {
       setBtsUploadLoading(false);
     }
+  };
+
+  const handleBtsEditClick = (item: BehindTheScenesItem) => {
+    setEditingBtsId(item.id);
+    setBtsTitle(item.title);
+    setBtsDescription(item.description || '');
+    setBtsFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBtsCancelEdit = () => {
+    setEditingBtsId(null);
+    setBtsTitle('');
+    setBtsDescription('');
+    setBtsFile(null);
   };
 
   const handleBtsDelete = async (id: string) => {
@@ -2878,9 +2921,17 @@ export default function AdminPortal() {
         {activeTab === 'behind_the_scenes' && (
           <div className="space-y-6">
             <div className="glass-card p-6 rounded-3xl border border-zinc-200">
-              <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-zinc-900">
-                <UploadCloud className="h-4 w-4 text-emerald-600" /> Add New Moment
-              </h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-base font-bold flex items-center gap-2 text-zinc-900">
+                  {editingBtsId ? <Edit className="h-4 w-4 text-emerald-600" /> : <UploadCloud className="h-4 w-4 text-emerald-600" />} 
+                  {editingBtsId ? 'Edit Moment' : 'Add New Moment'}
+                </h3>
+                {editingBtsId && (
+                  <button onClick={handleBtsCancelEdit} className="text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1">
+                    <X className="h-3 w-3" /> Cancel Edit
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Title</label>
@@ -2904,7 +2955,9 @@ export default function AdminPortal() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Upload Photo or Video (Max 50MB)</label>
+                <label className="block text-xs font-semibold mb-1.5 text-zinc-600">
+                  {editingBtsId ? 'Upload new Photo/Video to replace (optional)' : 'Upload Photo or Video (Max 50MB)'}
+                </label>
                 <div className="relative">
                   <input
                     type="file"
@@ -2936,16 +2989,17 @@ export default function AdminPortal() {
               </div>
               <button 
                 onClick={handleBtsPublish}
-                disabled={!btsFile || btsUploadLoading}
+                disabled={(!editingBtsId && !btsFile) || btsUploadLoading}
                 className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {btsUploadLoading ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> {btsUploadProgress > 0 ? `Compressing Video (${btsUploadProgress}%)...` : 'Publishing Moment...'}
+                    <Loader2 className="h-4 w-4 animate-spin" /> {btsUploadProgress > 0 ? `Compressing Video (${btsUploadProgress}%)...` : (editingBtsId ? 'Updating Moment...' : 'Publishing Moment...')}
                   </>
                 ) : (
                   <>
-                    <UploadCloud className="h-4 w-4" /> Publish Moment
+                    {editingBtsId ? <Edit className="h-4 w-4" /> : <UploadCloud className="h-4 w-4" />} 
+                    {editingBtsId ? 'Update Moment' : 'Publish Moment'}
                   </>
                 )}
               </button>
@@ -2967,18 +3021,27 @@ export default function AdminPortal() {
                     <div key={item.id} className="relative group rounded-xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
                       <div className="aspect-[4/5] bg-zinc-100 relative">
                         {item.media_url?.includes('.mp4') || item.media_url?.includes('.mov') ? (
-                          <video src={item.media_url} className="w-full h-full object-cover" muted loop autoPlay playsInline />
+                          <video src={item.media_url} className="w-full h-full object-cover" muted loop autoPlay playsInline controls />
                         ) : (
                           <img src={item.media_url} alt={item.title} className="w-full h-full object-cover" />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleBtsDelete(item.id)}
-                            disabled={actionLoading}
-                            className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          <div className="absolute top-2 right-2 flex gap-2">
+                            <button
+                              onClick={() => handleBtsEditClick(item)}
+                              disabled={actionLoading}
+                              className="p-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleBtsDelete(item.id)}
+                              disabled={actionLoading}
+                              className="p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                           <div className="absolute bottom-0 left-0 right-0 p-3">
                             <p className="text-xs font-bold text-white truncate">{item.title}</p>
                             {item.description && <p className="text-[10px] text-white/80 line-clamp-2 mt-0.5">{item.description}</p>}

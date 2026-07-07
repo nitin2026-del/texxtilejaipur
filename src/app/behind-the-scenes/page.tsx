@@ -88,6 +88,7 @@ export default function BehindTheScenes() {
                         muted 
                         loop 
                         playsInline
+                        controls
                       />
                     ) : (
                       <img 
