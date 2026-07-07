@@ -45,7 +45,7 @@ import { useCart } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play } from 'lucide-react';
+import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart } from 'lucide-react';
 
 interface Product {
   id: string;
