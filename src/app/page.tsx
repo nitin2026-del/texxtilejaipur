@@ -415,36 +415,6 @@ export default function Home() {
             ))}
           </div>
         ) : null}
-      </section>
-
-      {/* Story Banner Section */}
-      <section className="relative w-full h-[60vh] sm:h-[80vh] min-h-[450px] max-h-[800px] overflow-hidden my-4 sm:my-8 border-y border-zinc-200">
-        <div
-          className="absolute inset-0 z-0 bg-cover bg-center"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2000&auto=format&fit=crop)',
-            backgroundPosition: 'center 30%'
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
-        </div>
-        
-        <div className="relative z-10 w-full h-full px-8 sm:px-16 md:px-24 max-w-[1600px] mx-auto flex items-center">
-          <div className="max-w-2xl animate-fade-in-up">
-            <p className="text-white/90 text-sm sm:text-base tracking-[0.2em] uppercase font-bold mb-4 drop-shadow-md">
-              Explore Our New Collection
-            </p>
-            <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-[90px] font-sans text-white font-extrabold mb-10 leading-[1.05] drop-shadow-2xl uppercase tracking-tighter">
-              OUTDOORSY<br/>GALS&trade;
-            </h2>
-            
-            <a href="#categories" className="px-10 py-4 bg-white text-zinc-950 hover:bg-zinc-100 text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-xl inline-flex justify-center items-center">
-              SHOP NOW
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* Catalog & Filter Section */}
       <section id="categories" className="w-full bg-white border-t border-zinc-200 py-20 mt-8 shadow-sm">
         <div className="px-6 max-w-7xl mx-auto space-y-8">
