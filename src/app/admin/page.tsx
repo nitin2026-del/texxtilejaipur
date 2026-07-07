@@ -165,6 +165,7 @@ export default function AdminPortal() {
   const [btsUploadLoading, setBtsUploadLoading] = useState(false);
   const [btsTitle, setBtsTitle] = useState('');
   const [btsDescription, setBtsDescription] = useState('');
+  const [btsFile, setBtsFile] = useState<File | null>(null);
   const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null, display_order?: number}[]>([]);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -887,12 +888,12 @@ export default function AdminPortal() {
     }
   };
 
-  const handleBtsUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
+  const handleBtsPublish = async () => {
+    if (!btsFile) return;
     setBtsUploadLoading(true);
     
     try {
-      const file = e.target.files[0];
+      const file = btsFile;
       if (file.size > 50 * 1024 * 1024) {
         throw new Error('File is too large. Please upload a file smaller than 50MB.');
       }
@@ -937,13 +938,13 @@ export default function AdminPortal() {
       showNotification('Behind the scenes item added successfully!');
       setBtsTitle('');
       setBtsDescription('');
+      setBtsFile(null);
       fetchDashboardData();
     } catch (err: any) {
       console.error('BTS Upload Error:', err);
       showNotification(err.message || 'Error uploading BTS item', true);
     } finally {
       setBtsUploadLoading(false);
-      if (e.target) e.target.value = '';
     }
   };
 
@@ -2905,15 +2906,20 @@ export default function AdminPortal() {
                   <input
                     type="file"
                     accept="image/*,video/*"
-                    onChange={handleBtsUpload}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        setBtsFile(e.target.files[0]);
+                      }
+                    }}
                     disabled={btsUploadLoading || actionLoading}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10"
                   />
-                  <div className={`w-full border-2 border-dashed border-emerald-200 bg-emerald-50/50 rounded-2xl p-6 text-center transition-colors ${btsUploadLoading ? 'opacity-50' : 'hover:bg-emerald-50'}`}>
-                    {btsUploadLoading ? (
+                  <div className={`w-full border-2 border-dashed border-emerald-200 bg-emerald-50/50 rounded-2xl p-6 text-center transition-colors ${(btsUploadLoading || btsFile) ? 'opacity-50' : 'hover:bg-emerald-50'}`}>
+                    {btsFile ? (
                       <div className="flex flex-col items-center gap-2">
-                        <Loader2 className="h-6 w-6 text-emerald-600 animate-spin" />
-                        <span className="text-xs font-bold text-emerald-700">Uploading...</span>
+                        <CheckCircle className="h-6 w-6 text-emerald-600" />
+                        <span className="text-xs font-bold text-emerald-700">{btsFile.name} selected</span>
+                        <span className="text-[10px] text-zinc-500">{(btsFile.size / 1024 / 1024).toFixed(2)} MB</span>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-2">
@@ -2925,6 +2931,21 @@ export default function AdminPortal() {
                   </div>
                 </div>
               </div>
+              <button 
+                onClick={handleBtsPublish}
+                disabled={!btsFile || btsUploadLoading}
+                className="w-full mt-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {btsUploadLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Publishing Moment...
+                  </>
+                ) : (
+                  <>
+                    <UploadCloud className="h-4 w-4" /> Publish Moment
+                  </>
+                )}
+              </button>
             </div>
 
             <div className="glass-card p-6 rounded-3xl border border-zinc-200">

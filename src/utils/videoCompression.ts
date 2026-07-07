@@ -49,7 +49,7 @@ export const compressVideo = async (
   
   // The output is a Uint8Array. Create a Blob and then a File object.
   const uint8Data = data as Uint8Array;
-  const blob = new Blob([uint8Data], { type: 'video/mp4' });
+  const blob = new Blob([uint8Data as unknown as BlobPart], { type: 'video/mp4' });
   
   // Clean up the virtual file system
   await ffmpeg.deleteFile(inputName);
