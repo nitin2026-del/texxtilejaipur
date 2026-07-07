@@ -415,6 +415,8 @@ export default function Home() {
             ))}
           </div>
         ) : null}
+      </section>
+
       {/* Catalog & Filter Section */}
       <section id="categories" className="w-full bg-white border-t border-zinc-200 py-20 mt-8 shadow-sm">
         <div className="px-6 max-w-7xl mx-auto space-y-8">
