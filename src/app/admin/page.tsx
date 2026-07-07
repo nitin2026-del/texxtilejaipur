@@ -166,6 +166,7 @@ export default function AdminPortal() {
   const [btsTitle, setBtsTitle] = useState('');
   const [btsDescription, setBtsDescription] = useState('');
   const [btsFile, setBtsFile] = useState<File | null>(null);
+  const [btsUploadProgress, setBtsUploadProgress] = useState(0);
   const [dbCategories, setDbCategories] = useState<string[]>([]);
   const [dbCategoryObjects, setDbCategoryObjects] = useState<{id: string, name: string, parent_id: string | null, display_order?: number}[]>([]);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -904,9 +905,11 @@ export default function AdminPortal() {
       let fileToUpload = file;
       if (file.type.startsWith('video/')) {
         showNotification('Compressing video... This may take a minute.');
+        setBtsUploadProgress(1); // Start at 1%
         fileToUpload = await compressVideo(file, (progress) => {
-          console.log(`Video compression progress: ${Math.round(progress * 100)}%`);
+          setBtsUploadProgress(Math.round(progress * 100));
         });
+        setBtsUploadProgress(0); // Reset after compression
       }
 
       const fileExt = fileToUpload.name.split('.').pop();
@@ -2938,7 +2941,7 @@ export default function AdminPortal() {
               >
                 {btsUploadLoading ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Publishing Moment...
+                    <Loader2 className="h-4 w-4 animate-spin" /> {btsUploadProgress > 0 ? `Compressing Video (${btsUploadProgress}%)...` : 'Publishing Moment...'}
                   </>
                 ) : (
                   <>
