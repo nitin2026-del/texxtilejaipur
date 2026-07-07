@@ -8,7 +8,6 @@ import { ProductCard } from '@/components/ProductCard';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import { BottomNav } from '@/components/BottomNav';
-import { AbandonedCartSimulator } from '@/components/AbandonedCartSimulator';
 import { Search, Sparkles, Filter, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
@@ -764,9 +763,6 @@ export default function Home() {
 
       {/* Bottom Mobile Navigation */}
       <BottomNav onCartOpen={() => setCartOpen(true)} />
-      
-      {/* Background Simulators */}
-      <AbandonedCartSimulator />
     </main>
   );
 }

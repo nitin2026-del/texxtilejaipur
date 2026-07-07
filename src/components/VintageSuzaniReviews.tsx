@@ -31,7 +31,7 @@ const reviewsData = [
     date: 'April 30, 2026',
     stars: 5,
     title: '"Absolute perfection - and a great deal!"',
-    body: 'This is easily the most beautiful piece of outerwear I own. The contrast of the bright embroidery against the rich velvet is stunning, and it feels surprisingly warm for those crisp evenings. I paired it with a scarf to push my cart over $150, which triggered the automatic 25% off discount! Such an amazing deal for authentic handmade quality.',
+    body: 'This is easily the most beautiful piece of outerwear I own. The contrast of the bright embroidery against the rich velvet is stunning, and it feels surprisingly warm for those crisp evenings. I paired it with a scarf to push my cart over $120, which triggered the automatic 25% off discount! Such an amazing deal for authentic handmade quality.',
     reply: 'Smart move with the discount, Jessica! 🛍️ We love hearing how our customers style these vintage-inspired pieces.'
   },
   {

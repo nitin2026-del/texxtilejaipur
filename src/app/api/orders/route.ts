@@ -121,10 +121,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // B. Apply Bundle Discount (25% off if original USD value >= 150)
+    // B. Apply Bundle Discount (25% off if original USD value >= 120)
     // Approximate USD value for backend check
     const approximateUsdValue = realSubtotalInr * 0.010769; // Calibrated: 6500 INR = $70 USD
-    if (approximateUsdValue >= 150) {
+    if (approximateUsdValue >= 120) {
       finalTotalInr -= realSubtotalInr * 0.25; // 25% off original subtotal
     }
 

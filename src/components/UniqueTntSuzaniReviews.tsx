@@ -31,7 +31,7 @@ const reviewsData = [
     date: 'May 28, 2026',
     stars: 5,
     title: '"Obsessed with the raw texture (and the discount!)"',
-    body: 'I\'m obsessed with the raw, natural texture of the coarse cotton fabric. The way the thick green vines climb up the front is just so artistic and earthy. I paired this with a dress to get my cart over $150 and got 25% off my entire order! Such an incredible deal for this level of authentic craftsmanship.',
+    body: 'I\'m obsessed with the raw, natural texture of the coarse cotton fabric. The way the thick green vines climb up the front is just so artistic and earthy. I paired this with a dress to get my cart over $120 and got 25% off my entire order! Such an incredible deal for this level of authentic craftsmanship.',
     reply: 'Smart shopping, Grace! 🛍️ That 25% off deal is the perfect excuse to complete an outfit. Enjoy your beautiful earthy layer!'
   },
   {

@@ -186,8 +186,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const subtotal = getCartSubtotalInr();
     const usdValue = subtotal * FX_RATES['USD'];
     
-    // If order is >= $150 USD, apply 25% flat discount
-    if (usdValue >= 150) {
+    // If order is >= $120 USD, apply 25% flat discount
+    if (usdValue >= 120) {
       return subtotal * 0.25;
     }
     
