@@ -100,8 +100,8 @@ export default function BehindTheScenes() {
                       />
                     )}
                     {isVideo && (
-                      <div className="absolute top-4 right-4 w-8 h-8 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center pointer-events-none">
-                        <Play className="h-4 w-4 text-white fill-white ml-0.5" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-brand-600 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.5)] pointer-events-none border-2 border-white/90 z-10">
+                        <Play className="h-6 w-6 text-white fill-white ml-1" />
                       </div>
                     )}
                     

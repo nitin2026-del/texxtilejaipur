@@ -303,16 +303,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           <div className="space-y-4">
             <p>We're here to help with any questions about our products, your orders, or styling advice.</p>
             <div className="grid gap-4 mt-6">
-              <a href="tel:+918764655537" className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 hover:bg-zinc-100 transition-colors border border-zinc-200">
+              <a href="tel:+919461858955" className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 hover:bg-zinc-100 transition-colors border border-zinc-200">
                 <div className="p-2 rounded-full bg-white text-brand-700 shadow-sm border border-zinc-100">
                   <Phone className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="text-sm text-zinc-500">Call Us</div>
-                  <div className="text-zinc-900 font-semibold">+91 87646 55537</div>
+                  <div className="text-zinc-900 font-semibold">+91 94618 58955</div>
                 </div>
               </a>
-              <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 hover:bg-zinc-100 transition-colors border border-zinc-200">
+              <a href="https://wa.me/919461858955" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 hover:bg-zinc-100 transition-colors border border-zinc-200">
                 <div className="p-2 rounded-full bg-white text-green-600 shadow-sm border border-zinc-100">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"/></svg>
                 </div>

@@ -11,7 +11,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video, RefreshCcw
 } from 'lucide-react';
 
 interface Product {
@@ -1004,6 +1004,26 @@ export default function AdminPortal() {
       fetchDashboardData();
     } catch (err: any) {
       showNotification(err.message || 'Failed to delete item', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleBtsShuffle = async () => {
+    if (!window.confirm('Are you sure you want to shuffle the display order of all published moments?')) return;
+    setActionLoading(true);
+    try {
+      const shuffled = [...behindTheScenesItems].sort(() => Math.random() - 0.5);
+      
+      const updates = shuffled.map((item, index) => 
+        supabase.from('behind_the_scenes').update({ display_order: index }).eq('id', item.id)
+      );
+      
+      await Promise.all(updates);
+      showNotification('Moments shuffled successfully!');
+      fetchDashboardData();
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to shuffle items', true);
     } finally {
       setActionLoading(false);
     }
@@ -3006,9 +3026,18 @@ export default function AdminPortal() {
             </div>
 
             <div className="glass-card p-6 rounded-3xl border border-zinc-200">
-              <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-zinc-900">
-                <Video className="h-4 w-4 text-emerald-600" /> Published Moments
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold flex items-center gap-2 text-zinc-900">
+                  <Video className="h-4 w-4 text-emerald-600" /> Published Moments
+                </h3>
+                <button
+                  onClick={handleBtsShuffle}
+                  disabled={actionLoading || behindTheScenesItems.length < 2}
+                  className="text-xs px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg font-bold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  <RefreshCcw className="h-3 w-3" /> Shuffle
+                </button>
+              </div>
               {behindTheScenesItems.length === 0 ? (
                 <div className="text-center py-12 border border-zinc-200 border-dashed rounded-2xl bg-white/50">
                   <Video className="h-8 w-8 mx-auto text-zinc-300 mb-2" />
