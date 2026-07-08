@@ -419,6 +419,12 @@ export default function ProductPage() {
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
       const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
       
+      console.log('--- [ProductPage Component] ---');
+      console.log('Calling fbq("track", "ViewContent") directly from useEffect');
+      console.log('Product ID:', product.id);
+      console.log('URL:', window.location.href);
+      console.log('-------------------------------');
+      
       (window as any).fbq('track', 'ViewContent', {
         content_ids: [product.id],
         content_type: 'product',
