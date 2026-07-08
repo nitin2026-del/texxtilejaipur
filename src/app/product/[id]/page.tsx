@@ -45,7 +45,7 @@ import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart } from 'lucide-react';
+import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -920,6 +920,24 @@ export default function ProductPage() {
                     </span>
                   </div>
                 </div>
+
+                {/* Behind the Scenes CTA */}
+                <Link href="/behind-the-scenes" className="mt-4 block group relative overflow-hidden rounded-xl border border-zinc-200">
+                  <div className="absolute inset-0 bg-gradient-to-r from-zinc-900 to-zinc-800 z-0"></div>
+                  <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-700"></div>
+                  <div className="relative z-10 p-5 flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                        <Video className="h-4 w-4 text-brand-400" />
+                        Take a Tour of Our Store
+                      </h4>
+                      <p className="text-xs text-zinc-300">Watch how our artisans craft these pieces.</p>
+                    </div>
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-white/10 flex items-center justify-center border border-white/20 group-hover:bg-brand-600 group-hover:border-brand-500 transition-colors">
+                      <Play className="h-4 w-4 text-white fill-white ml-0.5" />
+                    </div>
+                  </div>
+                </Link>
 
                 {/* AI Heritage & Styling Guide */}
                 {(product.details?.culturalContext || product.details?.stylingAdvice) && (
