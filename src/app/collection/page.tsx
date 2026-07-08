@@ -72,6 +72,16 @@ export default function CollectionPage() {
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get('category');
+      if (cat) {
+        setSelectedCategory(cat);
+      }
+    }
+  }, []);
+
   // Cart
   const [cartOpen, setCartOpen] = useState(false);
 
