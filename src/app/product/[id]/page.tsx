@@ -710,8 +710,25 @@ export default function ProductPage() {
                   )}
                   {activeBadge === 'shipping' && (
                     <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                      <strong className="text-[#1a1464] text-[13px] block mb-1">Free Global Shipping</strong>
-                      We offer free, fully tracked worldwide shipping on all orders. Your handcrafted piece will be carefully packaged and delivered right to your doorstep via our premium courier partners.
+                      <strong className="text-[#1a1464] text-[13px] block mb-2">Free Global Shipping</strong>
+                      We offer free, fully tracked worldwide shipping on all orders via premium couriers.
+                      <div className="mt-3 bg-white p-3 rounded border border-zinc-100">
+                        <strong className="block mb-1 text-zinc-800">✈️ Estimated Delivery Times:</strong>
+                        <ul className="space-y-0.5 text-[11px] text-zinc-600">
+                          <li>• USA: 5–9 Business Days</li>
+                          <li>• UK: 4–8 Business Days</li>
+                          <li>• Europe: 5–10 Business Days</li>
+                          <li>• Canada: 6–10 Business Days</li>
+                          <li>• Australia: 6–12 Business Days</li>
+                        </ul>
+                      </div>
+                      <div className="mt-3 text-[11px] bg-brand-50 p-2.5 rounded border border-brand-100 text-brand-800">
+                        <strong className="block mb-1 text-sm">Need it sooner?</strong>
+                        We can provide expedited fast shipping at <strong>no extra cost</strong> if you have a genuine reason (like a wedding, gift, or special event). 
+                        <a href="https://wa.me/919461858955" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 px-3 py-1.5 bg-brand-700 text-white rounded font-bold hover:bg-brand-800 transition-colors shadow-sm">
+                          Request Fast Shipping
+                        </a>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1428,7 +1445,7 @@ export default function ProductPage() {
                   },
                   {
                     q: 'In how many days will I receive my delivery?',
-                    a: '✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We offer expedited shipping options for an additional fee. Please reach out to us to arrange fast delivery for your order.'
+                    a: '✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We can provide expedited shipping at no extra cost if you have a genuine reason (like a wedding, gift, or special event). Please reach out to us to request fast delivery for your order.'
                   }
                 ].map((qa, i) => (
                   <div key={i} className="border border-zinc-200 rounded-xl overflow-hidden bg-white">

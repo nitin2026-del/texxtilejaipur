@@ -6,7 +6,7 @@ import { Sparkles, MapPin, Mail, Phone, AtSign, Hash, Globe, ChevronDown, Chevro
 const FAQS = [
   {
     question: "In how many days will I receive my delivery?",
-    answer: "✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We offer expedited shipping options for an additional fee. Please reach out to us to arrange fast delivery for your order."
+    answer: "✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We can provide expedited shipping at no extra cost if you have a genuine reason (like a wedding, gift, or special event). Please reach out to us to request fast delivery for your order."
   },
   {
     question: "Are your garments truly handmade?",
