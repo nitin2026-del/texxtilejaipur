@@ -411,6 +411,23 @@ export default function ProductPage() {
     fetchProduct();
   }, [id]);
 
+  const hasTrackedView = useRef(false);
+
+  useEffect(() => {
+    if (product && !hasTrackedView.current && typeof window !== 'undefined' && (window as any).fbq) {
+      hasTrackedView.current = true;
+      const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
+      const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+      
+      (window as any).fbq('track', 'ViewContent', {
+        content_ids: [product.id],
+        content_type: 'product',
+        value: priceUSD,
+        currency: 'USD'
+      });
+    }
+  }, [product]);
+
   const handleSizingRequest = async () => {
     if (!product || !sizingInput.trim()) return;
     setSizingLoading(true);
