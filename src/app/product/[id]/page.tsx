@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -41,7 +41,7 @@ import { NavyFloralVelvetReviews } from '@/components/NavyFloralVelvetReviews';
 import { VelvetSuzaniHT5EB59E11Reviews } from '@/components/VelvetSuzaniHT5EB59E11Reviews';
 import { VelvetSuzaniHT7A15D83BReviews } from '@/components/VelvetSuzaniHT7A15D83BReviews';
 
-import { useCart } from '@/context/CartContext';
+import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
