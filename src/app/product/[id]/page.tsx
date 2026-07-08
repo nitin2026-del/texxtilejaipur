@@ -1425,6 +1425,10 @@ export default function ProductPage() {
                   {
                     q: 'Do you offer returns if it doesn\'t fit?',
                     a: 'Yes, we offer a 30-day hassle-free return and exchange policy. You can easily initiate a return through our self-service portal as long as the product is unused and has its original tags.'
+                  },
+                  {
+                    q: 'In how many days will I receive my delivery?',
+                    a: '✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We offer expedited shipping options for an additional fee. Please reach out to us to arrange fast delivery for your order.'
                   }
                 ].map((qa, i) => (
                   <div key={i} className="border border-zinc-200 rounded-xl overflow-hidden bg-white">
@@ -1440,7 +1444,7 @@ export default function ProductPage() {
                       )}
                     </button>
                     {expandedQa === i && (
-                      <div className="p-5 pt-0 text-sm text-zinc-600 leading-relaxed bg-white border-t border-zinc-100">
+                      <div className="p-5 pt-0 text-sm text-zinc-600 leading-relaxed bg-white border-t border-zinc-100 whitespace-pre-line">
                         {qa.a}
                       </div>
                     )}

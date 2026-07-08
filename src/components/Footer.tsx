@@ -5,8 +5,8 @@ import { Sparkles, MapPin, Mail, Phone, AtSign, Hash, Globe, ChevronDown, Chevro
 
 const FAQS = [
   {
-    question: "Do you ship internationally?",
-    answer: "Yes, we offer UPS shipping to the USA, Europe, Australia, and most global destinations. Delivery times typically range from 5-10 business days."
+    question: "In how many days will I receive my delivery?",
+    answer: "✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We offer expedited shipping options for an additional fee. Please reach out to us to arrange fast delivery for your order."
   },
   {
     question: "Are your garments truly handmade?",
@@ -106,7 +106,7 @@ export const Footer: React.FC = () => {
                     )}
                   </button>
                   {openFaq === idx && (
-                    <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-[#FDFBF7] font-medium">
+                    <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-[#FDFBF7] font-medium whitespace-pre-line">
                       {faq.answer}
                     </div>
                   )}
