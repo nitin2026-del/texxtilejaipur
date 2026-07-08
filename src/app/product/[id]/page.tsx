@@ -411,11 +411,11 @@ export default function ProductPage() {
     fetchProduct();
   }, [id]);
 
-  const hasTrackedView = useRef(false);
+  const trackedProductId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (product && !hasTrackedView.current && typeof window !== 'undefined' && (window as any).fbq) {
-      hasTrackedView.current = true;
+    if (product && trackedProductId.current !== product.id && typeof window !== 'undefined' && (window as any).fbq) {
+      trackedProductId.current = product.id;
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
       const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
       
