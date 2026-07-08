@@ -126,6 +126,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addToCart = (product: CartContextProduct, quantity = 1) => {
+    const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
+
     const existing = cart.find((item) => item.id === product.id);
     if (existing) {
       const updated = cart.map((item) =>
@@ -137,12 +139,23 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: product.id,
         sku: product.sku,
         name: product.name,
-        price_inr: typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr,
+        price_inr: parsedPriceInr,
         images: product.images,
         quantity: quantity,
         category: product.category,
       };
       saveCart([...cart, newItem]);
+    }
+
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      const productPrice = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+      const productId = product.id;
+      (window as any).fbq('track', 'AddToCart', {
+        content_ids: [productId],
+        content_type: 'product',
+        value: productPrice,
+        currency: 'USD'
+      });
     }
   };
 
