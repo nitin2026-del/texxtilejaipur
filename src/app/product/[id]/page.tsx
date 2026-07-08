@@ -944,6 +944,43 @@ export default function ProductPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Season & Comfort Guide */}
+                {(() => {
+                  const cat = product.category?.toUpperCase() || '';
+                  const name = product.name?.toUpperCase() || '';
+                  const desc = product.description?.toUpperCase() || '';
+                  
+                  let guide = null;
+                  if (cat.includes('COTTON') || name.includes('COTTON') || desc.includes('COTTON SUZANI')) {
+                    guide = { temp: '18°C–30°C (64°F–86°F)', comfort: 'Lightweight, breathable, ideal for spring, summer evenings, and mild autumn.' };
+                  } else if (cat.includes('TNT') || name.includes('TNT') || desc.includes('TNT SUZANI')) {
+                    guide = { temp: '15°C–25°C (59°F–77°F)', comfort: 'Medium-weight, suitable for spring, autumn, and cool evenings.' };
+                  } else if (cat.includes('VELVET') || name.includes('VELVET') || desc.includes('VELVET SUZANI')) {
+                    guide = { temp: '5°C–18°C (41°F–64°F)', comfort: 'Warm, soft, and perfect for autumn, winter, and chilly evenings. Layer for temperatures below 5°C.' };
+                  }
+
+                  if (!guide) return null;
+
+                  return (
+                    <div className="mt-6 border border-sky-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                      <div className="bg-sky-50 px-5 py-3 border-b border-sky-200 flex items-center gap-2">
+                        <svg className="h-4 w-4 text-sky-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/><path d="M12 12v.01"/></svg>
+                        <h4 className="text-sm font-bold text-sky-900">Season & Comfort Guide</h4>
+                      </div>
+                      <div className="p-5 space-y-4">
+                        <div>
+                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Best Temperature</h5>
+                          <p className="text-sm text-zinc-600 leading-relaxed font-medium">{guide.temp}</p>
+                        </div>
+                        <div className="pt-4 border-t border-zinc-100">
+                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Comfort Level</h5>
+                          <p className="text-sm text-zinc-600 leading-relaxed">{guide.comfort}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
         )}
