@@ -42,7 +42,7 @@ import { VelvetSuzaniHT5EB59E11Reviews } from '@/components/VelvetSuzaniHT5EB59E
 import { VelvetSuzaniHT7A15D83BReviews } from '@/components/VelvetSuzaniHT7A15D83BReviews';
 
 import { useCart, FX_RATES } from '@/context/CartContext';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video } from 'lucide-react';
@@ -412,18 +412,19 @@ export default function ProductPage() {
   }, [id]);
 
   const trackedProductId = useRef<string | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (product && trackedProductId.current !== product.id && typeof window !== 'undefined' && (window as any).fbq) {
-      trackedProductId.current = product.id;
+    if (!product || typeof window === 'undefined' || !(window as any).fbq) return;
+    
+    // Check if the current pathname matches this product's page
+    // This prevents background firing when hidden in Next.js router cache
+    const isCurrentPage = pathname === `/product/${product.id}` || pathname === `/product/${id}`;
+    
+    if (isCurrentPage && trackedProductId.current !== `${product.id}-${pathname}`) {
+      trackedProductId.current = `${product.id}-${pathname}`;
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
       const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
-      
-      console.log('--- [ProductPage Component] ---');
-      console.log('Calling fbq("track", "ViewContent") directly from useEffect');
-      console.log('Product ID:', product.id);
-      console.log('URL:', window.location.href);
-      console.log('-------------------------------');
       
       (window as any).fbq('track', 'ViewContent', {
         content_ids: [product.id],
@@ -432,7 +433,7 @@ export default function ProductPage() {
         currency: 'USD'
       });
     }
-  }, [product]);
+  }, [product, pathname, id]);
 
   const handleSizingRequest = async () => {
     if (!product || !sizingInput.trim()) return;

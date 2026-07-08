@@ -177,24 +177,6 @@ export default function RootLayout({
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              
-              var originalFbq = window.fbq;
-              window.initialPageLoad = true;
-              window.fbq = function() {
-                var eventName = arguments[1];
-                var args = arguments[2];
-                if (eventName === 'PageView' || eventName === 'ViewContent') {
-                  console.log('--- [Meta Event Fired] ---');
-                  console.log('Event Name:', eventName);
-                  console.log('URL:', window.location.href);
-                  console.log('Full Page Load:', window.initialPageLoad);
-                  console.log('Product ID:', args?.content_ids ? args.content_ids[0] : 'N/A');
-                  console.log('---------------------------');
-                }
-                originalFbq.apply(this, arguments);
-              };
-              setTimeout(function(){ window.initialPageLoad = false; }, 1000);
-
               fbq('init', '1325173556217164');
               fbq('track', 'PageView');
             `
