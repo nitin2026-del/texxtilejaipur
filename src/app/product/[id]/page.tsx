@@ -421,7 +421,13 @@ export default function ProductPage() {
     // This prevents background firing when hidden in Next.js router cache
     const isCurrentPage = pathname === `/product/${product.id}` || pathname === `/product/${id}`;
     
-    if (isCurrentPage && trackedProductId.current !== `${product.id}-${pathname}`) {
+    if (!isCurrentPage) {
+      // Reset tracking if the user navigates away so returning will fire a new ViewContent
+      trackedProductId.current = null;
+      return;
+    }
+    
+    if (trackedProductId.current !== `${product.id}-${pathname}`) {
       trackedProductId.current = `${product.id}-${pathname}`;
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
       const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
