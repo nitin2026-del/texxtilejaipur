@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { supabase } from '@/lib/supabase';
 
 export interface CartItem {
   id: string;
@@ -31,14 +32,13 @@ export interface CartContextProduct {
 
 export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD';
 
-// Mock Exchange Rates with 3% markup applied (Base INR)
-const FX_RATES: Record<Currency, number> = {
+export const FX_RATES: Record<Currency, number> = {
   INR: 1,
-  USD: 0.012 * 1.03, // Live rate roughly 0.012 + markup
-  EUR: 0.011 * 1.03,
-  GBP: 0.0093 * 1.03,
-  AED: 0.044 * 1.03,
-  AUD: 0.018 * 1.03,
+  USD: 0.010769, // Calibrated so 6500 INR = $70.00 USD
+  EUR: 0.009870, // Scaled proportionally (was €73.65, now €64.15)
+  GBP: 0.008340, // Scaled proportionally (£54.21)
+  AED: 0.039480, // Scaled proportionally
+  AUD: 0.016150, // Scaled proportionally
 };
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
@@ -65,7 +65,7 @@ interface CartContextType {
   getBundleDiscountInr: () => number;
   getCartTotalDisplay: () => number;
   appliedCoupon: Coupon | null;
-  applyCoupon: (code: string) => { success: boolean; message: string };
+  applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
   removeCoupon: () => void;
 }
 
@@ -126,6 +126,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addToCart = (product: CartContextProduct, quantity = 1) => {
+    const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
+
     const existing = cart.find((item) => item.id === product.id);
     if (existing) {
       const updated = cart.map((item) =>
@@ -137,12 +139,23 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: product.id,
         sku: product.sku,
         name: product.name,
-        price_inr: typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr,
+        price_inr: parsedPriceInr,
         images: product.images,
         quantity: quantity,
         category: product.category,
       };
       saveCart([...cart, newItem]);
+    }
+
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      const productPrice = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+      const productId = product.id;
+      (window as any).fbq('track', 'AddToCart', {
+        content_ids: [productId],
+        content_type: 'product',
+        value: productPrice,
+        currency: 'USD'
+      });
     }
   };
 
@@ -183,20 +196,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getBundleDiscountInr = () => {
-    // Filter items that are "velvet suzani" or "tnt"
-    const eligibleItems = cart.filter(item => {
-      const nameMatch = item.name.toLowerCase().includes('velvet suzani') || item.name.toLowerCase().includes('tnt');
-      const catMatch = item.category?.toLowerCase().includes('velvet suzani') || item.category?.toLowerCase().includes('tnt');
-      return nameMatch || catMatch;
-    });
+    const subtotal = getCartSubtotalInr();
+    const usdValue = subtotal * FX_RATES['USD'];
     
-    // Count total quantity of eligible items
-    const eligibleQty = eligibleItems.reduce((acc, item) => acc + item.quantity, 0);
-    
-    // If >= 2, apply 25% off their subtotal
-    if (eligibleQty >= 2) {
-      const eligibleSubtotal = eligibleItems.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
-      return eligibleSubtotal * 0.25;
+    // If order is >= $120 USD, apply 25% flat discount
+    if (usdValue >= 120) {
+      return subtotal * 0.25;
     }
     
     return 0;
@@ -231,26 +236,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return getCartTotalInr() * rate;
   };
 
-  const applyCoupon = (code: string) => {
+  const applyCoupon = async (code: string) => {
     const cleanCode = code.trim().toUpperCase();
-    const savedCoupons1 = localStorage.getItem('textilejaipur_admin_coupons');
-    const savedCoupons2 = localStorage.getItem('hiyawear_admin_coupons');
     
-    let allCoupons: Coupon[] = [];
     try {
-      if (savedCoupons1) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons1)];
-      if (savedCoupons2) allCoupons = [...allCoupons, ...JSON.parse(savedCoupons2)];
+      const { data: couponData, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', cleanCode)
+        .eq('is_active', true)
+        .single();
+
+      if (error || !couponData) {
+        return { success: false, message: 'Invalid or expired promo code.' };
+      }
+
+      // Check minimum order value
+      if (couponData.min_order_value && getCartSubtotalInr() < couponData.min_order_value) {
+        return { success: false, message: `Minimum order value of ₹${couponData.min_order_value} required.` };
+      }
+
+      const coupon: Coupon = {
+        id: couponData.id,
+        code: couponData.code,
+        type: couponData.discount_type === 'percentage' ? 'percent' : 'fixed',
+        value: couponData.discount_value
+      };
+
+      setAppliedCoupon(coupon);
+      return { success: true, message: 'Coupon applied successfully!' };
     } catch (e) {
-      console.error('Error parsing coupons', e);
+      console.error('Error validating coupon:', e);
+      return { success: false, message: 'Error applying coupon. Please try again.' };
     }
-    
-    const found = allCoupons.find(c => c?.code && c.code.trim().toUpperCase() === cleanCode);
-    if (found) {
-      setAppliedCoupon(found);
-      return { success: true, message: `Coupon applied successfully!` };
-    }
-    
-    return { success: false, message: 'Invalid or expired coupon code.' };
   };
 
   const removeCoupon = () => {
