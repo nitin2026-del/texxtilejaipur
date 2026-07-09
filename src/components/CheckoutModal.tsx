@@ -188,20 +188,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <MapPin className="h-4 w-4 text-gold" /> Delivery Details
               </h3>
 
-              {!user && (
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address <span className="text-zinc-400">(for order confirmation & tracking)</span></label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="name@domain.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
-                  />
-                  <p className="text-[10px] text-zinc-400 mt-1">We'll send your order summary and tracking link here.</p>
-                </div>
-              )}
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-600 mb-1">Full Name</label>
@@ -328,6 +314,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   )}
                 </div>
               </div>
+
+              {!user && (
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address <span className="text-zinc-400">(for order confirmation & tracking)</span></label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@domain.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
+                  />
+                  <p className="text-[10px] text-zinc-400 mt-1">We'll send your order summary and tracking link here.</p>
+                </div>
+              )}
 
               <div className="mt-4">
                 <label className="block text-xs font-semibold text-zinc-600 mb-2">Select Payment Method</label>
