@@ -105,14 +105,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const session = res?.data?.session;
       if (session) {
         setUser(session.user);
-        // Non-blocking initialization of profile
-        fetch('/api/auth/init-profile', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${session.access_token}` }
-        }).then(() => {
-          // Fetch profile after initialization
-          fetchProfile(session.user.id, session.user.email);
-        }).catch(console.error);
+        try {
+          await fetch('/api/auth/init-profile', {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId: session.user.id, email: session.user.email })
+          });
+        } catch (e) {
+          console.error('init-profile error:', e);
+        }
+        await fetchProfile(session.user.id, session.user.email);
       } else {
         setUser(null);
         setProfile(null);
@@ -139,12 +144,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (session) {
             setUser(session.user);
             // Non-blocking initialization
-            fetch('/api/auth/init-profile', {
-              method: 'POST',
-              headers: { 'Authorization': `Bearer ${session.access_token}` }
-            }).then(() => {
-              fetchProfile(session.user.id, session.user.email);
-            }).catch(console.error);
+            try {
+              await fetch('/api/auth/init-profile', {
+                method: 'POST',
+                headers: { 
+                  'Authorization': `Bearer ${session.access_token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: session.user.id, email: session.user.email })
+              });
+            } catch (e) {
+              console.error('init-profile error on auth change:', e);
+            }
+            await fetchProfile(session.user.id, session.user.email);
           } else {
             setUser(null);
             setProfile(null);
