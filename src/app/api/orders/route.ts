@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     const productIds = items.map((i: any) => i.id);
     const { data: realProducts, error: prodError } = await supabaseAdmin
       .from('products')
-      .select('id, price_inr')
+      .select('id, price')
       .in('id', productIds);
 
     if (prodError) {
@@ -96,11 +96,11 @@ export async function POST(req: NextRequest) {
     const secureOrderItems = items.map((item: any) => {
       const realProduct = realProducts?.find((p) => p.id === item.id);
       
-      if (realProduct?.price_inr == null) {
+      if (realProduct?.price == null) {
         throw new Error(`Product pricing error for item ID: ${item.id}`);
       }
       
-      const securePrice = realProduct.price_inr;
+      const securePrice = realProduct.price;
       realSubtotalInr += securePrice * item.quantity;
       
       return {
