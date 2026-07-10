@@ -690,7 +690,6 @@ export default function AdminPortal() {
         .from('orders')
         .select(`
           *,
-          profiles (first_name, last_name, phone),
           shipping_addresses (*),
           order_items (
             *,
@@ -712,7 +711,7 @@ export default function AdminPortal() {
           // Enrich with manual individual fetches
           const enriched = await Promise.all(
             fallbackOrders.map(async (ord) => {
-              const { data: items } = await supabase.from('order_items').select('*, products(name, sku)').eq('order_id', ord.id);
+              const { data: items } = await supabase.from('order_items').select('*, products(name, slug)').eq('order_id', ord.id);
               const { data: ships } = await supabase.from('shipments').select('*').eq('order_id', ord.id);
               const { data: pays } = await supabase.from('payments').select('*').eq('order_id', ord.id);
               return {
