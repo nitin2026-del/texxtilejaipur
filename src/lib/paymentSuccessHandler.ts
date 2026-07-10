@@ -3,6 +3,18 @@ import { generateInvoiceBuffer } from './invoiceGenerator';
 
 export async function handlePaymentSuccess(orderId: string, supabaseAdmin: SupabaseClient) {
   try {
+    // 0. Idempotency Check: Don't process if already completed
+    const { data: existingOrder } = await supabaseAdmin
+      .from('orders')
+      .select('payment_status')
+      .eq('id', orderId)
+      .single();
+
+    if (existingOrder?.payment_status === 'completed') {
+      console.log(`[handlePaymentSuccess] Order ${orderId} is already processed. Skipping duplicate fulfillment.`);
+      return { success: true };
+    }
+
     // 1. Standardize Order Status
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')

@@ -82,15 +82,25 @@ export async function POST(req: NextRequest) {
 
     // 2. Fetch real product prices from DB to prevent client forgery
     const productIds = items.map((i: any) => i.id);
-    const { data: realProducts } = await supabaseAdmin
+    const { data: realProducts, error: prodError } = await supabaseAdmin
       .from('products')
-      .select('id, price')
+      .select('id, price_inr')
       .in('id', productIds);
+
+    if (prodError) {
+      console.error('Failed to fetch real products:', prodError);
+      return NextResponse.json({ error: 'Failed to verify products' }, { status: 500 });
+    }
 
     let realSubtotalInr = 0;
     const secureOrderItems = items.map((item: any) => {
       const realProduct = realProducts?.find((p) => p.id === item.id);
-      const securePrice = realProduct?.price || item.price_inr || item.price || 0;
+      
+      if (realProduct?.price_inr == null) {
+        throw new Error(`Product pricing error for item ID: ${item.id}`);
+      }
+      
+      const securePrice = realProduct.price_inr;
       realSubtotalInr += securePrice * item.quantity;
       
       return {
@@ -160,7 +170,9 @@ export async function POST(req: NextRequest) {
         total: finalTotalInr, // Now using 100% secure server-side total
         subtotal: realSubtotalInr,
         status: 'pending',
-        payment_status: 'pending'
+        payment_status: 'pending',
+        display_currency: display_currency || 'INR',
+        total_display_currency: total_display_currency
       })
       .select('id')
       .single();
