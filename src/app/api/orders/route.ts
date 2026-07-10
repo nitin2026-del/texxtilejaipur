@@ -170,9 +170,7 @@ export async function POST(req: NextRequest) {
         total: finalTotalInr, // Now using 100% secure server-side total
         subtotal: realSubtotalInr,
         status: 'pending',
-        payment_status: 'pending',
-        display_currency: display_currency || 'INR',
-        total_display_currency: total_display_currency
+        payment_status: 'pending'
       })
       .select('id')
       .single();
