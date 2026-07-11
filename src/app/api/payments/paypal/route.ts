@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Invalid order amount for PayPal' }, { status: 400 });
       }
 
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com';
+      const siteUrl = req.headers.get('origin') || new URL(req.url).origin || process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com';
       const request = new paypal.orders.OrdersCreateRequest();
       request.prefer("return=representation");
       request.requestBody({

@@ -1814,9 +1814,13 @@ export default function AdminPortal() {
                               <span className="block text-[9px] text-zinc-500 font-mono mt-1 select-all">
                                 {order.tracking_number || 'No tracking ref'}
                               </span>
-                              {(order.payment_status !== 'paid' && order.payment_status !== 'completed') && (
+                              {(order.payment_status !== 'paid' && order.payment_status !== 'completed') ? (
                                 <span className="block text-[9px] text-red-400 font-bold mt-1 tracking-widest uppercase">
                                   UNPAID
+                                </span>
+                              ) : (
+                                <span className="block text-[9px] text-emerald-500 font-bold mt-1 tracking-widest uppercase">
+                                  PAID
                                 </span>
                               )}
                             </td>

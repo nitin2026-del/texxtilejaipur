@@ -10,7 +10,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
       .eq('id', orderId)
       .single();
 
-    if (existingOrder?.payment_status === 'completed') {
+    if (existingOrder?.payment_status === 'paid' || existingOrder?.payment_status === 'completed') {
       console.log(`[handlePaymentSuccess] Order ${orderId} is already processed. Skipping duplicate fulfillment.`);
       return { success: true };
     }
@@ -18,7 +18,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
     // 1. Standardize Order Status
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
-      .update({ payment_status: 'completed', status: 'processing' })
+      .update({ payment_status: 'paid', status: 'processing' })
       .eq('id', orderId)
       .select('*, shipping_addresses(*)')
       .single();

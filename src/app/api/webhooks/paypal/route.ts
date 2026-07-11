@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
         .eq('payment_id', paypalOrderId)
         .single();
         
-      if (order && order.payment_status !== 'completed') {
+      if (order && order.payment_status !== 'paid' && order.payment_status !== 'completed') {
         try {
           const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
           request.requestBody({});
