@@ -39,7 +39,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
 
         product = {
           id: item.id,
-          sku: item.slug ? `HT-${item.slug.toUpperCase()}` : `HT-${item.id.slice(0, 8).toUpperCase()}`,
+          sku: `HT-${item.id.slice(0, 8).toUpperCase()}`,
           name: item.name,
           description: item.description || '',
           price_inr: item.price || 0,
