@@ -75,9 +75,8 @@ interface Product {
 
 export function ProductPageClient({ product, relatedProducts, initialReviews }: { product: any, relatedProducts: any[], initialReviews: any[] }) {
     const { cart, addToCart, formatPrice, updateQuantity } = useCart();
-  
-  
-    
+    const id = product?.id;
+    const pathname = usePathname();
     const [quantity, setQuantity] = useState(1);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
 
@@ -242,155 +241,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
     setTimeout(() => setShareToast(false), 3000);
   };
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      if (!id) return;
-      if (!product) setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select(`
-            *,
-            categories (
-              name
-            ),
-            product_images (
-              url,
-              is_primary,
-              display_order
-            )
-          `)
-          .eq('id', id)
-          .single();
-
-        if (error) throw error;
-        if (data) {
-          const item = data as any;
-          const sortedImages = item.product_images
-            ? [...item.product_images]
-                .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
-                .map((img) => img.url)
-            : [];
-
-          setProduct({
-            id: item.id,
-            sku: `HT-${item.id.slice(0, 8).toUpperCase()}`,
-            name: item.name,
-            description: item.description || '',
-            price_inr: item.price || 0,
-            category: item.categories?.name || 'Ethnic Wear',
-            images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
-            stock_quantity: item.stock_quantity || item.stock || 0,
-            details: {
-              ...item.details,
-              material: item.details?.material || (item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric'),
-              origin: item.details?.origin || 'Jaipur, Rajasthan',
-              care: item.details?.care || 'Dry clean only',
-              sizes: item.details?.sizes || ['S', 'M', 'L', 'XL'],
-              video_url: item.details?.video_url,
-              culturalContext: item.details?.culturalContext,
-              stylingAdvice: item.details?.stylingAdvice,
-              translations: item.details?.translations
-            }
-          });
-
-          // Fetch dynamic reviews
-          try {
-            const { data: reviewsData, error: reviewsError } = await supabase
-              .from('reviews')
-              .select('*')
-              .eq('product_id', item.id)
-              .eq('status', 'approved')
-              .order('created_at', { ascending: false });
-              
-            if (!reviewsError && reviewsData) {
-              setDynamicReviews(reviewsData.map(r => ({
-                id: r.id,
-                initial: r.reviewer_name ? r.reviewer_name.charAt(0).toUpperCase() : 'A',
-                name: r.reviewer_name || 'Anonymous',
-                location: r.reviewer_location || undefined,
-                date: new Date(r.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-                stars: r.rating || 5,
-                title: r.title ? `"${r.title}"` : undefined,
-                body: r.comment || '',
-                reply: r.reply || undefined,
-                isVerified: r.is_verified_buyer || false
-              })));
-            }
-          } catch (e) {
-            console.error('Error fetching reviews:', e);
-          }
-
-          // Fetch related products
-          try {
-            let query = supabase
-              .from('products')
-              .select(`
-                id, name, price,
-                categories (name),
-                product_images (url, is_primary)
-              `)
-              .neq('id', item.id)
-              .limit(20);
-              
-            // If category exists, try fetching from same category first
-            if (item.category_id) {
-              const { data: categoryData } = await query.eq('category_id', item.category_id);
-              if (categoryData && categoryData.length >= 2) {
-                 // Use category data if we have at least 2 products
-                 const formatted = categoryData.map((p: any) => ({
-                    id: p.id,
-                    name: p.name,
-                    price_inr: p.price,
-                    category: p.categories?.name || 'Ethnic Wear',
-                    image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
-                 }));
-                 // Shuffle randomly and take 4
-                 const shuffled = formatted.sort(() => 0.5 - Math.random()).slice(0, 4);
-                 setRelatedProducts(shuffled);
-                 return;
-              }
-            }
-            
-            // Fallback: fetch any products
-            const { data: relatedData } = await supabase
-              .from('products')
-              .select(`
-                id, name, price,
-                categories (name),
-                product_images (url, is_primary)
-              `)
-              .neq('id', item.id)
-              .limit(20);
-
-            if (relatedData) {
-              const formatted = relatedData.map((p: any) => ({
-                id: p.id,
-                name: p.name,
-                price_inr: p.price,
-                category: p.categories?.name || 'Ethnic Wear',
-                image: p.product_images?.find((img: any) => img.is_primary)?.url || p.product_images?.[0]?.url || 'https://via.placeholder.com/400x500'
-              }));
-              // Shuffle randomly and take 4
-              const shuffled = formatted.sort(() => 0.5 - Math.random()).slice(0, 4);
-              setRelatedProducts(shuffled);
-            }
-          } catch (e) {
-            console.error('Error fetching related products:', e);
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching product:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [id]);
-
   const trackedProductId = useRef<string | null>(null);
-  const pathname = usePathname();
+
 
   useEffect(() => {
     if (!product || typeof window === 'undefined' || !(window as any).fbq) return;
@@ -494,20 +346,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
           <ArrowLeft className="h-4 w-4" />
           Back to Collection
         </Link>
-        {loading ? (
-          <div className="animate-pulse flex flex-col md:flex-row gap-12">
-            <div className="w-full md:w-1/2 h-[600px] bg-zinc-100/50 rounded-lg" />
-            <div className="w-full md:w-1/2 space-y-6">
-              <div className="h-8 bg-zinc-100/50 rounded w-3/4" />
-              <div className="h-6 bg-zinc-100/50 rounded w-1/4" />
-              <div className="h-24 bg-zinc-100/50 rounded w-full" />
-            </div>
-          </div>
-        ) : !product ? (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-serif text-zinc-900">Product Not Found</h2>
-            <p className="text-zinc-500 mt-2">The product you're looking for does not exist or has been removed.</p>
-          </div>
+        {!product ? (
+          <div className="text-center py-20 text-zinc-500">Product not found</div>
         ) : (
           <div className="flex flex-col md:flex-row gap-12 lg:gap-20">
             {/* Cinematic Media Gallery */}
