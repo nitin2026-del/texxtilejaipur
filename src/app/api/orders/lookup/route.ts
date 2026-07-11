@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
         subtotal,
         created_at,
         tracking_number,
-        display_currency,
         shipping_addresses (
           full_name,
           city,
@@ -57,45 +56,42 @@ export async function POST(req: NextRequest) {
     // Also try looking up by authenticated user profile email
     let finalOrder = order;
     if (!finalOrder) {
-      // Try matching via user profile email
-      const { data: profileMatch } = await supabaseAdmin
-        .from('profiles')
-        .select('id')
-        .eq('email', normalizedEmail)
+      // Try matching via auth.users
+      const { data: userOrder } = await supabaseAdmin
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          status,
+          payment_status,
+          total,
+          subtotal,
+          created_at,
+          tracking_number,
+          user_id,
+          shipping_addresses (
+            full_name,
+            city,
+            country
+          ),
+          order_items (
+            quantity,
+            price_at_time,
+            products (
+              name,
+              slug
+            )
+          )
+        `)
+        .eq('order_number', normalizedOrderNumber)
+        .not('user_id', 'is', null)
         .maybeSingle();
 
-      if (profileMatch) {
-        const { data: userOrder } = await supabaseAdmin
-          .from('orders')
-          .select(`
-            id,
-            order_number,
-            status,
-            payment_status,
-            total,
-            subtotal,
-            created_at,
-            tracking_number,
-            display_currency,
-            shipping_addresses (
-              full_name,
-              city,
-              country
-            ),
-            order_items (
-              quantity,
-              price_at_time,
-              products (
-                name,
-                slug
-              )
-            )
-          `)
-          .eq('order_number', normalizedOrderNumber)
-          .eq('user_id', profileMatch.id)
-          .maybeSingle();
-
-        finalOrder = userOrder;
+      if (userOrder && userOrder.user_id) {
+        const { data: authData } = await supabaseAdmin.auth.admin.getUserById(userOrder.user_id);
+        if (authData?.user?.email?.toLowerCase() === normalizedEmail) {
+          finalOrder = userOrder;
+        }
       }
     }
 

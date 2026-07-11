@@ -252,7 +252,7 @@ function TrackOrderContent() {
 
         {/* Help */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-zinc-400 font-sans">Need help? <a href="mailto:support@textilejaipur.com" className="underline" style={{ color: '#d4af37' }}>support@textilejaipur.com</a> or <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="underline text-green-600">WhatsApp Us</a></p>
+          <p className="text-xs text-zinc-400 font-sans">Need help? <a href="mailto:textileofrajasthan.info@gmail.com" className="underline" style={{ color: '#d4af37' }}>textileofrajasthan.info@gmail.com</a> or <a href="https://wa.me/919461858955" target="_blank" rel="noopener noreferrer" className="underline text-green-600">WhatsApp Us</a></p>
         </div>
       </div>
     </div>
