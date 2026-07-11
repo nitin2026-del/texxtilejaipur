@@ -434,6 +434,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             <RefreshCcw className="h-5 w-5 text-zinc-500" />
             Returns Portal
           </a>
+
+          <a 
+            href="/track-order"
+            onClick={() => setIsDrawerOpen(false)}
+            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+          >
+            <Truck className="h-5 w-5 text-zinc-500" />
+            Track Order
+          </a>
           
           <button 
             onClick={() => { setIsDrawerOpen(false); setActiveModal('about'); }}
