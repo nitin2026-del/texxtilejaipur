@@ -8,12 +8,7 @@ export async function generateInvoiceBuffer(order: any, orderItems: any[], user:
       const doc = new PDFDocument({ margin: 50 });
       
       // Load Custom Fonts
-      const fontRegular = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf');
-      const fontBold = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Bold.ttf');
-      
-      doc.registerFont('Roboto', fs.readFileSync(fontRegular));
-      doc.registerFont('Roboto-Bold', fs.readFileSync(fontBold));
-      const buffers: Buffer[] = [];
+            const buffers: Buffer[] = [];
       
       doc.on('data', buffers.push.bind(buffers));
       doc.on('end', () => {
@@ -23,9 +18,11 @@ export async function generateInvoiceBuffer(order: any, orderItems: any[], user:
 
       // Header
       doc
+        .font('Helvetica-Bold')
         .fillColor('#444444')
         .fontSize(20)
         .text('Textile Jaipur', 50, 57)
+        .font('Helvetica')
         .fontSize(10)
         .text('Textile Jaipur Export House', 200, 50, { align: 'right' })
         .text('Jaipur, Rajasthan, India', 200, 65, { align: 'right' })
@@ -40,9 +37,9 @@ export async function generateInvoiceBuffer(order: any, orderItems: any[], user:
       doc
         .fontSize(10)
         .text('Invoice Number:', 50, customerInfoTop)
-        .font('Roboto-Bold')
+        .font('Helvetica-Bold')
         .text(order.order_number || order.id.slice(0, 8), 150, customerInfoTop)
-        .font('Roboto')
+        .font('Helvetica')
         .text('Invoice Date:', 50, customerInfoTop + 15)
         .text(new Date().toLocaleDateString(), 150, customerInfoTop + 15)
         .text('Order Total:', 50, customerInfoTop + 30)
@@ -55,9 +52,9 @@ export async function generateInvoiceBuffer(order: any, orderItems: any[], user:
       // Customer Details
       doc
         .text('Billed To:', 300, customerInfoTop)
-        .font('Roboto-Bold')
+        .font('Helvetica-Bold')
         .text(user.full_name || 'Valued Customer', 300, customerInfoTop + 15)
-        .font('Roboto')
+        .font('Helvetica')
         .text(user.email, 300, customerInfoTop + 30);
 
       const hrPos2 = 200;
@@ -65,12 +62,12 @@ export async function generateInvoiceBuffer(order: any, orderItems: any[], user:
 
       // Items Table Header
       const invoiceTableTop = 230;
-      doc.font('Roboto-Bold');
+      doc.font('Helvetica-Bold');
       doc.text('Item', 50, invoiceTableTop);
       doc.text('Unit Cost', 280, invoiceTableTop, { width: 90, align: 'right' });
       doc.text('Quantity', 370, invoiceTableTop, { width: 90, align: 'right' });
       doc.text('Line Total', 470, invoiceTableTop, { width: 90, align: 'right' });
-      doc.font('Roboto');
+      doc.font('Helvetica');
 
       const hrPos3 = invoiceTableTop + 15;
       doc.strokeColor('#dddddd').lineWidth(1).moveTo(50, hrPos3).lineTo(550, hrPos3).stroke();
@@ -90,13 +87,13 @@ export async function generateInvoiceBuffer(order: any, orderItems: any[], user:
 
       // Total
       const subtotalPosition = position + 30;
-      doc.font('Roboto-Bold');
+      doc.font('Helvetica-Bold');
       doc.text('Total:', 370, subtotalPosition, { width: 90, align: 'right' });
       doc.text(`${order.total_display_currency} ${order.display_currency || 'INR'}`, 470, subtotalPosition, { width: 90, align: 'right' });
 
       // Footer
       doc
-        .font('Roboto')
+        .font('Helvetica')
         .fontSize(10)
         .text('Payment processed securely. Thank you for your business.', 50, 700, { align: 'center', width: 500 });
 

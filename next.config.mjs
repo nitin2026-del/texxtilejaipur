@@ -14,6 +14,9 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    serverComponentsExternalPackages: ['pdfkit'],
+  },
 };
 
 export default nextConfig;
