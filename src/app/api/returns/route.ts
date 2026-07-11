@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
         <p>Hi ${finalName},</p>
         <p>We received a return request for your order <strong>${orderId}</strong>.</p>
         <p style="text-align: center; margin: 30px 0;">
-          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com'}/returns/process?order=${orderId}" style="display: inline-block; background: #d4af37; color: #000; text-decoration: none; padding: 12px 30px; font-weight: bold; border-radius: 4px;">Complete Your Return</a>
+          <a href="https://www.textilejaipur.com/returns/process?order=${orderId}" style="display: inline-block; background: #d4af37; color: #000; text-decoration: none; padding: 12px 30px; font-weight: bold; border-radius: 4px;">Complete Your Return</a>
         </p>
         <p>If you didn't request this, you can safely ignore this email.</p>
         <p style="color: #666; font-size: 12px; text-align: center; margin-top: 40px;">
