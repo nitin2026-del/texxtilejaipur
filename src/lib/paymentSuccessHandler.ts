@@ -109,7 +109,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
             },
           });
 
-          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com';
+          const siteUrl = 'https://www.textilejaipur.com';
           const orderNumber = order.order_number || orderId;
           const trackingUrl = `${siteUrl}/track-order?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(userEmail)}`;
           const firstName = userName ? userName.split(' ')[0] : 'there';
@@ -187,7 +187,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
                   <!-- Divider -->
                   <div style="border-top: 1px solid #e8dfc8; margin: 28px 0;"></div>
                   <p style="font-size: 13px; color: #888; line-height: 1.7; font-family: Arial, sans-serif; margin: 0;">
-                    Questions? Reply to this email or contact us at <a href="mailto:support@textilejaipur.com" style="color: #d4af37;">support@textilejaipur.com</a><br/>
+                    Questions? Reply to this email or contact us at <a href="mailto:textileofrajasthan.info@gmail.com" style="color: #d4af37;">textileofrajasthan.info@gmail.com</a><br/>
                     <em>Your official PDF invoice is attached to this email.</em>
                   </p>
                 </div>

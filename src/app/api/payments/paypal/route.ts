@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       } catch (captureError: any) {
         // If already captured (back button / duplicate request), treat as success
         const isAlreadyCaptured =
-          captureError?.statusCode === 422 ||
+          
           JSON.stringify(captureError).includes('ORDER_ALREADY_CAPTURED');
         if (isAlreadyCaptured) {
           captureStatus = 'COMPLETED'; // Already captured — order is paid
