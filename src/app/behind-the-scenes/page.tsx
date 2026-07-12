@@ -77,17 +77,15 @@ export default function BehindTheScenes() {
               return (
                 <div 
                   key={item.id} 
-                  className="break-inside-avoid relative group rounded-2xl overflow-hidden bg-white/50 border border-zinc-200/50 transform transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-zinc-900/10"
+                  className="break-inside-avoid relative group rounded-2xl overflow-hidden bg-white border border-zinc-200/50 transform transition-all duration-500 hover:-translate-y-2 hover:shadow-xl"
                   style={{ animation: `fadeSlideUp 0.6s ease-out forwards ${index * 0.1}s`, opacity: 0 }}
                 >
                   <div className="relative w-full overflow-hidden bg-zinc-100">
                     {isVideo ? (
                       <video 
                         src={item.media_url} 
-                        className="w-full h-auto object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out" 
-                        autoPlay 
+                        className="w-full h-auto object-cover transition-transform duration-700 ease-out" 
                         muted 
-                        loop 
                         playsInline
                         controls
                       />
@@ -95,30 +93,22 @@ export default function BehindTheScenes() {
                       <img 
                         src={item.media_url} 
                         alt={item.title} 
-                        className="w-full h-auto object-cover scale-105 group-hover:scale-100 transition-transform duration-700 ease-out" 
+                        className="w-full h-auto object-cover transition-transform duration-700 ease-out" 
                         loading="lazy"
                       />
                     )}
-                    {isVideo && (
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-brand-600 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.5)] pointer-events-none border-2 border-white/90 z-10">
-                        <Play className="h-6 w-6 text-white fill-white ml-1" />
-                      </div>
+                  </div>
+                  
+                  {/* Content below media */}
+                  <div className="p-6 bg-white">
+                    <h3 className="text-xl font-bold text-zinc-900 mb-2 leading-tight">
+                      {item.title}
+                    </h3>
+                    {item.description && (
+                      <p className="text-zinc-600 text-sm leading-relaxed">
+                        {item.description}
+                      </p>
                     )}
-                    
-                    {/* Gradient overlay on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                    
-                    {/* Content */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-                      <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
-                        {item.title}
-                      </h3>
-                      {item.description && (
-                        <p className="text-white/80 text-sm md:text-base leading-relaxed line-clamp-3">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
                   </div>
                 </div>
               );
