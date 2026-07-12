@@ -30,7 +30,7 @@ export interface CartContextProduct {
   category?: string;
 }
 
-export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD';
+export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD' | 'NZD' | 'CAD';
 
 export const FX_RATES: Record<Currency, number> = {
   INR: 1,
@@ -39,6 +39,8 @@ export const FX_RATES: Record<Currency, number> = {
   GBP: 0.008340, // Scaled proportionally (£54.21)
   AED: 0.039480, // Scaled proportionally
   AUD: 0.016150, // Scaled proportionally
+  NZD: 0.020000, // Scaled proportionally (~130 NZD)
+  CAD: 0.016500,
 };
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
@@ -48,6 +50,8 @@ const CURRENCY_SYMBOLS: Record<Currency, string> = {
   GBP: '£',
   AED: 'د.إ',
   AUD: 'A$',
+  NZD: 'NZ$',
+  CAD: 'C$',
 };
 
 interface CartContextType {
@@ -100,6 +104,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setCurrencyState('AED');
         } else if (userLocale.includes('AU')) {
           setCurrencyState('AUD');
+        } else if (userLocale.includes('NZ')) {
+          setCurrencyState('NZD');
+        } else if (userLocale.includes('CA')) {
+          setCurrencyState('CAD');
         } else if (userLocale.includes('EU') || userLocale.includes('FR') || userLocale.includes('DE')) {
           setCurrencyState('EUR');
         } else {

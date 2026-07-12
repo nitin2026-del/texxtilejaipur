@@ -171,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
               >
                 <Globe className="h-3.5 w-3.5 text-zinc-500" />
                 <span>
-                  {currency} ({currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'AED' ? 'د.إ' : 'A$'})
+                  {currency} ({currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'AED' ? 'د.إ' : currency === 'AUD' ? 'A$' : currency === 'NZD' ? 'NZ$' : currency === 'CAD' ? 'C$' : '₹'})
                 </span>
                 <ChevronDown className={`h-3 w-3 text-zinc-500 transition-transform duration-200 ${isCurrencyOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -183,10 +183,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                     onClick={() => setIsCurrencyOpen(false)} 
                   />
                   <div className="absolute right-0 mt-2 w-36 bg-white border border-zinc-200 rounded-lg shadow-xl py-1.5 z-50 flex flex-col animate-fade-in">
-                    {(['USD', 'EUR', 'GBP', 'AED', 'AUD', 'INR'] as Currency[]).map((code) => {
+                    {(['USD', 'EUR', 'GBP', 'AED', 'AUD', 'NZD', 'CAD', 'INR'] as Currency[]).map((code) => {
                       const labels: Record<Currency, string> = {
                         USD: 'USD ($)', EUR: 'EUR (€)', GBP: 'GBP (£)',
-                        AED: 'AED (د.إ)', AUD: 'AUD (A$)', INR: 'INR (₹)',
+                        AED: 'AED (د.إ)', AUD: 'AUD (A$)', NZD: 'NZD (NZ$)',
+                        CAD: 'CAD (C$)', INR: 'INR (₹)',
                       };
                       return (
                         <button

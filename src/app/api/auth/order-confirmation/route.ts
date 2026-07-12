@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const trackingUrl = `${siteUrl}/track-order?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}`;
 
     const currencySymbols: Record<string, string> = {
-      INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', AUD: 'A$'
+      INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', AUD: 'A$', NZD: 'NZ$', CAD: 'C$'
     };
     const symbol = currencySymbols[currency] || '₹';
 

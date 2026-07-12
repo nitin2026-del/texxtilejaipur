@@ -359,7 +359,7 @@ export default function Dashboard() {
                         <div>
                           <p className="text-zinc-500 uppercase tracking-wider mb-0.5 text-[10px]">Total Amount</p>
                           <p className="text-zinc-900 font-semibold">
-                            {order.display_currency === 'INR' ? '₹' : order.display_currency === 'USD' ? '$' : order.display_currency === 'EUR' ? '€' : order.display_currency === 'GBP' ? '£' : order.display_currency === 'AED' ? 'د.إ' : order.display_currency === 'AUD' ? 'A$' : '₹'}
+                            {order.display_currency === 'INR' ? '₹' : order.display_currency === 'USD' ? '$' : order.display_currency === 'EUR' ? '€' : order.display_currency === 'GBP' ? '£' : order.display_currency === 'AED' ? 'د.إ' : order.display_currency === 'AUD' ? 'A$' : order.display_currency === 'NZD' ? 'NZ$' : order.display_currency === 'CAD' ? 'C$' : '₹'}
                             {(order.total_display_currency || order.total)?.toLocaleString()}
                           </p>
                         </div>

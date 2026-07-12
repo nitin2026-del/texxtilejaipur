@@ -114,7 +114,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
           const trackingUrl = `${siteUrl}/track-order?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(userEmail)}`;
           const firstName = userName ? userName.split(' ')[0] : 'there';
           const currency = order.display_currency || 'INR';
-          const currencySymbols: Record<string, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', AUD: 'A$' };
+          const currencySymbols: Record<string, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', AUD: 'A$', NZD: 'NZ$', CAD: 'C$' };
           const symbol = currencySymbols[currency] || '₹';
 
           const itemsHtml = mappedItems.map((item: any) => `
