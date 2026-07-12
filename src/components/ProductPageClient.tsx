@@ -568,29 +568,48 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                 <div className="space-y-3 pt-4">
                   <div className="flex flex-col gap-2">
                     <div className="text-[11px] uppercase font-bold text-[#111] tracking-widest">
-                      SIZE: XL
+                      SIZE: One Size Fits Most (S–XL)
                     </div>
                     
                     <div className="text-[12px] text-[#444] bg-[#fdfbf7] p-4 rounded border border-brand-200 space-y-3 shadow-sm">
                       <div>
-                        <strong className="text-[#1a1464]">Best Fit For:</strong>
-                        <ul className="list-disc pl-5 mt-1 space-y-0.5 text-zinc-600">
-                          <li>Recommended for women who usually wear <strong>US XL (16–18)</strong> or <strong>UK XL (18–20)</strong>.</li>
-                          <li>Suitable for a <strong>bust measurement of 44–46 inches (112–117 cm)</strong>.</li>
-                          <li>Ideal for those who prefer a comfortable, relaxed fit.</li>
-                        </ul>
+                        <strong className="text-[#1a1464]">Actual Measurements:</strong>
+                        <div className="mt-2 border border-zinc-200 rounded overflow-hidden">
+                          <table className="w-full text-left text-zinc-600 text-[11px]">
+                            <thead className="bg-zinc-100/50">
+                              <tr>
+                                <th className="px-3 py-2 border-b border-zinc-200 font-semibold">Measurement</th>
+                                <th className="px-3 py-2 border-b border-zinc-200 font-semibold">Size</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className="px-3 py-2 border-b border-zinc-100">Chest</td>
+                                <td className="px-3 py-2 border-b border-zinc-100">Up to 46 in (117 cm)</td>
+                              </tr>
+                              <tr>
+                                <td className="px-3 py-2 border-b border-zinc-100">Length</td>
+                                <td className="px-3 py-2 border-b border-zinc-100">24–26 in (61–66 cm)</td>
+                              </tr>
+                              <tr>
+                                <td className="px-3 py-2 border-b border-zinc-100">Sleeve</td>
+                                <td className="px-3 py-2 border-b border-zinc-100">Full Length</td>
+                              </tr>
+                              <tr>
+                                <td className="px-3 py-2 border-b border-zinc-100">Fit</td>
+                                <td className="px-3 py-2 border-b border-zinc-100">Relaxed / Oversized</td>
+                              </tr>
+                              <tr>
+                                <td className="px-3 py-2">Recommended Fit</td>
+                                <td className="px-3 py-2">Best fits Women's S–XL<br/>(US 4–16 / UK 8–20 / EU 36–46)</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                      <div>
-                        <strong className="text-[#1a1464]">Garment Measurements:</strong>
-                        <ul className="list-disc pl-5 mt-1 space-y-0.5 text-zinc-600">
-                          <li>Chest: 46 in (117 cm)</li>
-                          <li>Shoulder: 19 in (48 cm)</li>
-                          <li>Sleeve Length: 24.5 in (62 cm)</li>
-                          <li>Jacket Length: 29 in (74 cm)</li>
-                        </ul>
-                      </div>
-                      <p className="text-xs italic text-zinc-500">
-                        Please allow a 1–2 cm variation, as each jacket is handmade.
+                      
+                      <p className="text-xs text-zinc-600 leading-relaxed border-t border-brand-200/50 pt-3">
+                        <strong className="text-[#1a1464]">Fit Note:</strong> This handcrafted jacket comes in one relaxed size designed to comfortably fit most customers from Small (S) to Extra Large (XL). Please compare the garment measurements with a jacket you already own for the best fit.
                       </p>
                     </div>
 
