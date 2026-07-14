@@ -50,7 +50,8 @@ export default async function ProductPage({ params }: { params: { id: string } }
             material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
             origin: 'Jaipur, Rajasthan',
             care: 'Dry clean only',
-            sizes: ['XS', 'S', 'M', 'L', 'XL']
+            sizes: ['XS', 'S', 'M', 'L', 'XL'],
+            ...(item.details || {})
           },
           is_featured: item.is_featured || false,
           display_rank: item.display_rank || 999
