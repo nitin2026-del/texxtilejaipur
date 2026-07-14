@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     });
 
     const firstName = customerName ? customerName.split(' ')[0] : 'there';
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com';
+    const siteUrl = 'https://www.textilejaipur.com';
     const trackingUrl = `${siteUrl}/track-order?order=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}`;
 
     const currencySymbols: Record<string, string> = {
