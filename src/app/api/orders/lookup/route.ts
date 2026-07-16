@@ -30,6 +30,8 @@ export async function POST(req: NextRequest) {
         subtotal,
         created_at,
         tracking_number,
+        shipping_provider,
+        display_currency,
         shipping_addresses (
           full_name,
           city,
@@ -68,6 +70,8 @@ export async function POST(req: NextRequest) {
           subtotal,
           created_at,
           tracking_number,
+          shipping_provider,
+          display_currency,
           user_id,
           shipping_addresses (
             full_name,

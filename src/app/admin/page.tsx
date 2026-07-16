@@ -3176,6 +3176,8 @@ export default function AdminPortal() {
                     className="w-full bg-white border border-zinc-200 rounded-xl py-2.5 px-3 text-xs text-zinc-900 focus:outline-none focus:border-violet-500"
                   >
                     <option value="ups">UPS</option>
+                    <option value="dhl">DHL Express</option>
+                    <option value="dpd">DPD</option>
                   </select>
                 </div>
 

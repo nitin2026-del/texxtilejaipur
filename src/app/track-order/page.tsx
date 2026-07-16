@@ -20,6 +20,7 @@ interface OrderData {
   subtotal: number;
   created_at: string;
   tracking_number: string | null;
+  shipping_provider?: string;
   display_currency: string;
   shipping_addresses: { full_name: string; city: string; country: string } | null;
   order_items: OrderItem[];
@@ -198,16 +199,45 @@ function TrackOrderContent() {
             </div>
 
             {/* Tracking Number */}
-            {order.tracking_number && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
-                <Truck className="h-5 w-5 text-blue-500 shrink-0" />
-                <div>
-                  <p className="text-xs font-semibold text-blue-700 font-sans">UPS Tracking Number</p>
-                  <p className="text-sm font-mono font-bold text-blue-900">{order.tracking_number}</p>
-                  <a href={`https://www.ups.com/track?tracknum=${order.tracking_number}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline font-sans">Track on UPS.com →</a>
+            {order.tracking_number && (() => {
+              const provider = order.shipping_provider?.toLowerCase() || 'ups';
+              let providerName = 'UPS';
+              let trackUrl = `https://www.ups.com/track?tracknum=${order.tracking_number}`;
+              let bgColor = 'bg-blue-50 border-blue-200';
+              let textColor = 'text-blue-700';
+              let iconColor = 'text-blue-500';
+              let valueColor = 'text-blue-900';
+              let linkColor = 'text-blue-600';
+
+              if (provider === 'dhl') {
+                providerName = 'DHL Express';
+                trackUrl = `https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=${order.tracking_number}`;
+                bgColor = 'bg-amber-50 border-amber-200';
+                textColor = 'text-amber-800';
+                iconColor = 'text-red-600'; // DHL red/yellow branding
+                valueColor = 'text-amber-950';
+                linkColor = 'text-red-600';
+              } else if (provider === 'dpd') {
+                providerName = 'DPD';
+                trackUrl = `https://tracking.dpd.de/status/en_US/parcel/${order.tracking_number}`;
+                bgColor = 'bg-red-50 border-red-200';
+                textColor = 'text-red-800';
+                iconColor = 'text-red-600'; // DPD red branding
+                valueColor = 'text-red-950';
+                linkColor = 'text-red-700';
+              }
+
+              return (
+                <div className={`${bgColor} border rounded-xl p-4 flex items-center gap-3`}>
+                  <Truck className={`h-5 w-5 ${iconColor} shrink-0`} />
+                  <div>
+                    <p className={`text-xs font-semibold ${textColor} font-sans`}>{providerName} Tracking Number</p>
+                    <p className={`text-sm font-mono font-bold ${valueColor}`}>{order.tracking_number}</p>
+                    <a href={trackUrl} target="_blank" rel="noopener noreferrer" className={`text-xs ${linkColor} underline font-sans`}>Track on {providerName} →</a>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Order Items */}
             <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm">
