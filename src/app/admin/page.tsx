@@ -3178,6 +3178,7 @@ export default function AdminPortal() {
                     <option value="ups">UPS</option>
                     <option value="dhl">DHL Express</option>
                     <option value="dpd">DPD</option>
+                    <option value="shipglobal">ShipGlobal</option>
                   </select>
                 </div>
 

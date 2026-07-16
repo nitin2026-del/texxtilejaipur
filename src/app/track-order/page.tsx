@@ -225,6 +225,14 @@ function TrackOrderContent() {
                 iconColor = 'text-red-600'; // DPD red branding
                 valueColor = 'text-red-950';
                 linkColor = 'text-red-700';
+              } else if (provider === 'shipglobal') {
+                providerName = 'ShipGlobal';
+                trackUrl = `https://shipglobal.in/tracking/`;
+                bgColor = 'bg-teal-50 border-teal-200';
+                textColor = 'text-teal-800';
+                iconColor = 'text-teal-600';
+                valueColor = 'text-teal-950';
+                linkColor = 'text-teal-700';
               }
 
               return (
