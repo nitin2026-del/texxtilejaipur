@@ -129,7 +129,7 @@ interface BehindTheScenesItem {
   created_at: string;
 }
 
-export default function AdminPortal() {
+function AdminPortalContent() {
   const { user, profile, loading: authLoading, signOut } = useAuth();
   const { formatPrice } = useCart();
 
@@ -3268,5 +3268,36 @@ export default function AdminPortal() {
       )}
     </main>
     </>
+  );
+}
+
+
+class ErrorBoundary extends React.Component<any, { hasError: boolean, error: Error | null }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 50, color: 'red', background: '#fee', zIndex: 9999, position: 'relative' }}>
+          <h2>AdminPortal Client Error</h2>
+          <pre>{this.state.error?.toString()}</pre>
+          <pre>{this.state.error?.stack}</pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export default function AdminPortal() {
+  return (
+    <ErrorBoundary>
+      <AdminPortalContent />
+    </ErrorBoundary>
   );
 }
