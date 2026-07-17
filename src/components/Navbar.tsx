@@ -269,14 +269,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 pl-3 ml-1 border-l border-zinc-200">
-                <a
-                  href="/admin"
-                  className="hidden sm:flex px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-colors shadow-sm"
-                >
-                  Admin Portal
-                </a>
-              </div>
+              <div className="hidden"></div>
             )}
           </div>
         </div>
