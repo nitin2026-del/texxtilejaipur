@@ -236,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 {profile?.role === 'admin' && (
                   <a
                     href="/admin"
-                    className="hidden lg:flex px-3 py-1.5 rounded-lg border border-brand-200 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition-all"
+                    className="flex px-3 py-1.5 rounded-lg border border-brand-200 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition-all"
                   >
                     Admin Portal
                   </a>
@@ -256,7 +256,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 </div>
                 <a
                   href="/dashboard"
-                  className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-colors shadow-sm"
+                  className="hidden sm:flex px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-colors shadow-sm"
                 >
                   Dashboard
                 </a>
@@ -268,7 +268,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                   <LogOut className="h-4 w-4" />
                 </button>
               </div>
-            ) : null}
+            ) : (
+              <div className="flex items-center gap-2 pl-3 ml-1 border-l border-zinc-200">
+                <a
+                  href="/admin"
+                  className="hidden sm:flex px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-colors shadow-sm"
+                >
+                  Admin Portal
+                </a>
+                <button
+                  onClick={() => setAuthModalOpen(true)}
+                  className="px-3 py-1.5 rounded-lg border border-transparent bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-sm"
+                >
+                  Sign In
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </nav>

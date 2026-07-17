@@ -1405,9 +1405,11 @@ export default function AdminPortal() {
   }
 
   // 🔒 ACCESS DENIED GATE
-  if (!user || profile?.role !== 'admin') {
-    if (!user) {
-      return (
+  const isDenied = !user || profile?.role !== 'admin';
+
+  const overlayJSX = isDenied ? (
+    <div className="fixed inset-0 z-[100] bg-white overflow-y-auto">
+      {!user ? (
         <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 flex items-center justify-center p-6 relative overflow-hidden">
           {/* Decorative background glows */}
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-brand-100 blur-[120px] rounded-full pointer-events-none -z-10" />
@@ -1481,10 +1483,7 @@ export default function AdminPortal() {
             </div>
           </div>
         </div>
-      );
-    } else {
-      // User is logged in but role !== admin
-      return (
+      ) : (
         <div className="min-h-screen bg-[#FDFBF7] text-zinc-900 flex items-center justify-center p-6 relative overflow-hidden">
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-red-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
@@ -1518,9 +1517,9 @@ export default function AdminPortal() {
             </div>
           </div>
         </div>
-      );
-    }
-  }
+      )}
+    </div>
+  ) : null;
 
   // Calculate quick metrics
   const totalRevenue = orders
@@ -1534,7 +1533,9 @@ export default function AdminPortal() {
   const lowStockCount = products.filter(p => p.stock <= 5).length;
 
   return (
-    <main className="min-h-screen text-zinc-900 pb-24">
+    <>
+    {overlayJSX}
+    <main className="min-h-screen text-zinc-900 pb-24 relative">
       {/* Background Glow */}
       <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-brand-50 blur-[150px] rounded-full pointer-events-none -z-10" />
 
@@ -1558,7 +1559,7 @@ export default function AdminPortal() {
       </nav>
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto pt-28 px-6 space-y-8">
+      <div className={`max-w-7xl mx-auto pt-28 px-6 space-y-8 ${isDenied ? 'opacity-0 pointer-events-none' : ''}`}>
         
         {/* Tab Controls Bar */}
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-zinc-200 pb-4">
@@ -3266,5 +3267,6 @@ export default function AdminPortal() {
         </div>
       )}
     </main>
+    </>
   );
 }

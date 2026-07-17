@@ -90,11 +90,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(mappedProfile);
       } else {
         console.warn('Profile fetch error:', error);
-        setProfile(null);
+        setProfile(prev => prev ? prev : null);
       }
     } catch (e) {
       console.error('fetchProfile exception:', e);
-      setProfile(null);
+      setProfile(prev => prev ? prev : null);
     }
   };
 
