@@ -59,9 +59,24 @@ function PaymentCaptureHandler() {
         if (data.success) {
           // Clear cart on success
           clearCart();
-          
           // Fire Facebook Pixel Purchase Event
           if (typeof window !== 'undefined' && (window as any).fbq && usdAmount > 0) {
+            
+            // Format Advanced Matching Data
+            const customer = data.customer || {};
+            const nameParts = (customer.name || '').trim().split(' ');
+            const fn = nameParts[0]?.toLowerCase() || undefined;
+            const ln = nameParts.slice(1).join(' ').toLowerCase() || undefined;
+            const em = customer.email?.toLowerCase() || undefined;
+            const ph = customer.phone?.replace(/\D/g, '') || undefined;
+            const country = customer.country?.toLowerCase() || undefined;
+            const zp = customer.zip?.toLowerCase().replace(/\s/g, '') || undefined;
+
+            // Re-initialize with advanced matching data
+            (window as any).fbq('init', '1325173556217164', {
+              em, ph, fn, ln, country, zp
+            });
+
             (window as any).fbq('track', 'Purchase', {
               value: usdAmount,
               currency: 'USD'

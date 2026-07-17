@@ -69,7 +69,36 @@ export async function POST(req: NextRequest) {
       // Centralized success handler
       await handlePaymentSuccess(orderId, supabaseAdmin);
 
-      return NextResponse.json({ success: true, status: captureStatus }, { status: 200 });
+      // Fetch customer details for Meta Pixel Advanced Matching
+      const { data: orderData } = await supabaseAdmin
+        .from('orders')
+        .select(`
+          guest_email,
+          user_id,
+          shipping_addresses (
+            full_name, phone, country, postal_code
+          )
+        `)
+        .eq('id', orderId)
+        .single();
+        
+      let email = orderData?.guest_email || '';
+      if (!email && orderData?.user_id) {
+        const { data: userData } = await supabaseAdmin.auth.admin.getUserById(orderData.user_id);
+        email = userData?.user?.email || '';
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        status: captureStatus,
+        customer: {
+          email,
+          name: orderData?.shipping_addresses?.full_name || '',
+          phone: orderData?.shipping_addresses?.phone || '',
+          country: orderData?.shipping_addresses?.country || '',
+          zip: orderData?.shipping_addresses?.postal_code || ''
+        }
+      }, { status: 200 });
     } else {
       // Default: Create PayPal Order
       if (!orderId || !currency) {
