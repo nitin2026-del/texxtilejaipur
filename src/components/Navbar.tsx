@@ -276,23 +276,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 >
                   Admin Portal
                 </a>
-                <button
-                  onClick={() => setAuthModalOpen(true)}
-                  className="px-3 py-1.5 rounded-lg border border-transparent bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-sm"
-                >
-                  Sign In
-                </button>
               </div>
             )}
           </div>
         </div>
       </nav>
 
-      {/* Auth Modal overlay */}
-      <AuthModal 
-        isOpen={authModalOpen} 
-        onClose={() => setAuthModalOpen(false)} 
-      />
+      {/* Auth Modal removed */}
 
       {/* Info Modals */}
       <InfoModal
