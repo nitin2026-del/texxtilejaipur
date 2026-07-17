@@ -621,33 +621,53 @@ export default function AdminPortal() {
     }
   };
 
-  // Fetch admin dashboard details
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // 1. Fetch Products
-      const { data: prodData, error: prodErr } = await supabase
-        .from('products')
-        .select(`
-          *,
-          categories (
-            name
-          ),
-          product_images (
-            url,
-            is_primary,
-            display_order
-          )
-        `)
-        .order('display_rank', { ascending: true, nullsFirst: false });
+      const [
+        { data: prodData, error: prodErr },
+        { data: catData, error: catErr },
+        { data: orderData, error: orderErr },
+        { data: blogData, error: blogErr },
+        { data: couponsData, error: couponsErr },
+        { data: inquiryData, error: inquiryErr },
+        { data: btsData, error: btsErr }
+      ] = await Promise.all([
+        supabase
+          .from('products')
+          .select('*, categories (name), product_images (url, is_primary, display_order)')
+          .order('display_rank', { ascending: true, nullsFirst: false }),
+        supabase
+          .from('categories')
+          .select('id, name, parent_id, display_order')
+          .order('display_order', { ascending: true })
+          .order('name', { ascending: true }),
+        supabase
+          .from('orders')
+          .select('*, shipping_addresses (*), order_items (*, products (name, slug)), payments (*)')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('blogs')
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('coupons')
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('product_inquiries')
+          .select('*, products (name, sku)')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('behind_the_scenes')
+          .select('*')
+          .order('display_order', { ascending: true })
+          .order('created_at', { ascending: false })
+      ]);
+
       if (prodErr) throw prodErr;
 
       // 1.5 Fetch Categories from DB
-      const { data: catData, error: catErr } = await supabase
-        .from('categories')
-        .select('id, name, parent_id, display_order')
-        .order('display_order', { ascending: true })
-        .order('name', { ascending: true });
       if (!catErr && catData) {
         setDbCategoryObjects(catData);
         const uniqueNames = Array.from(new Set(catData.map((c: any) => c.name).filter(Boolean))) as string[];
@@ -655,6 +675,8 @@ export default function AdminPortal() {
           setDbCategories(uniqueNames);
         }
       }
+
+      // 1. Fetch Products
       if (prodData) {
         const mapped = (prodData as any[]).map((item) => {
           const sortedImages = item.product_images
@@ -686,21 +708,7 @@ export default function AdminPortal() {
       }
 
       // 2. Fetch Orders with relations
-      const { data: orderData, error: orderErr } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          shipping_addresses (*),
-          order_items (
-            *,
-            products (name, slug)
-          ),
-          payments (*)
-        `)
-        .order('created_at', { ascending: false });
-
       if (orderErr) {
-        // Fallback in case relationships are not fully established
         console.warn('Relationships fetch warning:', orderErr);
         const { data: fallbackOrders } = await supabase
           .from('orders')
@@ -708,7 +716,6 @@ export default function AdminPortal() {
           .order('created_at', { ascending: false });
         
         if (fallbackOrders) {
-          // Enrich with manual individual fetches
           const enriched = await Promise.all(
             fallbackOrders.map(async (ord) => {
               const { data: items } = await supabase.from('order_items').select('*, products(name, slug)').eq('order_id', ord.id);
@@ -728,19 +735,11 @@ export default function AdminPortal() {
       }
 
       // 3. Fetch Blogs
-      const { data: blogData, error: blogErr } = await supabase
-        .from('blogs')
-        .select('*')
-        .order('created_at', { ascending: false });
       if (!blogErr && blogData) {
         setBlogs(blogData);
       }
 
       // 4. Fetch Coupons
-      const { data: couponsData, error: couponsErr } = await supabase
-        .from('coupons')
-        .select('*')
-        .order('created_at', { ascending: false });
       if (!couponsErr && couponsData) {
         const formattedCoupons = couponsData.map((c: any) => ({
           id: c.id,
@@ -752,23 +751,11 @@ export default function AdminPortal() {
       }
 
       // 5. Fetch Inquiries
-      const { data: inquiryData, error: inquiryErr } = await supabase
-        .from('product_inquiries')
-        .select(`
-          *,
-          products (name, sku)
-        `)
-        .order('created_at', { ascending: false });
       if (!inquiryErr && inquiryData) {
         setInquiries(inquiryData as Inquiry[]);
       }
 
       // 6. Fetch Behind The Scenes Items
-      const { data: btsData, error: btsErr } = await supabase
-        .from('behind_the_scenes')
-        .select('*')
-        .order('display_order', { ascending: true })
-        .order('created_at', { ascending: false });
       if (!btsErr && btsData) {
         setBehindTheScenesItems(btsData);
       }
@@ -781,12 +768,13 @@ export default function AdminPortal() {
     }
   };
 
+  const profileRole = profile?.role;
   useEffect(() => {
-    if (profile?.role === 'admin' || isBypassed) {
+    if (profileRole === 'admin' || isBypassed) {
       fetchDashboardData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, isBypassed]);
+  }, [profileRole, isBypassed]);
 
 
 
