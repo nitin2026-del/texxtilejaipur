@@ -80,7 +80,7 @@ function PaymentCaptureHandler() {
             (window as any).fbq('track', 'Purchase', {
               value: usdAmount,
               currency: 'USD'
-            });
+            }, { eventID: orderId });
           }
 
           // Redirect to dashboard with success flag — will show success banner

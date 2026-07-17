@@ -75,8 +75,9 @@ export async function POST(req: NextRequest) {
         .select(`
           guest_email,
           user_id,
+          total,
           shipping_addresses (
-            full_name, phone, country, postal_code
+            full_name, phone, country, postal_code, city, state
           )
         `)
         .eq('id', orderId)
@@ -87,6 +88,48 @@ export async function POST(req: NextRequest) {
         const { data: userData } = await supabaseAdmin.auth.admin.getUserById(orderData.user_id);
         email = userData?.user?.email || '';
       }
+
+      // 1. Calculate the USD value used in the frontend Pixel
+      const secureTotalInr = orderData?.total || 0;
+      const USD_RATE = 0.010769; // Calibrated rate
+      const usdValue = Number((secureTotalInr * USD_RATE).toFixed(2));
+
+      // 2. Extract Client Network Identifiers for CAPI
+      const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined;
+      const userAgent = req.headers.get('user-agent') || undefined;
+      const fbp = req.cookies.get('_fbp')?.value;
+      const fbc = req.cookies.get('_fbc')?.value;
+      const nameParts = (orderData?.shipping_addresses?.full_name || '').trim().split(' ');
+      const fn = nameParts[0] || undefined;
+      const ln = nameParts.slice(1).join(' ') || undefined;
+
+      // 3. Fire Meta CAPI Event (Non-blocking)
+      const { sendMetaConversionsApiEvent } = await import('@/lib/metaConversionsApi');
+      
+      // We don't await this so it doesn't block the checkout response
+      sendMetaConversionsApiEvent({
+        eventName: 'Purchase',
+        eventId: orderId, // Crucial for Deduplication
+        eventSourceUrl: req.headers.get('referer') || 'https://www.textilejaipur.com/payment/success',
+        userData: {
+          email,
+          phone: orderData?.shipping_addresses?.phone || undefined,
+          first_name: fn,
+          last_name: ln,
+          city: orderData?.shipping_addresses?.city || undefined,
+          state: orderData?.shipping_addresses?.state || undefined,
+          country: orderData?.shipping_addresses?.country || undefined,
+          zip: orderData?.shipping_addresses?.postal_code || undefined,
+          client_ip_address: clientIp,
+          client_user_agent: userAgent,
+          fbp,
+          fbc
+        },
+        customData: {
+          currency: 'USD',
+          value: usdValue,
+        }
+      });
 
       return NextResponse.json({ 
         success: true, 
