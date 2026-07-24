@@ -64,17 +64,45 @@ function PaymentCaptureHandler() {
             
             // Format Advanced Matching Data
             const customer = data.customer || {};
-            const nameParts = (customer.name || '').trim().split(' ');
-            const fn = nameParts[0]?.toLowerCase() || undefined;
-            const ln = nameParts.slice(1).join(' ').toLowerCase() || undefined;
-            const em = customer.email?.toLowerCase() || undefined;
+            
+            // Name sanitization (a-z only)
+            const rawName = (customer.name || '').trim();
+            const nameParts = rawName.split(/\s+/);
+            const fn = nameParts[0]?.toLowerCase().replace(/[^a-z]/g, '') || undefined;
+            const ln = nameParts.length > 1 ? nameParts.slice(1).join('').toLowerCase().replace(/[^a-z]/g, '') : undefined;
+            
+            const em = customer.email?.toLowerCase().trim() || undefined;
             const ph = customer.phone?.replace(/\D/g, '') || undefined;
-            const country = customer.country?.toLowerCase() || undefined;
             const zp = customer.zip?.toLowerCase().replace(/\s/g, '') || undefined;
+            
+            // City & State
+            const ct = customer.city?.toLowerCase().trim().replace(/[^a-z\s]/g, '') || undefined;
+            const st = customer.state?.toLowerCase().trim() || undefined;
+            
+            // ISO-2 Country Map
+            const rawCountry = (customer.country || '').toLowerCase().trim();
+            const countryMap: Record<string, string> = {
+              'united states': 'us',
+              'usa': 'us',
+              'india': 'in',
+              'united kingdom': 'gb',
+              'uk': 'gb',
+              'australia': 'au',
+              'canada': 'ca',
+              'germany': 'de',
+              'france': 'fr',
+              'italy': 'it',
+              'spain': 'es',
+              'netherlands': 'nl',
+              'united arab emirates': 'ae',
+              'uae': 'ae',
+              'new zealand': 'nz'
+            };
+            const country = countryMap[rawCountry] || (rawCountry.length === 2 ? rawCountry : undefined);
 
             // Re-initialize with advanced matching data
             (window as any).fbq('init', '1325173556217164', {
-              em, ph, fn, ln, country, zp
+              em, ph, fn, ln, country, zp, ct, st
             });
 
             (window as any).fbq('track', 'Purchase', {

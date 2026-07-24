@@ -53,6 +53,16 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       localStorage.setItem('pending_jaicoins_earned', coinsEarned);
       localStorage.setItem('pending_usd_amount', usdAmount.toString());
 
+      // Extract Meta cookies (_fbp, _fbc)
+      const getCookie = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift() || '';
+        return '';
+      };
+      const fbp = getCookie('_fbp');
+      const fbc = getCookie('_fbc');
+
       const res = await fetch('/api/payments/paypal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +71,9 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
           amount: usdAmount, 
           currency: 'USD', 
           landingPage,
-          coinsUsed: Number(coinsUsed) 
+          coinsUsed: Number(coinsUsed),
+          fbp,
+          fbc
         }),
       });
       const data = await res.json();

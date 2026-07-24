@@ -583,26 +583,53 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                               </tr>
                             </thead>
                             <tbody>
-                              <tr>
-                                <td className="px-3 py-2 border-b border-zinc-100">Chest</td>
-                                <td className="px-3 py-2 border-b border-zinc-100">Up to 46 in (117 cm)</td>
-                              </tr>
-                              <tr>
-                                <td className="px-3 py-2 border-b border-zinc-100">Length</td>
-                                <td className="px-3 py-2 border-b border-zinc-100">24–26 in (61–66 cm)</td>
-                              </tr>
-                              <tr>
-                                <td className="px-3 py-2 border-b border-zinc-100">Sleeve</td>
-                                <td className="px-3 py-2 border-b border-zinc-100">Full Length</td>
-                              </tr>
-                              <tr>
-                                <td className="px-3 py-2 border-b border-zinc-100">Fit</td>
-                                <td className="px-3 py-2 border-b border-zinc-100">Relaxed / Oversized</td>
-                              </tr>
-                              <tr>
-                                <td className="px-3 py-2">Recommended Fit</td>
-                                <td className="px-3 py-2">Best fits Women's S–XL<br/>(US 4–16 / UK 8–20 / EU 36–46)</td>
-                              </tr>
+                              {product?.name?.toLowerCase().includes('long') || product?.name?.toLowerCase().includes('kimono') || product?.name?.toLowerCase().includes('duster') ? (
+                                <>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Length</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">48 in (122 cm)</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Chest</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">48 in (122 cm)</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Sleeve</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">20 in (51 cm)</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Fit</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Relaxed, Open-Front Fit</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2">Recommended Fit</td>
+                                    <td className="px-3 py-2">Best fits Women's US sizes 6–16<br/>(approximately XS–XL)</td>
+                                  </tr>
+                                </>
+                              ) : (
+                                <>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Chest</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Up to 46 in (117 cm)</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Length</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">24–26 in (61–66 cm)</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Sleeve</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Full Length</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Fit</td>
+                                    <td className="px-3 py-2 border-b border-zinc-100">Relaxed / Oversized</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="px-3 py-2">Recommended Fit</td>
+                                    <td className="px-3 py-2">Best fits Women's S–XL<br/>(US 4–16 / UK 8–20 / EU 36–46)</td>
+                                  </tr>
+                                </>
+                              )}
                             </tbody>
                           </table>
                         </div>
@@ -625,7 +652,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   <div className="flex h-14 max-w-md">
                     {isInCart ? (
                       <button
-                        onClick={handleAddToCart}
+                        onClick={() => setCartOpen(true)}
                         className="flex-1 bg-white border-2 border-[#1a1464] text-[#1a1464] font-bold text-[13px] uppercase tracking-widest flex items-center justify-center gap-2 transition-colors hover:bg-[#f0f0f5]"
                       >
                         <Check className="h-4 w-4 stroke-[3]" />

@@ -23,7 +23,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned } = body;
+    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned, fbp, fbc } = body;
 
     if (action === 'capture') {
       if (!paypalOrderId || !orderId) {
@@ -100,7 +100,9 @@ export async function POST(req: NextRequest) {
           name: orderData?.shipping_addresses?.full_name || '',
           phone: orderData?.shipping_addresses?.phone || '',
           country: orderData?.shipping_addresses?.country || '',
-          zip: orderData?.shipping_addresses?.postal_code || ''
+          zip: orderData?.shipping_addresses?.postal_code || '',
+          city: orderData?.shipping_addresses?.city || '',
+          state: orderData?.shipping_addresses?.state || ''
         }
       }, { status: 200 });
     } else {
@@ -152,10 +154,15 @@ export async function POST(req: NextRequest) {
       // Get the approval URL so the frontend can redirect the user
       const approvalUrl = response.result.links?.find((l: any) => l.rel === 'approve')?.href || '';
 
-      // Update the order in Supabase with the PayPal order ID
+      // Update the order in Supabase with the PayPal order ID and Meta cookies
       await supabaseAdmin
         .from('orders')
-        .update({ payment_id: createdPaypalOrderId, payment_method: 'paypal' })
+        .update({ 
+          payment_id: createdPaypalOrderId, 
+          payment_method: 'paypal',
+          fbp: fbp || null,
+          fbc: fbc || null 
+        })
         .eq('id', orderId);
 
       // Record the payment attempt in the payments table

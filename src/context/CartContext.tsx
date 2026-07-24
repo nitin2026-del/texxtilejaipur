@@ -153,17 +153,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         category: product.category,
       };
       saveCart([...cart, newItem]);
-    }
 
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      const productPrice = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
-      const productId = product.id;
-      (window as any).fbq('track', 'AddToCart', {
-        content_ids: [productId],
-        content_type: 'product',
-        value: productPrice,
-        currency: 'USD'
-      });
+      // Only fire Meta Pixel AddToCart when a NEW item is actually added to the cart
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        const productPrice = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+        const productId = product.id;
+        (window as any).fbq('track', 'AddToCart', {
+          content_ids: [productId],
+          content_type: 'product',
+          value: productPrice,
+          currency: 'USD'
+        });
+      }
     }
   };
 
