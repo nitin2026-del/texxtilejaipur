@@ -98,8 +98,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const originalPrice = product.price_inr * 1.30;
 
   return (
-    <div 
-      id={`product-${product.id}`}
+    <>
+      <div 
+        id={`product-${product.id}`}
       className="relative bg-white flex flex-col h-full group transition-all duration-500" 
       onMouseEnter={() => setIsHovered(true)} 
       onMouseLeave={() => setIsHovered(false)}
@@ -316,6 +317,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </Link>
           </div>
         </div>
+        </div>
+      </div>
       {/* Quick View Modal */}
       {isQuickViewOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in cursor-pointer" onClick={() => setIsQuickViewOpen(false)}>
@@ -418,6 +421,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
