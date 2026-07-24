@@ -369,6 +369,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {/* Specs */}
               <div className="space-y-3 mb-8 bg-zinc-50 p-4 rounded-xl border border-zinc-100">
                 <div className="flex justify-between text-sm">
+                  <span className="text-zinc-500">Size</span>
+                  <span className="font-bold text-zinc-900 text-right">One Size Fits Most (S-XL)</span>
+                </div>
+                <div className="flex justify-between text-sm">
                   <span className="text-zinc-500">Material</span>
                   <span className="font-bold text-zinc-900 text-right">{product.details?.material || 'Handloom Fabric'}</span>
                 </div>
