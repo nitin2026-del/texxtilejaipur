@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import Link from 'next/link';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 // This page handles the PayPal return for BOTH guest and logged-in users.
 // PayPal redirects to: /payment/success?token=PAYPAL_ORDER_ID&PayerID=xxx&order_id=xxx
@@ -10,97 +12,70 @@ function PaymentCaptureHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
-  // Guard against double-capture (React StrictMode double-invoke / back-button re-visit)
   const hasCaptured = useRef(false);
+  const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
+  const [orderIdState, setOrderIdState] = useState<string | null>(null);
 
   useEffect(() => {
-    // Prevent double execution
     if (hasCaptured.current) return;
 
     const token = searchParams.get('token');       // PayPal order ID (token param)
     const orderId = searchParams.get('order_id'); // Our internal Supabase order ID
 
     if (!token || !orderId) {
-      // Missing params — someone visited this URL directly, send them home
       router.replace('/');
       return;
     }
 
-    // Guard against re-capture on page reload / back-button using localStorage
+    setOrderIdState(orderId);
     const captureKey = `captured_${orderId}`;
+
     if (localStorage.getItem(captureKey) === 'done') {
-      // Already captured — go straight to dashboard
-      router.replace(`/dashboard?payment=captured&order_id=${orderId}`);
+      setStatus('success');
       return;
     }
 
     hasCaptured.current = true;
-
     const usdAmount = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_usd_amount') || 0) : 0;
 
-    // Capture the PayPal payment server-side
     fetch('/api/payments/paypal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'capture',
-        paypalOrderId: token,   // PayPal token = their order ID
-        orderId: orderId,       // Our DB order ID to mark as paid
+        paypalOrderId: token,
+        orderId: orderId,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        // Mark as captured in localStorage to prevent re-capture
         localStorage.setItem(captureKey, 'done');
-        // Clear pending data
         localStorage.removeItem('pending_order_id');
         localStorage.removeItem('pending_usd_amount');
 
         if (data.success) {
-          // Clear cart on success
           clearCart();
           // Fire Facebook Pixel Purchase Event
           if (typeof window !== 'undefined' && (window as any).fbq && usdAmount > 0) {
-            
-            // Format Advanced Matching Data
             const customer = data.customer || {};
-            
-            // Name sanitization (a-z only)
             const rawName = (customer.name || '').trim();
             const nameParts = rawName.split(/\s+/);
             const fn = nameParts[0]?.toLowerCase().replace(/[^a-z]/g, '') || undefined;
             const ln = nameParts.length > 1 ? nameParts.slice(1).join('').toLowerCase().replace(/[^a-z]/g, '') : undefined;
-            
             const em = customer.email?.toLowerCase().trim() || undefined;
             const ph = customer.phone?.replace(/\D/g, '') || undefined;
             const zp = customer.zip?.toLowerCase().replace(/\s/g, '') || undefined;
-            
-            // City & State
             const ct = customer.city?.toLowerCase().trim().replace(/[^a-z\s]/g, '') || undefined;
             const st = customer.state?.toLowerCase().trim() || undefined;
             
-            // ISO-2 Country Map
             const rawCountry = (customer.country || '').toLowerCase().trim();
             const countryMap: Record<string, string> = {
-              'united states': 'us',
-              'usa': 'us',
-              'india': 'in',
-              'united kingdom': 'gb',
-              'uk': 'gb',
-              'australia': 'au',
-              'canada': 'ca',
-              'germany': 'de',
-              'france': 'fr',
-              'italy': 'it',
-              'spain': 'es',
-              'netherlands': 'nl',
-              'united arab emirates': 'ae',
-              'uae': 'ae',
-              'new zealand': 'nz'
+              'united states': 'us', 'usa': 'us', 'india': 'in', 'united kingdom': 'gb', 'uk': 'gb',
+              'australia': 'au', 'canada': 'ca', 'germany': 'de', 'france': 'fr', 'italy': 'it',
+              'spain': 'es', 'netherlands': 'nl', 'united arab emirates': 'ae', 'uae': 'ae', 'new zealand': 'nz'
             };
             const country = countryMap[rawCountry] || (rawCountry.length === 2 ? rawCountry : undefined);
 
-            // Re-initialize with advanced matching data
             (window as any).fbq('init', '1325173556217164', {
               em, ph, fn, ln, country, zp, ct, st
             });
@@ -110,22 +85,55 @@ function PaymentCaptureHandler() {
               currency: 'USD'
             }, { eventID: orderId });
           }
-
-          // Redirect to dashboard with success flag — will show success banner
-          router.replace(`/dashboard?payment=captured&order_id=${orderId}`);
+          setStatus('success');
         } else {
           console.error('PayPal capture API returned failure:', data.error);
-          // Even if capture returns false, PayPal may have already captured.
-          // Redirect to dashboard anyway — order will show as paid if capture succeeded server-side.
-          router.replace(`/dashboard?payment=captured&order_id=${orderId}`);
+          setStatus('error');
         }
       })
       .catch((err) => {
         console.error('PayPal capture network error:', err);
-        // Network error — still redirect, admin can verify in PayPal dashboard
-        router.replace(`/dashboard?payment=captured&order_id=${orderId}`);
+        setStatus('error');
       });
-  }, [searchParams, router]);
+  }, [searchParams, router, clearCart]);
+
+  if (status === 'success') {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6 py-12 text-center">
+        <CheckCircle className="h-20 w-20 text-brand-600 animate-fade-in" />
+        <div>
+          <h1 className="text-3xl font-serif text-zinc-900 mb-2">Thank you for your order!</h1>
+          <p className="text-zinc-600 mb-1">Your payment was successfully processed.</p>
+          <p className="text-zinc-500 text-sm">Order ID: {orderIdState}</p>
+        </div>
+        <div className="flex gap-4 mt-4">
+          <Link href={`/dashboard?payment=captured&order_id=${orderIdState}`} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
+            View Order
+          </Link>
+          <Link href="/collection" className="px-6 py-3 border border-zinc-300 text-zinc-700 font-bold text-sm uppercase tracking-wider hover:bg-zinc-50 transition-colors">
+            Continue Shopping
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6 py-12 text-center">
+        <XCircle className="h-20 w-20 text-red-500" />
+        <div>
+          <h1 className="text-2xl font-serif text-zinc-900 mb-2">Something went wrong</h1>
+          <p className="text-zinc-600">We couldn't confirm your payment automatically.</p>
+        </div>
+        <div className="flex gap-4 mt-4">
+          <Link href={`/dashboard`} className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
+            Go to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6">
