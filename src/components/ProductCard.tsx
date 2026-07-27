@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
-import { ShoppingCart, Star, Globe, Check, Heart, Share2, Shield, Flame, Eye, X } from 'lucide-react';
+import { ShoppingCart, Star, Globe, Check, Heart, Share2, Shield, Flame, Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -30,6 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [shareToast, setShareToast] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [quickViewImageIndex, setQuickViewImageIndex] = useState(0);
 
   useEffect(() => {
     if (isQuickViewOpen) {
@@ -321,25 +322,54 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
       {/* Quick View Modal */}
       {isQuickViewOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in cursor-pointer" onClick={() => setIsQuickViewOpen(false)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in cursor-pointer" onClick={() => { setIsQuickViewOpen(false); setQuickViewImageIndex(0); }}>
           <div 
             className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative cursor-default"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button 
-              onClick={() => setIsQuickViewOpen(false)}
+              onClick={() => { setIsQuickViewOpen(false); setQuickViewImageIndex(0); }}
               className="absolute top-4 right-4 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full text-zinc-500 hover:text-zinc-900 shadow-md transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
 
             {/* Left: Image */}
-            <div className="w-full md:w-1/2 aspect-[4/5] md:aspect-auto md:h-auto min-h-[40vh] relative bg-[#FDFBF7]">
-              {product.details?.video_url || product.images?.[0]?.match(/\.(mp4|webm|mov|ogg)$/i) ? (
-                <video src={product.details?.video_url || product.images?.[0]} autoPlay loop muted playsInline className="object-cover absolute inset-0 w-full h-full" />
+            <div className="w-full md:w-1/2 aspect-[4/5] md:aspect-auto md:h-auto min-h-[40vh] relative bg-[#FDFBF7] group/slider">
+              {product.details?.video_url && quickViewImageIndex === 0 ? (
+                <video src={product.details?.video_url} autoPlay loop muted playsInline className="object-cover absolute inset-0 w-full h-full" />
               ) : (
-                <Image src={product.images?.[0] || 'https://via.placeholder.com/400x500'} alt={product.name} fill className="object-cover" unoptimized={true} />
+                <Image src={product.images?.[quickViewImageIndex] || 'https://via.placeholder.com/400x500'} alt={product.name} fill className="object-cover" unoptimized={true} />
+              )}
+              
+              {/* Slider Controls */}
+              {product.images && product.images.length > 1 && (
+                <>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setQuickViewImageIndex(prev => prev === 0 ? product.images!.length - 1 : prev - 1); }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white text-zinc-800 rounded-full shadow-md backdrop-blur-sm opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setQuickViewImageIndex(prev => prev === product.images!.length - 1 ? 0 : prev + 1); }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white text-zinc-800 rounded-full shadow-md backdrop-blur-sm opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  
+                  {/* Dots */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+                    {product.images.map((_, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={(e) => { e.stopPropagation(); setQuickViewImageIndex(idx); }}
+                        className={`transition-all duration-300 rounded-full ${quickViewImageIndex === idx ? 'w-4 h-1.5 bg-white shadow-sm' : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/80'}`}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
