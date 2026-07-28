@@ -182,7 +182,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                     className="fixed inset-0 z-40 cursor-default" 
                     onClick={() => setIsCurrencyOpen(false)} 
                   />
-                  <div className="absolute right-0 mt-2 w-36 bg-white border border-zinc-200 rounded-lg shadow-xl py-1.5 z-50 flex flex-col animate-fade-in">
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-lg shadow-xl py-1.5 z-50 flex flex-col animate-fade-in">
                     {(['USD', 'EUR', 'GBP', 'AED', 'AUD', 'NZD', 'CAD', 'INR'] as Currency[]).map((code) => {
                       const labels: Record<Currency, string> = {
                         USD: 'USD ($)', EUR: 'EUR (€)', GBP: 'GBP (£)',
@@ -204,6 +204,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                         </button>
                       );
                     })}
+                    <div className="px-3 py-2 mt-1 border-t border-zinc-100 bg-zinc-50/50">
+                      <p className="text-[10px] text-zinc-500 leading-relaxed font-medium">
+                        Don't see your currency? Don't worry! We ship <strong className="text-zinc-700">worldwide</strong>. You can comfortably checkout in USD.
+                      </p>
+                    </div>
                   </div>
                 </>
               )}
