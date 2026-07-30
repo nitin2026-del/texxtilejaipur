@@ -29,19 +29,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
-  const [quickViewImageIndex, setQuickViewImageIndex] = useState(0);
 
-  useEffect(() => {
-    if (isQuickViewOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isQuickViewOpen]);
 
   // Load wishlist state from localStorage
   useEffect(() => {
@@ -204,20 +192,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </span>
         )}
 
-        {/* Quick View Button */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsQuickViewOpen(true);
-            }}
-            className="pointer-events-auto bg-white/95 backdrop-blur-md text-zinc-900 flex items-center gap-2 px-5 py-2.5 rounded-full shadow-xl opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-zinc-900 hover:text-white font-bold tracking-widest uppercase text-[10px]"
-          >
-            <Eye className="h-4 w-4" />
-            Quick View
-          </button>
-        </div>
+
 
         {/* Share toast */}
         {shareToast && (
@@ -320,141 +295,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
         </div>
       </div>
-      {/* Quick View Modal */}
-      {isQuickViewOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in cursor-pointer" onClick={() => { setIsQuickViewOpen(false); setQuickViewImageIndex(0); }}>
-          <div 
-            className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col md:flex-row relative cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button 
-              onClick={() => { setIsQuickViewOpen(false); setQuickViewImageIndex(0); }}
-              className="absolute top-4 right-4 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full text-zinc-500 hover:text-zinc-900 shadow-md transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
 
-            {/* Left: Image */}
-            <div className="w-full md:w-1/2 aspect-[4/5] md:aspect-auto md:h-auto min-h-[40vh] relative bg-[#FDFBF7] group/slider">
-              {product.details?.video_url && quickViewImageIndex === 0 ? (
-                <video src={product.details?.video_url} autoPlay loop muted playsInline className="object-cover absolute inset-0 w-full h-full" />
-              ) : (
-                <Image src={product.images?.[quickViewImageIndex] || 'https://via.placeholder.com/400x500'} alt={product.name} fill className="object-cover" unoptimized={true} />
-              )}
-              
-              {/* Slider Controls */}
-              {product.images && product.images.length > 1 && (
-                <>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setQuickViewImageIndex(prev => prev === 0 ? product.images!.length - 1 : prev - 1); }}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white text-zinc-800 rounded-full shadow-md backdrop-blur-sm opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setQuickViewImageIndex(prev => prev === product.images!.length - 1 ? 0 : prev + 1); }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 hover:bg-white text-zinc-800 rounded-full shadow-md backdrop-blur-sm opacity-0 group-hover/slider:opacity-100 transition-opacity duration-200"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                  
-                  {/* Dots */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
-                    {product.images.map((_, idx) => (
-                      <button 
-                        key={idx}
-                        onClick={(e) => { e.stopPropagation(); setQuickViewImageIndex(idx); }}
-                        className={`transition-all duration-300 rounded-full ${quickViewImageIndex === idx ? 'w-4 h-1.5 bg-white shadow-sm' : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/80'}`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Right: Details */}
-            <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col bg-white">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold px-2 py-1 rounded tracking-wider uppercase">
-                  <Shield className="h-3 w-3" />
-                  GI Certified
-                </span>
-                <div className="flex items-center gap-1">
-                  <Star className="h-3.5 w-3.5 fill-gold text-gold" />
-                  <span className="text-zinc-600 font-semibold text-xs">4.8 (24 Reviews)</span>
-                </div>
-              </div>
-
-              <h2 className="text-2xl md:text-3xl font-serif text-zinc-900 mb-2 leading-tight">{product.name}</h2>
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-2xl font-serif font-bold text-zinc-900">{formatPrice(product.price_inr)}</span>
-                <span className="text-sm text-zinc-400 line-through font-medium">{formatPrice(originalPrice)}</span>
-              </div>
-
-              <p className="text-zinc-600 text-sm leading-relaxed mb-6 line-clamp-4">
-                {product.description || 'Experience the true essence of Jaipur with this authentic, hand-crafted piece. Perfect for any special occasion.'}
-              </p>
-
-              {/* Specs */}
-              <div className="space-y-3 mb-8 bg-zinc-50 p-4 rounded-xl border border-zinc-100">
-                <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Size</span>
-                  <span className="font-bold text-zinc-900 text-right">One Size Fits Most (S-XL)</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Material</span>
-                  <span className="font-bold text-zinc-900 text-right">{product.details?.material || 'Handloom Fabric'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">Origin</span>
-                  <span className="font-bold text-zinc-900 text-right">{product.details?.origin || 'Jaipur, Rajasthan'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500">SKU</span>
-                  <span className="font-mono text-zinc-900">{product.sku}</span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="mt-auto flex flex-col gap-3">
-                {isInCart ? (
-                  <button
-                    onClick={(e) => { e.preventDefault(); addToCart(product); }}
-                    className="w-full px-6 py-4 bg-zinc-900 text-white text-sm font-bold uppercase tracking-widest transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-2 hover:bg-zinc-800"
-                  >
-                    <Check className="h-5 w-5 stroke-[3]" /> Added to Cart
-                  </button>
-                ) : (
-                  <button
-                    onClick={(e) => { e.preventDefault(); addToCart(product); }}
-                    disabled={product.stock === 0}
-                    className={`w-full px-6 py-4 text-sm font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 border-2 border-zinc-900 ${
-                      product.stock === 0 ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed' : 'bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white shadow-sm hover:shadow-xl'
-                    }`}
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                  </button>
-                )}
-                
-                <Link
-                  href={`/product/${product.id}?buy=true`}
-                  className={`w-full px-6 py-4 text-sm font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-brand-700 ${
-                    product.stock === 0 ? 'bg-brand-50 text-brand-300 cursor-not-allowed pointer-events-none' : 'bg-brand-700 text-white hover:bg-brand-800 shadow-md'
-                  }`}
-                >
-                  Buy Now
-                </Link>
-
-                <Link href={`/product/${product.id}`} className="text-center text-sm text-zinc-500 hover:text-zinc-900 underline underline-offset-4 mt-2 font-medium">
-                  View Full Details
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
