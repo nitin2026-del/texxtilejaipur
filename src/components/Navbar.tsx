@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart, Currency } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw, Truck, Undo2, ShieldCheck, Video } from 'lucide-react';
+import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw, Truck, Undo2, ShieldCheck, Video, Heart } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { InfoModal } from './InfoModal';
 
@@ -153,9 +153,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 <ShoppingBag className="h-4 w-4" />
                 Shop All
               </a>
+              <a href="/about" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
+                <Heart className="h-4 w-4" />
+                Our Story
+              </a>
               <a href="/behind-the-scenes" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
                 <Video className="h-4 w-4" />
-                Our Story
+                Behind the Scenes
               </a>
             </div>
           </div>
@@ -375,9 +379,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             Shop All Collections
           </a>
 
+          <a href="/about" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
+            <Heart className="h-5 w-5 text-zinc-500" />
+            Our Story
+          </a>
+
           <a href="/behind-the-scenes" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
             <Video className="h-5 w-5 text-zinc-500" />
-            Our Story
+            Behind the Scenes
           </a>
 
           {user && (

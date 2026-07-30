@@ -159,9 +159,7 @@ export async function POST(req: NextRequest) {
         .from('orders')
         .update({ 
           payment_id: createdPaypalOrderId, 
-          payment_method: 'paypal',
-          fbp: fbp || null,
-          fbc: fbc || null 
+          payment_method: 'paypal'
         })
         .eq('id', orderId);
 
