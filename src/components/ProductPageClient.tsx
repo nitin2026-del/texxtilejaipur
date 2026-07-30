@@ -40,6 +40,8 @@ import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews'
 import { NavyFloralVelvetReviews } from '@/components/NavyFloralVelvetReviews';
 import { VelvetSuzaniHT5EB59E11Reviews } from '@/components/VelvetSuzaniHT5EB59E11Reviews';
 import { VelvetSuzaniHT7A15D83BReviews } from '@/components/VelvetSuzaniHT7A15D83BReviews';
+import { HandcraftedSuzaniCottonReviews } from '@/components/HandcraftedSuzaniCottonReviews';
+import { TealVelvetSuzaniReviews } from '@/components/TealVelvetSuzaniReviews';
 
 import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname } from 'next/navigation';
@@ -1083,6 +1085,14 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
           ) : product.sku === 'HT-7A15D83B' ? (
             <div className="mt-20 border-t border-zinc-200">
               <VelvetSuzaniHT7A15D83BReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-2BC53C7A' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <HandcraftedSuzaniCottonReviews dynamicReviews={dynamicReviews} />
+            </div>
+          ) : product.sku === 'HT-D0EB90F4' ? (
+            <div className="mt-20 border-t border-zinc-200">
+              <TealVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
             </div>
           ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
