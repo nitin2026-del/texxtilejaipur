@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -361,10 +362,13 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
                     >
                       {media.type === 'image' ? (
-                        <img 
+                        <Image 
                           src={media.url || 'https://via.placeholder.com/600x800'} 
                           alt={`${product.name} view ${idx + 1}`}
-                          className="absolute inset-0 w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
+                          priority={idx === 0}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-black">
@@ -392,10 +396,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     </div>
                   );
                 }) : (
-                  <img 
+                  <Image 
                     src="https://via.placeholder.com/600x800" 
                     alt="Placeholder"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 )}
                 
@@ -438,10 +443,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       }`}
                     >
                       <div className="absolute inset-0">
-                        <img 
+                        <Image 
                           src={media.type === 'image' ? (media.url || 'https://via.placeholder.com/80') : (product.images?.[0] || 'https://via.placeholder.com/80')} 
                           alt={`Thumbnail ${idx}`} 
-                          className="absolute inset-0 w-full h-full object-cover" 
+                          fill
+                          sizes="80px"
+                          className="object-cover" 
                         />
                       </div>
                       {media.type === 'video' && (
