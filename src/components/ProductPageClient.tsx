@@ -789,30 +789,37 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                 </div>
 
                 {/* Artisan Story Section */}
-                <div className="mt-6 p-5 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-amber-100 rounded-full">
-                      <User className="h-4 w-4 text-amber-700" />
+                <div className="mt-6">
+                  <details className="group bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-amber-100/50 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-amber-100 rounded-full group-hover:scale-110 transition-transform">
+                          <User className="h-4 w-4 text-amber-700" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-zinc-900">Meet the Artisan</h4>
+                          <p className="text-[10px] text-amber-700 font-semibold uppercase tracking-wider">Crafted by hand in Jaipur, Rajasthan</p>
+                        </div>
+                      </div>
+                      <ChevronDown className="h-5 w-5 text-amber-700 group-open:-rotate-180 transition-transform duration-200" />
+                    </summary>
+                    <div className="p-5 pt-0 border-t border-amber-200/50 mt-2">
+                      <p className="text-xs text-zinc-700 leading-relaxed mb-3 mt-3">
+                        This piece was handcrafted by skilled artisans from Jaipur's heritage weaving community, carrying forward a tradition that spans over 400 years. Each thread is carefully selected and every pattern is block-printed or embroidered by hand — a process that can take 3–7 days per piece.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-flex items-center gap-1 bg-white/70 text-amber-800 text-[9px] font-bold px-2 py-1 rounded-full border border-amber-200">
+                          <Palette className="h-2.5 w-2.5" /> Hand Block Printed
+                        </span>
+                        <span className="inline-flex items-center gap-1 bg-white/70 text-amber-800 text-[9px] font-bold px-2 py-1 rounded-full border border-amber-200">
+                          🏺 Jaipur Heritage Craft
+                        </span>
+                        <span className="inline-flex items-center gap-1 bg-white/70 text-amber-800 text-[9px] font-bold px-2 py-1 rounded-full border border-amber-200">
+                          ✅ Zero Middlemen
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-zinc-900">Meet the Artisan</h4>
-                      <p className="text-[10px] text-amber-700 font-semibold uppercase tracking-wider">Crafted by hand in Jaipur, Rajasthan</p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-zinc-700 leading-relaxed mb-3">
-                    This piece was handcrafted by skilled artisans from Jaipur's heritage weaving community, carrying forward a tradition that spans over 400 years. Each thread is carefully selected and every pattern is block-printed or embroidered by hand — a process that can take 3–7 days per piece.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1 bg-white/70 text-amber-800 text-[9px] font-bold px-2 py-1 rounded-full border border-amber-200">
-                      <Palette className="h-2.5 w-2.5" /> Hand Block Printed
-                    </span>
-                    <span className="inline-flex items-center gap-1 bg-white/70 text-amber-800 text-[9px] font-bold px-2 py-1 rounded-full border border-amber-200">
-                      🏺 Jaipur Heritage Craft
-                    </span>
-                    <span className="inline-flex items-center gap-1 bg-white/70 text-amber-800 text-[9px] font-bold px-2 py-1 rounded-full border border-amber-200">
-                      ✅ Zero Middlemen
-                    </span>
-                  </div>
+                  </details>
                 </div>
 
                 {/* Behind the Scenes CTA */}
@@ -835,25 +842,30 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
 
                 {/* AI Heritage & Styling Guide */}
                 {(product.details?.culturalContext || product.details?.stylingAdvice) && (
-                  <div className="mt-6 border border-brand-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                    <div className="bg-brand-50 px-5 py-3 border-b border-brand-200 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-brand-700" />
-                      <h4 className="text-sm font-bold text-brand-900">The Heritage & Styling Guide</h4>
-                    </div>
-                    <div className="p-5 space-y-4">
-                      {product.details.culturalContext && (
-                        <div>
-                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Cultural Context</h5>
-                          <p className="text-sm text-zinc-600 leading-relaxed">{product.details.culturalContext}</p>
+                  <div className="mt-6">
+                    <details className="group bg-white border border-brand-200 rounded-xl overflow-hidden shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="bg-brand-50 px-5 py-4 border-b border-brand-200 flex items-center justify-between cursor-pointer hover:bg-brand-100/50 transition-colors">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-brand-700" />
+                          <h4 className="text-sm font-bold text-brand-900">The Heritage & Styling Guide</h4>
                         </div>
-                      )}
-                      {product.details.stylingAdvice && (
-                        <div className={product.details.culturalContext ? "pt-4 border-t border-zinc-100" : ""}>
-                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">How to Style</h5>
-                          <p className="text-sm text-zinc-600 leading-relaxed">{product.details.stylingAdvice}</p>
-                        </div>
-                      )}
-                    </div>
+                        <ChevronDown className="h-5 w-5 text-brand-700 group-open:-rotate-180 transition-transform duration-200" />
+                      </summary>
+                      <div className="p-5 space-y-4">
+                        {product.details.culturalContext && (
+                          <div>
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Cultural Context</h5>
+                            <p className="text-sm text-zinc-600 leading-relaxed">{product.details.culturalContext}</p>
+                          </div>
+                        )}
+                        {product.details.stylingAdvice && (
+                          <div className={product.details.culturalContext ? "pt-4 border-t border-zinc-100" : ""}>
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">How to Style</h5>
+                            <p className="text-sm text-zinc-600 leading-relaxed">{product.details.stylingAdvice}</p>
+                          </div>
+                        )}
+                      </div>
+                    </details>
                   </div>
                 )}
 
