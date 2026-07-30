@@ -713,6 +713,40 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" className="h-4 object-contain rounded-sm" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
                   </div>
+
+                  {/* Frequently Asked Questions */}
+                  <div className="mt-6 pt-6 border-t border-zinc-200 max-w-md">
+                    <h3 className="text-sm font-bold text-zinc-900 mb-3">Customer Q&A</h3>
+                    <div className="space-y-2">
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          Do you offer returns if it doesn't fit?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Yes, absolutely! We want you to love your Texxtile Jaipur piece. If it doesn't fit perfectly, we offer hassle-free returns within 7 days of delivery. Just make sure the item is unworn with original tags attached.
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          In how many days will I receive my delivery?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          We use express international shipping (UPS/FedEx) for all orders. Depending on your location, your order will typically arrive within 4 to 8 business days after dispatch. We'll provide a tracking number as soon as it ships!
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          What payment methods do you accept?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          We accept secure checkout via PayPal. Even if you don't have a PayPal account, you can select the "Pay with Debit or Credit Card" option during the PayPal checkout process. All transactions are 100% encrypted and secure.
+                        </div>
+                      </details>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Info Banners */}
@@ -822,23 +856,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   </details>
                 </div>
 
-                {/* Behind the Scenes CTA */}
-                <Link href="/behind-the-scenes" className="mt-4 block group relative overflow-hidden rounded-xl border border-zinc-200">
-                  <div className="absolute inset-0 bg-gradient-to-r from-zinc-900 to-zinc-800 z-0"></div>
-                  <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')] bg-cover bg-center opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-700"></div>
-                  <div className="relative z-10 p-5 flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-                        <Video className="h-4 w-4 text-brand-400" />
-                        Take a Tour of Our Store
-                      </h4>
-                      <p className="text-xs text-zinc-300">Watch how our artisans craft these pieces.</p>
-                    </div>
-                    <div className="h-10 w-10 shrink-0 rounded-full bg-white/10 flex items-center justify-center border border-white/20 group-hover:bg-brand-600 group-hover:border-brand-500 transition-colors">
-                      <Play className="h-4 w-4 text-white fill-white ml-0.5" />
-                    </div>
-                  </div>
-                </Link>
+
 
                 {/* AI Heritage & Styling Guide */}
                 {(product.details?.culturalContext || product.details?.stylingAdvice) && (
@@ -905,39 +923,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     </div>
                   );
                 })()}
-                {/* Frequently Asked Questions */}
-                <div className="mt-8 pt-8 border-t border-zinc-200">
-                  <h3 className="text-lg font-bold text-zinc-900 mb-4">Frequently Asked Questions</h3>
-                  <div className="space-y-3">
-                    <details className="group bg-white border border-zinc-200 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                      <summary className="flex items-center justify-between p-4 cursor-pointer text-sm font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                        Do you offer returns if it doesn't fit?
-                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                      </summary>
-                      <div className="p-4 pt-0 text-sm text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                        Yes, absolutely! We want you to love your Texxtile Jaipur piece. If it doesn't fit perfectly, we offer hassle-free returns within 7 days of delivery. Just make sure the item is unworn with original tags attached.
-                      </div>
-                    </details>
-                    <details className="group bg-white border border-zinc-200 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                      <summary className="flex items-center justify-between p-4 cursor-pointer text-sm font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                        In how many days will I receive my delivery?
-                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                      </summary>
-                      <div className="p-4 pt-0 text-sm text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                        We use express international shipping (UPS/FedEx) for all orders. Depending on your location, your order will typically arrive within 4 to 8 business days after dispatch. We'll provide a tracking number as soon as it ships!
-                      </div>
-                    </details>
-                    <details className="group bg-white border border-zinc-200 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                      <summary className="flex items-center justify-between p-4 cursor-pointer text-sm font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                        What payment methods do you accept?
-                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                      </summary>
-                      <div className="p-4 pt-0 text-sm text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                        We accept secure checkout via PayPal. Even if you don't have a PayPal account, you can select the "Pay with Debit or Credit Card" option during the PayPal checkout process. All transactions are 100% encrypted and secure.
-                      </div>
-                    </details>
-                  </div>
-                </div>
+
               </div>
             </div>
         )}
