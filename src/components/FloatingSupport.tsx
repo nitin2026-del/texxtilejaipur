@@ -5,6 +5,7 @@ import { MessageCircle, Mail, X } from 'lucide-react';
 
 export const FloatingSupport = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
   
   // Drag state
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -14,6 +15,14 @@ export const FloatingSupport = () => {
 
   const whatsappNumber = "919461858955";
   const email = "textileofrajasthan.info@gmail.com";
+
+  useEffect(() => {
+    // Auto-hide tooltip after 4 seconds
+    const timer = setTimeout(() => {
+      setShowTooltip(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handlePointerMove = (e: PointerEvent) => {
@@ -76,6 +85,14 @@ export const FloatingSupport = () => {
       style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
       onPointerDown={handlePointerDown}
     >
+      {/* Auto-hiding Tooltip */}
+      {showTooltip && !isOpen && (
+        <div className="absolute right-16 bottom-2 bg-white text-zinc-900 px-4 py-2 rounded-xl shadow-lg border border-zinc-100 text-sm font-medium whitespace-nowrap animate-fade-in-up">
+          Hi! Need some help?
+          <div className="absolute top-1/2 -right-2 -translate-y-1/2 border-[6px] border-transparent border-l-white"></div>
+        </div>
+      )}
+
       {/* Support Menu */}
       {isOpen && (
         <div className="support-menu bg-white rounded-2xl shadow-2xl border border-zinc-100 p-3 mb-2 animate-fadeIn flex flex-col gap-2 w-64 origin-bottom-right">

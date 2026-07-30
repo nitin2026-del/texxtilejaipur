@@ -288,22 +288,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
 
       {/* Info Modals */}
       <InfoModal
-        isOpen={activeModal === 'about'}
-        onClose={() => setActiveModal(null)}
-        title="About Textile Jaipur"
-        content={
-          <div className="space-y-4">
-            <p>Textile Jaipur was born from a desire to bring India's finest handcrafted textiles to the world. We bridge the gap between Jaipur's legendary artisans and discerning customers globally who appreciate authentic craftsmanship.</p>
-            <p>Every piece is crafted with meticulous attention to detail, using ethically sourced materials and traditional techniques passed down through generations in Rajasthan.</p>
-            <div className="mt-6 pt-6 border-t border-zinc-200">
-              <h4 className="text-zinc-900 font-semibold mb-2">Our Mission</h4>
-              <p className="text-sm text-zinc-600">To redefine global fashion through timeless Indian design, uncompromising quality, and a commitment to preserving artisanal heritage.</p>
-            </div>
-          </div>
-        }
-      />
-
-      <InfoModal
         isOpen={activeModal === 'contact'}
         onClose={() => setActiveModal(null)}
         title="Contact Us"
@@ -457,14 +441,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             Track Order
           </a>
           
-          <button 
-            onClick={() => { setIsDrawerOpen(false); setActiveModal('about'); }}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
-          >
-            <Info className="h-5 w-5 text-zinc-500" />
-            About
-          </button>
-          
+
           <button 
             onClick={() => { setIsDrawerOpen(false); setActiveModal('contact'); }}
             className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
