@@ -635,9 +635,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                         </div>
                       </div>
                       
-                      <p className="text-xs text-zinc-600 leading-relaxed border-t border-brand-200/50 pt-3">
-                        <strong className="text-[#1a1464]">Fit Note:</strong> This handcrafted jacket comes in one relaxed size designed to comfortably fit most customers from Small (S) to Extra Large (XL). Please compare the garment measurements with a jacket you already own for the best fit.
-                      </p>
                     </div>
 
                     <p className="text-[12px] text-[#555] bg-[#f5f5f7] p-3 rounded border border-zinc-200 mt-2">
@@ -764,12 +761,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   </div>
                 </div>
 
-                {/* Info Banners */}
-                <div className="flex flex-col gap-2 max-w-md pt-3">
-                  <div className="bg-[#f5f5f7] rounded p-3.5 text-center text-[12px] font-medium text-[#444]">
-                    <span className="font-bold text-[#1a1464]">25% off</span> on shop above $120. <a href="#" className="text-[#1a1464] font-bold underline underline-offset-2">Details here</a>
-                  </div>
-                </div>
 
                 {/* Actions (Wishlist/Share) & AI Sizing */}
                 <div className="pt-4 flex flex-col gap-4 max-w-md">
@@ -920,21 +911,26 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   if (!guide) return null;
 
                   return (
-                    <div className="mt-6 border border-sky-200 rounded-xl overflow-hidden bg-white shadow-sm">
-                      <div className="bg-sky-50 px-5 py-3 border-b border-sky-200 flex items-center gap-2">
-                        <svg className="h-4 w-4 text-sky-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/><path d="M12 12v.01"/></svg>
-                        <h4 className="text-sm font-bold text-sky-900">Season & Comfort Guide</h4>
-                      </div>
-                      <div className="p-5 space-y-4">
-                        <div>
-                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Best Temperature</h5>
-                          <p className="text-sm text-zinc-600 leading-relaxed font-medium">{guide.temp}</p>
+                    <div className="mt-6">
+                      <details className="group bg-white border border-sky-200 rounded-xl overflow-hidden shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="bg-sky-50 px-5 py-4 border-b border-sky-200 flex items-center justify-between cursor-pointer hover:bg-sky-100/50 transition-colors">
+                          <div className="flex items-center gap-2">
+                            <svg className="h-4 w-4 text-sky-700" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/><path d="M12 12v.01"/></svg>
+                            <h4 className="text-sm font-bold text-sky-900">Season & Comfort Guide</h4>
+                          </div>
+                          <ChevronDown className="h-5 w-5 text-sky-700 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-5 space-y-4">
+                          <div>
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Best Temperature</h5>
+                            <p className="text-sm text-zinc-600 leading-relaxed font-medium">{guide.temp}</p>
+                          </div>
+                          <div className="pt-4 border-t border-zinc-100">
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Comfort Level</h5>
+                            <p className="text-sm text-zinc-600 leading-relaxed">{guide.comfort}</p>
+                          </div>
                         </div>
-                        <div className="pt-4 border-t border-zinc-100">
-                          <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Comfort Level</h5>
-                          <p className="text-sm text-zinc-600 leading-relaxed">{guide.comfort}</p>
-                        </div>
-                      </div>
+                      </details>
                     </div>
                   );
                 })()}
