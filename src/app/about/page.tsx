@@ -6,7 +6,7 @@ import { Footer } from '@/components/Footer';
 import Link from 'next/link';
 import { ArrowRight, Globe, Heart, ShieldCheck, Star } from 'lucide-react';
 
-export default function OurStoryPage() {
+export default function AboutUsPage() {
   return (
     <main className="min-h-screen bg-[#FDFBF7] flex flex-col selection:bg-brand-200">
       <Navbar onCartOpen={() => {}} />
@@ -20,7 +20,7 @@ export default function OurStoryPage() {
         </div>
         <div className="max-w-4xl mx-auto relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/50 border border-amber-200/50 text-amber-800 text-xs font-bold tracking-widest uppercase mb-6 animate-slideUp">
-            <Heart className="h-3 w-3 fill-amber-500 text-amber-500" /> Our Heritage
+            <Heart className="h-3 w-3 fill-amber-500 text-amber-500" /> About Us
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-zinc-900 tracking-tight leading-[1.1] mb-6 animate-slideUp" style={{ animationDelay: '0.1s' }}>
             The Soul of <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800">Jaipur</span>
@@ -35,10 +35,10 @@ export default function OurStoryPage() {
       <section className="py-20 md:py-32 px-6 bg-white border-y border-zinc-100">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
           <div className="w-full lg:w-1/2 relative">
-            <div className="aspect-[4/5] rounded-3xl overflow-hidden relative shadow-2xl">
+            <div className="aspect-[4/5] rounded-3xl overflow-hidden relative shadow-2xl bg-zinc-100">
               <img 
-                src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1200&auto=format&fit=crop" 
-                alt="Artisan working on textiles" 
+                src="/about/img1.jpg" 
+                alt="Texxtile Jaipur Collection" 
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -85,24 +85,24 @@ export default function OurStoryPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Craft 1 */}
             <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
-              <div className="h-48 rounded-xl overflow-hidden mb-6">
-                <img src="https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=800&auto=format&fit=crop" alt="Suzani Embroidery" className="w-full h-full object-cover" />
+              <div className="h-48 rounded-xl overflow-hidden mb-6 bg-white/10">
+                <img src="/about/img2.jpg" alt="Suzani Embroidery" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-2xl font-bold mb-3 text-white">Suzani Embroidery</h3>
               <p className="text-zinc-400 leading-relaxed">Painstakingly hand-embroidered floral motifs that require weeks of dedication. A true labor of love that results in breathtaking, one-of-a-kind jackets.</p>
             </div>
             {/* Craft 2 */}
             <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors md:translate-y-8">
-              <div className="h-48 rounded-xl overflow-hidden mb-6">
-                <img src="https://images.unsplash.com/photo-1611082531776-64560b73c434?q=80&w=800&auto=format&fit=crop" alt="Block Printing" className="w-full h-full object-cover" />
+              <div className="h-48 rounded-xl overflow-hidden mb-6 bg-white/10">
+                <img src="/about/img3.jpg" alt="Hand Block Printing" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-2xl font-bold mb-3 text-white">Hand Block Printing</h3>
               <p className="text-zinc-400 leading-relaxed">Carved wooden blocks dipped in natural dyes, stamped by hand with perfect precision to create rhythmic, bohemian patterns.</p>
             </div>
             {/* Craft 3 */}
             <div className="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
-              <div className="h-48 rounded-xl overflow-hidden mb-6">
-                <img src="https://images.unsplash.com/photo-1583391733959-b362071295fc?q=80&w=800&auto=format&fit=crop" alt="Banarasi Silk" className="w-full h-full object-cover" />
+              <div className="h-48 rounded-xl overflow-hidden mb-6 bg-white/10">
+                <img src="/about/img4.jpg" alt="Premium Textiles" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-2xl font-bold mb-3 text-white">Premium Textiles</h3>
               <p className="text-zinc-400 leading-relaxed">From rich, lustrous velvets to handloom cottons and Banarasi silks, we source only the finest fabrics that feel as luxurious as they look.</p>
