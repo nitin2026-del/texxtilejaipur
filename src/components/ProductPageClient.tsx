@@ -733,7 +733,22 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          We use express international shipping (UPS/FedEx) for all orders. Depending on your location, your order will typically arrive within 4 to 8 business days after dispatch. We'll provide a tracking number as soon as it ships!
+                          <p className="mb-2 mt-2">We offer free, fully tracked worldwide shipping on all orders via premium couriers. ✈️</p>
+                          <p className="font-bold mb-1">Estimated Delivery Times:</p>
+                          <ul className="list-disc pl-4 mb-2 space-y-0.5">
+                            <li><strong>USA:</strong> 5–9 Business Days</li>
+                            <li><strong>UK:</strong> 4–8 Business Days</li>
+                            <li><strong>Europe:</strong> 5–10 Business Days</li>
+                            <li><strong>Canada:</strong> 6–10 Business Days</li>
+                            <li><strong>Australia:</strong> 6–12 Business Days</li>
+                          </ul>
+                          <p className="mb-2 italic text-[#1a1464] font-medium">We deliver everywhere! If your country is not mentioned here, don't worry, we will deliver to you.</p>
+                          <div className="mt-3 p-2 bg-amber-50 rounded border border-amber-100 text-[11px]">
+                            <strong>Need it sooner?</strong> We can provide expedited fast shipping at no extra cost if you have a genuine reason (like a wedding, gift, or special event). <br/>
+                            <a href="https://wa.me/919461858955" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold hover:underline inline-flex items-center gap-1 mt-1">
+                              Request Fast Shipping &rarr;
+                            </a>
+                          </div>
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
