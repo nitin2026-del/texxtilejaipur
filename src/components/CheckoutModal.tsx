@@ -64,6 +64,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     }
   }, [isOpen, user, profile]);
 
+  // Fire InitiateCheckout Event
+  useEffect(() => {
+    if (isOpen && typeof window !== 'undefined' && (window as any).fbq && cart.length > 0) {
+      (window as any).fbq('track', 'InitiateCheckout', {
+        value: Number((getCartTotalInr() * 0.010769).toFixed(2)),
+        currency: 'USD',
+        content_ids: cart.map(item => item.id),
+        content_type: 'product',
+        num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
+      });
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleShippingSubmit = async (e: React.FormEvent) => {
