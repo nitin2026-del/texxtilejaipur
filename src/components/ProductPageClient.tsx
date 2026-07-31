@@ -81,6 +81,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
     const pathname = usePathname();
     const [quantity, setQuantity] = useState(1);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -363,14 +364,27 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
                     >
                       {media.type === 'image' ? (
-                        <Image 
-                          src={media.url || 'https://via.placeholder.com/600x800'} 
-                          alt={`${product.name} view ${idx + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          className="object-cover"
-                          priority={idx === 0}
-                        />
+                        <div
+                          className="absolute inset-0 cursor-zoom-in"
+                          onClick={() => { if (isActive) setLightboxOpen(true); }}
+                          title="Click to view full quality"
+                        >
+                          <Image 
+                            src={media.url || 'https://via.placeholder.com/600x800'} 
+                            alt={`${product.name} view ${idx + 1}`}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="object-cover"
+                            priority={idx === 0}
+                            quality={90}
+                          />
+                          {isActive && (
+                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                              Click for full quality
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-black">
                           {media.url.includes('youtube.com') || media.url.includes('youtu.be') ? (
@@ -462,6 +476,70 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                 </div>
               )}
             </div>
+
+              {/* Lightbox - Full Quality Viewer */}
+              {lightboxOpen && mediaItems[selectedMediaIndex]?.type === 'image' && (
+                <div
+                  className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center"
+                  onClick={() => setLightboxOpen(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setLightboxOpen(false);
+                    if (e.key === 'ArrowRight') setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1);
+                    if (e.key === 'ArrowLeft') setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1);
+                  }}
+                  tabIndex={0}
+                  ref={el => el?.focus()}
+                >
+                  {/* Close */}
+                  <button
+                    className="absolute top-5 right-5 z-10 text-white/70 hover:text-white bg-white/10 rounded-full p-2 transition-colors"
+                    onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+
+                  {/* Counter */}
+                  {mediaItems.length > 1 && (
+                    <div className="absolute top-5 left-1/2 -translate-x-1/2 text-white/60 text-sm">
+                      {selectedMediaIndex + 1} / {mediaItems.length}
+                    </div>
+                  )}
+
+                  {/* Full-Quality Image */}
+                  <div
+                    className="relative w-full h-full max-w-5xl max-h-[90vh] mx-auto px-16"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <Image
+                      src={mediaItems[selectedMediaIndex].url}
+                      alt={`${product.name} – full quality`}
+                      fill
+                      sizes="100vw"
+                      className="object-contain"
+                      quality={100}
+                      priority
+                    />
+                  </div>
+
+                  {/* Arrows */}
+                  {mediaItems.length > 1 && (
+                    <>
+                      <button
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        onClick={(e) => { e.stopPropagation(); setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1); }}
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </button>
+                      <button
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        onClick={(e) => { e.stopPropagation(); setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1); }}
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
 
             {/* Product Details */}
             <div className="w-full md:w-1/2 flex flex-col justify-center">
