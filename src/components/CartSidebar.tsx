@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { X, ShoppingBag, Plus, Minus, Trash2, ShieldCheck, ArrowRight, Info } from 'lucide-react';
@@ -15,8 +16,14 @@ interface CartSidebarProps {
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
   const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon } = useCart();
   const { userTier, tierDiscountPercentage } = useAuth();
+  const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
+
+  const goToProduct = (id: string) => {
+    onClose();
+    router.push(`/product/${id}`);
+  };
 
   if (!isOpen) return null;
 
@@ -64,19 +71,19 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                     className="flex gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/40 relative group"
                   >
                     {/* Item Image - clickable to product page */}
-                    <Link href={`/product/${item.id}`} className="h-20 w-20 rounded-md overflow-hidden bg-zinc-800 shrink-0 block hover:opacity-80 transition-opacity">
+                    <button onClick={() => goToProduct(item.id)} className="h-20 w-20 rounded-md overflow-hidden bg-zinc-800 shrink-0 block hover:opacity-80 transition-opacity cursor-pointer">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
                         src={item.images?.[0] || 'https://via.placeholder.com/80'} 
                         alt={item.name}
                         className="h-full w-full object-cover"
                       />
-                    </Link>
+                    </button>
 
                     {/* Item Info */}
                     <div className="flex-1 flex flex-col justify-between py-0.5">
                       <div>
-                        <Link href={`/product/${item.id}`} className="text-sm font-semibold text-white line-clamp-1 pr-6 hover:text-amber-300 transition-colors block">{item.name}</Link>
+                        <button onClick={() => goToProduct(item.id)} className="text-sm font-semibold text-white line-clamp-1 pr-6 hover:text-amber-300 transition-colors block text-left w-full">{item.name}</button>
                         <span className="text-[10px] text-zinc-500 font-mono tracking-wider">{item.sku}</span>
                       </div>
 
