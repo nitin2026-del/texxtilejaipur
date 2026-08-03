@@ -96,7 +96,30 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
         onClose={() => setCheckoutOpen(false)} 
       />
 
-      <div className="pt-4 md:pt-6 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
+      <div className="pt-28 md:pt-32 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
+
+        {/* 1-Week Sale Banner */}
+        <div className="mb-8 w-full bg-gradient-to-r from-red-700 via-rose-600 to-red-700 text-white rounded-xl shadow-2xl overflow-hidden relative group cursor-default">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+          
+          {/* Animated Shine Effect */}
+          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-[shimmer_1.5s_infinite]"></div>
+
+          <div className="px-6 py-8 md:py-10 text-center relative z-10 flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/20 backdrop-blur-md rounded-full text-xs font-bold tracking-widest uppercase mb-4 border border-white/20">
+              <Sparkles className="h-4 w-4 text-yellow-300" />
+              <span className="text-yellow-100">Limited Time Only</span>
+            </div>
+            
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mb-3 drop-shadow-md leading-tight">
+              1-Week Artisan Sale
+            </h2>
+            
+            <p className="text-base md:text-lg text-rose-100 max-w-2xl mx-auto font-medium mb-0">
+              The prices have been temporarily reduced. This is your chance to own authentic, handcrafted pieces before the event ends.
+            </p>
+          </div>
+        </div>
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Mobile Filter Toggle Pill */}
