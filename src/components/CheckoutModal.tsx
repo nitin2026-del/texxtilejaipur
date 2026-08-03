@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useCart } from '@/context/CartContext';
+import { useCart, FX_RATES } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { X, CreditCard, ShoppingBag, ShieldCheck, User, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
@@ -45,7 +45,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
   
-  const effectiveInr = getCartTotalInr();
+  // $5 USD converted to INR
+  const shippingCostInr = 5 / 0.010769;
+  const effectiveInr = getCartTotalInr() + shippingCostInr;
   const USD_RATE = 0.010769;
   const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
 
@@ -94,8 +96,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
       // We pass the RAW cart total (including tier/coupon) to the backend.
       // The backend will independently verify this total, but we send it for logging/fallback.
-      const orderTotalInr = getCartTotalInr();
-      const orderTotalDisplay = getCartTotalDisplay();
+      const orderTotalInr = effectiveInr;
+      const orderTotalDisplay = effectiveInr * FX_RATES[currency];
 
       // 1. Create order via our API
       const orderRes = await fetch('/api/orders', {
@@ -406,14 +408,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                   </div>
                 )}
                 <div className="flex justify-between text-xs text-zinc-600">
-                  <span>Duties & Port Taxes</span>
-                  <span className="text-amber-500 font-bold bg-amber-900/30 px-2 py-0.5 rounded border border-amber-500/30">
-                    FREE UPS Express
+                  <span>Worldwide UPS Express Shipping</span>
+                  <span className="text-zinc-900 font-bold">
+                    {formatPrice(shippingCostInr)}
                   </span>
                 </div>
-                
-
-
                 <div className="flex justify-between text-sm font-bold text-zinc-900 border-t border-zinc-300 pt-2 mt-2 font-serif">
                   <span>Total Charges</span>
                   <span className="text-gold">

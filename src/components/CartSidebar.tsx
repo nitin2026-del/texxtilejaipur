@@ -145,7 +145,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   <div className="flex justify-between text-xs text-zinc-400">
                     <span>Shipping</span>
                     <span className="text-zinc-100 font-bold">
-                      {formatPrice(getShippingCostInr())}
+                      Calculated at checkout
                     </span>
                   </div>
                   
