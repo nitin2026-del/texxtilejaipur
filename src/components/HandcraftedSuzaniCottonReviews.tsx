@@ -130,7 +130,7 @@ export const HandcraftedSuzaniCottonReviews: React.FC<{ dynamicReviews?: ReviewD
 
       <div className="text-center py-10 px-6 border-t border-[#c9a84c1a]">
         <p className="text-[11px] tracking-[0.2em] text-[#c9a84c55] uppercase mb-1">Handcrafted in Jaipur, India</p>
-        <h3 className="font-serif text-[18px] text-[#c9a84c88]">Free Shipping · Secure Checkout · Genuine Artisan Craft</h3>
+        <h3 className="font-serif text-[18px] text-[#c9a84c88]">Fast Shipping · Secure Checkout · Genuine Artisan Craft</h3>
       </div>
     </div>
   );

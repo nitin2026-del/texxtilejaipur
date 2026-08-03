@@ -1449,10 +1449,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     a: 'Please refer to our detailed size chart. Our garments usually run true to size, but since they are handcrafted, there might be a slight 0.5-inch variation. If you are between sizes, we suggest sizing up for a comfortable fit.'
                   },
                   {
-                    q: 'Is this fabric suitable for summer?',
-                    a: 'Absolutely! This is crafted from 100% pure, breathable cotton that is exceptionally comfortable and airy, making it perfect for hot and humid weather.'
-                  },
-                  {
                     q: 'Do you offer returns if it doesn\'t fit?',
                     a: 'Yes, we offer a 30-day hassle-free return and exchange policy. You can easily initiate a return through our self-service portal as long as the product is unused and has its original tags.'
                   },

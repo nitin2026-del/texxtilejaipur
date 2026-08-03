@@ -31,7 +31,7 @@ const reviewsData = [
     date: 'June 2, 2026',
     stars: 5,
     title: '"The 25% off deal made this an absolute steal!"',
-    body: 'I bought this jacket along with a matching tote to get my cart over $120, and the automatic 25% off discount applied flawlessly. The jacket itself is incredibly soft breathable cotton and the dimensional floral needlework is flawless. Highly recommend paying with PayPal for a quick checkout!',
+    body: 'The jacket itself is incredibly soft breathable cotton and the dimensional floral needlework is flawless. Highly recommend paying with PayPal for a quick checkout!',
     reply: 'Smart shopping, Chloe! 🛍️ We\'re so glad you took advantage of the discount. Thank you for the kind words about our artisans\' needlework!'
   },
   {
@@ -71,7 +71,7 @@ const reviewsData = [
     date: 'March 28, 2026',
     stars: 5,
     title: '"Gorgeous jacket, amazing perks."',
-    body: 'The embroidery is top-notch. It really captures that authentic bohemian vibe on a comfortable cotton base. Between the free shipping, the PayPal option, and the highly responsive customer service when I asked about care instructions, Textile Jaipur has won a loyal customer!',
+    body: 'The embroidery is top-notch. It really captures that authentic bohemian vibe on a comfortable cotton base. Between the fast shipping, the PayPal option, and the highly responsive customer service when I asked about care instructions, Textile Jaipur has won a loyal customer!',
     reply: 'Welcome to the TJ family, Jessica! 🌸 Enjoy your beautiful new handcrafted jacket!'
   }
 ];

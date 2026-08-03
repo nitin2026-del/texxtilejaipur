@@ -66,7 +66,7 @@ interface CartContextType {
   formatPrice: (priceInr: number) => string;
   getCartSubtotalInr: () => number;
   getCartTotalInr: () => number;
-  getBundleDiscountInr: () => number;
+  getShippingCostInr: () => number;
   getCartTotalDisplay: () => number;
   appliedCoupon: Coupon | null;
   applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
@@ -204,16 +204,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return cart.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
   };
 
-  const getBundleDiscountInr = () => {
-    const subtotal = getCartSubtotalInr();
-    const usdValue = subtotal * FX_RATES['USD'];
-    
-    // If order is >= $120 USD, apply 25% flat discount
-    if (usdValue >= 120) {
-      return subtotal * 0.25;
-    }
-    
-    return 0;
+  const getShippingCostInr = () => {
+    if (cart.length === 0) return 0;
+    return 5 / FX_RATES['USD']; // $5 USD converted to INR base
   };
 
   const getCartTotalInr = () => {
@@ -224,9 +217,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subtotal = subtotal - (subtotal * (tierDiscountPercentage / 100));
     }
 
-    // Apply Bundle Discount
-    const bundleDiscount = getBundleDiscountInr();
-    subtotal = subtotal - bundleDiscount;
+    // Add Shipping
+    subtotal = subtotal + getShippingCostInr();
 
     if (!appliedCoupon) return Math.max(0, subtotal);
     
@@ -298,7 +290,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         formatPrice,
         getCartSubtotalInr,
         getCartTotalInr,
-        getBundleDiscountInr,
+        getShippingCostInr,
         getCartTotalDisplay,
         appliedCoupon,
         applyCoupon,

@@ -12,7 +12,7 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
-  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, getBundleDiscountInr, appliedCoupon, applyCoupon, removeCoupon } = useCart();
+  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, getShippingCostInr, appliedCoupon, applyCoupon, removeCoupon } = useCart();
   const { userTier, tierDiscountPercentage } = useAuth();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
@@ -142,16 +142,10 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                       <span>-{formatPrice(getCartSubtotalInr() * (tierDiscountPercentage / 100))}</span>
                     </div>
                   )}
-                  {getBundleDiscountInr() > 0 && (
-                    <div className="flex justify-between text-xs text-brand-400 font-bold">
-                      <span>Volume Discount (25% Off Orders {'>'} {formatPrice(120 / 0.010769)})</span>
-                      <span>-{formatPrice(getBundleDiscountInr())}</span>
-                    </div>
-                  )}
                   <div className="flex justify-between text-xs text-zinc-400">
-                    <span>Duties & Taxes</span>
-                    <span className="text-amber-500 font-bold bg-amber-900/30 px-2 py-0.5 rounded border border-amber-500/30">
-                      FREE UPS Express
+                    <span>Shipping</span>
+                    <span className="text-zinc-100 font-bold">
+                      {formatPrice(getShippingCostInr())}
                     </span>
                   </div>
                   
