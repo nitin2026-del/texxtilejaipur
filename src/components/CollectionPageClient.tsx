@@ -96,7 +96,7 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
         onClose={() => setCheckoutOpen(false)} 
       />
 
-      <div className="pt-20 md:pt-24 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
+      <div className="pt-12 md:pt-16 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
 
         {/* Beautiful Sale Banner */}
         <div className="mb-10 w-full bg-[#1A1A1A] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] overflow-hidden relative group cursor-default border border-[#333]">
