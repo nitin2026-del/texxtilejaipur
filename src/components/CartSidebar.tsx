@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { X, ShoppingBag, Plus, Minus, Trash2, ShieldCheck, ArrowRight, Info } from 'lucide-react';
@@ -62,20 +63,20 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                     key={item.id}
                     className="flex gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/40 relative group"
                   >
-                    {/* Item Image */}
-                    <div className="h-20 w-20 rounded-md overflow-hidden bg-zinc-800 shrink-0">
+                    {/* Item Image - clickable to product page */}
+                    <Link href={`/product/${item.id}`} className="h-20 w-20 rounded-md overflow-hidden bg-zinc-800 shrink-0 block hover:opacity-80 transition-opacity">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
                         src={item.images?.[0] || 'https://via.placeholder.com/80'} 
                         alt={item.name}
                         className="h-full w-full object-cover"
                       />
-                    </div>
+                    </Link>
 
                     {/* Item Info */}
                     <div className="flex-1 flex flex-col justify-between py-0.5">
                       <div>
-                        <h4 className="text-sm font-semibold text-white line-clamp-1 pr-6">{item.name}</h4>
+                        <Link href={`/product/${item.id}`} className="text-sm font-semibold text-white line-clamp-1 pr-6 hover:text-amber-300 transition-colors block">{item.name}</Link>
                         <span className="text-[10px] text-zinc-500 font-mono tracking-wider">{item.sku}</span>
                       </div>
 
