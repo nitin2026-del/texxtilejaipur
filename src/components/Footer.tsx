@@ -80,7 +80,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-brand-700 shrink-0" />
-                <span className="text-sm text-zinc-600 font-medium">textileofrajasthan.info[at]gmail.com</span>
+                <a href="mailto:textileofrajasthan.info@gmail.com" className="text-sm text-zinc-600 font-medium hover:text-brand-800 transition-colors">textileofrajasthan.info@gmail.com</a>
               </li>
               <li className="flex items-center gap-3">
                 <AtSign className="h-4 w-4 text-brand-700 shrink-0" />
