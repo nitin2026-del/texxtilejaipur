@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { ShoppingCart, Star, Globe, Check, Heart, Share2, Shield, Flame, Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -26,6 +27,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen }) => {
   const { cart, addToCart, formatPrice } = useCart();
+  const router = useRouter();
   const isInCart = cart.some((item) => item.id === product.id);
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
@@ -258,8 +260,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  addToCart(product);
-                  onCartOpen?.();
+                  router.push(`/product/${product.id}`);
                 }}
                 className="flex-1 px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
               >

@@ -96,27 +96,36 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
         onClose={() => setCheckoutOpen(false)} 
       />
 
-      <div className="pt-28 md:pt-32 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
+      <div className="pt-20 md:pt-24 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
 
-        {/* 1-Week Sale Banner */}
-        <div className="mb-8 w-full bg-gradient-to-r from-red-700 via-rose-600 to-red-700 text-white rounded-xl shadow-2xl overflow-hidden relative group cursor-default">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+        {/* Beautiful Sale Banner */}
+        <div className="mb-10 w-full bg-[#1A1A1A] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] overflow-hidden relative group cursor-default border border-[#333]">
+          {/* Subtle dark gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-red-950/40 via-[#1A1A1A] to-amber-950/30"></div>
+          
+          {/* Noise texture for premium feel */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 mix-blend-overlay"></div>
           
           {/* Animated Shine Effect */}
-          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-[shimmer_1.5s_infinite]"></div>
+          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:animate-[shimmer_2s_infinite]"></div>
 
-          <div className="px-6 py-8 md:py-10 text-center relative z-10 flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-black/20 backdrop-blur-md rounded-full text-xs font-bold tracking-widest uppercase mb-4 border border-white/20">
-              <Sparkles className="h-4 w-4 text-yellow-300" />
-              <span className="text-yellow-100">Limited Time Only · Jackets Only</span>
+          <div className="px-6 py-10 md:py-12 text-center relative z-10 flex flex-col items-center">
+            {/* Elegant Tag */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-amber-500/10 to-amber-700/10 backdrop-blur-md rounded-full text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase mb-6 border border-amber-500/20 shadow-inner">
+              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+              <span className="text-amber-200/90 drop-shadow-sm">Exclusive Artisan Event</span>
+              <span className="text-amber-500/50 mx-1">•</span>
+              <span className="text-amber-200/90 drop-shadow-sm">Jackets Only</span>
             </div>
             
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mb-3 drop-shadow-md leading-tight">
-              1-Week Artisan Jacket Sale
+            {/* Main Headline */}
+            <h2 className="text-4xl md:text-6xl font-serif font-medium text-transparent bg-clip-text bg-gradient-to-b from-white via-[#F5E6D3] to-[#C1A073] mb-5 drop-shadow-lg leading-tight tracking-tight">
+              The Winter Archive Sale
             </h2>
             
-            <p className="text-base md:text-lg text-rose-100 max-w-2xl mx-auto font-medium mb-0">
-              Exclusive sale on our handcrafted jacket collection — prices have been temporarily reduced. Don't miss out before the sale ends!
+            {/* Sophisticated Subtext */}
+            <p className="text-sm md:text-base text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed mb-0 tracking-wide">
+              An extraordinarily rare opportunity to acquire our handcrafted statement jackets at temporarily reduced prices. <br className="hidden md:block"/> Elevate your wardrobe with authentic artisan craftsmanship before the archive closes.
             </p>
           </div>
         </div>
