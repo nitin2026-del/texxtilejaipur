@@ -84,10 +84,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
     fetchPromo();
 
     const interval = setInterval(() => {
-      setTrustIndex((prev) => (prev + 1) % 4);
+      setTrustIndex((prev) => (prev + 1) % trustMessages.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [trustMessages.length]);
 
   const cartCount = cart.reduce((a, b) => a + b.quantity, 0);
 
