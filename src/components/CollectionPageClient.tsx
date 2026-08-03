@@ -120,7 +120,7 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
             
             {/* Main Headline */}
             <h2 className="text-4xl md:text-6xl font-serif font-medium text-transparent bg-clip-text bg-gradient-to-b from-white via-[#F5E6D3] to-[#C1A073] mb-5 drop-shadow-lg leading-tight tracking-tight">
-              The Winter Archive Sale
+              The Beyond The Spider-Verse Sale
             </h2>
             
             {/* Sophisticated Subtext */}
