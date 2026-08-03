@@ -21,9 +21,10 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
+  onCartOpen?: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen }) => {
   const { cart, addToCart, formatPrice } = useCart();
   const isInCart = cart.some((item) => item.id === product.id);
   const [wishlisted, setWishlisted] = useState(false);
@@ -258,6 +259,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 onClick={(e) => {
                   e.preventDefault();
                   addToCart(product);
+                  onCartOpen?.();
                 }}
                 className="flex-1 px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
               >
@@ -268,6 +270,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 onClick={(e) => {
                   e.preventDefault();
                   addToCart(product);
+                  onCartOpen?.();
                 }}
                 disabled={product.stock === 0}
                 className={`flex-1 px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-1.5 border border-zinc-900 ${

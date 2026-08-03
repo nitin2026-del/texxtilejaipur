@@ -229,7 +229,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
               : products
             ).slice(0, 4).map((prod) => (
               <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0">
-                <ProductCard product={prod} />
+                <ProductCard product={prod} onCartOpen={() => setCartOpen(true)} />
               </div>
             ))}
           </div>
@@ -357,7 +357,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
                   <div id={`carousel-${catName.replace(/\s+/g, '-')}`} className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar [overflow-anchor:none]">
                     {visibleCatProducts.map((prod) => (
                       <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0">
-                        <ProductCard product={prod} />
+                        <ProductCard product={prod} onCartOpen={() => setCartOpen(true)} />
                       </div>
                     ))}
                     
