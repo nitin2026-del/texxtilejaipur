@@ -369,11 +369,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           onClick={() => { if (isActive) setLightboxOpen(true); }}
                           title="Click to view full quality"
                         >
-                          <img 
+                          <Image 
                             src={media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
                             alt={`${product.name} view ${idx + 1}`}
-                            className="absolute inset-0 w-full h-full object-cover"
-                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="object-cover"
                           />
                           {isActive && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
@@ -408,10 +409,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     </div>
                   );
                 }) : (
-                  <img 
+                  <Image 
                     src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80" 
                     alt="Placeholder"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
                   />
                 )}
                 
@@ -454,11 +457,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       }`}
                     >
                       <div className="absolute inset-0">
-                        <img 
+                        <Image 
                           src={media.type === 'image' ? (media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') : (product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')} 
                           alt={`Thumbnail ${idx}`} 
-                          className="absolute inset-0 w-full h-full object-cover" 
-                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
+                          fill
+                          sizes="80px"
+                          className="object-cover" 
                         />
                       </div>
                       {media.type === 'video' && (
@@ -505,11 +509,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     className="relative w-full h-full max-w-5xl max-h-[90vh] mx-auto px-16"
                     onClick={e => e.stopPropagation()}
                   >
-                    <img
+                    <Image
                       src={mediaItems[selectedMediaIndex].url}
                       alt={`${product.name} – full quality`}
-                      className="absolute inset-0 w-full h-full object-contain"
-                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
+                      fill
+                      sizes="100vw"
+                      className="object-contain"
                     />
                   </div>
 
