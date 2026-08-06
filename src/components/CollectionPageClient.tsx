@@ -119,7 +119,7 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
             
             {/* Main Headline */}
             <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-red-100 to-red-500 mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] tracking-tighter uppercase italic transform -skew-x-6">
-              The Beyond The<br className="md:hidden" /> Spider-Verse Sale
+              Beyond The<br className="md:hidden" /> Spider-Verse Sale
             </h2>
             
             {/* Subtext */}
