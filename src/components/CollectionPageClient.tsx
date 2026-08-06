@@ -98,34 +98,34 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
 
       <div className="pt-12 md:pt-16 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
 
-        {/* Beautiful Sale Banner */}
-        <div className="mb-10 w-full bg-[#1A1A1A] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] overflow-hidden relative group cursor-default border border-[#333]">
-          {/* Subtle dark gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-red-950/40 via-[#1A1A1A] to-amber-950/30"></div>
+        {/* Spider-Verse Sale Banner */}
+        <div className="mb-12 w-full bg-black rounded-xl shadow-[0_0_40px_rgba(220,38,38,0.2)] overflow-hidden relative group cursor-default border-2 border-red-600/30">
+          {/* Red/Blue Comic Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 via-black to-blue-600/20"></div>
           
-          {/* Noise texture for premium feel */}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 mix-blend-overlay"></div>
+          {/* Halftone / Comic Dot Pattern */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dots-pattern.png')] opacity-20 mix-blend-overlay"></div>
           
-          {/* Animated Shine Effect */}
-          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:animate-[shimmer_2s_infinite]"></div>
+          {/* Glitch / Web Animated Lines */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/line-diagonal.png')] opacity-10"></div>
+          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-red-500/10 to-transparent group-hover:animate-[shimmer_2s_infinite]"></div>
 
-          <div className="px-6 py-10 md:py-12 text-center relative z-10 flex flex-col items-center">
-            {/* Elegant Tag */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-amber-500/10 to-amber-700/10 backdrop-blur-md rounded-full text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase mb-6 border border-amber-500/20 shadow-inner">
-              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-              <span className="text-amber-200/90 drop-shadow-sm">Exclusive Artisan Event</span>
-              <span className="text-amber-500/50 mx-1">•</span>
-              <span className="text-amber-200/90 drop-shadow-sm">Jackets Only</span>
+          <div className="px-6 py-12 md:py-16 text-center relative z-10 flex flex-col items-center">
+            {/* Sale Tag */}
+            <div className="inline-flex items-center gap-2 px-5 py-1.5 bg-red-600 rounded-sm text-white text-xs md:text-sm font-black tracking-[0.25em] uppercase mb-6 shadow-[4px_4px_0_rgba(0,0,0,1)] border border-white/20 transform -skew-x-12">
+              <Sparkles className="h-4 w-4" />
+              <span>Limited Time Drop</span>
             </div>
             
             {/* Main Headline */}
-            <h2 className="text-4xl md:text-6xl font-serif font-medium text-transparent bg-clip-text bg-gradient-to-b from-white via-[#F5E6D3] to-[#C1A073] mb-5 drop-shadow-lg leading-tight tracking-tight">
-              The Beyond The Spider-Verse Sale
+            <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-red-100 to-red-500 mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] tracking-tighter uppercase italic transform -skew-x-6">
+              The Beyond The<br className="md:hidden" /> Spider-Verse Sale
             </h2>
             
-            {/* Sophisticated Subtext */}
-            <p className="text-sm md:text-base text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed mb-0 tracking-wide">
-              An extraordinarily rare opportunity to acquire our handcrafted statement jackets at temporarily reduced prices. <br className="hidden md:block"/> Elevate your wardrobe with authentic artisan craftsmanship before the archive closes.
+            {/* Subtext */}
+            <p className="text-base md:text-lg text-blue-100/80 max-w-2xl mx-auto font-medium leading-relaxed tracking-wide font-mono">
+              AN EXTRAORDINARILY RARE OPPORTUNITY. <br className="hidden md:block"/>
+              AQUIRE HANDCRAFTED JACKETS AT MULTIVERSE-SHATTERING PRICES.
             </p>
           </div>
         </div>

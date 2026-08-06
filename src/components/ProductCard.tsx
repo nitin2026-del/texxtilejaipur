@@ -141,10 +141,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
 
         {/* Top-left: Badges */}
         <div className="absolute top-4 left-4 flex flex-col items-start gap-2 z-10">
-
+          <span className="bg-red-600 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black transform -skew-x-6">
+            SALE - 30% OFF
+          </span>
           {product.is_featured && (
-            <span className="bg-brand-900 text-brand-50 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-brand-800">
-              New Arrival
+            <span className="bg-blue-600 text-white text-[9px] font-bold tracking-widest uppercase px-3 py-1 shadow-[2px_2px_0_rgba(0,0,0,1)] border border-black transform -skew-x-6">
+              New Drop
             </span>
           )}
           <span className="bg-white/95 backdrop-blur-sm text-zinc-900 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-zinc-200">
@@ -243,10 +245,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
         <div className="flex flex-col justify-between pt-3 gap-3">
           <div className="flex flex-col shrink-0">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-serif font-bold text-zinc-900">
+              <span className="text-xl font-black text-red-600 tracking-tight">
                 {formatPrice(product.price_inr)}
               </span>
-              <span className="text-xs text-zinc-400 line-through font-medium">
+              <span className="text-sm text-zinc-500 line-through font-medium">
                 {formatPrice(originalPrice)}
               </span>
             </div>
