@@ -72,11 +72,11 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   >
                     {/* Item Image - clickable to product page */}
                     <button onClick={() => goToProduct(item.id)} className="h-20 w-20 rounded-md overflow-hidden bg-zinc-800 shrink-0 block hover:opacity-80 transition-opacity cursor-pointer">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img 
                         src={item.images?.[0] || 'https://via.placeholder.com/80'} 
                         alt={item.name}
                         className="h-full w-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/80'; }}
                       />
                     </button>
 

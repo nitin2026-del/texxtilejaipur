@@ -397,8 +397,9 @@ export default function Dashboard() {
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img 
                               src={item.products?.product_images?.[0]?.url || 'https://via.placeholder.com/64'} 
-                              alt={item.product_name}
-                              className="w-full h-full object-cover"
+                              alt={item.products?.name}
+                              className="h-full w-full object-cover"
+                              onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/64'; }}
                             />
                           </div>
                           <div className="flex-1 min-w-0">
