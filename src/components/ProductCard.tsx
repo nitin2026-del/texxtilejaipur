@@ -112,25 +112,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
           />
         ) : (
-          <Image 
+          <img 
             src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
             alt={product.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
-            unoptimized={true}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x500'; }}
           />
         )}
         
         {/* Secondary Image (Crossfade) */}
         {product.images && product.images.length > 1 && !product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) && (
-          <Image 
+          <img 
             src={product.images[1]} 
             alt={`${product.name} alternate view`}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className={`object-cover absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
-            unoptimized={true}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
+            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x500'; }}
           />
         )}
         

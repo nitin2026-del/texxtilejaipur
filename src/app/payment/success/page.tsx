@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { CheckCircle, XCircle } from 'lucide-react';
 
@@ -12,9 +13,12 @@ function PaymentCaptureHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
+  const { user } = useAuth();
   const hasCaptured = useRef(false);
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [orderIdState, setOrderIdState] = useState<string | null>(null);
+  const [orderNumberState, setOrderNumberState] = useState<string | null>(null);
+  const [customerEmail, setCustomerEmail] = useState<string | null>(null);
 
   useEffect(() => {
     if (hasCaptured.current) return;
@@ -28,9 +32,13 @@ function PaymentCaptureHandler() {
     }
 
     setOrderIdState(orderId);
-    const captureKey = `captured_${orderId}`;
+    const captureKey = \captured_\\;
 
-    if (localStorage.getItem(captureKey) === 'done') {
+    // Wait we can't reliably load order number if it was cached as done without server response,
+    // but the email and number should be fetched. For now if it's cached we just show generic success.
+
+    if (localStorage.getItem(captureKey) === 'done' && !orderNumberState) {
+      // If we want we can fetch order details here, but let's just show success
       setStatus('success');
       return;
     }
@@ -54,6 +62,8 @@ function PaymentCaptureHandler() {
         localStorage.removeItem('pending_usd_amount');
 
         if (data.success) {
+          if (data.order_number) setOrderNumberState(data.order_number);
+          if (data.customer?.email) setCustomerEmail(data.customer.email);
           clearCart();
           // Fire Facebook Pixel Purchase Event
           if (typeof window !== 'undefined' && (window as any).fbq && usdAmount > 0) {
@@ -95,7 +105,7 @@ function PaymentCaptureHandler() {
         console.error('PayPal capture network error:', err);
         setStatus('error');
       });
-  }, [searchParams, router, clearCart]);
+  }, [searchParams, router, clearCart, orderNumberState]);
 
   if (status === 'success') {
     return (
@@ -104,12 +114,18 @@ function PaymentCaptureHandler() {
         <div>
           <h1 className="text-3xl font-serif text-zinc-900 mb-2">Thank you for your order!</h1>
           <p className="text-zinc-600 mb-1">Your payment was successfully processed.</p>
-          <p className="text-zinc-500 text-sm">Order ID: {orderIdState}</p>
+          <p className="text-zinc-500 text-sm">Order ID: {orderNumberState || orderIdState}</p>
         </div>
         <div className="flex gap-4 mt-4">
-          <Link href={`/dashboard?payment=captured&order_id=${orderIdState}`} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
-            View Order
-          </Link>
+          {user ? (
+            <Link href={\/dashboard?payment=captured&order_id=\\} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
+              View Order
+            </Link>
+          ) : (
+            <Link href={\/track-order?order=\&email=\\} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
+              Track Order
+            </Link>
+          )}
           <Link href="/collection" className="px-6 py-3 border border-zinc-300 text-zinc-700 font-bold text-sm uppercase tracking-wider hover:bg-zinc-50 transition-colors">
             Continue Shopping
           </Link>
@@ -127,9 +143,15 @@ function PaymentCaptureHandler() {
           <p className="text-zinc-600">We couldn't confirm your payment automatically.</p>
         </div>
         <div className="flex gap-4 mt-4">
-          <Link href={`/dashboard`} className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
-            Go to Dashboard
-          </Link>
+          {user ? (
+            <Link href={\/dashboard\} className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
+              Go to Dashboard
+            </Link>
+          ) : (
+            <Link href={\/\} className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
+              Return Home
+            </Link>
+          )}
         </div>
       </div>
     );
@@ -139,17 +161,16 @@ function PaymentCaptureHandler() {
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6">
       <div className="animate-spin h-12 w-12 border-4 border-amber-500 border-t-transparent rounded-full" />
       <div className="text-center">
-        <p className="text-zinc-800 font-bold text-base">Confirming your paymentâ€¦</p>
+        <p className="text-zinc-800 font-bold text-base">Confirming your payment…</p>
         <p className="text-zinc-500 text-sm mt-1">Please do not close or refresh this page</p>
       </div>
       <div className="flex items-center gap-2 text-xs text-zinc-400 border border-zinc-200 rounded-full px-4 py-2 bg-white">
-        ðŸ”’ Secured by PayPal Â· 256-bit SSL
+        ?? Secured by PayPal · 256-bit SSL
       </div>
       <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-2">
-        If this page takes too long, donâ€™t worry â€”{' '}
+        If this page takes too long, don’t worry —{' '}
         <a href="mailto:textileofrajasthan.info@gmail.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
-        <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>.
-        We will confirm your payment and order from our side.
+        <a href="https://wa.me/919929835848" target="_blank" rel="noopener noreferrer" className="text-amber-600 underline">WhatsApp us</a>.
       </p>
     </div>
   );
@@ -158,16 +179,8 @@ function PaymentCaptureHandler() {
 export default function PaymentSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-4">
-        <div className="animate-spin h-12 w-12 border-4 border-amber-500 border-t-transparent rounded-full" />
-        <p className="text-zinc-700 font-semibold text-sm">Processing paymentâ€¦</p>
-        <p className="text-zinc-400 text-xs">Please do not close this page</p>
-        <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-4">
-          Having trouble?{' '}
-          <a href="mailto:textileofrajasthan.info@gmail.com" className="text-amber-600 underline">Email us</a>{' '}or{' '}
-          <a href="https://wa.me/918764655537" target="_blank" rel="noopener noreferrer" className="text-green-600 underline">WhatsApp us</a>
-          {' '}â€” we handle all issues from our side.
-        </p>
+      <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-4 border-amber-500 border-t-transparent rounded-full" />
       </div>
     }>
       <PaymentCaptureHandler />

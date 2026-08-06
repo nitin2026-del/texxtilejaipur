@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 <ShoppingBag className="h-4 w-4" />
                 Shop All
               </a>
-              <a href="/track" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
+              <a href="/track-order" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
                 <RefreshCcw className="h-4 w-4" />
                 Track Order
               </a>
@@ -436,7 +436,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           </a>
 
           <a 
-            href="/track"
+            href="/track-order"
             onClick={() => setIsDrawerOpen(false)}
             className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
           >

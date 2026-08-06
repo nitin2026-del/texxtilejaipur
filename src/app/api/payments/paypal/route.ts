@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
       const { data: orderData } = await supabaseAdmin
         .from('orders')
         .select(`
+          order_number,
           guest_email,
           user_id,
           total,
@@ -95,6 +96,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         status: captureStatus,
+        order_number: orderData?.order_number || orderId,
         customer: {
           email,
           name: orderData?.shipping_addresses?.full_name || '',

@@ -369,14 +369,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           onClick={() => { if (isActive) setLightboxOpen(true); }}
                           title="Click to view full quality"
                         >
-                          <Image 
+                          <img 
                             src={media.url || 'https://via.placeholder.com/600x800'} 
                             alt={`${product.name} view ${idx + 1}`}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            className="object-cover"
-                            priority={idx === 0}
-                            quality={90}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x800'; }}
                           />
                           {isActive && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
@@ -411,11 +408,10 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     </div>
                   );
                 }) : (
-                  <Image 
+                  <img 
                     src="https://via.placeholder.com/600x800" 
                     alt="Placeholder"
-                    fill
-                    className="object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
                 
@@ -458,12 +454,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       }`}
                     >
                       <div className="absolute inset-0">
-                        <Image 
+                        <img 
                           src={media.type === 'image' ? (media.url || 'https://via.placeholder.com/80') : (product.images?.[0] || 'https://via.placeholder.com/80')} 
                           alt={`Thumbnail ${idx}`} 
-                          fill
-                          sizes="80px"
-                          className="object-cover" 
+                          className="absolute inset-0 w-full h-full object-cover" 
+                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/80'; }}
                         />
                       </div>
                       {media.type === 'video' && (
@@ -510,14 +505,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     className="relative w-full h-full max-w-5xl max-h-[90vh] mx-auto px-16"
                     onClick={e => e.stopPropagation()}
                   >
-                    <Image
+                    <img
                       src={mediaItems[selectedMediaIndex].url}
                       alt={`${product.name} – full quality`}
-                      fill
-                      sizes="100vw"
-                      className="object-contain"
-                      quality={100}
-                      priority
+                      className="absolute inset-0 w-full h-full object-contain"
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x800'; }}
                     />
                   </div>
 
