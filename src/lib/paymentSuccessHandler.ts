@@ -284,6 +284,8 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
 
           await transporter.sendMail(mailOptions);
           console.log(`[handlePaymentSuccess] Order confirmation email (with PDF) sent to: ${userEmail}`);
+        } else {
+          console.warn('[handlePaymentSuccess] ⚠️ WARNING: Skipping order confirmation email. Missing SMTP credentials in Environment Variables! Ensure SMTP_HOST, SMTP_USER, and SMTP_PASS are set in Vercel.');
         }
       } catch (err) {
         console.error(`[handlePaymentSuccess] Failed during notification/PDF step:`, err);
