@@ -109,14 +109,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             loop
             muted
             playsInline
+            poster={product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'}
             className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
           />
         ) : (
           <img 
-            src={product.images?.[0] || 'https://via.placeholder.com/400x500'} 
+            src={product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
             alt={product.name}
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
-            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x500'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
           />
         )}
         
@@ -126,7 +127,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             src={product.images[1]} 
             alt={`${product.name} alternate view`}
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
-            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x500'; }}
+            onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
           />
         )}
         

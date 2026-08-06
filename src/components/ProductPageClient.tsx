@@ -370,10 +370,10 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           title="Click to view full quality"
                         >
                           <img 
-                            src={media.url || 'https://via.placeholder.com/600x800'} 
+                            src={media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
                             alt={`${product.name} view ${idx + 1}`}
                             className="absolute inset-0 w-full h-full object-cover"
-                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x800'; }}
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
                           />
                           {isActive && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
@@ -409,7 +409,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   );
                 }) : (
                   <img 
-                    src="https://via.placeholder.com/600x800" 
+                    src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80" 
                     alt="Placeholder"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -455,10 +455,10 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     >
                       <div className="absolute inset-0">
                         <img 
-                          src={media.type === 'image' ? (media.url || 'https://via.placeholder.com/80') : (product.images?.[0] || 'https://via.placeholder.com/80')} 
+                          src={media.type === 'image' ? (media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') : (product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')} 
                           alt={`Thumbnail ${idx}`} 
                           className="absolute inset-0 w-full h-full object-cover" 
-                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/80'; }}
+                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
                         />
                       </div>
                       {media.type === 'video' && (
@@ -509,7 +509,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       src={mediaItems[selectedMediaIndex].url}
                       alt={`${product.name} – full quality`}
                       className="absolute inset-0 w-full h-full object-contain"
-                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x800'; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'; }}
                     />
                   </div>
 
