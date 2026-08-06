@@ -86,8 +86,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
   const isLowStock = product.stock > 0 && product.stock <= 4;
   const isSellingFast = product.stock > 4 && product.stock <= 10;
   
-  // Is this product a jacket?
-  const isJacket = product.category?.toLowerCase().includes('jacket') || product.name.toLowerCase().includes('jacket');
+  // Is this product a jacket? (Ensure it's not a Kimono)
+  const isJacket = (product.category?.toLowerCase().includes('jacket') || product.name.toLowerCase().includes('jacket')) 
+    && !product.name.toLowerCase().includes('kimono') 
+    && !product.category?.toLowerCase().includes('kimono');
   
   // Psychological Pricing
   const originalPrice = isJacket ? product.price_inr * 1.30 : null;
