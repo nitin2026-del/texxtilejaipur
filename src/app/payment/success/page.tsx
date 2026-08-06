@@ -32,7 +32,7 @@ function PaymentCaptureHandler() {
     }
 
     setOrderIdState(orderId);
-    const captureKey = \captured_\\;
+    const captureKey = `captured_${orderId}`;
 
     // Wait we can't reliably load order number if it was cached as done without server response,
     // but the email and number should be fetched. For now if it's cached we just show generic success.
@@ -118,11 +118,11 @@ function PaymentCaptureHandler() {
         </div>
         <div className="flex gap-4 mt-4">
           {user ? (
-            <Link href={\/dashboard?payment=captured&order_id=\\} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
+            <Link href={`/dashboard?payment=captured&order_id=${orderIdState}`} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
               View Order
             </Link>
           ) : (
-            <Link href={\/track-order?order=\&email=\\} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
+            <Link href={`/track-order?order=${orderNumberState}&email=`} className="px-6 py-3 bg-brand-800 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-brand-900 transition-colors">
               Track Order
             </Link>
           )}
@@ -144,11 +144,11 @@ function PaymentCaptureHandler() {
         </div>
         <div className="flex gap-4 mt-4">
           {user ? (
-            <Link href={\/dashboard\} className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
+            <Link href="/dashboard" className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
               Go to Dashboard
             </Link>
           ) : (
-            <Link href={\/\} className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
+            <Link href="/" className="px-6 py-3 bg-zinc-900 text-white font-bold text-sm uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-colors">
               Return Home
             </Link>
           )}
@@ -161,14 +161,14 @@ function PaymentCaptureHandler() {
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6">
       <div className="animate-spin h-12 w-12 border-4 border-amber-500 border-t-transparent rounded-full" />
       <div className="text-center">
-        <p className="text-zinc-800 font-bold text-base">Confirming your payment…</p>
+        <p className="text-zinc-800 font-bold text-base">Confirming your paymentï¿½</p>
         <p className="text-zinc-500 text-sm mt-1">Please do not close or refresh this page</p>
       </div>
       <div className="flex items-center gap-2 text-xs text-zinc-400 border border-zinc-200 rounded-full px-4 py-2 bg-white">
-        ?? Secured by PayPal · 256-bit SSL
+        ?? Secured by PayPal ï¿½ 256-bit SSL
       </div>
       <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-2">
-        If this page takes too long, don’t worry —{' '}
+        If this page takes too long, donï¿½t worry ï¿½{' '}
         <a href="mailto:textileofrajasthan.info@gmail.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
         <a href="https://wa.me/919929835848" target="_blank" rel="noopener noreferrer" className="text-amber-600 underline">WhatsApp us</a>.
       </p>
