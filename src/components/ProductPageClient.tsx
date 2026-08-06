@@ -45,7 +45,7 @@ import { TealVelvetSuzaniReviews } from '@/components/TealVelvetSuzaniReviews';
 
 import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname } from 'next/navigation';
-import Image from 'next/image';
+import { getOptimizedUrl } from '@/utils/imageUtils';
 import Link from 'next/link';
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video } from 'lucide-react';
 
@@ -85,7 +85,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
-    const items = (product.images || []).map((url: string) => ({ type: url?.match(/\.(mp4|webm|mov|ogg)$/i) ? 'video' : 'image', url: url + '?v=1' }));
+    const items = (product.images || []).map((url: string) => ({ type: url?.match(/\.(mp4|webm|mov|ogg)$/i) ? 'video' : 'image', url: getOptimizedUrl(url) }));
     if (product.details?.video_url) {
       items.push({ type: 'video', url: product.details.video_url });
     }
@@ -369,12 +369,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           onClick={() => { if (isActive) setLightboxOpen(true); }}
                           title="Click to view full quality"
                         >
-                          <Image 
-                            src={(media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') + '?v=1'} 
+                          <img 
+                            src={media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
                             alt={`${product.name} view ${idx + 1}`}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            className="object-cover"
+                            loading={idx === 0 ? "eager" : "lazy"}
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                           {isActive && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
@@ -457,12 +456,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       }`}
                     >
                       <div className="absolute inset-0">
-                        <Image 
-                          src={(media.type === 'image' ? (media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') : (product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')) + '?v=1'} 
+                        <img 
+                          src={media.type === 'image' ? (media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') : getOptimizedUrl(product.images?.[0])} 
                           alt={`Thumbnail ${idx}`} 
-                          fill
-                          sizes="80px"
-                          className="object-cover" 
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover" 
                         />
                       </div>
                       {media.type === 'video' && (
@@ -509,13 +507,10 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     className="relative w-full h-full max-w-5xl max-h-[90vh] mx-auto px-16"
                     onClick={e => e.stopPropagation()}
                   >
-                    <Image
+                    <img
                       src={mediaItems[selectedMediaIndex].url}
                       alt={`${product.name} – full quality`}
-                      fill
-                      sizes="100vw"
-                      quality={100}
-                      className="object-contain"
+                      className="absolute inset-0 w-full h-full object-contain"
                     />
                   </div>
 

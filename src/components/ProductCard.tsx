@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { ShoppingCart, Star, Globe, Check, Heart, Share2, Shield, Flame, Eye, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getOptimizedUrl } from '@/utils/imageUtils';
 
 interface Product {
   id: string;
@@ -109,27 +109,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             loop
             muted
             playsInline
-            poster={(product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') + '?v=1'}
+            poster={getOptimizedUrl(product.images?.[0])}
             className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
           />
         ) : (
-          <Image 
-            src={(product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') + '?v=1'} 
+          <img 
+            src={getOptimizedUrl(product.images?.[0])} 
             alt={product.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+            loading="lazy"
+            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
           />
         )}
         
         {/* Secondary Image (Crossfade) */}
         {product.images && product.images.length > 1 && !product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) && (
-          <Image 
-            src={product.images[1] + '?v=1'} 
+          <img 
+            src={getOptimizedUrl(product.images[1])} 
             alt={`${product.name} alternate view`}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className={`object-cover transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
+            loading="lazy"
+            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
           />
         )}
         
