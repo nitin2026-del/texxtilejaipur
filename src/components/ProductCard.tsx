@@ -109,12 +109,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             loop
             muted
             playsInline
-            poster={product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'}
+            poster={(product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') + '?v=1'}
             className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
           />
         ) : (
           <Image 
-            src={product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
+            src={(product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') + '?v=1'} 
             alt={product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -125,7 +125,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
         {/* Secondary Image (Crossfade) */}
         {product.images && product.images.length > 1 && !product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) && (
           <Image 
-            src={product.images[1]} 
+            src={product.images[1] + '?v=1'} 
             alt={`${product.name} alternate view`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

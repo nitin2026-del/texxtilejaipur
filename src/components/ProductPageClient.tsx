@@ -85,7 +85,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
-    const items = (product.images || []).map((url: string) => ({ type: 'image', url }));
+    const items = (product.images || []).map((url: string) => ({ type: url?.match(/\.(mp4|webm|mov|ogg)$/i) ? 'video' : 'image', url: url + '?v=1' }));
     if (product.details?.video_url) {
       items.push({ type: 'video', url: product.details.video_url });
     }
@@ -370,7 +370,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           title="Click to view full quality"
                         >
                           <Image 
-                            src={media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
+                            src={(media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') + '?v=1'} 
                             alt={`${product.name} view ${idx + 1}`}
                             fill
                             sizes="(max-width: 768px) 100vw, 50vw"
@@ -458,7 +458,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     >
                       <div className="absolute inset-0">
                         <Image 
-                          src={media.type === 'image' ? (media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') : (product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')} 
+                          src={(media.type === 'image' ? (media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') : (product.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')) + '?v=1'} 
                           alt={`Thumbnail ${idx}`} 
                           fill
                           sizes="80px"
@@ -514,6 +514,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       alt={`${product.name} – full quality`}
                       fill
                       sizes="100vw"
+                      quality={100}
                       className="object-contain"
                     />
                   </div>
