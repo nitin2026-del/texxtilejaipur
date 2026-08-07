@@ -4,6 +4,7 @@ import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import './globals.css';
 import { FloatingSupport } from '@/components/FloatingSupport';
+import { GlobalModals } from '@/components/GlobalModals';
 
 export const viewport = {
   width: 'device-width',
@@ -241,6 +242,7 @@ export default function RootLayout({
           <CartProvider>
             <div className="bg-mesh" />
             <FloatingSupport />
+            <GlobalModals />
             {children}
           </CartProvider>
         </AuthProvider>

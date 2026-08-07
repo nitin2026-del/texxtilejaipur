@@ -160,9 +160,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 <Heart className="h-4 w-4" />
                 About Us
               </a>
-              <a href="/behind-the-scenes" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
+              <a href="/the-artisan-edit" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
                 <Video className="h-4 w-4" />
-                Behind the Scenes
+                The Artisan Edit
               </a>
             </div>
           </div>
@@ -371,9 +371,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             About Us
           </a>
 
-          <a href="/behind-the-scenes" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
+          <a href="/the-artisan-edit" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
             <Video className="h-5 w-5 text-zinc-500" />
-            Behind the Scenes
+            The Artisan Edit
           </a>
 
           {user && (
