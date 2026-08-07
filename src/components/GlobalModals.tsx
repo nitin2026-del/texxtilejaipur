@@ -34,11 +34,21 @@ export function GlobalModals() {
     return () => document.removeEventListener('mouseleave', handleMouseLeave);
   }, [vipModalOpen]);
 
-  const handleVipSubmit = (e: React.FormEvent) => {
+  const handleVipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    
+    try {
+      await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+    } catch (err) {
+      console.error('Subscription error', err);
+    }
+    
     setSubscribed(true);
-    // Real implementation would save email to DB
     setTimeout(() => {
       setVipModalOpen(false);
     }, 2000);

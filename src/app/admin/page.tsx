@@ -129,6 +129,12 @@ interface BehindTheScenesItem {
   created_at: string;
 }
 
+interface NewsletterItem {
+  id: string;
+  email: string;
+  created_at: string;
+}
+
 function AdminPortalContent() {
   const { user, profile, loading: authLoading, signOut } = useAuth();
   const { formatPrice } = useCart();
@@ -139,7 +145,7 @@ function AdminPortalContent() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters'>('overview');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
@@ -221,6 +227,9 @@ function AdminPortalContent() {
 
   // Inquiries states
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+
+  // Newsletters state
+  const [newsletters, setNewsletters] = useState<NewsletterItem[]>([]);
 
   // Bulk Edit States
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
@@ -632,7 +641,8 @@ function AdminPortalContent() {
         { data: blogData, error: blogErr },
         { data: couponsData, error: couponsErr },
         { data: inquiryData, error: inquiryErr },
-        { data: btsData, error: btsErr }
+        { data: btsData, error: btsErr },
+        { data: newsData, error: newsErr }
       ] = await Promise.all([
         supabase
           .from('products')
@@ -663,6 +673,10 @@ function AdminPortalContent() {
           .from('behind_the_scenes')
           .select('*')
           .order('display_order', { ascending: true })
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('newsletters')
+          .select('*')
           .order('created_at', { ascending: false })
       ]);
 
@@ -759,6 +773,11 @@ function AdminPortalContent() {
       // 6. Fetch Behind The Scenes Items
       if (!btsErr && btsData) {
         setBehindTheScenesItems(btsData);
+      }
+
+      // 7. Fetch Newsletters
+      if (!newsErr && newsData) {
+        setNewsletters(newsData);
       }
 
     } catch (err) {
@@ -1584,7 +1603,7 @@ function AdminPortalContent() {
             <p className="text-xs text-zinc-500">Manage catalog and ship Indian block-print textile orders globally.</p>
           </div>
 
-          <div className="flex items-center gap-2 bg-[#FDFBF7] border border-zinc-200 p-1 rounded-xl shrink-0">
+          <div className="flex flex-wrap items-center gap-2 bg-[#FDFBF7] border border-zinc-200 p-1 rounded-xl shrink-0">
             <button
               onClick={() => setActiveTab('overview')}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
@@ -1664,6 +1683,16 @@ function AdminPortalContent() {
               }`}
             >
               <Video className="h-3.5 w-3.5" /> The Artisan Edit
+            </button>
+            <button
+              onClick={() => setActiveTab('newsletters')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'newsletters'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <MessageCircleQuestion className="h-3.5 w-3.5" /> Newsletters
             </button>
           </div>
         </div>
@@ -3100,6 +3129,55 @@ function AdminPortalContent() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 9: NEWSLETTERS */}
+        {activeTab === 'newsletters' && (
+          <div className="space-y-6">
+            <div className="glass-card p-6 rounded-3xl border border-zinc-200">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-base font-bold flex items-center gap-2 text-zinc-900">
+                  <MessageCircleQuestion className="h-4 w-4 text-blue-600" /> Newsletter Subscribers
+                </h3>
+                <span className="text-[10px] bg-white text-zinc-600 border border-zinc-200 px-3 py-1 rounded-full font-mono">
+                  {newsletters.length} subscribers
+                </span>
+              </div>
+              
+              {newsletters.length === 0 ? (
+                <div className="text-center py-12 border border-zinc-200 border-dashed rounded-2xl bg-white/50">
+                  <p className="text-sm font-semibold text-zinc-600">No subscribers yet</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="bg-[#FDFBF7]/50 border-b border-zinc-200 text-zinc-600 font-medium">
+                        <th className="p-4">Email Address</th>
+                        <th className="p-4 text-right">Subscribed On</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-200">
+                      {newsletters.map((sub) => (
+                        <tr key={sub.id} className="hover:bg-white/50 transition-colors">
+                          <td className="p-4 font-medium text-zinc-900">{sub.email}</td>
+                          <td className="p-4 text-right text-zinc-500 font-mono">
+                            {new Date(sub.created_at).toLocaleDateString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
