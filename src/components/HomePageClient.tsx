@@ -7,6 +7,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import { BottomNav } from '@/components/BottomNav';
+import { EditorialScroll } from '@/components/EditorialScroll';
 import { Search, Sparkles, Filter, ShieldCheck, Truck, Clock } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
@@ -209,6 +210,9 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
           <span className="mx-8">✦ WE SHIP TO EVERY COUNTRY</span>
         </div>
       </div>
+
+      {/* The Vogue Editorial Parallax Scroll */}
+      <EditorialScroll products={products} />
 
       {/* New Arrivals Section */}
       <section id="new-arrivals" className="px-6 sm:px-12 max-w-[1600px] mx-auto pt-24 pb-12">
