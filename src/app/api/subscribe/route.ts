@@ -42,9 +42,10 @@ export async function POST(request: Request) {
       .from('coupons')
       .insert([{
         code: discountCode,
-        type: 'percent',
-        value: 10,
-        min_order_value: 0
+        discount_type: 'percentage',
+        discount_value: 10,
+        min_order_value: 0,
+        is_active: true
       }]);
 
     if (couponError) {
