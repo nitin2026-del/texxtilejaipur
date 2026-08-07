@@ -54,7 +54,7 @@ export function GlobalModals() {
             {/* Image side */}
             <div className="md:w-1/2 relative min-h-[300px] hidden md:block">
               <img 
-                src="https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=800&auto=format&fit=crop" 
+                src="/heritage_craft.png" 
                 alt="Luxury Artisan Jacket"
                 className="absolute inset-0 w-full h-full object-cover"
               />
