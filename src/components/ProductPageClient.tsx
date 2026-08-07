@@ -44,7 +44,7 @@ import { HandcraftedSuzaniCottonReviews } from '@/components/HandcraftedSuzaniCo
 import { TealVelvetSuzaniReviews } from '@/components/TealVelvetSuzaniReviews';
 
 import { useCart, FX_RATES } from '@/context/CartContext';
-import { useParams, useRouter, usePathname } from 'next/navigation';
+import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getOptimizedUrl } from '@/utils/imageUtils';
 import Link from 'next/link';
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video } from 'lucide-react';
@@ -335,6 +335,16 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
       setCheckoutOpen(true);
     }
   };
+
+  const searchParams = useSearchParams();
+  const buyParam = searchParams.get('buy');
+  
+  useEffect(() => {
+    if (buyParam === 'true' && product) {
+      handleBuyNow();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyParam, product]);
 
   return (
     <main className="min-h-screen text-zinc-900 pb-16">
