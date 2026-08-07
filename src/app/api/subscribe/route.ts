@@ -88,7 +88,7 @@ export async function POST(request: Request) {
               <p>Simply enter this code at checkout to apply the discount. You'll also get Priority Processing & Expedited Shipping on your order automatically!</p>
               
               <div style="text-align: center; margin-top: 30px;">
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://texxtilejaipur.com'}" style="background-color: #d4af37; color: #000; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 14px;">Shop the Collection</a>
+                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com'}" style="background-color: #d4af37; color: #000; text-decoration: none; padding: 12px 25px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 14px;">Shop the Collection</a>
               </div>
               
               <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">

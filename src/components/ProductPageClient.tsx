@@ -419,7 +419,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                 
                 {/* Brand Logo Overlay */}
                 <div className="absolute top-4 right-4 z-20 opacity-90 drop-shadow-md pointer-events-none">
-                  <img src="/icon.png" alt="Texxtile Jaipur" className="h-10 w-10 rounded-lg object-cover border border-white/30 shadow-lg" />
+                  <img src="/icon.png" alt="Textile Jaipur" className="h-10 w-10 rounded-lg object-cover border border-white/30 shadow-lg" />
                 </div>
                 
                 {/* Navigation Arrows */}
@@ -800,7 +800,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Yes, absolutely! We want you to love your Texxtile Jaipur piece. If it doesn't fit perfectly, we offer hassle-free returns within 7 days of delivery. Just make sure the item is unworn with original tags attached.
+                          Yes, absolutely! We want you to love your Textile Jaipur piece. If it doesn't fit perfectly, we offer hassle-free returns within 7 days of delivery. Just make sure the item is unworn with original tags attached.
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">

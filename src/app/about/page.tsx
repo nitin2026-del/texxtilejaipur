@@ -38,7 +38,7 @@ export default function AboutUsPage() {
             <div className="aspect-[4/5] rounded-3xl overflow-hidden relative shadow-2xl bg-zinc-100">
               <img 
                 src="/about/img1.jpg" 
-                alt="Texxtile Jaipur Collection" 
+                alt="Textile Jaipur Collection" 
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
@@ -57,7 +57,7 @@ export default function AboutUsPage() {
             </h2>
             <div className="space-y-6 text-zinc-600 text-lg leading-relaxed">
               <p>
-                Texxtile Jaipur was born from a simple yet profound vision: to bridge the gap between the master artisans of Rajasthan and the global fashion community. 
+                Textile Jaipur was born from a simple yet profound vision: to bridge the gap between the master artisans of Rajasthan and the global fashion community. 
               </p>
               <p>
                 Nestled in the heart of Jaipur, the Pink City, we are surrounded by a living tapestry of colors, history, and art. For generations, the families we work with have been perfecting the arts of block printing, intricate Suzani embroidery, and weaving luxurious Banarasi silk.
@@ -79,7 +79,7 @@ export default function AboutUsPage() {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16 md:mb-24">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Our Craft</h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">The timeless techniques that make every Texxtile Jaipur piece a masterpiece.</p>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">The timeless techniques that make every Textile Jaipur piece a masterpiece.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -158,7 +158,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
             <div className="flex flex-col items-center gap-3">
               <img
                 src="/icon.png"
-                alt="Texxtile Jaipur"
+                alt="Textile Jaipur"
                 className="h-24 w-24 rounded-2xl shadow-2xl border-2 border-white/30 object-cover"
               />
               <div className="text-center">
