@@ -68,8 +68,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           .from('coupons')
           .select('*')
           .eq('is_active', true)
+          .not('code', 'ilike', 'VIP10-%')
           .limit(1)
-          .single();
+          .maybeSingle();
           
         if (data && !error) {
           setActivePromo({
