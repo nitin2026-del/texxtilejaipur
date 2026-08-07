@@ -98,7 +98,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               <BookOpen className="h-5 w-5" />
             </div>
             <div>
-              <span className="block text-sm font-bold text-white">Hiyawear Editorial</span>
+              <span className="block text-sm font-bold text-white">Textile Jaipur Editorial</span>
               <span className="block text-xs text-zinc-500">Luxury Handcrafted Fashion</span>
             </div>
           </div>

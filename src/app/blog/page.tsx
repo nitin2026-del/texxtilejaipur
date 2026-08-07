@@ -9,7 +9,7 @@ import { BookOpen, Calendar, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Blog | Hiyawear',
+  title: 'Blog | Textile Jaipur',
   description: 'Discover the latest trends, styling tips, and stories behind our luxury handcrafted collections.',
 };
 
