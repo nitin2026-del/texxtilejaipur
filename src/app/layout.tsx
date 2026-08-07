@@ -13,11 +13,11 @@ export const viewport = {
 
 export const metadata: Metadata = {
   title: 'Textile Jaipur | Handcrafted Indian Ethnic Wear',
-  description: 'Shop authentic handcrafted Indian textiles direct from Jaipur. Buy embroidered jackets, Boho dresses & Banarasi silk. Free global shipping!',
+  description: 'Shop authentic handcrafted Indian textiles direct from Jaipur. Buy embroidered jackets, Boho dresses & block print dresses. Free global shipping!',
   keywords: [
     'Indian ethnic wear online', 'buy Indian textiles USA', 'handmade embroidered jacket', 'suzani jacket Europe',
     'boho dress India export', 'Jaipur textile online shop', 'Indian export clothing UK', 'authentic Rajasthani clothing',
-    'handcrafted Indian fashion', 'buy Indian dress online USA', 'vintage embroidered jacket', 'Banarasi silk saree',
+    'handcrafted Indian fashion', 'buy Indian dress online USA', 'vintage embroidered jacket', 'block print dresses',
     'Indian artisan clothing', 'block print fabric', 'Indian boho fashion', 'sustainable Indian fashion',
     'Indian ethnic fashion Europe', 'ropa india artesanal', 'vêtements indiens artisanaux', 'indische Textilien kaufen',
     'comprar ropa india', 'Jaipur fashion store', 'Rajasthan handloom', 'ethnic wear worldwide shipping',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Textile Jaipur | Authentic Handcrafted Indian Ethnic Wear',
-    description: 'Direct from master artisans in Jaipur — embroidered jackets, Boho dresses, Banarasi silk. Worldwide UPS shipping. Trusted by 3,200+ buyers across 30+ countries.',
+    description: 'Direct from master artisans in Jaipur — embroidered jackets, Boho dresses, block print textiles. Worldwide UPS shipping. Trusted by 3,200+ buyers across 30+ countries.',
     url: 'https://textilejaipur.com',
     siteName: 'Textile Jaipur',
     locale: 'en_US',
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Textile Jaipur | Authentic Indian Ethnic Wear — Worldwide Shipping',
-    description: 'Shop embroidered jackets, Boho dresses & Banarasi silk direct from Jaipur artisans. Free UPS Express worldwide shipping. Trusted by 3,200+ happy customers across 30+ countries.',
+    description: 'Shop embroidered jackets, Boho dresses & block print dresses direct from Jaipur artisans. Free UPS Express worldwide shipping. Trusted by 3,200+ happy customers across 30+ countries.',
     images: ['https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=1200&auto=format&fit=crop'],
     creator: '@textileofjaipur',
     site: '@textileofjaipur'
@@ -96,7 +96,7 @@ const organizationSchema = {
   name: 'Textile Jaipur',
   url: 'https://textilejaipur.com',
   logo: 'https://textilejaipur.com/icon.png',
-  description: 'Premium handcrafted Indian ethnic wear — embroidered jackets, Boho dresses, Banarasi silk, suzani masterpieces — shipped worldwide from Jaipur, Rajasthan.',
+  description: 'Premium handcrafted Indian ethnic wear — embroidered jackets, Boho dresses, block print textiles, suzani masterpieces — shipped worldwide from Jaipur, Rajasthan.',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Jaipur',
