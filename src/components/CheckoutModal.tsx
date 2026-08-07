@@ -46,8 +46,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   
-  // $5 USD converted to INR if express shipping is selected
-  const shippingCostInr = shippingMethod === 'express' ? 5 / 0.010769 : 0;
+  // $3 USD converted to INR if express shipping is selected
+  const shippingCostInr = shippingMethod === 'express' ? 3 / 0.010769 : 0;
   const effectiveInr = getCartTotalInr() + shippingCostInr;
   const USD_RATE = 0.010769;
   const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
@@ -382,7 +382,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                         <span className="text-[10px] text-zinc-500">Priority processing, 3-5 business days</span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-zinc-900">$5.00</span>
+                    <span className="text-sm font-bold text-zinc-900">$3.00</span>
                   </label>
                 </div>
               </div>
