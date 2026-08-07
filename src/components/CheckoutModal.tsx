@@ -44,9 +44,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
+  const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   
-  // $5 USD converted to INR
-  const shippingCostInr = 5 / 0.010769;
+  // $5 USD converted to INR if express shipping is selected
+  const shippingCostInr = shippingMethod === 'express' ? 5 / 0.010769 : 0;
   const effectiveInr = getCartTotalInr() + shippingCostInr;
   const USD_RATE = 0.010769;
   const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
@@ -346,6 +347,47 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               )}
 
               <div className="mt-4">
+                <label className="block text-xs font-semibold text-zinc-600 mb-2">Select Shipping Method</label>
+                <div className="flex flex-col gap-3">
+                  <label className={`flex items-center justify-between border rounded p-3 cursor-pointer transition-colors ${shippingMethod === 'standard' ? 'border-gold bg-gold/5' : 'border-zinc-200 hover:border-gold/50'}`}>
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="radio" 
+                        name="shipping" 
+                        value="standard" 
+                        checked={shippingMethod === 'standard'} 
+                        onChange={() => setShippingMethod('standard')}
+                        className="accent-gold h-4 w-4" 
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-zinc-900">Standard Shipping</span>
+                        <span className="text-[10px] text-zinc-500">Delivery in 7-10 business days</span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-emerald-600">Free</span>
+                  </label>
+                  
+                  <label className={`flex items-center justify-between border rounded p-3 cursor-pointer transition-colors ${shippingMethod === 'express' ? 'border-gold bg-gold/5' : 'border-zinc-200 hover:border-gold/50'}`}>
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="radio" 
+                        name="shipping" 
+                        value="express" 
+                        checked={shippingMethod === 'express'} 
+                        onChange={() => setShippingMethod('express')}
+                        className="accent-gold h-4 w-4" 
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-zinc-900">UPS Express Delivery</span>
+                        <span className="text-[10px] text-zinc-500">Priority processing, 3-5 business days</span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-zinc-900">$5.00</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-2 border-t border-zinc-100">
                 <label className="block text-xs font-semibold text-zinc-600 mb-2">Select Payment Method</label>
                 <div className="flex gap-4">
                   <label className={`flex-1 border rounded py-3 px-2 cursor-pointer transition-colors border-gold bg-gold/10`}>
@@ -407,12 +449,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     <span>-{formatPrice(getCartSubtotalInr() * (tierDiscountPercentage / 100))}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-xs text-zinc-600">
-                  <span>Worldwide UPS Express Shipping</span>
-                  <span className="text-zinc-900 font-bold">
-                    {formatPrice(shippingCostInr)}
-                  </span>
-                </div>
+                  <div className="flex justify-between text-xs text-zinc-600">
+                    <span>{shippingMethod === 'express' ? 'Worldwide UPS Express Shipping' : 'Standard Shipping'}</span>
+                    <span className={`font-bold ${shippingMethod === 'standard' ? 'text-emerald-600' : 'text-zinc-900'}`}>
+                      {shippingMethod === 'express' ? formatPrice(shippingCostInr) : 'Free'}
+                    </span>
+                  </div>
                 <div className="flex justify-between text-sm font-bold text-zinc-900 border-t border-zinc-300 pt-2 mt-2 font-serif">
                   <span>Total Charges</span>
                   <span className="text-gold">
