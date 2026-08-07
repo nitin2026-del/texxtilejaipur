@@ -89,7 +89,7 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
               ref={(el) => { videoRefs.current[index] = el; }}
               data-index={index}
               src={reel.videoUrl}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-contain"
               loop
               muted={isMuted}
               playsInline
