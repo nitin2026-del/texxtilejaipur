@@ -146,11 +146,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
 
         {/* Top-left: Badges */}
         <div className="absolute top-4 left-4 flex flex-col items-start gap-2 z-10">
-          {isJacket && (
-            <span className="bg-red-600 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 shadow-[4px_4px_0_rgba(0,0,0,1)] border-2 border-black transform -skew-x-6">
-              SALE - 30% OFF
-            </span>
-          )}
           {product.is_featured && (
             <span className="bg-blue-600 text-white text-[9px] font-bold tracking-widest uppercase px-3 py-1 shadow-[2px_2px_0_rgba(0,0,0,1)] border border-black transform -skew-x-6">
               New Drop

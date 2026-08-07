@@ -165,6 +165,7 @@ function AdminPortalContent() {
   const [btsUploadLoading, setBtsUploadLoading] = useState(false);
   const [btsTitle, setBtsTitle] = useState('');
   const [btsDescription, setBtsDescription] = useState('');
+  const [btsProductId, setBtsProductId] = useState('');
   const [btsFile, setBtsFile] = useState<File | null>(null);
   const [btsUploadProgress, setBtsUploadProgress] = useState(0);
   const [editingBtsId, setEditingBtsId] = useState<string | null>(null);
@@ -921,10 +922,12 @@ function AdminPortalContent() {
       }
         
       if (editingBtsId) {
+        const finalDescription = btsProductId ? `${btsDescription}|||${btsProductId}` : btsDescription;
+        
         // Update existing record
         const updateData: any = {
           title: btsTitle,
-          description: btsDescription,
+          description: finalDescription,
         };
         if (publicUrl) {
           updateData.media_url = publicUrl;
@@ -938,12 +941,14 @@ function AdminPortalContent() {
         if (dbErr) throw dbErr;
         showNotification('Behind the scenes item updated successfully!');
       } else {
+        const finalDescription = btsProductId ? `${btsDescription}|||${btsProductId}` : btsDescription;
+
         // Create new record
         const { error: dbErr } = await supabase
           .from('behind_the_scenes')
           .insert({
             title: btsTitle,
-            description: btsDescription,
+            description: finalDescription,
             media_url: publicUrl,
             status: 'published',
             display_order: behindTheScenesItems.length
@@ -955,6 +960,7 @@ function AdminPortalContent() {
 
       setBtsTitle('');
       setBtsDescription('');
+      setBtsProductId('');
       setBtsFile(null);
       setEditingBtsId(null);
       fetchDashboardData();
@@ -969,7 +975,14 @@ function AdminPortalContent() {
   const handleBtsEditClick = (item: BehindTheScenesItem) => {
     setEditingBtsId(item.id);
     setBtsTitle(item.title);
-    setBtsDescription(item.description || '');
+    if (item.description && item.description.includes('|||')) {
+      const [desc, pid] = item.description.split('|||');
+      setBtsDescription(desc);
+      setBtsProductId(pid);
+    } else {
+      setBtsDescription(item.description || '');
+      setBtsProductId('');
+    }
     setBtsFile(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -978,6 +991,7 @@ function AdminPortalContent() {
     setEditingBtsId(null);
     setBtsTitle('');
     setBtsDescription('');
+    setBtsProductId('');
     setBtsFile(null);
   };
 
@@ -1649,7 +1663,7 @@ function AdminPortalContent() {
                   : 'text-zinc-500 hover:text-zinc-700'
               }`}
             >
-              <Video className="h-3.5 w-3.5" /> Behind The Scenes
+              <Video className="h-3.5 w-3.5" /> The Artisan Edit
             </button>
           </div>
         </div>
@@ -2956,6 +2970,21 @@ function AdminPortalContent() {
                   />
                 </div>
                 <div>
+                  <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Linked Product (Optional)</label>
+                  <select
+                    value={btsProductId}
+                    onChange={(e) => setBtsProductId(e.target.value)}
+                    className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
+                  >
+                    <option value="">No Product Linked</option>
+                    {products.map(p => (
+                      <option key={p.id} value={p.id}>{p.name} ({p.sku})</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 mb-4">
+                <div>
                   <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Description (Optional)</label>
                   <input
                     type="text"
@@ -3065,7 +3094,7 @@ function AdminPortalContent() {
                           </div>
                           <div className="absolute bottom-0 left-0 right-0 p-3">
                             <p className="text-xs font-bold text-white truncate">{item.title}</p>
-                            {item.description && <p className="text-[10px] text-white/80 line-clamp-2 mt-0.5">{item.description}</p>}
+                            {item.description && <p className="text-[10px] text-white/80 line-clamp-2 mt-0.5">{item.description.split('|||')[0]}</p>}
                           </div>
                         </div>
                       </div>

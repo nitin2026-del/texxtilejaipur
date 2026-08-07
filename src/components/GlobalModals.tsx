@@ -127,14 +127,14 @@ export function GlobalModals() {
             </button>
             <h2 className="text-3xl font-serif text-zinc-900 mb-3">Wait! Don't leave empty-handed.</h2>
             <p className="text-zinc-600 mb-6 font-medium leading-relaxed">
-              Complete your purchase today and we'll upgrade your order to <strong className="text-black">Complimentary UPS Express Shipping</strong> worldwide.
+              Complete your purchase today and we'll upgrade your order to <strong className="text-black">Priority Processing & Expedited Shipping</strong> at no extra cost.
             </p>
             <div className="flex flex-col gap-3">
               <button 
                 onClick={() => setExitModalOpen(false)}
                 className="w-full bg-black text-white font-bold tracking-widest uppercase py-4 hover:bg-zinc-800 transition-colors rounded-sm"
               >
-                Claim Free Shipping
+                Claim Fast Shipping
               </button>
               <button 
                 onClick={() => setExitModalOpen(false)}
