@@ -11,7 +11,7 @@ import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getOptimizedUrl } from '@/utils/imageUtils';
 import Link from 'next/link';
-import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video } from 'lucide-react';
+import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2 } from 'lucide-react';
 
 interface Product {
   id: string;
