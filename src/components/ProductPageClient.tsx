@@ -805,7 +805,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Free UPS Express Delivery. Note: International buyers are responsible for any local customs duties or taxes applied by their country.
+                          Free UPS Express Delivery.
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -814,7 +814,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          14-day hassle-free returns on all unworn items.
+                          14-day hassle-free returns on all unworn items. We will take care of all taxes and duties.
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
