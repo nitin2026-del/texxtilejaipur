@@ -147,6 +147,7 @@ function AdminPortalContent() {
   const [adminLoginError, setAdminLoginError] = useState('');
 
   const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews'>('overview');
+  const [reviewProductId, setReviewProductId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
@@ -2082,6 +2083,16 @@ function AdminPortalContent() {
                             >
                               <Edit className="h-4 w-4" />
                             </button>
+                            <button
+                              onClick={() => {
+                                setReviewProductId(prod.id);
+                                setActiveTab('reviews');
+                              }}
+                              className="p-2 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-indigo-950/20 hover:border-indigo-900/30 text-zinc-700 hover:text-indigo-600 transition-colors"
+                              title="Manage Reviews"
+                            >
+                              <Star className="h-4 w-4" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -3197,7 +3208,7 @@ function AdminPortalContent() {
         {/* TAB 10: REVIEWS */}
         {activeTab === 'reviews' && (
           <div className="space-y-6">
-            <AdminReviews products={products} />
+            <AdminReviews products={products} initialProductId={reviewProductId} />
           </div>
         )}
 

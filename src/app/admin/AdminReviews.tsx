@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Trash2, Image as ImageIcon, Star } from 'lucide-react';
 
-export const AdminReviews = ({ products }: { products: any[] }) => {
-  const [selectedProductId, setSelectedProductId] = useState<string>('');
+export const AdminReviews = ({ products, initialProductId }: { products: any[], initialProductId?: string }) => {
+  const [selectedProductId, setSelectedProductId] = useState<string>(initialProductId || '');
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    if (initialProductId) {
+      setSelectedProductId(initialProductId);
+    }
+  }, [initialProductId]);
   
   const [newReview, setNewReview] = useState({
     name: '',
