@@ -43,7 +43,6 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
   
   // Pagination State
   const [categoryTiers, setCategoryTiers] = useState<Record<string, number>>({});
-  const [expandedCollections, setExpandedCollections] = useState<string[]>([]);
   
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
@@ -264,56 +263,83 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
           </div>
         </div>
 
-        {/* Curated Featured Collections */}
+        {/* Subcategories Filter Strip */}
+        {currentSubCategories.length > 0 && (
+          <div className="mt-8 flex flex-wrap gap-2 items-center justify-center border-t border-zinc-200 pt-8 animate-fade-in">
+            <button
+              onClick={() => setSelectedSubCategory('All')}
+              className={`px-3 py-1.5 rounded-md text-[10px] font-bold tracking-wider transition-all duration-250 uppercase ${
+                selectedSubCategory === 'All'
+                  ? 'bg-zinc-100 text-zinc-900'
+                  : 'bg-transparent text-zinc-500 hover:text-zinc-800'
+              }`}
+            >
+              All {selectedMainCategory}
+            </button>
+            {currentSubCategories.map((subCat) => (
+              <button
+                key={subCat}
+                onClick={() => setSelectedSubCategory(subCat)}
+                className={`px-3 py-1.5 rounded-md text-[10px] font-bold tracking-wider transition-all duration-250 uppercase ${
+                  selectedSubCategory === subCat
+                    ? 'bg-zinc-100 text-zinc-900'
+                    : 'bg-transparent text-zinc-500 hover:text-zinc-800'
+                }`}
+              >
+                {subCat}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Stacked Categories Grid */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-32 bg-[#FDFBF7] border border-zinc-200 p-8">
             <Filter className="h-12 w-12 text-zinc-300 mx-auto mb-4 stroke-[1.5]" />
             <p className="text-lg font-serif font-bold text-zinc-900">No products found</p>
-            <p className="text-sm text-zinc-500 mt-2 font-medium tracking-wide">Try adjusting your search terms.</p>
+            <p className="text-sm text-zinc-500 mt-2 font-medium tracking-wide">Try adjusting your category or search terms.</p>
           </div>
         ) : (
           <div className="space-y-24">
-            {[
-              { title: 'Suzani Jackets', filter: (p: Product) => (p.category?.toLowerCase().includes('suzani') && p.category?.toLowerCase().includes('jacket')) || p.name?.toLowerCase().includes('suzani jacket') },
-              { title: 'Handcrafted Kimonos', filter: (p: Product) => p.category?.toLowerCase().includes('kimono') || p.name?.toLowerCase().includes('kimono') },
-              { title: 'Jaipur Textile Bags', filter: (p: Product) => p.category?.toLowerCase().includes('bag') || p.name?.toLowerCase().includes('bag') },
-              { title: 'Artisan Velvet Collection', filter: (p: Product) => p.category?.toLowerCase().includes('velvet') || p.name?.toLowerCase().includes('velvet') },
-              { title: 'One-of-a-Kind Pieces', filter: (p: Product) => p.is_featured }
-            ].map((collection) => {
-              // 1. Get products for this collection, applying the active search term
-              const catProducts = filteredProducts.filter(collection.filter);
+            {categoriesToRender.map((catName) => {
+              // 1. Get products for this category
+              const isMainCat = dbCategories.find(c => c.name === catName && !c.parent_id);
+              const subCats = isMainCat ? dbCategories.filter(c => c.parent_id === isMainCat.id).map(c => c.name) : [];
+              const catProducts = filteredProducts.filter(p => p.category === catName || subCats.includes(p.category));
               
               if (catProducts.length === 0) return null;
 
-              // 2. Limit to 8 best products
-              const isExpanded = expandedCollections.includes(collection.title);
-              const visibleCatProducts = isExpanded ? catProducts : catProducts.slice(0, 8);
+              // 2. Apply pagination logic for THIS category
+              const currentTier = categoryTiers[catName] || 1;
+              const visibleCatProducts = catProducts.slice(0, currentTier * 12);
+
+              const hasMoreProducts = visibleCatProducts.length < catProducts.length;
 
               return (
-                <div key={collection.title} className="space-y-8">
-                  {/* Collection Header */}
+                <div key={catName} className="space-y-8">
+                  {/* Category Header */}
                   <div className="flex items-center gap-4 border-b border-zinc-200 pb-2">
-                    <h4 className="text-3xl font-serif text-zinc-900">{collection.title}</h4>
+                    <h4 className="text-3xl font-serif text-zinc-900">{catName}</h4>
                     <span className="text-xs text-zinc-500 font-medium tracking-widest uppercase">{catProducts.length} items</span>
                   </div>
 
                   {/* Horizontal Scrolling Carousel */}
-                  <div id={`carousel-${collection.title.replace(/\s+/g, '-')}`} className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar [overflow-anchor:none]">
+                  <div id={`carousel-${catName.replace(/\s+/g, '-')}`} className="flex gap-6 overflow-x-auto pb-8 pt-4 custom-scrollbar [overflow-anchor:none]">
                     {visibleCatProducts.map((prod) => (
                       <div key={prod.id} className="w-[280px] sm:w-[320px] shrink-0">
                         <ProductCard product={prod} onCartOpen={() => setCartOpen(true)} />
                       </div>
                     ))}
                     
-                    {/* View All Button */}
-                    {catProducts.length > 8 && !isExpanded && (
-                      <div className="w-[280px] sm:w-[320px] shrink-0 flex items-center justify-center">
+                    {/* Load More Button at the end of carousel */}
+                    {hasMoreProducts && (
+                      <div key={`load-more-${catName}-${currentTier}`} className="w-[280px] sm:w-[320px] shrink-0 flex items-center justify-center">
                         <button
-                          onClick={() => setExpandedCollections(prev => [...prev, collection.title])}
+                          onClick={(e) => handleLoadMore(catName, e)}
                           className="px-8 py-6 border border-zinc-900 text-zinc-900 font-bold tracking-widest uppercase text-xs hover:bg-zinc-900 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col items-center gap-2"
                         >
-                          <span>View All {collection.title}</span>
-                          <span className="text-[10px] text-zinc-500">{catProducts.length - 8} more items</span>
+                          <span>View More</span>
+                          <span className="text-[10px] text-zinc-500">{catProducts.length - visibleCatProducts.length} more items</span>
                         </button>
                       </div>
                     )}
