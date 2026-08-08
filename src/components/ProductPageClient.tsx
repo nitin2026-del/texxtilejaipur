@@ -47,6 +47,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -307,8 +308,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     >
                       {media.type === 'image' ? (
                         <div
-                          className="absolute inset-0 cursor-zoom-in"
-                          onClick={() => { if (isActive) setLightboxOpen(true); }}
+                          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'} ${isActive ? 'cursor-zoom-in' : ''}`}
+                          onClick={() => { if (isActive) { setImageLoading(true); setLightboxOpen(true); } }}
                           title="Click to view full quality"
                         >
                           <img 
@@ -462,10 +463,28 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       setIsZoomed(!isZoomed); 
                     }}
                   >
+                    {/* Fast Loading Preview Image */}
+                    {imageLoading && (
+                      <img
+                        src={mediaItems[selectedMediaIndex].url}
+                        alt="Preview"
+                        className={`${isZoomed ? 'object-contain w-full h-full' : 'absolute inset-0 w-full h-full object-contain'} opacity-60 blur-md transition-opacity duration-300`}
+                        style={isZoomed ? { maxWidth: 'none' } : {}}
+                      />
+                    )}
+                    
+                    {/* Loading Spinner */}
+                    {imageLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                        <Loader2 className="h-12 w-12 text-white animate-spin opacity-90 drop-shadow-lg" />
+                      </div>
+                    )}
+
                     <img
                       src={product.images?.[selectedMediaIndex] || mediaItems[selectedMediaIndex].url}
                       alt={`${product.name} – full quality`}
-                      className={`${isZoomed ? 'object-contain w-full h-full' : 'absolute inset-0 w-full h-full object-contain'}`}
+                      onLoad={() => setImageLoading(false)}
+                      className={`${isZoomed ? 'object-contain w-full h-full' : 'absolute inset-0 w-full h-full object-contain'} ${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
                       style={isZoomed ? { maxWidth: 'none' } : {}}
                     />
                   </div>
@@ -475,13 +494,13 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     <>
                       <button
                         className="fixed left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-20"
-                        onClick={(e) => { e.stopPropagation(); setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1); }}
+                        onClick={(e) => { e.stopPropagation(); setImageLoading(true); setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1); }}
                       >
                         <ChevronLeft className="h-6 w-6" />
                       </button>
                       <button
                         className="fixed right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-20"
-                        onClick={(e) => { e.stopPropagation(); setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1); }}
+                        onClick={(e) => { e.stopPropagation(); setImageLoading(true); setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1); }}
                       >
                         <ChevronRight className="h-6 w-6" />
                       </button>
