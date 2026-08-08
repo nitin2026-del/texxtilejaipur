@@ -769,7 +769,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          100% {product.details?.material || 'Premium Fabric'}
+                          100% Cotton
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">

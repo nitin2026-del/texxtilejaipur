@@ -43,6 +43,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
   
   // Pagination State
   const [categoryTiers, setCategoryTiers] = useState<Record<string, number>>({});
+  const [expandedCollections, setExpandedCollections] = useState<string[]>([]);
   
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
@@ -285,7 +286,8 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
               if (catProducts.length === 0) return null;
 
               // 2. Limit to 8 best products
-              const visibleCatProducts = catProducts.slice(0, 8);
+              const isExpanded = expandedCollections.includes(collection.title);
+              const visibleCatProducts = isExpanded ? catProducts : catProducts.slice(0, 8);
 
               return (
                 <div key={collection.title} className="space-y-8">
@@ -304,9 +306,10 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
                     ))}
                     
                     {/* View All Button */}
-                    {catProducts.length > 8 && (
+                    {catProducts.length > 8 && !isExpanded && (
                       <div className="w-[280px] sm:w-[320px] shrink-0 flex items-center justify-center">
                         <button
+                          onClick={() => setExpandedCollections(prev => [...prev, collection.title])}
                           className="px-8 py-6 border border-zinc-900 text-zinc-900 font-bold tracking-widest uppercase text-xs hover:bg-zinc-900 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col items-center gap-2"
                         >
                           <span>View All {collection.title}</span>
