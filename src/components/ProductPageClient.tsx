@@ -1051,6 +1051,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
 
         {/* Photo Reviews Section */}
         {product && (
+          <>
           <div className="mt-20 pt-16 border-t border-zinc-200">
             <div className="flex flex-col md:flex-row gap-12">
               <div className="w-full md:w-1/3">
