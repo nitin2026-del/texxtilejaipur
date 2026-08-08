@@ -235,8 +235,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
     }
   }, [product, pathname, id]);
 
-  };
-
   const handleAddToCart = () => {
     const qtyToAdd = quantity === 0 ? 1 : quantity;
     if (product) {
