@@ -46,6 +46,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
     const [quantity, setQuantity] = useState(1);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -156,11 +157,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
   
   // International AI features
   const [language, setLanguage] = useState<'en' | 'fr' | 'es' | 'ar' | 'de'>('en');
-  const [sizingOpen, setSizingOpen] = useState(false);
   const [activeBadge, setActiveBadge] = useState<string | null>(null);
-  const [sizingInput, setSizingInput] = useState('');
-  const [sizingResult, setSizingResult] = useState('');
-  const [sizingLoading, setSizingLoading] = useState(false);
   
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
@@ -238,33 +235,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
     }
   }, [product, pathname, id]);
 
-  const handleSizingRequest = async () => {
-    if (!product || !sizingInput.trim()) return;
-    setSizingLoading(true);
-    setSizingResult('');
-    try {
-      const res = await fetch('/api/ai/size-assistant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userSize: sizingInput,
-          brand: 'standard western brands',
-          productName: product.name,
-          material: product.details?.material,
-          category: product.category
-        })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSizingResult(data.recommendation);
-      } else {
-        setSizingResult("Sorry, I couldn't determine the size right now. Please check our standard size chart.");
-      }
-    } catch (err) {
-      setSizingResult("Sorry, I couldn't determine the size right now. Please check our standard size chart.");
-    } finally {
-      setSizingLoading(false);
-    }
   };
 
   const handleAddToCart = () => {
@@ -382,12 +352,10 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     </div>
                   );
                 }) : (
-                  <Image 
+                  <img 
                     src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80" 
                     alt="Placeholder"
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 )}
                 
@@ -451,54 +419,70 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
               {/* Lightbox - Full Quality Viewer */}
               {lightboxOpen && mediaItems[selectedMediaIndex]?.type === 'image' && (
                 <div
-                  className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center"
-                  onClick={() => setLightboxOpen(false)}
+                  className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center overflow-auto"
+                  onClick={() => {
+                    if (isZoomed) setIsZoomed(false);
+                    else setLightboxOpen(false);
+                  }}
                   onKeyDown={(e) => {
-                    if (e.key === 'Escape') setLightboxOpen(false);
-                    if (e.key === 'ArrowRight') setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1);
-                    if (e.key === 'ArrowLeft') setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1);
+                    if (e.key === 'Escape') {
+                      if (isZoomed) setIsZoomed(false);
+                      else setLightboxOpen(false);
+                    }
+                    if (!isZoomed) {
+                      if (e.key === 'ArrowRight') setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1);
+                      if (e.key === 'ArrowLeft') setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1);
+                    }
                   }}
                   tabIndex={0}
                   ref={el => el?.focus()}
                 >
                   {/* Close */}
                   <button
-                    className="absolute top-5 right-5 z-10 text-white/70 hover:text-white bg-white/10 rounded-full p-2 transition-colors"
-                    onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); }}
+                    className="fixed top-5 right-5 z-20 text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-full p-2 transition-colors"
+                    onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); setIsZoomed(false); }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   </button>
 
                   {/* Counter */}
-                  {mediaItems.length > 1 && (
-                    <div className="absolute top-5 left-1/2 -translate-x-1/2 text-white/60 text-sm">
+                  {!isZoomed && mediaItems.length > 1 && (
+                    <div className="fixed top-5 left-1/2 -translate-x-1/2 text-white/60 text-sm z-20 bg-black/50 px-3 py-1 rounded-full">
                       {selectedMediaIndex + 1} / {mediaItems.length}
                     </div>
                   )}
 
                   {/* Full-Quality Image */}
                   <div
-                    className="relative w-full h-full max-w-5xl max-h-[90vh] mx-auto px-16"
-                    onClick={e => e.stopPropagation()}
+                    className={`relative transition-all duration-300 ${
+                      isZoomed 
+                        ? 'w-auto h-auto min-w-[150vw] min-h-[150vh] cursor-zoom-out p-4 flex items-center justify-center' 
+                        : 'w-full h-full max-w-6xl max-h-[90vh] mx-auto px-8 md:px-16 cursor-zoom-in'
+                    }`}
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setIsZoomed(!isZoomed); 
+                    }}
                   >
                     <img
-                      src={mediaItems[selectedMediaIndex].url}
+                      src={product.images?.[selectedMediaIndex] || mediaItems[selectedMediaIndex].url}
                       alt={`${product.name} – full quality`}
-                      className="absolute inset-0 w-full h-full object-contain"
+                      className={`${isZoomed ? 'object-contain w-full h-full' : 'absolute inset-0 w-full h-full object-contain'}`}
+                      style={isZoomed ? { maxWidth: 'none' } : {}}
                     />
                   </div>
 
-                  {/* Arrows */}
-                  {mediaItems.length > 1 && (
+                  {/* Navigation Arrows */}
+                  {!isZoomed && mediaItems.length > 1 && (
                     <>
                       <button
-                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        className="fixed left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-20"
                         onClick={(e) => { e.stopPropagation(); setSelectedMediaIndex(prev => prev === 0 ? mediaItems.length - 1 : prev - 1); }}
                       >
                         <ChevronLeft className="h-6 w-6" />
                       </button>
                       <button
-                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                        className="fixed right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-20"
                         onClick={(e) => { e.stopPropagation(); setSelectedMediaIndex(prev => prev === mediaItems.length - 1 ? 0 : prev + 1); }}
                       >
                         <ChevronRight className="h-6 w-6" />
@@ -893,51 +877,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     </button>
                   </div>
                   
-                  {/* AI Sizing Assistant - Collapsed */}
-                  <div className={`transition-all duration-500 overflow-hidden rounded-xl border ${sizingOpen ? 'border-brand-300 shadow-lg' : 'border-zinc-200'}`}>
-                    <button 
-                      onClick={() => setSizingOpen(!sizingOpen)}
-                      className={`w-full flex items-center justify-between p-4 ${sizingOpen ? 'bg-brand-50' : 'bg-white hover:bg-zinc-50'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Sparkles className="h-4 w-4 text-brand-600" />
-                        <span className="text-sm font-bold text-zinc-900 font-serif">AI TAILOR ✨</span>
-                      </div>
-                      <ChevronDown className={`h-4 w-4 text-zinc-400 transition-transform ${sizingOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    <div className={`transition-all duration-500 ease-in-out ${sizingOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                      <div className="p-4 border-t border-brand-100 bg-brand-50/50">
-                        <input 
-                          type="text" 
-                          value={sizingInput}
-                          onChange={(e) => setSizingInput(e.target.value)}
-                          placeholder="e.g. US Size 6, Zara" 
-                          className="w-full text-sm px-3 py-2 border border-zinc-200 rounded mb-2"
-                        />
-                        <button 
-                          onClick={handleSizingRequest}
-                          disabled={sizingLoading || !sizingInput.trim()}
-                          className="w-full py-2 bg-zinc-900 text-white text-xs font-bold rounded"
-                        >
-                          {sizingLoading ? '...' : 'Calculate Size'}
-                        </button>
-                        {sizingResult && (
-                          <div className="mt-3 text-sm font-medium text-brand-800">{sizingResult}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                  {/* AI Sizing Assistant - Removed per user request */}
                 </div>
               </div>
 
-                {/* Social */}
-                <div className="mt-4 flex flex-col sm:flex-row items-center justify-start gap-4 max-w-md">
-                  <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full gap-2 px-4 py-3 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white rounded-lg hover:shadow-md transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                    <span className="text-[13px] font-bold tracking-wide">Follow @textileofjaipur</span>
-                  </a>
-                </div>
-
+                {/* Social - Removed per user request */}
                 {/* Artisan Story Section */}
                 <div className="mt-6">
                   <details className="group bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -1316,10 +1260,9 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     q: 'How do I know my correct size?',
                     a: 'Please refer to our detailed size chart. Our garments usually run true to size, but since they are handcrafted, there might be a slight 0.5-inch variation. If you are between sizes, we suggest sizing up for a comfortable fit.'
                   },
-                  
                   {
-                    q: 'In how many days will I receive my delivery?',
-                    a: '✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We can provide expedited shipping at no extra cost if you have a genuine reason (like a wedding, gift, or special event). Please reach out to us to request fast delivery for your order.'
+                    q: 'Is this item authentic and handmade?',
+                    a: 'Yes, all our garments are crafted by rural artisans in Jaipur, India. We use traditional techniques like hand-block printing and hand-embroidery, ensuring every piece is unique and supports heritage craftsmanship.'
                   }
                 ].map((qa, i) => (
                   <div key={i} className="border border-zinc-200 rounded-xl overflow-hidden bg-white">
