@@ -176,17 +176,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
           </button>
         </div>
 
-        {/* Stock urgency badges */}
-        {isLowStock && (
-          <span className="absolute bottom-4 right-4 bg-red-600/95 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-10 flex items-center gap-1.5 shadow-[0_0_15px_rgba(220,38,38,0.5)] animate-pulse border border-red-400">
-            <Flame className="h-3 w-3" /> Only {product.stock} left!
-          </span>
-        )}
-        {!isLowStock && isSellingFast && (
-          <span className="absolute bottom-4 right-4 bg-amber-500/95 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-full z-10 flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.5)] border border-amber-300">
-            <Flame className="h-3 w-3" /> Selling Fast
-          </span>
-        )}
+        {/* Stock urgency badges removed per feedback */}
 
         {/* Origin badge */}
         {product.details?.origin && (
@@ -211,19 +201,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
       {/* Product Info */}
       <div className="pt-5 flex-1 flex flex-col justify-between space-y-3 bg-white">
         <div className="space-y-1.5">
-          {/* GI Tag + Rating row */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase">
-                <Shield className="h-2.5 w-2.5" />
-                GI Certified
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Star className="h-3 w-3 fill-gold text-gold" />
-              <span className="text-zinc-600 font-semibold text-[10px]">4.8</span>
-            </div>
-          </div>
+          {/* GI Tag + Rating row removed per feedback */}
 
           <Link href={`/product/${product.id}`} prefetch={true} className="block">
             <h4 className="text-lg font-serif text-zinc-900 tracking-wide line-clamp-1 group-hover:text-brand-700 transition-colors duration-300">
@@ -231,15 +209,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             </h4>
           </Link>
 
-          {/* SKU + material */}
-          <div className="flex items-center gap-2 text-[9px] text-zinc-400">
-            <span className="font-mono tracking-wider">{product.sku}</span>
-            {product.details?.material && (
-              <>
-                <span>·</span>
-                <span className="font-bold tracking-widest uppercase text-zinc-500">{product.details.material}</span>
-              </>
-            )}
+          {/* Subtitle */}
+          <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 font-medium tracking-wide">
+            <span>Handcrafted {product.details?.material || 'Cotton'}</span>
+            <span>·</span>
+            <span>Jaipur, India</span>
           </div>
         </div>
 

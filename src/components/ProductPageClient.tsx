@@ -590,14 +590,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                 {/* Circular Badges */}
                 <div className="flex flex-col gap-3 py-2">
                   <div className="flex items-center gap-10">
-                    <div className="flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setActiveBadge(activeBadge === 'gi' ? null : 'gi')}>
-                      <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative group-hover:bg-[#f5f5f7] transition-colors">
-                        <Award className="h-6 w-6 relative z-10" strokeWidth={1.5} />
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#ffe270] rounded-full -z-0"></div>
-                      </div>
-                      <span className="text-[11px] text-[#444] font-medium text-center leading-tight">GI Certified</span>
-                    </div>
-                    
                     <div className="flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setActiveBadge(activeBadge === 'material' ? null : 'material')}>
                       <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative group-hover:bg-[#f5f5f7] transition-colors">
                         <ShieldCheck className="h-6 w-6 relative z-10" strokeWidth={1.5} />
@@ -616,12 +608,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   </div>
 
                   {/* Badge Info Expandable Area */}
-                  {activeBadge === 'gi' && (
-                    <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                      <strong className="text-[#1a1464] text-[13px] block mb-1">GI Certified (Geographical Indication)</strong>
-                      This product holds an authentic Geographical Indication tag, guaranteeing that it is genuinely handcrafted in its traditional region of origin (Jaipur, Rajasthan) using centuries-old heritage techniques.
-                    </div>
-                  )}
                   {activeBadge === 'material' && (
                     <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                       <strong className="text-[#1a1464] text-[13px] block mb-1">Material Details</strong>
@@ -798,6 +784,85 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 object-contain" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" className="h-4 object-contain rounded-sm" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
+                  </div>
+
+                  {/* Structured Details */}
+                  <div className="mt-6 pt-6 border-t border-zinc-200 max-w-md">
+                    <h3 className="text-sm font-bold text-zinc-900 mb-3">Product Details</h3>
+                    <div className="space-y-2">
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          What is it?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Handcrafted {product.category?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          What is it made from?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          100% {product.details?.material || 'Premium Fabric'}
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          How was it made?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Authentic hand embroidery & artisan crafting techniques.
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          Where was it made?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Jaipur, Rajasthan (India)
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          Weight?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Approx. 0.8kg - 1.2kg (varies slightly by item)
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          Shipping & Customs?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Free UPS Express Delivery. Note: International buyers are responsible for any local customs duties or taxes applied by their country.
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          Returns?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          14-day hassle-free returns on all unworn items.
+                        </div>
+                      </details>
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          What's included?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          {(product.category?.toLowerCase().includes('jacket') || product.name.toLowerCase().includes('jacket') || product.name.toLowerCase().includes('kimono')) ? 'Jacket/Kimono only — inner wear and accessories shown in photographs are not included.' : 'Product only — accessories shown in photographs are not included.'}
+                        </div>
+                      </details>
+                    </div>
                   </div>
 
                   {/* Frequently Asked Questions */}
