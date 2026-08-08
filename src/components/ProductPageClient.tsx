@@ -1097,7 +1097,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
               </div>
             </div>
           </div>
-          )}
           
           
 
