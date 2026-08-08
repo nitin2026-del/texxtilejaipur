@@ -12,7 +12,7 @@ export default async function Home() {
   }
 
   let dbCategories = [];
-  let products = [];
+  let products: any[] = [];
 
   try {
     const catRes = await fetch(

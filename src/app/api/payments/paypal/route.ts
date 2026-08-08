@@ -99,12 +99,12 @@ export async function POST(req: NextRequest) {
         order_number: orderData?.order_number || orderId,
         customer: {
           email,
-          name: orderData?.shipping_addresses?.full_name || '',
-          phone: orderData?.shipping_addresses?.phone || '',
-          country: orderData?.shipping_addresses?.country || '',
-          zip: orderData?.shipping_addresses?.postal_code || '',
-          city: orderData?.shipping_addresses?.city || '',
-          state: orderData?.shipping_addresses?.state || ''
+          name: orderData?.shipping_addresses?.[0]?.full_name || '',
+          phone: orderData?.shipping_addresses?.[0]?.phone || '',
+          country: orderData?.shipping_addresses?.[0]?.country || '',
+          zip: orderData?.shipping_addresses?.[0]?.postal_code || '',
+          city: orderData?.shipping_addresses?.[0]?.city || '',
+          state: orderData?.shipping_addresses?.[0]?.state || ''
         }
       }, { status: 200 });
     } else {

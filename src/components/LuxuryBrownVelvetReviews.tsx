@@ -3,7 +3,7 @@
 import React from 'react';
 import { ReviewData } from './SuzaniReviews';
 
-const reviewsData = [
+const reviewsData: ReviewData[] = [
   {
     initial: 'V',
     name: 'Victoria L.',

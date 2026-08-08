@@ -25,7 +25,7 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
   const [currentReelIndex, setCurrentReelIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [cartOpen, setCartOpen] = useState(false);
-  const { addToCart } = useCart();
+  const { addToCart, cart } = useCart();
   
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,12 +62,11 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
   const handleShopClick = (product: ReelProduct) => {
     addToCart({
       id: product.id,
+      sku: product.id,
       name: product.name,
-      price: product.price_inr,
-      image: product.images[0],
-      quantity: 1,
-      size: 'One Size'
-    });
+      price_inr: product.price_inr,
+      images: product.images
+    }, 1);
     setCartOpen(true);
   };
 
@@ -78,45 +77,50 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
         ref={containerRef}
         className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:rounded-[40px] sm:border-[8px] sm:border-zinc-900 overflow-y-scroll snap-y snap-mandatory hide-scrollbar relative bg-black shadow-2xl"
       >
-        {/* Back Button */}
-        <Link href="/" className="absolute top-6 left-4 z-50 p-2 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition-colors">
-          <ChevronLeft className="w-6 h-6" />
-        </Link>
-
         {reels.map((reel, index) => (
-          <div key={reel.id} className="relative w-full h-full snap-start shrink-0 flex items-center justify-center bg-zinc-900">
+          <div key={reel.id} className="relative w-full h-full snap-start snap-always shrink-0 bg-zinc-900">
             <video
               ref={(el) => { videoRefs.current[index] = el; }}
               data-index={index}
               src={reel.videoUrl}
-              className="absolute inset-0 w-full h-full object-contain"
+              className="w-full h-full object-cover"
               loop
               muted={isMuted}
               playsInline
-              onClick={(e) => {
-                const video = e.currentTarget;
-                if (video.paused) video.play();
-                else video.pause();
-              }}
             />
 
-            {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/80 pointer-events-none" />
-
-            {/* Right Side Actions */}
-            <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-10">
-              <button onClick={toggleMute} className="p-3 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition-colors">
-                {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-              </button>
-              <button className="p-3 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition-colors flex flex-col items-center gap-1">
-                <Heart className="w-6 h-6" />
-              </button>
-              <button className="p-3 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition-colors">
-                <Share2 className="w-6 h-6" />
-              </button>
+            {/* Overlay UI */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 pointer-events-none" />
+            
+            {/* Top controls */}
+            <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10">
+              <Link 
+                href="/"
+                className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </Link>
+              
+              <div className="flex gap-2">
+                <button 
+                  onClick={toggleMute}
+                  className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+                <button 
+                  onClick={() => setCartOpen(true)}
+                  className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-colors relative"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {cart.length > 0 && (
+                    <span className="absolute top-0 right-0 w-3 h-3 bg-[#D4AF37] rounded-full" />
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* Bottom Content Info */}
+            {/* Bottom Info */}
             <div className="absolute bottom-0 left-0 w-full p-6 z-10">
               <h2 className="text-white font-bold text-xl mb-2 drop-shadow-md">{reel.title}</h2>
               <p className="text-zinc-200 text-sm mb-6 max-w-[80%] drop-shadow-md line-clamp-2">
@@ -145,7 +149,7 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
         ))}
       </div>
 
-      <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} onCheckout={() => setCartOpen(false)} />
       
       <style dangerouslySetInnerHTML={{__html: `
         .hide-scrollbar::-webkit-scrollbar {

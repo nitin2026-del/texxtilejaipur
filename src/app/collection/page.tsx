@@ -11,7 +11,7 @@ export default async function CollectionPage() {
     return <CollectionPageClient initialProducts={[]} categories={['All']} />;
   }
 
-  let products = [];
+  let products: any[] = [];
   let categories = ['All'];
 
   try {
