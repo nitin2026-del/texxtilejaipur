@@ -6,42 +6,6 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
-import { SuzaniReviews } from '@/components/SuzaniReviews';
-import { BlueFloralReviews } from '@/components/BlueFloralReviews';
-import { PinkVelvetReviews } from '@/components/PinkVelvetReviews';
-import { CottonSuzaniReviews } from '@/components/CottonSuzaniReviews';
-import { RustVelvetReviews } from '@/components/RustVelvetReviews';
-import { BohemianEleganceReviews } from '@/components/BohemianEleganceReviews';
-import { TntSuzaniReviews } from '@/components/TntSuzaniReviews';
-import { VintageSuzaniReviews } from '@/components/VintageSuzaniReviews';
-import { UniqueTntSuzaniReviews } from '@/components/UniqueTntSuzaniReviews';
-import { PremiumTntSuzaniReviews } from '@/components/PremiumTntSuzaniReviews';
-import { LuxeVelvetSuzaniReviews } from '@/components/LuxeVelvetSuzaniReviews';
-import { ArtisanVelvetReviews } from '@/components/ArtisanVelvetReviews';
-import { ElegantVelvetReviews } from '@/components/ElegantVelvetReviews';
-import { OrangeVelvetReviews } from '@/components/OrangeVelvetReviews';
-import { VintageRedVelvetReviews } from '@/components/VintageRedVelvetReviews';
-import { PurpleTntSuzaniReviews } from '@/components/PurpleTntSuzaniReviews';
-import { LuxuryBrownVelvetReviews } from '@/components/LuxuryBrownVelvetReviews';
-import { TraditionalBlackVelvetReviews } from '@/components/TraditionalBlackVelvetReviews';
-import { EthnicBlackVelvetReviews } from '@/components/EthnicBlackVelvetReviews';
-import { BlueTntSuzaniReviews } from '@/components/BlueTntSuzaniReviews';
-import { GreenVelvetSuzaniReviews } from '@/components/GreenVelvetSuzaniReviews';
-import { CyanVelvetSuzaniReviews } from '@/components/CyanVelvetSuzaniReviews';
-import { BohemianVelvetReviews } from '@/components/BohemianVelvetReviews';
-import { EvilEyeVelvetReviews } from '@/components/EvilEyeVelvetReviews';
-import { DarkPaisleyVelvetReviews } from '@/components/DarkPaisleyVelvetReviews';
-import { WomensVelvetSuzaniReviews } from '@/components/WomensVelvetSuzaniReviews';
-import { CottonTntEmbroideryReviews } from '@/components/CottonTntEmbroideryReviews';
-import { EmbroideredVelvetSuzaniReviews } from '@/components/EmbroideredVelvetSuzaniReviews';
-import { HandcraftedVelvetCoatReviews } from '@/components/HandcraftedVelvetCoatReviews';
-import { RedCottonSuzaniReviews } from '@/components/RedCottonSuzaniReviews';
-import { EmeraldBohoVelvetReviews } from '@/components/EmeraldBohoVelvetReviews';
-import { NavyFloralVelvetReviews } from '@/components/NavyFloralVelvetReviews';
-import { VelvetSuzaniHT5EB59E11Reviews } from '@/components/VelvetSuzaniHT5EB59E11Reviews';
-import { VelvetSuzaniHT7A15D83BReviews } from '@/components/VelvetSuzaniHT7A15D83BReviews';
-import { HandcraftedSuzaniCottonReviews } from '@/components/HandcraftedSuzaniCottonReviews';
-import { TealVelvetSuzaniReviews } from '@/components/TealVelvetSuzaniReviews';
 
 import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -869,15 +833,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   <div className="mt-6 pt-6 border-t border-zinc-200 max-w-md">
                     <h3 className="text-sm font-bold text-zinc-900 mb-3">Customer Q&A</h3>
                     <div className="space-y-2">
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          Do you offer returns if it doesn't fit?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Yes, absolutely! We want you to love your Textile Jaipur piece. If it doesn't fit perfectly, we offer hassle-free returns within 7 days of delivery. Just make sure the item is unworn with original tags attached.
-                        </div>
-                      </details>
+                      
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
                         <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
                           In how many days will I receive my delivery?
@@ -1095,152 +1051,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
 
         {/* Photo Reviews Section */}
         {product && (
-          <>
-          {product.sku === 'HT-F355E192' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <SuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-24DD340C' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <BlueFloralReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-4E174E27' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <PinkVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-EADEC91A' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <CottonSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-20D55B39' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <RustVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-97C9E512' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <BohemianEleganceReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-4934F30C' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <TntSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-DC120E55' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <VintageSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-D55D59E3' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <UniqueTntSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-ADC0D306' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <PremiumTntSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-3E213213' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <LuxeVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-67C735B7' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <ArtisanVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-9583C699' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <ElegantVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-AC3C5EFA' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <OrangeVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-AAE2C552' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <VintageRedVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-5A70D4A3' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <PurpleTntSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-546BA892' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <LuxuryBrownVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-A7C17406' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <TraditionalBlackVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-70FAB166' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <EthnicBlackVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-6ECC305C' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <BlueTntSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-62DFD632' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <GreenVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-4D240629' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <CyanVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-3E4548B1' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <BohemianVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-BFB1B936' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <EvilEyeVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-745FF4DE' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <DarkPaisleyVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-3CB2856C' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <WomensVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-2F2A2BCB' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <CottonTntEmbroideryReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-5046D569' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <EmbroideredVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-D6AE71F0' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <HandcraftedVelvetCoatReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-91807C13' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <RedCottonSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-52B60A68' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <EmeraldBohoVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-9B8CB946' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <NavyFloralVelvetReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-5EB59E11' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <VelvetSuzaniHT5EB59E11Reviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-7A15D83B' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <VelvetSuzaniHT7A15D83BReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-2BC53C7A' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <HandcraftedSuzaniCottonReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : product.sku === 'HT-D0EB90F4' ? (
-            <div className="mt-20 border-t border-zinc-200">
-              <TealVelvetSuzaniReviews dynamicReviews={dynamicReviews} />
-            </div>
-          ) : (
           <div className="mt-20 pt-16 border-t border-zinc-200">
             <div className="flex flex-col md:flex-row gap-12">
               <div className="w-full md:w-1/3">
@@ -1288,17 +1098,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
           </div>
           )}
           
-          {/* Review Disclaimer */}
-          <div className="mt-12 mb-4 flex justify-center px-4">
-            <div className="max-w-2xl flex items-start gap-3 p-4 bg-zinc-50 border border-zinc-100 rounded-xl text-left">
-              <div className="shrink-0 pt-0.5">
-                <Info className="h-4 w-4 text-zinc-400" />
-              </div>
-              <p className="text-xs text-zinc-500 leading-relaxed">
-                <span className="font-semibold text-zinc-600">Disclaimer:</span> Some of the reviews displayed here may have been collected from our official Instagram page or other platforms where our shop operates, such as Etsy. We consolidate these reviews to provide a complete picture of our customers' experiences.
-              </p>
-            </div>
-          </div>
+          
 
           {/* Review Form (Appears below either the custom or generic review section) */}
           <div className="mt-8 mb-20 flex justify-center">
@@ -1516,10 +1316,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     q: 'How do I know my correct size?',
                     a: 'Please refer to our detailed size chart. Our garments usually run true to size, but since they are handcrafted, there might be a slight 0.5-inch variation. If you are between sizes, we suggest sizing up for a comfortable fit.'
                   },
-                  {
-                    q: 'Do you offer returns if it doesn\'t fit?',
-                    a: 'Yes, we offer a 30-day hassle-free return and exchange policy. You can easily initiate a return through our self-service portal as long as the product is unused and has its original tags.'
-                  },
+                  
                   {
                     q: 'In how many days will I receive my delivery?',
                     a: '✈️ Estimated Delivery Times:\n\n• USA: 5–9 Business Days\n• United Kingdom: 4–8 Business Days\n• Europe: 5–10 Business Days\n• Canada: 6–10 Business Days\n• Australia: 6–12 Business Days\n\nNeed it sooner? We can provide expedited shipping at no extra cost if you have a genuine reason (like a wedding, gift, or special event). Please reach out to us to request fast delivery for your order.'
