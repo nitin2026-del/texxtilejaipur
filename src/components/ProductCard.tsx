@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -32,7 +32,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isHovered) {
+        videoRef.current.play().catch(() => {});
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isHovered]);
 
   // Load wishlist state from localStorage
   useEffect(() => {
@@ -109,13 +119,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
         {/* Primary Media (Image or Video) */}
         {product.details?.video_url || product.images?.[0]?.match(/\.(mp4|webm|mov|ogg)$/i) ? (
           <video 
+            ref={videoRef}
             src={product.details?.video_url || product.images?.[0]}
-            autoPlay
             loop
             muted
             playsInline
             poster={getOptimizedUrl(product.images?.[0])}
-            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-100'}`}
+            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-105 opacity-100' : 'scale-100 opacity-100'}`}
           />
         ) : (
           <img 
