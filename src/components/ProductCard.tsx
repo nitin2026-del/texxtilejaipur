@@ -115,7 +115,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             muted
             playsInline
             poster={getOptimizedUrl(product.images?.[0])}
-            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-100'}`}
           />
         ) : (
           <img 
@@ -126,8 +126,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
           />
         )}
         
-        {/* Secondary Image (Crossfade) */}
-        {product.images && product.images.length > 1 && !product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) && (
+        {/* Secondary Image (Crossfade) - only show if primary is NOT a video */}
+        {!(product.details?.video_url || product.images?.[0]?.match(/\.(mp4|webm|mov|ogg)$/i)) && product.images && product.images.length > 1 && !product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) && (
           <img 
             src={getOptimizedUrl(product.images[1])} 
             alt={`${product.name} alternate view`}
