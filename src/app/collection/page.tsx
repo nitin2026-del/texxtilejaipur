@@ -58,7 +58,8 @@ export default async function CollectionPage() {
           details: {
             material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
             origin: 'Jaipur, Rajasthan',
-            care: 'Dry clean only'
+            care: 'Dry clean only',
+            ...(item.details || {})
           },
           is_featured: item.is_featured || false,
           display_rank: item.display_rank || 999,
