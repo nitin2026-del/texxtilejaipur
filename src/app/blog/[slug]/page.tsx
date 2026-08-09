@@ -6,9 +6,7 @@ import { notFound } from 'next/navigation';
 import { Calendar, ArrowLeft, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
-// Use standard Markdown rendering
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 
 export const revalidate = 60; // Revalidate every minute
 
@@ -85,10 +83,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           prose-blockquote:border-gold prose-blockquote:bg-gold/5 prose-blockquote:text-white prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-xl
           animate-fade-in"
         >
-          {/* We use ReactMarkdown to safely render the content */}
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {post.content}
-          </ReactMarkdown>
+          <MarkdownRenderer content={post.content} />
         </article>
 
         {/* Footer/Author Area */}
