@@ -7,7 +7,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
 
 export default function RefundPolicyPage() {
   const [cartOpen, setCartOpen] = useState(false);
