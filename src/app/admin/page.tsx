@@ -2698,7 +2698,9 @@ function AdminPortalContent() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Content (Markdown / HTML / Text)</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold text-zinc-600">Content (Markdown / HTML / Text)</label>
+                    </div>
                     <textarea
                       required
                       rows={10}
@@ -2706,6 +2708,10 @@ function AdminPortalContent() {
                       onChange={(e) => setFormBlogContent(e.target.value)}
                       className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 font-mono"
                     />
+                    <p className="text-[10px] text-zinc-500 mt-1.5">
+                      💡 <strong className="text-zinc-700">Add a Product Button:</strong> To add a beautiful gold button linking to a product at the bottom of the article, type: <br/>
+                      <code className="bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded text-brand-700 font-bold mt-1 inline-block">[BUTTON: Shop This Jacket](/product/product-id)</code>
+                    </p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
