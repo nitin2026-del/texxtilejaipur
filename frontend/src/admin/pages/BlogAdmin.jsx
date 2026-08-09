@@ -145,7 +145,7 @@ export default function BlogAdmin() {
 
     const postData = {
       title: form.title,
-      slug: form.slug || form.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      slug: (form.slug || form.title).toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-'),
       content: form.content,
       excerpt: form.excerpt || form.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...',
       image_url: form.image_url || null,
