@@ -11,7 +11,7 @@ import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getOptimizedUrl } from '@/utils/imageUtils';
 import Link from 'next/link';
-import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2 } from 'lucide-react';
+import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -35,7 +35,8 @@ interface Product {
       es?: string;
       ar?: string;
       de?: string;
-    }
+    };
+    isBestseller?: boolean;
   };
 }
 
@@ -512,7 +513,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
             {/* Product Details */}
             <div className="w-full md:w-1/2 flex flex-col justify-center">
               <div className="space-y-6 max-w-lg">
-                <div className="space-y-1">
+                <div className="space-y-2">
+                  {product.details?.isBestseller && (
+                    <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[11px] font-black tracking-widest uppercase px-3 py-1.5 shadow-[2px_2px_10px_rgba(245,158,11,0.5)] border border-orange-300 rounded-md animate-pulse">
+                      <Flame className="h-4 w-4 fill-white" /> Bestseller
+                    </div>
+                  )}
                   <h1 className="text-3xl md:text-[34px] font-serif font-medium text-[#111] leading-tight">
                     {product.name}
                   </h1>

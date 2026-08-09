@@ -17,7 +17,7 @@ interface Product {
   images: string[];
   stock: number;
   is_featured?: boolean;
-  details: { material?: string; origin?: string; care?: string; video_url?: string };
+  details: { material?: string; origin?: string; care?: string; video_url?: string; isBestseller?: boolean; };
 }
 
 interface ProductCardProps {
@@ -149,6 +149,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
           {product.is_featured && (
             <span className="bg-blue-600 text-white text-[9px] font-bold tracking-widest uppercase px-3 py-1 shadow-[2px_2px_0_rgba(0,0,0,1)] border border-black transform -skew-x-6">
               New Drop
+            </span>
+          )}
+          {product.details?.isBestseller && (
+            <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-black tracking-widest uppercase px-3 py-1.5 shadow-[2px_2px_10px_rgba(245,158,11,0.5)] border border-orange-300 flex items-center gap-1.5 rounded-r-xl">
+              <Flame className="h-3 w-3 fill-white animate-pulse" /> Bestseller
             </span>
           )}
           <span className="bg-white/95 backdrop-blur-sm text-zinc-900 text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 shadow-sm border border-zinc-200">

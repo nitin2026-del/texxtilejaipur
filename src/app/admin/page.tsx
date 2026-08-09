@@ -12,7 +12,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video, RefreshCcw
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video, RefreshCcw, Flame
 } from 'lucide-react';
 
 interface Product {
@@ -203,6 +203,7 @@ function AdminPortalContent() {
   const [formCare, setFormCare] = useState('');
   const [formVideoUrl, setFormVideoUrl] = useState('');
   const [formIsFeatured, setFormIsFeatured] = useState(false);
+  const [formIsBestseller, setFormIsBestseller] = useState(false);
   const [formDisplayRank, setFormDisplayRank] = useState('');
   
   // International AI features
@@ -1120,7 +1121,8 @@ function AdminPortalContent() {
           video_url: formVideoUrl,
           culturalContext: formCulturalContext,
           stylingAdvice: formStylingAdvice,
-          translations: parsedTranslations
+          translations: parsedTranslations,
+          isBestseller: formIsBestseller
         }
       };
 
@@ -1200,6 +1202,7 @@ function AdminPortalContent() {
     setFormCare(prod.details?.care || '');
     setFormVideoUrl(prod.details?.video_url || '');
     setFormIsFeatured(prod.is_featured || false);
+    setFormIsBestseller(prod.details?.isBestseller || false);
     setFormDisplayRank(prod.display_rank?.toString() || '');
     setFormCulturalContext(prod.details?.culturalContext || '');
     setFormStylingAdvice(prod.details?.stylingAdvice || '');
@@ -1242,6 +1245,7 @@ function AdminPortalContent() {
     setFormCare('');
     setFormVideoUrl('');
     setFormIsFeatured(false);
+    setFormIsBestseller(false);
     setFormDisplayRank('');
   };
 
@@ -2026,7 +2030,14 @@ function AdminPortalContent() {
                           </span>
                         </td>
                         <td className="p-4">
-                          <span className="block font-bold text-zinc-900">{prod.name}</span>
+                          <span className="block font-bold text-zinc-900">
+                            {prod.name}
+                            {prod.details?.isBestseller && (
+                              <span className="ml-2 inline-flex items-center gap-1 bg-orange-100 text-orange-700 text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">
+                                <Flame className="h-2.5 w-2.5" /> Bestseller
+                              </span>
+                            )}
+                          </span>
                           <span className="text-[10px] text-zinc-500 line-clamp-1 max-w-[200px] mt-0.5">
                             {prod.description}
                           </span>
@@ -2474,7 +2485,7 @@ function AdminPortalContent() {
               </div>
 
               {/* Is Featured & Rank */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                 <div>
                   <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">New Arrival</label>
                   <label className="flex items-center gap-3 p-3 border border-zinc-200 rounded-xl bg-zinc-100/30 cursor-pointer hover:bg-zinc-100/50 transition-colors h-11">
@@ -2489,7 +2500,20 @@ function AdminPortalContent() {
                     </div>
                   </label>
                 </div>
-
+                <div>
+                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Bestseller</label>
+                  <label className="flex items-center gap-3 p-3 border border-zinc-200 rounded-xl bg-zinc-100/30 cursor-pointer hover:bg-zinc-100/50 transition-colors h-11">
+                    <input 
+                      type="checkbox" 
+                      checked={formIsBestseller}
+                      onChange={(e) => setFormIsBestseller(e.target.checked)}
+                      className="w-4 h-4 rounded border-zinc-300 text-brand-700 focus:ring-gold bg-[#FDFBF7]"
+                    />
+                    <div>
+                      <span className="block text-xs font-bold text-zinc-900 uppercase tracking-widest">Mark as Bestseller</span>
+                    </div>
+                  </label>
+                </div>
                 <div>
                   <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Display Rank (1 = Best)</label>
                   <input 
