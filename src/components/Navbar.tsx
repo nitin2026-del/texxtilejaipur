@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart, Currency } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw, Truck, Undo2, ShieldCheck, Video, Heart } from 'lucide-react';
+import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw, Truck, Undo2, ShieldCheck, Video, Heart, Plane } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { InfoModal } from './InfoModal';
 
