@@ -115,6 +115,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           total_inr: orderTotalInr,
           display_currency: currency,
           total_display_currency: orderTotalDisplay, // this is the display currency before JaiCoins
+          shipping_method: shippingMethod, // Pass selected shipping method to backend
           shipping_address: {
             full_name: fullName,
             address_line1: addressLine1,

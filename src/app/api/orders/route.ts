@@ -10,7 +10,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address, guest_email, coupon_code } = body;
+    const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address, guest_email, coupon_code, shipping_method } = body;
 
     const authHeader = req.headers.get('Authorization');
     let supabaseClient = supabaseAdmin;
@@ -131,8 +131,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // B. Add flat shipping fee ($5 USD)
-    const shippingCostInr = 5 / 0.010769; // Calibrated: 6500 INR = $70 USD
+    // B. Add shipping fee securely based on method selected
+    // Express shipping is $3 USD, Standard is $0
+    let shippingCostInr = 0;
+    if (shipping_method === 'express') {
+      shippingCostInr = 3 / 0.010769; // Calibrated: $3 USD
+    }
     finalTotalInr += shippingCostInr;
 
     // C. Apply Coupon Discount securely from DB
