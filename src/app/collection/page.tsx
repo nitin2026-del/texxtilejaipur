@@ -1,5 +1,19 @@
 import React from 'react';
 import { CollectionPageClient } from '@/components/CollectionPageClient';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Shop All Collections | Textile Jaipur',
+  description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover premium silk and cotton pieces, featuring traditional Jaipur block prints and intricate embroidery.',
+  openGraph: {
+    title: 'Shop All Collections | Textile Jaipur',
+    description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover premium silk and cotton pieces, featuring traditional Jaipur block prints and intricate embroidery.',
+    url: 'https://textilejaipur.com/collection',
+    siteName: 'Textile Jaipur',
+    locale: 'en_IN',
+    type: 'website',
+  },
+};
 
 export const revalidate = 60; // ISR cache for 60 seconds
 

@@ -1,10 +1,65 @@
 import React from 'react';
 import { ProductPageClient } from '@/components/ProductPageClient';
 import { notFound } from 'next/navigation';
+import { Metadata, ResolvingMetadata } from 'next';
 
 export const revalidate = 60; // ISR cache for 60 seconds
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
+type Props = {
+  params: { id: string };
+};
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { id } = params;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+  if (!url || !key) {
+    return { title: 'Product Not Found' };
+  }
+
+  try {
+    const res = await fetch(`${url}/rest/v1/products?select=name,description,product_images(url,is_primary)&id=eq.${id}`, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`
+      },
+      next: { revalidate: 60 }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const item = data[0];
+        const primaryImage = item.product_images?.find((img: any) => img.is_primary)?.url 
+          || item.product_images?.[0]?.url 
+          || 'https://textilejaipur.com/images/default-share.jpg';
+
+        return {
+          title: `${item.name} | Textile Jaipur`,
+          description: item.description?.substring(0, 160) || `Buy ${item.name} at Textile Jaipur.`,
+          openGraph: {
+            title: `${item.name} | Textile Jaipur`,
+            description: item.description?.substring(0, 160),
+            images: [primaryImage],
+            type: 'website',
+          },
+        };
+      }
+    }
+  } catch (err) {
+    console.error('Error fetching metadata', err);
+  }
+
+  return {
+    title: 'Product | Textile Jaipur',
+  };
+}
+
+export default async function ProductPage({ params }: Props) {
   const { id } = params;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -109,11 +164,40 @@ export default async function ProductPage({ params }: { params: { id: string } }
     return notFound();
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.images[0],
+    description: product.description,
+    sku: product.sku,
+    brand: {
+      '@type': 'Brand',
+      name: 'Textile Jaipur'
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `https://textilejaipur.com/product/${product.id}`,
+      priceCurrency: 'INR',
+      price: product.price_inr,
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: product.stock_quantity > 0 
+        ? 'https://schema.org/InStock' 
+        : 'https://schema.org/OutOfStock',
+    }
+  };
+
   return (
-    <ProductPageClient 
-      product={product} 
-      relatedProducts={relatedProducts} 
-      initialReviews={initialReviews} 
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductPageClient 
+        product={product} 
+        relatedProducts={relatedProducts} 
+        initialReviews={initialReviews} 
+      />
+    </>
   );
 }
