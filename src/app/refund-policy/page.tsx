@@ -31,9 +31,17 @@ export default function RefundPolicyPage() {
         <h1 className="text-4xl font-serif font-bold text-zinc-900 mb-8">Refund & Return Policy</h1>
         
         <div className="prose prose-zinc max-w-none text-zinc-700 space-y-6">
-          <p>
-            We stand behind the quality of our handcrafted garments. If you are not completely satisfied with your purchase, we're here to help with our <strong>30-Day Money Back Guarantee</strong>.
-          </p>
+          <section className="mb-12">
+            <h2 className="text-2xl font-serif text-zinc-900 mb-6 font-bold flex items-center gap-3">
+              <Heart className="h-6 w-6 text-brand-600" /> Our Promise
+            </h2>
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-zinc-100 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-brand-600"></div>
+              <p className="text-zinc-600 leading-relaxed text-lg">
+                We stand behind the quality of our handcrafted garments. If you are not completely satisfied with your purchase, we're here to help with our <strong>14-Day Money Back Guarantee</strong>.
+              </p>
+            </div>
+          </section>
 
           <div className="bg-brand-50 border border-brand-200 p-6 rounded-xl my-8">
             <h3 className="text-lg font-serif font-bold text-brand-900 mb-2">Ready to initiate a return?</h3>
@@ -43,10 +51,16 @@ export default function RefundPolicyPage() {
             </Link>
           </div>
           
-          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">1. Eligibility for Returns</h2>
-          <p>
-            To be eligible for a return, your item must be unused, unwashed, and in the same condition that you received it. It must also be in the original packaging with all tags attached. Returns must be initiated within 30 days of receiving your order.
-          </p>
+          <section className="mb-12">
+            <h2 className="text-2xl font-serif text-zinc-900 mb-6 font-bold flex items-center gap-3">
+              <ShieldCheck className="h-6 w-6 text-brand-600" /> Return Eligibility
+            </h2>
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-zinc-100">
+              <p className="text-zinc-600 leading-relaxed">
+                To be eligible for a return, your item must be unused, unwashed, and in the same condition that you received it. It must also be in the original packaging with all tags attached. Returns must be initiated within 14 days of receiving your order.
+              </p>
+            </div>
+          </section>
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">2. Non-returnable Items</h2>
           <p>

@@ -25,9 +25,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [trustIndex, setTrustIndex] = useState(0);
   
   const trustMessages = [
-    { icon: <Truck className="h-3.5 w-3.5" />, text: "Worldwide UPS Express Shipping" },
-    { icon: <Undo2 className="h-3.5 w-3.5" />, text: "30-Day No-Questions Returns" },
-    { icon: <ShieldCheck className="h-3.5 w-3.5" />, text: "100% Secure Checkout" }
+    { icon: <Plane className="h-3.5 w-3.5" />, text: "Free Worldwide Express Shipping" },
+    { icon: <Undo2 className="h-3.5 w-3.5" />, text: "14-Day No-Questions Returns" },
+    { icon: <Heart className="h-3.5 w-3.5" />, text: "Handcrafted with love in Jaipur" }
   ];
   const [navCategories, setNavCategories] = useState<string[]>([
     'Embroidered Jackets',

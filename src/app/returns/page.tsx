@@ -145,9 +145,9 @@ export default function ReturnsPage() {
                 </div>
               </div>
               <div>
-                <h4 className="font-bold text-zinc-900 mb-1">30-Day Window</h4>
+                <h4 className="font-bold text-zinc-900 mb-1">14-Day Window</h4>
                 <p className="text-sm text-zinc-600 leading-relaxed">
-                  You have 30 days from the date of delivery to return or exchange your items. Items must be unworn, unwashed, and have original tags attached.
+                  You have 14 days from the date of delivery to return or exchange your items. Items must be unworn, unwashed, and have original tags attached.
                 </p>
               </div>
             </div>

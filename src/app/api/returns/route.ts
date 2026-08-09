@@ -57,13 +57,11 @@ export async function POST(req: NextRequest) {
     // since order numbers are cryptographically random/unguessable.
     const finalEmail = email;
 
-    // 3. Verify 30-Day Window
-    const createdAt = new Date(orderData.created_at);
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    if (createdAt < thirtyDaysAgo) {
-      return NextResponse.json({ error: 'Order is past the 30-day return window.' }, { status: 400 });
+    // 3. Verify 14-Day Window
+    const orderDate = new Date(orderData.created_at);
+    const daysSinceOrder = (new Date().getTime() - orderDate.getTime()) / (1000 * 3600 * 24);
+    if (daysSinceOrder > 14) {
+      return NextResponse.json({ error: 'Order is past the 14-day return window.' }, { status: 400 });
     }
 
     const finalName = (orderData.shipping_addresses as any)?.full_name || 'Customer';

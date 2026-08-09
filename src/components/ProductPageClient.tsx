@@ -761,7 +761,19 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Handcrafted {product.category?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                          {(() => {
+                            const cat = product.category?.toLowerCase() || '';
+                            if (cat.includes('velvet suzani')) {
+                              return "This is a premium handcrafted Velvet Suzani piece, featuring intricate silk thread embroidery on plush velvet fabric, traditionally crafted by master artisans in Jaipur.";
+                            }
+                            if (cat.includes('tnt suzani') || cat.includes('tnt')) {
+                              return "This is an exquisite TNT (Tone-on-Tone) Suzani piece, showcasing detailed thread work on high-quality fabric where the embroidery matches the base color for an elegant, subtle texture.";
+                            }
+                            if (cat.includes('cotton suzani')) {
+                              return "This is a breathable and lightweight Cotton Suzani piece, adorned with vibrant hand-embroidery perfect for layering across seasons.";
+                            }
+                            return `A beautifully handcrafted ${product.category?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())} piece, made with traditional techniques.`;
+                          })()}
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -770,7 +782,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          100% Cotton
+                          Premium quality materials specific to the collection.
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -793,20 +805,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
                         <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          Weight?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Approx. 0.8kg - 1.2kg (varies slightly by item)
-                        </div>
-                      </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
                           Shipping & Customs?
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Free UPS Express Delivery.
+                          We provide FREE worldwide shipping. There are NO custom fees or hidden charges—we take care of all taxes and duties for you.
                         </div>
                       </details>
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -818,15 +821,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           14-day hassle-free returns on all unworn items. We will take care of all taxes and duties.
                         </div>
                       </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          What's included?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          {(product.category?.toLowerCase().includes('jacket') || product.name.toLowerCase().includes('jacket') || product.name.toLowerCase().includes('kimono')) ? 'Jacket/Kimono only — inner wear and accessories shown in photographs are not included.' : 'Product only — accessories shown in photographs are not included.'}
-                        </div>
-                      </details>
                     </div>
                   </div>
 
@@ -834,6 +828,35 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   <div className="mt-6 pt-6 border-t border-zinc-200 max-w-md">
                     <h3 className="text-sm font-bold text-zinc-900 mb-3">Customer Q&A</h3>
                     <div className="space-y-2">
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          Are your garments truly handmade?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Yes! Absolutely. Our pieces are crafted by master artisans in Jaipur and rural Rajasthan using traditional techniques passed down through generations.
+                        </div>
+                      </details>
+
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          What is your return policy?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          We accept returns within 14 days of delivery for unworn items in their original condition with tags attached. Custom orders are final sale. We will take care of all taxes and duties.
+                        </div>
+                      </details>
+
+                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                          Can I request custom size?
+                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                        </summary>
+                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                          Yes! We offer a customization service for most of our garments. Please contact our support team with your measurements before placing an order.
+                        </div>
+                      </details>
                       
                       <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
                         <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
