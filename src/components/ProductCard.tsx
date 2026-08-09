@@ -105,46 +105,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
       onTouchCancel={() => setIsHovered(false)}
     >
       <Link href={`/product/${product.id}`} prefetch={true} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
-        {/* Primary Media (Image or Video) */}
-        {product.details?.video_url || product.images?.[0]?.match(/\.(mp4|webm|mov|ogg)$/i) ? (
-          <video 
-            src={product.details?.video_url || product.images?.[0]}
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={getOptimizedUrl(product.images?.[0])}
-            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-100'}`}
-          />
-        ) : (
-          <img 
-            src={getOptimizedUrl(product.images?.[0])} 
-            alt={product.name}
-            loading="lazy"
-            className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && product.images?.length > 1 ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
-          />
-        )}
-        
-        {/* Secondary Media (Crossfade) - only show if primary is NOT a video */}
-        {!(product.details?.video_url || product.images?.[0]?.match(/\.(mp4|webm|mov|ogg)$/i)) && product.images && product.images.length > 1 && (
-          product.images[1].match(/\.(mp4|webm|mov|ogg)$/i) ? (
-            <video 
-              src={product.images[1]}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
-            />
-          ) : (
-            <img 
-              src={getOptimizedUrl(product.images[1])} 
-              alt={`${product.name} alternate view`}
-              loading="lazy"
-              className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
-            />
-          )
-        )}
+        {/* Filter out any videos from the images array for the product card display */}
+        {(() => {
+          const validImages = (product.images || []).filter(img => !img.match(/\.(mp4|webm|mov|ogg)$/i));
+          const primaryImage = validImages[0] || 'https://via.placeholder.com/800x1000?text=No+Image';
+          const secondaryImage = validImages.length > 1 ? validImages[1] : null;
+
+          return (
+            <>
+              {/* Primary Image */}
+              <img 
+                src={getOptimizedUrl(primaryImage)} 
+                alt={product.name}
+                loading="lazy"
+                className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && secondaryImage ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+              />
+              
+              {/* Secondary Image (Crossfade) */}
+              {secondaryImage && (
+                <img 
+                  src={getOptimizedUrl(secondaryImage)} 
+                  alt={`${product.name} alternate view`}
+                  loading="lazy"
+                  className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
+                />
+              )}
+            </>
+          );
+        })()}
         
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
