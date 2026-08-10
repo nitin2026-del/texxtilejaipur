@@ -1831,7 +1831,7 @@ function AdminPortalContent() {
                                 {order.order_items?.map((item) => (
                                   <div key={item.id} className="text-[10px] text-zinc-700 leading-tight">
                                     • {item.products?.slug ? (
-                                      <a href={`/product/${item.products.slug}`} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-600 font-medium transition-colors" title="View product page">
+                                      <a href={`/product/${item.products.slug}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 font-medium transition-colors" title="View product page">
                                         {item.products.name || 'Handloom Garment'}
                                       </a>
                                     ) : (
@@ -3311,7 +3311,7 @@ function AdminPortalContent() {
                       <div className="flex justify-between w-full">
                         <span className="text-zinc-800 font-semibold truncate max-w-[250px]">
                           {item.products?.slug ? (
-                            <a href={`/product/${item.products.slug}`} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-600 transition-colors" title="View product page">
+                            <a href={`/product/${item.products.slug}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 transition-colors" title="View product page">
                               {item.products.name || 'Handloom Garment'} 
                             </a>
                           ) : (
