@@ -1830,7 +1830,13 @@ function AdminPortalContent() {
                               <div className="flex flex-col gap-1 max-w-[200px]">
                                 {order.order_items?.map((item) => (
                                   <div key={item.id} className="text-[10px] text-zinc-700 leading-tight">
-                                    • {item.products?.name || 'Handloom Garment'} <strong className="font-mono text-zinc-500 text-[9px]">(x{item.quantity})</strong>
+                                    • {item.products?.slug ? (
+                                      <a href={`/product/${item.products.slug}`} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-600 font-medium transition-colors" title="View product page">
+                                        {item.products.name || 'Handloom Garment'}
+                                      </a>
+                                    ) : (
+                                      item.products?.name || 'Handloom Garment'
+                                    )} <strong className="font-mono text-zinc-500 text-[9px]">(x{item.quantity})</strong>
                                   </div>
                                 ))}
                                 {(!order.order_items || order.order_items.length === 0) && (
@@ -3304,7 +3310,13 @@ function AdminPortalContent() {
                     <div key={item.id} className="flex flex-col gap-1 text-xs py-1.5 border-b border-zinc-200 last:border-b-0">
                       <div className="flex justify-between w-full">
                         <span className="text-zinc-800 font-semibold truncate max-w-[250px]">
-                          {item.products?.name || 'Handloom Garment'} 
+                          {item.products?.slug ? (
+                            <a href={`/product/${item.products.slug}`} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-brand-600 transition-colors" title="View product page">
+                              {item.products.name || 'Handloom Garment'} 
+                            </a>
+                          ) : (
+                            item.products?.name || 'Handloom Garment'
+                          )}
                         </span>
                         <span className="text-zinc-600 font-bold ml-2">x{item.quantity}</span>
                       </div>
