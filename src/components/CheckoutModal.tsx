@@ -46,8 +46,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   
-  // $3 USD converted to INR if express shipping is selected
-  const shippingCostInr = shippingMethod === 'express' ? 3 / 0.010769 : 0;
+  // $10 USD converted to INR if express shipping is selected
+  const shippingCostInr = shippingMethod === 'express' ? 10 / 0.010769 : 0;
   const effectiveInr = getCartTotalInr() + shippingCostInr;
   const USD_RATE = 0.010769;
   const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
@@ -115,6 +115,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           total_inr: orderTotalInr,
           display_currency: currency,
           total_display_currency: orderTotalDisplay, // this is the display currency before JaiCoins
+          shipping_method: shippingMethod, // pass selected shipping method
           shipping_address: {
             full_name: fullName,
             address_line1: addressLine1,

@@ -185,7 +185,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
               </a>
               <div className="flex items-center gap-2 text-white/60 text-[10px] sm:text-xs font-medium">
                 <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 shrink-0" />
-                <span>Secure Payments &bull; 14-Day Returns &bull; Free UPS Express</span>
+                <span>Secure Payments &bull; 14-Day Returns &bull; Fast UPS Express</span>
               </div>
             </div>
           </div>
@@ -195,14 +195,14 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
       {/* Infinite Scrolling Marquee */}
       <div className="w-full bg-zinc-950 text-white overflow-hidden py-3 border-y border-zinc-800 relative z-20">
         <div className="whitespace-nowrap flex animate-marquee items-center text-xs font-bold tracking-widest uppercase opacity-90">
-          <span className="mx-8">✦ FREE UPS EXPRESS WORLDWIDE</span>
+          <span className="mx-8">✦ FAST UPS EXPRESS WORLDWIDE</span>
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
           <span className="mx-8">✦ 14-DAY MONEY BACK GUARANTEE</span>
           <span className="mx-8">✦ TRUSTED BY 3,200+ BUYERS</span>
           <span className="mx-8">✦ WE SHIP TO EVERY COUNTRY</span>
           <span className="mx-8">✦ SECURE PAYPAL CHECKOUT</span>
           <span className="mx-8">✦ 400+ YEARS OF CRAFT HERITAGE</span>
-          <span className="mx-8">✦ FREE UPS EXPRESS WORLDWIDE</span>
+          <span className="mx-8">✦ FAST UPS EXPRESS WORLDWIDE</span>
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
           <span className="mx-8">✦ 14-DAY MONEY BACK GUARANTEE</span>
           <span className="mx-8">✦ TRUSTED BY 3,200+ BUYERS</span>

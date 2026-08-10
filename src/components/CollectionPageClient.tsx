@@ -292,7 +292,7 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
               <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center text-brand-600 shadow-sm mb-4">
                 <Truck className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-zinc-900 mb-2">Free Express Shipping</h3>
+              <h3 className="font-bold text-zinc-900 mb-2">Worldwide Express Shipping</h3>
               <p className="text-sm text-zinc-600">We partner with UPS to deliver your ethnic wear safely and fast, anywhere in the world.</p>
             </div>
             

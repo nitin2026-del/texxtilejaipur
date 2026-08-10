@@ -1842,9 +1842,14 @@ function AdminPortalContent() {
                               <span className="block font-medium text-zinc-700">
                                 {order.shipping_addresses?.city || 'Jaipur'}
                               </span>
-                              <span className="text-[9px] text-zinc-500 uppercase font-semibold tracking-wider">
+                              <span className="text-[9px] text-zinc-500 uppercase font-semibold tracking-wider block">
                                 ✈️ {order.shipping_addresses?.country || 'India'}
                               </span>
+                              {order.shipping_provider === 'UPS Express' && (
+                                <span className="mt-1.5 inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-[#b49045] text-white shadow-sm">
+                                  ⚡ UPS EXPRESS
+                                </span>
+                              )}
                             </td>
                             <td className="p-4">
                               <span className="font-extrabold text-zinc-900">{formatPrice(order.total)}</span>

@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Textile Jaipur | Authentic Indian Ethnic Wear — Worldwide Shipping',
-    description: 'Shop embroidered jackets, Boho dresses & block print dresses direct from Jaipur artisans. Free UPS Express worldwide shipping. Trusted by 3,200+ happy customers across 30+ countries.',
+    description: 'Shop embroidered jackets, Boho dresses & block print dresses direct from Jaipur artisans. Fast UPS Express worldwide shipping. Trusted by 3,200+ happy customers across 30+ countries.',
     images: ['https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=1200&auto=format&fit=crop'],
     creator: '@textileofjaipur',
     site: '@textileofjaipur'
