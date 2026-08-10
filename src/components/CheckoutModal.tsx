@@ -383,7 +383,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                         <span className="text-[10px] text-zinc-500">Priority processing, 3-5 business days</span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-zinc-900">$3.00</span>
+                    <span className="text-sm font-bold text-zinc-900">$10.00</span>
                   </label>
                 </div>
               </div>
