@@ -11,10 +11,11 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 export const revalidate = 60; // Revalidate every minute
 
 async function getBlogPost(slug: string) {
+  const decodedSlug = decodeURIComponent(slug);
   const { data, error } = await supabase
     .from('blogs')
     .select('*')
-    .eq('slug', slug)
+    .eq('slug', decodedSlug)
     .eq('status', 'published')
     .single();
 
