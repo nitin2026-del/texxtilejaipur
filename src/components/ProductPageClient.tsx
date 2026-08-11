@@ -1094,7 +1094,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                                 </span>
                               )}
                             </div>
-                            <div className="text-[10px] text-zinc-500 uppercase">{review.date}</div>
                           </div>
                           <div className="text-[12px] text-brand-600 tracking-wider">
                             {'★'.repeat(review.stars)}{'☆'.repeat(5 - review.stars)}

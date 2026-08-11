@@ -35,11 +35,15 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
   const fetchReviews = async (productId: string) => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('reviews')
-        .select('*')
-        .eq('product_id', productId)
-        .order('created_at', { ascending: false });
+      let query = supabase.from('reviews').select('*').order('created_at', { ascending: false });
+      
+      if (productId === 'general') {
+        query = query.is('product_id', null);
+      } else {
+        query = query.eq('product_id', productId);
+      }
+      
+      const { data, error } = await query;
         
       if (error) throw error;
       setReviews(data || []);
@@ -102,13 +106,13 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProductId) return alert('Select a product first');
+    if (!selectedProductId) return alert('Select a product or General Review first');
     if (!newReview.name || !newReview.comment) return alert('Name and Comment are required');
     
     setIsSubmitting(true);
     try {
       const payload: any = {
-        product_id: selectedProductId,
+        product_id: selectedProductId === 'general' ? null : selectedProductId,
         reviewer_name: newReview.name,
         reviewer_location: newReview.location,
         rating: newReview.rating,
@@ -148,6 +152,7 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
             onChange={(e) => setSelectedProductId(e.target.value)}
           >
             <option value="">-- Choose a Product --</option>
+            <option value="general">✨ General / Site Review (No Product)</option>
             {products.map(p => (
               <option key={p.id} value={p.id}>{p.name} (SKU: {p.sku})</option>
             ))}
