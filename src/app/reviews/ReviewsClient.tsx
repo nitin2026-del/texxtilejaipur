@@ -42,8 +42,21 @@ export function ReviewsClient({ reviews, averageRating }: { reviews: any[], aver
           <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
             {reviews.map((review) => (
               <div key={review.id} className="break-inside-avoid bg-white border border-zinc-200 rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow">
-                {/* Photo (if exists) */}
-                {review.image_url && (
+                {/* Photo(s) (if exists) */}
+                {review.image_urls && review.image_urls.length > 0 ? (
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    {review.image_urls.map((url: string, imgIdx: number) => (
+                      <div key={imgIdx} className="rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100 flex-1 min-w-[45%] max-w-full">
+                        <img 
+                          src={url} 
+                          alt={`Review photo ${imgIdx + 1} by ${review.reviewer_name}`}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : review.image_url && (
                   <div className="mb-6 rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100">
                     <img 
                       src={review.image_url} 

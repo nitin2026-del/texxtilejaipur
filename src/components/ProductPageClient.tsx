@@ -1058,7 +1058,20 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   <div className="space-y-6 w-full">
                     {dynamicReviews.map((review, idx) => (
                       <div key={idx} className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm text-left">
-                        {review.imageUrl && (
+                        {review.imageUrls && review.imageUrls.length > 0 ? (
+                          <div className="mb-4 flex flex-wrap gap-2">
+                            {review.imageUrls.map((url: string, imgIdx: number) => (
+                              <div key={imgIdx} className="rounded-xl overflow-hidden aspect-[4/5] bg-zinc-100 max-w-sm w-32 shrink-0 border border-zinc-200">
+                                <img 
+                                  src={url} 
+                                  alt={`Customer review photo ${imgIdx + 1}`} 
+                                  className="w-full h-full object-cover"
+                                  loading="lazy"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        ) : review.imageUrl && (
                           <div className="mb-4 rounded-xl overflow-hidden aspect-[4/5] bg-zinc-100 max-w-sm">
                             <img 
                               src={review.imageUrl} 

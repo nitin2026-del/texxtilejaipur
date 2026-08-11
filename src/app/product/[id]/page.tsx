@@ -154,7 +154,10 @@ export default async function ProductPage({ params }: Props) {
         body: review.comment || '',
         reply: review.reply || undefined,
         isVerified: review.is_verified_buyer || false,
-        imageUrl: review.image_url || undefined
+        imageUrl: review.image_url || undefined,
+        imageUrls: review.image_urls && review.image_urls.length > 0 
+          ? review.image_urls 
+          : (review.image_url ? [review.image_url] : [])
       }));
     }
   } catch (err) {

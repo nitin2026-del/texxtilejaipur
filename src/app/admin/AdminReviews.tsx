@@ -19,7 +19,8 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
     rating: 5,
     title: '',
     comment: '',
-    image_url: ''
+    image_url: '',
+    image_urls: [] as string[]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -62,29 +63,41 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
     
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `review-images/${fileName}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('products')
-        .upload(filePath, file);
+      const uploadPromises = files.map(async (file) => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `review-images/${fileName}`;
         
-      if (uploadError) throw uploadError;
-      
-      const { data } = supabase.storage
-        .from('products')
-        .getPublicUrl(filePath);
+        const { error: uploadError } = await supabase.storage
+          .from('products')
+          .upload(filePath, file);
+          
+        if (uploadError) throw uploadError;
         
-      setNewReview(prev => ({ ...prev, image_url: data.publicUrl }));
+        const { data } = supabase.storage
+          .from('products')
+          .getPublicUrl(filePath);
+          
+        return data.publicUrl;
+      });
+
+      const newUrls = await Promise.all(uploadPromises);
+      setNewReview(prev => ({ ...prev, image_urls: [...prev.image_urls, ...newUrls] }));
     } catch (err) {
       console.error('Upload error:', err);
       alert('Failed to upload image. Please check bucket permissions.');
     }
+  };
+
+  const removeImage = (indexToRemove: number) => {
+    setNewReview(prev => ({
+      ...prev,
+      image_urls: prev.image_urls.filter((_, i) => i !== indexToRemove)
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,21 +114,16 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
         rating: newReview.rating,
         title: newReview.title,
         comment: newReview.comment,
-        status: 'approved'
+        status: 'approved',
+        image_urls: newReview.image_urls
       };
-      
-      // Only include image_url if it's not empty (in case column doesn't exist yet, avoiding errors if not used)
-      // Actually we will include it. If it fails, user needs to run the migration.
-      if (newReview.image_url) {
-        payload.image_url = newReview.image_url;
-      }
 
       const { data, error } = await supabase.from('reviews').insert(payload).select().single();
       
       if (error) throw error;
       
       setReviews(prev => [data, ...prev]);
-      setNewReview({ name: '', location: '', rating: 5, title: '', comment: '', image_url: '' });
+      setNewReview({ name: '', location: '', rating: 5, title: '', comment: '', image_url: '', image_urls: [] });
       alert('Review added successfully');
     } catch (err: any) {
       console.error('Error adding review:', err);
@@ -203,20 +211,25 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
                 <div className="p-4 border-2 border-dashed border-zinc-200 rounded-xl flex flex-col">
                   <label className="flex items-center gap-2 cursor-pointer text-sm font-bold text-violet-600 w-max">
                     <ImageIcon className="h-5 w-5" />
-                    <span>Upload Customer Photo (Optional)</span>
-                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                    <span>Upload Customer Photo(s) (Optional)</span>
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
                   </label>
-                  <p className="text-xs text-zinc-500 mt-1">Make sure you add the image_url column in DB first!</p>
-                  {newReview.image_url && (
-                    <div className="mt-4 relative w-24 h-24 rounded-lg overflow-hidden border border-zinc-200">
-                      <img src={newReview.image_url} alt="Review" className="w-full h-full object-cover" />
-                      <button 
-                        type="button" 
-                        onClick={() => setNewReview(prev => ({...prev, image_url: ''}))}
-                        className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full text-xs"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
+                  <p className="text-xs text-zinc-500 mt-1">You can upload multiple photos at once.</p>
+                  
+                  {newReview.image_urls && newReview.image_urls.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {newReview.image_urls.map((url, idx) => (
+                        <div key={idx} className="relative w-24 h-24 rounded-lg overflow-hidden border border-zinc-200">
+                          <img src={url} alt={`Review ${idx}`} className="w-full h-full object-cover" />
+                          <button 
+                            type="button" 
+                            onClick={() => removeImage(idx)}
+                            className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full text-xs"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
