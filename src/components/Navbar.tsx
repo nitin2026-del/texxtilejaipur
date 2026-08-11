@@ -153,12 +153,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 <ShoppingBag className="h-4 w-4" />
                 Shop All
               </a>
+              <a href="/reviews" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
+                <Heart className="h-4 w-4" />
+                Reviews
+              </a>
               <a href="/track-order" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
                 <RefreshCcw className="h-4 w-4" />
                 Track Order
               </a>
               <a href="/about" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
-                <Heart className="h-4 w-4" />
+                <Info className="h-4 w-4" />
                 About Us
               </a>
               <a href="/the-artisan-edit" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
@@ -425,6 +429,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           >
             <BookOpen className="h-5 w-5 text-zinc-500" />
             Blog
+          </a>
+
+          <a 
+            href="/reviews"
+            onClick={() => setIsDrawerOpen(false)}
+            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+          >
+            <Heart className="h-5 w-5 text-zinc-500" />
+            Customer Reviews
           </a>
 
           <a 
