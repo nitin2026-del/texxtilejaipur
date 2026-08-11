@@ -1058,12 +1058,29 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   <div className="space-y-6 w-full">
                     {dynamicReviews.map((review, idx) => (
                       <div key={idx} className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm text-left">
+                        {review.imageUrl && (
+                          <div className="mb-4 rounded-xl overflow-hidden aspect-[4/5] bg-zinc-100 max-w-sm">
+                            <img 
+                              src={review.imageUrl} 
+                              alt="Customer review photo" 
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          </div>
+                        )}
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center font-serif text-[14px] font-bold border border-zinc-200 shrink-0">
                             {review.initial || review.name.charAt(0)}
                           </div>
                           <div className="flex-1">
-                            <div className="font-bold text-[13px] text-zinc-900">{review.name}</div>
+                            <div className="font-bold text-[13px] text-zinc-900 flex items-center gap-2">
+                              {review.name}
+                              {review.isVerified && (
+                                <span className="bg-green-100 text-green-700 text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                  Verified
+                                </span>
+                              )}
+                            </div>
                             <div className="text-[10px] text-zinc-500 uppercase">{review.date}</div>
                           </div>
                           <div className="text-[12px] text-brand-600 tracking-wider">

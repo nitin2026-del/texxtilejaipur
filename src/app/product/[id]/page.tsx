@@ -153,7 +153,8 @@ export default async function ProductPage({ params }: Props) {
         title: review.title ? `"${review.title}"` : undefined,
         body: review.comment || '',
         reply: review.reply || undefined,
-        isVerified: review.is_verified_buyer || false
+        isVerified: review.is_verified_buyer || false,
+        imageUrl: review.image_url || undefined
       }));
     }
   } catch (err) {
