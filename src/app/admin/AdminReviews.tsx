@@ -27,6 +27,13 @@ export const AdminReviews = ({ products, initialProductId }: { products: any[], 
   useEffect(() => {
     if (selectedProductId) {
       fetchReviews(selectedProductId);
+      if (selectedProductId === 'general') {
+        setNewReview(prev => ({
+          ...prev,
+          name: 'Textile Jaipur',
+          location: 'Jaipur, Rajasthan'
+        }));
+      }
     } else {
       setReviews([]);
     }
