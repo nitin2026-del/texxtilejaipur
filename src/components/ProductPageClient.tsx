@@ -1052,6 +1052,10 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                 <p className="text-zinc-600 text-sm mb-6">
                   Share your experience with this beautiful piece. We'd love to hear from you!
                 </p>
+                <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2.5 rounded-xl text-xs font-bold border border-green-200 uppercase tracking-wide">
+                  <ShieldCheck className="h-4 w-4 shrink-0" />
+                  100% Authentic Customer Photos (No AI Gen)
+                </div>
               </div>
               <div className="w-full md:w-2/3 flex items-start justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 min-h-[300px]">
                 {dynamicReviews.length > 0 ? (

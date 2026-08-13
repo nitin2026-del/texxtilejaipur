@@ -3,7 +3,7 @@
 import React from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { Star, MessageCircleHeart } from 'lucide-react';
+import { Star, MessageCircleHeart, ShieldCheck } from 'lucide-react';
 
 export function ReviewsClient({ reviews, averageRating }: { reviews: any[], averageRating: string }) {
   return (
@@ -29,6 +29,10 @@ export function ReviewsClient({ reviews, averageRating }: { reviews: any[], aver
             <p className="text-zinc-600 font-medium">
               <span className="font-bold text-zinc-900">{averageRating}/5</span> based on {reviews.length}+ reviews
             </p>
+            <div className="mt-4 flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-xl text-sm font-medium border border-green-200">
+              <ShieldCheck className="h-4 w-4" />
+              100% Authentic Customer Photos (No AI Generated Content)
+            </div>
           </div>
         </div>
       </div>
