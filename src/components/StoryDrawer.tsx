@@ -40,13 +40,13 @@ export function StoryDrawer({ isOpen, onClose }: StoryDrawerProps) {
       icon: <Users className="h-8 w-8 text-emerald-500 mb-4" />,
       title: "Our Artisans",
       content: "Today, we proudly work with 60+ skilled artisans, manufacturing handcrafted Suzani jackets, block print apparel, bags, and home textiles. Every piece we create carries the heritage of Jaipur while supporting the talented artisans who keep these traditional crafts alive.",
-      image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80" // Textile artisan
+      image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop&q=80" // Open shop with products
     },
     {
       icon: <Globe className="h-8 w-8 text-blue-500 mb-4" />,
       title: "Trusted Worldwide",
       content: "Our greatest achievement isn't just exporting our products—it's earning the trust of buyers worldwide through quality craftsmanship, honest relationships, and reliable service. Our mission remains simple: to preserve India's textile traditions and deliver handcrafted products you can trust.",
-      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=80", // Boho clothing rack
+      image: "https://evtjgujsfllegfmtqspq.supabase.co/storage/v1/object/public/product-images/3ee66097-c7e2-457a-b55e-e034b798497d.webp", // Suzani jacket from DB
       tagline: "Crafted in Jaipur. Built on Trust."
     }
   ];
