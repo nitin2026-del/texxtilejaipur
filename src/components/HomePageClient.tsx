@@ -7,7 +7,8 @@ import { ProductCard } from '@/components/ProductCard';
 import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import { BottomNav } from '@/components/BottomNav';
-import { Search, Sparkles, Filter, ShieldCheck, Truck, Clock } from 'lucide-react';
+import { StoryDrawer } from '@/components/StoryDrawer';
+import { Search, Sparkles, Filter, ShieldCheck, Truck, Clock, BookOpen } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 interface Product {
@@ -47,6 +48,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [storyOpen, setStoryOpen] = useState(false);
 
   useEffect(() => {
     const handleCategorySelect = (e: Event) => {
@@ -209,6 +211,27 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
           <span className="mx-8">✦ WE SHIP TO EVERY COUNTRY</span>
         </div>
       </div>
+
+      {/* Story Banner */}
+      <section className="w-full bg-brand-50 border-b border-brand-100 overflow-hidden relative cursor-pointer group" onClick={() => setStoryOpen(true)}>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')] opacity-5 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+        <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+          <div className="flex-1 max-w-2xl">
+            <div className="inline-flex items-center gap-2 text-brand-700 text-xs font-bold uppercase tracking-widest mb-4">
+              <Sparkles className="h-4 w-4" /> Discover Our Roots
+            </div>
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-zinc-900 mb-4">
+              The Heart Behind <br className="hidden md:block" /> Textile Jaipur
+            </h2>
+            <p className="text-zinc-600 md:text-lg leading-relaxed max-w-xl">
+              From a dream at 21 to earning the trust of buyers worldwide. See how we preserve India's textile traditions alongside 60+ skilled artisans.
+            </p>
+          </div>
+          <button className="shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-zinc-900 text-white rounded-full font-bold hover:bg-brand-600 transition-colors shadow-xl hover:shadow-brand-500/20 group-hover:bg-brand-600">
+            <BookOpen className="h-5 w-5" /> Read Our Story
+          </button>
+        </div>
+      </section>
 
       {/* New Arrivals Section */}
       <section id="new-arrivals" className="px-6 sm:px-12 max-w-[1600px] mx-auto pt-24 pb-12">
@@ -534,6 +557,11 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
       <CheckoutModal 
         isOpen={checkoutOpen} 
         onClose={() => setCheckoutOpen(false)} 
+      />
+
+      <StoryDrawer
+        isOpen={storyOpen}
+        onClose={() => setStoryOpen(false)}
       />
 
       {/* Bottom Mobile Navigation */}
