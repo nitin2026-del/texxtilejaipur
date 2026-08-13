@@ -1107,10 +1107,17 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center self-center">
-                    <Heart className="h-10 w-10 text-zinc-300 mx-auto mb-3" />
-                    <p className="font-bold text-zinc-700 text-lg">No experiences shared yet</p>
-                    <p className="text-sm text-zinc-500 mt-1">Be the first to share your experience!</p>
+                  <div className="text-center self-center py-8">
+                    <Heart className="h-10 w-10 text-zinc-300 mx-auto mb-4" />
+                    <p className="font-serif font-bold text-zinc-900 text-xl mb-3">
+                      See the real customer photos who like our products
+                    </p>
+                    <a 
+                      href="/reviews"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-brand-600 text-white rounded-full font-semibold text-sm transition-colors shadow-md"
+                    >
+                      View All Reviews
+                    </a>
                   </div>
                 )}
               </div>
