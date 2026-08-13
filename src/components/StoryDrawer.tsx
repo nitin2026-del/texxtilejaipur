@@ -28,19 +28,19 @@ export function StoryDrawer({ isOpen, onClose }: StoryDrawerProps) {
       icon: <Sparkles className="h-8 w-8 text-amber-500 mb-4" />,
       title: "A Dream at 21",
       content: "Our journey began in 2021, when, at just 21 years old, I started this company with a dream, determination, and a passion for sharing Jaipur's rich textile heritage with the world. In the beginning, I didn't know exactly how the journey would unfold, but I believed in taking one step at a time.",
-      image: "https://images.unsplash.com/photo-1599661559905-244e45cbf92a?w=800&auto=format&fit=crop&q=80" // Jaipur Hawa Mahal
+      image: "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?w=800&auto=format&fit=crop&q=80" // Taj Mahal
     },
     {
       icon: <Heart className="h-8 w-8 text-brand-500 mb-4" />,
       title: "Family & Heart",
       content: "This journey would not have been possible without the constant support of my brother, Hitesh, and my sister-in-law, Archana. Their guidance gave me the confidence to keep moving forward. Our company is named after my little sister, Hiya, whose name represents the heart, inspiration, and values behind everything we do.",
-      image: "https://images.unsplash.com/photo-1605333104694-7df844e1d167?w=800&auto=format&fit=crop&q=80" // Beautiful Indian fabric
+      image: "https://images.unsplash.com/photo-1517427677506-ade074eb1432?w=800&auto=format&fit=crop&q=80" // Indian textiles
     },
     {
       icon: <Users className="h-8 w-8 text-emerald-500 mb-4" />,
       title: "Our Artisans",
       content: "Today, we proudly work with 60+ skilled artisans, manufacturing handcrafted Suzani jackets, block print apparel, bags, and home textiles. Every piece we create carries the heritage of Jaipur while supporting the talented artisans who keep these traditional crafts alive.",
-      image: "https://images.unsplash.com/photo-1584050212852-6db726b28938?w=800&auto=format&fit=crop&q=80" // Textile artisan work
+      image: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80" // Textile artisan
     },
     {
       icon: <Globe className="h-8 w-8 text-blue-500 mb-4" />,
