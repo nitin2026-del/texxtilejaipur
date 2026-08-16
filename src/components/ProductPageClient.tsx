@@ -11,6 +11,7 @@ import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getOptimizedUrl } from '@/utils/imageUtils';
 import Link from 'next/link';
+import { HappyCustomersSlider } from '@/components/HappyCustomersSlider';
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame } from 'lucide-react';
 
 interface Product {
@@ -1042,93 +1043,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
         {/* Photo Reviews Section */}
         {product && (
           <>
-          <div className="mt-20 pt-16 border-t border-zinc-200">
-            <div className="flex flex-col md:flex-row gap-12">
-              <div className="w-full md:w-1/3">
-                <h3 className="text-2xl font-serif text-zinc-900 font-bold mb-6 flex items-center gap-2">
-                  <Heart className="h-6 w-6 text-brand-600 fill-brand-600" />
-                  Customer Experiences
-                </h3>
-                <p className="text-zinc-600 text-sm mb-6">
-                  Share your experience with this beautiful piece. We'd love to hear from you!
-                </p>
-                <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2.5 rounded-xl text-xs font-bold border border-green-200 uppercase tracking-wide">
-                  <ShieldCheck className="h-4 w-4 shrink-0" />
-                  100% Authentic Customer Photos (No AI Gen)
-                </div>
-              </div>
-              <div className="w-full md:w-2/3 flex items-start justify-center bg-zinc-50 border border-zinc-100 rounded-2xl p-12 min-h-[300px]">
-                {dynamicReviews.length > 0 ? (
-                  <div className="space-y-6 w-full">
-                    {dynamicReviews.map((review, idx) => (
-                      <div key={idx} className="bg-white p-5 rounded-xl border border-zinc-200 shadow-sm text-left">
-                        {review.imageUrls && review.imageUrls.length > 0 ? (
-                          <div className="mb-4 flex flex-wrap gap-2">
-                            {review.imageUrls.map((url: string, imgIdx: number) => (
-                              <div key={imgIdx} className="rounded-xl overflow-hidden aspect-[4/5] bg-zinc-100 max-w-sm w-32 shrink-0 border border-zinc-200">
-                                <img 
-                                  src={url} 
-                                  alt={`Customer review photo ${imgIdx + 1}`} 
-                                  className="w-full h-full object-cover"
-                                  loading="lazy"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        ) : review.imageUrl && (
-                          <div className="mb-4 rounded-xl overflow-hidden aspect-[4/5] bg-zinc-100 max-w-sm">
-                            <img 
-                              src={review.imageUrl} 
-                              alt="Customer review photo" 
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                            />
-                          </div>
-                        )}
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-8 h-8 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center font-serif text-[14px] font-bold border border-zinc-200 shrink-0">
-                            {review.initial || review.name.charAt(0)}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-bold text-[13px] text-zinc-900 flex items-center gap-2">
-                              {review.name}
-                              {review.isVerified && (
-                                <span className="bg-green-100 text-green-700 text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                                  Verified
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-[12px] text-brand-600 tracking-wider">
-                            {'★'.repeat(review.stars)}{'☆'.repeat(5 - review.stars)}
-                          </div>
-                        </div>
-                        {review.title && <div className="font-serif text-[14px] font-semibold text-zinc-900 mb-1.5">{review.title}</div>}
-                        <div className="text-[13px] leading-relaxed text-zinc-600">
-                          {review.body}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center self-center py-8">
-                    <Heart className="h-10 w-10 text-zinc-300 mx-auto mb-4" />
-                    <p className="font-serif font-bold text-zinc-900 text-xl mb-3">
-                      See the real customer photos who like our products
-                    </p>
-                    <a 
-                      href="/reviews"
-                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-brand-600 text-white rounded-full font-semibold text-sm transition-colors shadow-md"
-                    >
-                      View All Reviews
-                    </a>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          
+          <HappyCustomersSlider />
 
           {/* Review Form (Appears below either the custom or generic review section) */}
           <div className="mt-8 mb-20 flex justify-center">
