@@ -53,7 +53,7 @@ export function HappyCustomersSlider({ initialImages = [] }: { initialImages?: s
 
       <div className="relative w-full flex overflow-hidden group">
         {/* We use two identical blocks that slide together to create a seamless infinite loop */}
-        <div className="flex animate-marquee shrink-0 gap-4 pr-4 hover:[animation-play-state:paused]">
+        <div className="flex animate-marquee shrink-0 gap-4 pr-4">
           {images.map((src, i) => (
             <div key={`set1-${i}`} className="w-[280px] md:w-[320px] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden shadow-sm bg-zinc-100 relative">
               <img src={src} alt="Happy Customer" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
@@ -63,7 +63,7 @@ export function HappyCustomersSlider({ initialImages = [] }: { initialImages?: s
             </div>
           ))}
         </div>
-        <div className="flex animate-marquee shrink-0 gap-4 pr-4 hover:[animation-play-state:paused]">
+        <div className="flex animate-marquee shrink-0 gap-4 pr-4">
           {images.map((src, i) => (
             <div key={`set2-${i}`} className="w-[280px] md:w-[320px] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden shadow-sm bg-zinc-100 relative">
               <img src={src} alt="Happy Customer" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
