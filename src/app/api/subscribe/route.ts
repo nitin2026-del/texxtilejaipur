@@ -34,11 +34,27 @@ export async function POST(request: Request) {
       }
     }
 
-    // 1. Use static 10% off code
-    const discountCode = 'VIP10';
+    // 1. Generate unique 10% off code
+    const discountCode = 'VIP10-' + Math.random().toString(36).substring(2, 6).toUpperCase();
 
-    // We no longer dynamically create coupons here to prevent spam and because we use the anon key.
-    // The VIP10 coupon is already seeded in the database.
+    // 2. Save the coupon to the database so it actually works at checkout
+    // This now works securely using the anon key because we added an RLS policy
+    // that only allows inserting 10% coupons starting with VIP10- and usage_limit=1.
+    const { error: couponError } = await supabase
+      .from('coupons')
+      .insert([{
+        code: discountCode,
+        discount_type: 'percentage',
+        discount_value: 10,
+        min_order_value: 0,
+        usage_limit: 1,
+        is_active: true
+      }]);
+
+    if (couponError) {
+      console.error('Failed to generate coupon:', couponError);
+      // Fallback or log.
+    }
 
     // 3. Send the email with the code
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
