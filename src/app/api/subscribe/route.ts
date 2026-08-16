@@ -11,14 +11,14 @@ export async function POST(request: Request) {
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!supabaseUrl || !supabaseAnonKey) {
       return NextResponse.json({ success: false, error: 'Server configuration error' }, { status: 500 });
     }
 
-    // Use service role key to bypass RLS for inserting subscribers
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Use anon key since we added an RLS policy allowing anyone to insert a newsletter subscription
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const { error } = await supabase
       .from('newsletters')
@@ -34,25 +34,11 @@ export async function POST(request: Request) {
       }
     }
 
-    // 1. Generate unique 10% off code
-    const discountCode = 'VIP10-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    // 1. Use static 10% off code
+    const discountCode = 'VIP10';
 
-    // 2. Save the coupon to the database so it actually works at checkout
-    const { error: couponError } = await supabase
-      .from('coupons')
-      .insert([{
-        code: discountCode,
-        discount_type: 'percentage',
-        discount_value: 10,
-        min_order_value: 0,
-        is_active: true
-      }]);
-
-    if (couponError) {
-      console.error('Failed to generate coupon:', couponError);
-      // We will still try to send an email, maybe without the code or with a fallback code?
-      // Or just fail. It's better to log and proceed, maybe fallback to a generic code.
-    }
+    // We no longer dynamically create coupons here to prevent spam and because we use the anon key.
+    // The VIP10 coupon is already seeded in the database.
 
     // 3. Send the email with the code
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
