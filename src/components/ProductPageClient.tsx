@@ -1043,7 +1043,9 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
         {/* Photo Reviews Section */}
         {product && (
           <>
-          <HappyCustomersSlider />
+          <HappyCustomersSlider 
+            initialImages={dynamicReviews.flatMap((r: any) => [r.imageUrl, ...(r.imageUrls || [])]).filter(Boolean)} 
+          />
 
           {/* Review Form (Appears below either the custom or generic review section) */}
           <div className="mt-8 mb-20 flex justify-center">

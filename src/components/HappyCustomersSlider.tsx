@@ -4,30 +4,30 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Heart } from 'lucide-react';
 
-export function HappyCustomersSlider() {
+export function HappyCustomersSlider({ initialImages = [] }: { initialImages?: string[] }) {
   const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.from('reviews')
       .select('image_url, image_urls')
-      .not('image_urls', 'is', null) // only fetch reviews with images to save bandwidth
       .then(({ data, error }) => {
-        if (error) {
-          console.error("Error fetching review images:", error);
-          return;
-        }
-        
-        const allImages: string[] = [];
-        if (data) {
+        let dbImages: string[] = [];
+        if (!error && data) {
           data.forEach(r => {
-            if (r.image_url) allImages.push(r.image_url);
-            if (r.image_urls) allImages.push(...r.image_urls);
+            if (r.image_url) dbImages.push(r.image_url);
+            if (r.image_urls) dbImages.push(...r.image_urls);
           });
         }
         
-        // Remove duplicates just in case
-        const uniqueImages = Array.from(new Set(allImages.filter(Boolean)));
+        // Merge DB images with the initially passed images (which might contain pending local uploads)
+        const combined = [...initialImages, ...dbImages].filter(Boolean);
+        const uniqueImages = Array.from(new Set(combined));
         
+        if (uniqueImages.length === 0) {
+          setImages([]);
+          return;
+        }
+
         // If we have fewer than 5 images, repeat them so the marquee has enough content to scroll
         let finalImages = [...uniqueImages];
         while (finalImages.length > 0 && finalImages.length < 6) {
@@ -36,7 +36,7 @@ export function HappyCustomersSlider() {
         
         setImages(finalImages);
       });
-  }, []);
+  }, [initialImages]);
 
   if (images.length === 0) return null;
 
