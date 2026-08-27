@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     // 1. Fetch order
     const { data: orderData, error: orderError } = await supabaseAdmin
       .from('orders')
-      .select('id, user_id, created_at, shipping_addresses(full_name)')
+      .select('id, user_id, guest_email, created_at, shipping_addresses(full_name)')
       .eq('order_number', orderId)
       .single();
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found. Please check your order number.' }, { status: 404 });
     }
 
-    // 2. Verify Email matches (only if user_id exists)
+    // 2. Verify Email matches
     if (orderData.user_id) {
       const { data: userData } = await supabaseAdmin.auth.admin.getUserById(orderData.user_id);
       if (userData?.user?.email) {
@@ -51,10 +51,12 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: 'The email does not match the order records.' }, { status: 403 });
         }
       }
+    } else if (orderData.guest_email) {
+      if (orderData.guest_email.toLowerCase() !== email.toLowerCase()) {
+        return NextResponse.json({ error: 'The email does not match the order records.' }, { status: 403 });
+      }
     }
     
-    // For guest users (user_id is null), we accept the email they provide 
-    // since order numbers are cryptographically random/unguessable.
     const finalEmail = email;
 
     // 3. Verify 14-Day Window

@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     // We fetch the order by order_number
     const { data: orderData, error: orderError } = await supabaseAdmin
       .from('orders')
-      .select('id, user_id, status, shipping_addresses(full_name)')
+      .select('id, user_id, guest_email, status, shipping_addresses(full_name)')
       .eq('order_number', orderId)
       .single();
 
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Send confirmation email
-    let finalEmail = '';
+    let finalEmail = orderData.guest_email || '';
     if (orderData.user_id) {
       const { data: userData } = await supabaseAdmin.auth.admin.getUserById(orderData.user_id);
       if (userData?.user?.email) {
