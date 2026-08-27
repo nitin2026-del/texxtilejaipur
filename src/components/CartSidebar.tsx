@@ -19,6 +19,16 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
+  const [shippingConfig, setShippingConfig] = useState<{ standard_price: number; is_free_shipping: boolean } | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetch('/api/shipping-config')
+        .then(res => res.json())
+        .then(data => setShippingConfig(data))
+        .catch(console.error);
+    }
+  }, [isOpen]);
 
   const goToProduct = (id: string) => {
     onClose();
@@ -153,7 +163,13 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   <div className="flex justify-between text-xs text-zinc-400">
                     <span>Shipping</span>
                     <span className="text-gold font-bold uppercase tracking-wider">
-                      Free
+                      {shippingConfig ? (
+                        (shippingConfig.is_free_shipping || shippingConfig.standard_price === 0) 
+                          ? 'Free' 
+                          : formatPrice(shippingConfig.standard_price / 0.010769)
+                      ) : (
+                        'Calculated at checkout'
+                      )}
                     </span>
                   </div>
                   

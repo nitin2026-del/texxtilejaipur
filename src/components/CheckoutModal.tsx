@@ -46,10 +46,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   
-  // $10 USD converted to INR if express shipping is selected
-  const shippingCostInr = shippingMethod === 'express' ? 10 / 0.010769 : 0;
-  const effectiveInr = getCartTotalInr() + shippingCostInr;
+  // Shipping configuration from DB
+  const [shippingConfig, setShippingConfig] = useState({
+    standard_price: 0,
+    express_price: 10,
+    is_free_shipping: true
+  });
+
+  const baseStandardUsd = shippingConfig.is_free_shipping ? 0 : shippingConfig.standard_price;
+  const baseExpressUsd = shippingConfig.express_price;
+  
+  const shippingCostInUsd = shippingMethod === 'express' ? baseExpressUsd : baseStandardUsd;
+  
+  // Convert shipping cost to INR using FX rate if needed, or stick to USD equivalent
   const USD_RATE = 0.010769;
+  const shippingCostInr = shippingCostInUsd / USD_RATE;
+
+  const effectiveInr = getCartTotalInr() + shippingCostInr;
   const paypalUsdAmount = Number((effectiveInr * USD_RATE).toFixed(2));
 
   // Reset createdOrderId and step on every open to avoid stale state (BUG-006)
@@ -64,6 +77,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           setPhone(profile.phone || '');
         }
       }
+      
+      // Fetch dynamic shipping config
+      fetch('/api/shipping-config')
+        .then(res => res.json())
+        .then(data => setShippingConfig(data))
+        .catch(console.error);
     }
   }, [isOpen, user, profile]);
 
@@ -365,7 +384,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                         <span className="text-[10px] text-zinc-500">Delivery in 7-10 business days</span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-emerald-600">Free</span>
+                    <span className={`text-sm font-bold ${baseStandardUsd === 0 ? 'text-emerald-600' : 'text-zinc-900'}`}>
+                      {baseStandardUsd === 0 ? 'Free' : `$${baseStandardUsd.toFixed(2)}`}
+                    </span>
                   </label>
                   
                   <label className={`flex items-center justify-between border rounded p-3 cursor-pointer transition-colors ${shippingMethod === 'express' ? 'border-gold bg-gold/5' : 'border-zinc-200 hover:border-gold/50'}`}>
@@ -383,7 +404,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                         <span className="text-[10px] text-zinc-500">Priority processing, 3-5 business days</span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-zinc-900">$10.00</span>
+                    <span className="text-sm font-bold text-zinc-900">${baseExpressUsd.toFixed(2)}</span>
                   </label>
                 </div>
               </div>
@@ -452,8 +473,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 )}
                   <div className="flex justify-between text-xs text-zinc-600">
                     <span>{shippingMethod === 'express' ? 'Worldwide UPS Express Shipping' : 'Standard Shipping'}</span>
-                    <span className={`font-bold ${shippingMethod === 'standard' ? 'text-emerald-600' : 'text-zinc-900'}`}>
-                      {shippingMethod === 'express' ? formatPrice(shippingCostInr) : 'Free'}
+                    <span className={`font-bold ${shippingMethod === 'standard' && baseStandardUsd === 0 ? 'text-emerald-600' : 'text-zinc-900'}`}>
+                      {shippingMethod === 'standard' && baseStandardUsd === 0 ? 'Free' : formatPrice(shippingCostInr)}
                     </span>
                   </div>
                 <div className="flex justify-between text-sm font-bold text-zinc-900 border-t border-zinc-300 pt-2 mt-2 font-serif">

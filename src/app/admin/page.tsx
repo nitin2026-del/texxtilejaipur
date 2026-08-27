@@ -146,7 +146,7 @@ function AdminPortalContent() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping'>('overview');
   const [reviewProductId, setReviewProductId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -1710,6 +1710,16 @@ function AdminPortalContent() {
             >
               <Star className="h-3.5 w-3.5" /> Reviews
             </button>
+            <button
+              onClick={() => setActiveTab('shipping')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'shipping'
+                  ? 'bg-brand-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Truck className="h-3.5 w-3.5" /> Shipping
+            </button>
           </div>
         </div>
 
@@ -3253,6 +3263,12 @@ function AdminPortalContent() {
           </div>
         )}
 
+        {/* TAB 11: SHIPPING */}
+        {activeTab === 'shipping' && (
+          <div className="space-y-6">
+            <AdminShippingConfig />
+          </div>
+        )}
 
       </div>
       {/* TRACKING AND SHIPMENT EDIT MODAL */}
