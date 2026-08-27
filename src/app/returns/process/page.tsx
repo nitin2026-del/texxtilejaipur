@@ -183,6 +183,45 @@ function ReturnProcessContent() {
                 </select>
               </div>
 
+              {/* Refund Breakdown */}
+              {Object.values(selectedItems).some(Boolean) && (
+                <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-6 mt-8">
+                  <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest mb-4">Refund Estimate</h3>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between text-zinc-600">
+                      <span>Gross Refund Amount:</span>
+                      <span>₹{Object.keys(selectedItems)
+                        .filter(id => selectedItems[id])
+                        .reduce((acc, id) => {
+                          const item = items.find(i => i.id === id);
+                          return acc + (item ? item.price_at_time * item.quantity : 0);
+                        }, 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-600">
+                      <span>PayPal Transaction Fee:</span>
+                      <span className="text-red-500">-₹500</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-600 pb-3 border-b border-zinc-200">
+                      <span>Return Shipping Fee:</span>
+                      <span className="text-red-500">-₹4,000</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-zinc-900 pt-1 text-base">
+                      <span>Estimated Net Refund:</span>
+                      <span>₹{Math.max(0, Object.keys(selectedItems)
+                        .filter(id => selectedItems[id])
+                        .reduce((acc, id) => {
+                          const item = items.find(i => i.id === id);
+                          return acc + (item ? item.price_at_time * item.quantity : 0);
+                        }, 0) - 4500).toLocaleString()}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 text-xs text-zinc-500 bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-800">
+                    <strong>Note:</strong> The estimated net refund amount will be processed and returned to your original payment method <strong>only after</strong> the returned product reaches our warehouse and passes quality inspection.
+                  </div>
+                </div>
+              )}
+
               <button 
                 type="submit"
                 disabled={submitting}
