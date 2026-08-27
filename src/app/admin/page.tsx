@@ -8,6 +8,7 @@ import imageCompression from 'browser-image-compression';
 import { v4 as uuidv4 } from 'uuid';
 import { compressVideo } from '@/utils/videoCompression';
 import { AdminReviews } from './AdminReviews';
+import { AdminShippingConfig } from '@/components/AdminShippingConfig';
 import { 
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
@@ -24,7 +25,7 @@ interface Product {
   category: string;
   images: string[];
   stock: number;
-  details: { material?: string; origin?: string; care?: string; video_url?: string; translations?: any; culturalContext?: string; stylingAdvice?: string };
+  details: { material?: string; origin?: string; care?: string; video_url?: string; translations?: any; culturalContext?: string; stylingAdvice?: string; isBestseller?: boolean };
   is_featured?: boolean;
   display_rank?: number;
   image_url?: string;
