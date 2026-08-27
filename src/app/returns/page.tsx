@@ -152,19 +152,7 @@ export default function ReturnsPage() {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <div className="mt-1">
-                <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center">
-                  <Truck className="h-5 w-5 text-zinc-700" />
-                </div>
-              </div>
-              <div>
-                <h4 className="font-bold text-zinc-900 mb-1">Free Return Shipping</h4>
-                <p className="text-sm text-zinc-600 leading-relaxed">
-                  We provide a prepaid shipping label for all returns within India. For international orders, a small return shipping fee applies.
-                </p>
-              </div>
-            </div>
+
 
             <div className="flex gap-4">
               <div className="mt-1">
