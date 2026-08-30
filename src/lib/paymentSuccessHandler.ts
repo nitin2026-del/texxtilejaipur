@@ -1,6 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { generateInvoiceBuffer } from './invoiceGenerator';
-import crypto from 'crypto';
 
 export async function handlePaymentSuccess(orderId: string, supabaseAdmin: SupabaseClient) {
   try {
