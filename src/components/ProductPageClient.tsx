@@ -208,35 +208,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
     setTimeout(() => setShareToast(false), 3000);
   };
 
-  const trackedProductId = useRef<string | null>(null);
 
-
-  useEffect(() => {
-    if (!product || typeof window === 'undefined' || !(window as any).fbq) return;
-    
-    // Check if the current pathname matches this product's page
-    // This prevents background firing when hidden in Next.js router cache
-    const isCurrentPage = pathname === `/product/${product.id}` || pathname === `/product/${id}`;
-    
-    if (!isCurrentPage) {
-      // Reset tracking if the user navigates away so returning will fire a new ViewContent
-      trackedProductId.current = null;
-      return;
-    }
-    
-    if (trackedProductId.current !== `${product.id}-${pathname}`) {
-      trackedProductId.current = `${product.id}-${pathname}`;
-      const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
-      const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
-      
-      (window as any).fbq('track', 'ViewContent', {
-        content_ids: [product.id],
-        content_type: 'product',
-        value: priceUSD,
-        currency: 'USD'
-      });
-    }
-  }, [product, pathname, id]);
 
   const handleAddToCart = () => {
     const qtyToAdd = quantity === 0 ? 1 : quantity;

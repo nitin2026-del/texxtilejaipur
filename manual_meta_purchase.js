@@ -3,8 +3,8 @@ const crypto = require('crypto');
 // ==========================================
 // 1. FILL IN YOUR PIXEL AND TOKEN DETAILS
 // ==========================================
-const PIXEL_ID = '1325173556217164'; // Your Meta Pixel ID
-const ACCESS_TOKEN = 'EAAQ1fcDnsdABRx5GUvw3z9a4H3Mna4bwiMQCDARCEuwUlbR5QIKb7UhCZBGblpwiZB0yKBTFoTYRoEiRUH9CB0H2EpvANFTXRl94O4xIl78HPjfoewN0vuiWMlreje11x0GYRonmfG674JjihmvMEIq6ZClttMp2KhoV3xcnW6xgKcZA043p9ZCGZAbNGn0mg6XwZDZD';
+const PIXEL_ID = ''; // Your Meta Pixel ID
+const ACCESS_TOKEN = '';
 
 // ==========================================
 // 2. FILL IN THE ORDER DETAILS

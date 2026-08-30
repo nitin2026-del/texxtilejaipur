@@ -87,70 +87,7 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
       userName = profileData?.full_name || 'Valued Customer';
     }
 
-    // ---------------------------------------------------------
-    // META CONVERSIONS API (CAPI) - Send Purchase Event
-    // ---------------------------------------------------------
-    if (process.env.META_ACCESS_TOKEN) {
-      try {
-        const hash = (str: string) => crypto.createHash('sha256').update(str.toLowerCase().trim()).digest('hex');
-        
-        // Convert total to USD
-        const USD_RATE = 0.010769; // Or dynamic rate
-        const usdValue = Number(((order?.total || 0) * USD_RATE).toFixed(2));
-        
-        // Split name for CAPI
-        const nameParts = userName.split(/\s+/);
-        const fn = nameParts[0] ? hash(nameParts[0]) : undefined;
-        const ln = nameParts.length > 1 ? hash(nameParts.slice(1).join('')) : undefined;
-        
-        const payload = {
-          data: [
-            {
-              event_name: 'Purchase',
-              event_time: Math.floor(Date.now() / 1000),
-              event_id: orderId,
-              action_source: 'website',
-              user_data: {
-                em: userEmail ? [hash(userEmail)] : [],
-                ph: userPhone ? [hash(userPhone.replace(/\D/g, ''))] : [],
-                fn: fn ? [fn] : [],
-                ln: ln ? [ln] : [],
-                ct: userCity ? [hash(userCity)] : [],
-                st: userState ? [hash(userState)] : [],
-                zp: userZip ? [hash(userZip)] : [],
-                country: userCountry ? [hash(userCountry)] : [],
-              },
-              custom_data: {
-                currency: 'USD',
-                value: usdValue,
-                content_ids: (orderItems || []).map(i => i.product_id).filter(Boolean),
-                content_type: 'product',
-              }
-            }
-          ],
-          test_event_code: process.env.META_TEST_EVENT_CODE // Optional for debugging
-        };
 
-        const PIXEL_ID = '1325173556217164'; // Fixed from layout.tsx
-        
-        const capiResponse = await fetch(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${process.env.META_ACCESS_TOKEN}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        
-        const capiResult = await capiResponse.json();
-        if (!capiResponse.ok) {
-          console.error('[handlePaymentSuccess] Meta CAPI Error:', capiResult);
-        } else {
-          console.log('[handlePaymentSuccess] Meta CAPI Purchase tracked successfully.');
-        }
-      } catch (capiErr) {
-        console.error('[handlePaymentSuccess] Failed to send Meta CAPI event:', capiErr);
-      }
-    } else {
-      console.warn('[handlePaymentSuccess] META_ACCESS_TOKEN not found. Skipping Conversions API.');
-    }
 
     if (hasEmailToNotify) {
       try {

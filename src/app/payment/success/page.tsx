@@ -65,36 +65,7 @@ function PaymentCaptureHandler() {
           if (data.order_number) setOrderNumberState(data.order_number);
           if (data.customer?.email) setCustomerEmail(data.customer.email);
           clearCart();
-          // Fire Facebook Pixel Purchase Event
-          if (typeof window !== 'undefined' && (window as any).fbq && usdAmount > 0) {
-            const customer = data.customer || {};
-            const rawName = (customer.name || '').trim();
-            const nameParts = rawName.split(/\s+/);
-            const fn = nameParts[0]?.toLowerCase().replace(/[^a-z]/g, '') || undefined;
-            const ln = nameParts.length > 1 ? nameParts.slice(1).join('').toLowerCase().replace(/[^a-z]/g, '') : undefined;
-            const em = customer.email?.toLowerCase().trim() || undefined;
-            const ph = customer.phone?.replace(/\D/g, '') || undefined;
-            const zp = customer.zip?.toLowerCase().replace(/\s/g, '') || undefined;
-            const ct = customer.city?.toLowerCase().trim().replace(/[^a-z\s]/g, '') || undefined;
-            const st = customer.state?.toLowerCase().trim() || undefined;
-            
-            const rawCountry = (customer.country || '').toLowerCase().trim();
-            const countryMap: Record<string, string> = {
-              'united states': 'us', 'usa': 'us', 'india': 'in', 'united kingdom': 'gb', 'uk': 'gb',
-              'australia': 'au', 'canada': 'ca', 'germany': 'de', 'france': 'fr', 'italy': 'it',
-              'spain': 'es', 'netherlands': 'nl', 'united arab emirates': 'ae', 'uae': 'ae', 'new zealand': 'nz'
-            };
-            const country = countryMap[rawCountry] || (rawCountry.length === 2 ? rawCountry : undefined);
 
-            (window as any).fbq('init', '1325173556217164', {
-              em, ph, fn, ln, country, zp, ct, st
-            });
-
-            (window as any).fbq('track', 'Purchase', {
-              value: usdAmount,
-              currency: 'USD'
-            }, { eventID: orderId });
-          }
           setStatus('success');
         } else {
           console.error('PayPal capture API returned failure:', data.error);
