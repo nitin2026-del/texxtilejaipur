@@ -6,6 +6,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { trackMetaEvent } from '@/utils/metaTracking';
 
 // This page handles the PayPal return for BOTH guest and logged-in users.
 // PayPal redirects to: /payment/success?token=PAYPAL_ORDER_ID&PayerID=xxx&order_id=xxx
@@ -65,6 +66,11 @@ function PaymentCaptureHandler() {
           if (data.order_number) setOrderNumberState(data.order_number);
           if (data.customer?.email) setCustomerEmail(data.customer.email);
           clearCart();
+
+          trackMetaEvent('Purchase', {
+            value: usdAmount,
+            currency: 'USD'
+          }, orderId, true);
 
           setStatus('success');
         } else {

@@ -10,6 +10,7 @@ import { CheckoutModal } from '@/components/CheckoutModal';
 import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getOptimizedUrl } from '@/utils/imageUtils';
+import { trackMetaEvent } from '@/utils/metaTracking';
 import Link from 'next/link';
 import { HappyCustomersSlider } from '@/components/HappyCustomersSlider';
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame } from 'lucide-react';
@@ -209,6 +210,19 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
   };
 
 
+
+  useEffect(() => {
+    if (product) {
+      const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
+      const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+      trackMetaEvent('ViewContent', {
+        content_ids: [product.id],
+        content_type: 'product',
+        value: priceUSD,
+        currency: 'USD'
+      });
+    }
+  }, [product, pathname]);
 
   const handleAddToCart = () => {
     const qtyToAdd = quantity === 0 ? 1 : quantity;

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Suspense } from 'react';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { MetaPixel } from '@/components/MetaPixel';
 import './globals.css';
 import { FloatingSupport } from '@/components/FloatingSupport';
 import { GlobalModals } from '@/components/GlobalModals';
@@ -214,6 +216,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
         <AuthProvider>
           <CartProvider>
             <div className="bg-mesh" />

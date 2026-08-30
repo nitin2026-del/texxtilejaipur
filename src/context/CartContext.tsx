@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { trackMetaEvent } from '@/utils/metaTracking';
 import { supabase } from '@/lib/supabase';
 
 export interface CartItem {
@@ -152,8 +153,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         category: product.category,
       };
       saveCart([...cart, newItem]);
-
-
+      
+      const productPrice = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+      trackMetaEvent('AddToCart', {
+        content_ids: [product.id],
+        content_type: 'product',
+        value: productPrice,
+        currency: 'USD'
+      });
     }
   };
 

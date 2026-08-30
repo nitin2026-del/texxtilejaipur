@@ -89,6 +89,40 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
 
 
 
+    // Send Meta CAPI Purchase Event
+    const PIXEL_ID = '2857970634559091';
+    if (process.env.META_ACCESS_TOKEN) {
+      try {
+        const payload = {
+          data: [{
+            event_name: 'Purchase',
+            event_time: Math.floor(Date.now() / 1000),
+            event_id: orderId,
+            action_source: 'website',
+            user_data: {
+              // Hashing would go here if needed, but not strictly required by this prompt
+            },
+            custom_data: {
+              currency: 'USD',
+              value: Number(((order?.total || 0) * 0.010769).toFixed(2)) // USD rate approx
+            }
+          }]
+        };
+
+        const capiResponse = await fetch(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${process.env.META_ACCESS_TOKEN}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!capiResponse.ok) {
+          console.error('[CAPI] Purchase event failed:', await capiResponse.text());
+        }
+      } catch (err) {
+        console.error('[CAPI] Error:', err);
+      }
+    }
+
+
     if (hasEmailToNotify) {
       try {
         const userData = { email: userEmail, full_name: userName };

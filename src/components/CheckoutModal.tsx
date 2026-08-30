@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { X, CreditCard, ShoppingBag, ShieldCheck, User, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { trackMetaEvent } from '@/utils/metaTracking';
 import { PayPalPaymentForm } from './PayPalPaymentForm';
 
 interface CheckoutModalProps {
@@ -86,7 +87,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     }
   }, [isOpen, user, profile]);
 
-
+  useEffect(() => {
+    if (isOpen && cart.length > 0) {
+      trackMetaEvent('InitiateCheckout', {
+        value: Number((getCartTotalInr() * 0.010769).toFixed(2)),
+        currency: 'USD',
+        content_ids: cart.map(item => item.id),
+        content_type: 'product',
+        num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
+      });
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -168,7 +179,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         body: JSON.stringify({ orderId, coinsUsed, coinsEarned })
       });
       
-
+      trackMetaEvent('Purchase', {
+        value: 0,
+        currency: 'USD'
+      }, orderId, true);
       
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
       setStep('success');
