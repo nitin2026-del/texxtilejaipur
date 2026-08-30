@@ -13,7 +13,7 @@ import { trackMetaEvent } from '@/utils/metaTracking';
 function PaymentCaptureHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { clearCart } = useCart();
+  const { clearCart, cart } = useCart();
   const { user } = useAuth();
   const hasCaptured = useRef(false);
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
@@ -69,7 +69,9 @@ function PaymentCaptureHandler() {
 
           trackMetaEvent('Purchase', {
             value: usdAmount,
-            currency: 'USD'
+            currency: 'USD',
+            content_ids: cart.map(item => item.id),
+            content_type: 'product'
           }, orderId, true);
 
           setStatus('success');

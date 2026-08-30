@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCart, FX_RATES } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -87,8 +87,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     }
   }, [isOpen, user, profile]);
 
+  const hasTrackedCheckout = useRef(false);
+
   useEffect(() => {
-    if (isOpen && cart.length > 0) {
+    if (isOpen && cart.length > 0 && !hasTrackedCheckout.current) {
+      hasTrackedCheckout.current = true;
       trackMetaEvent('InitiateCheckout', {
         value: Number((getCartTotalInr() * 0.010769).toFixed(2)),
         currency: 'USD',
@@ -97,7 +100,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
       });
     }
-  }, [isOpen]);
+  }, [isOpen, cart, getCartTotalInr]);
 
   if (!isOpen) return null;
 
@@ -181,7 +184,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       
       trackMetaEvent('Purchase', {
         value: 0,
-        currency: 'USD'
+        currency: 'USD',
+        content_ids: cart.map(item => item.id),
+        content_type: 'product'
       }, orderId, true);
       
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });

@@ -104,7 +104,9 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
             },
             custom_data: {
               currency: 'USD',
-              value: Number(((order?.total || 0) * 0.010769).toFixed(2)) // USD rate approx
+              value: Number(((order?.total || 0) * 0.010769).toFixed(2)), // USD rate approx
+              content_ids: (orderItems || []).map(item => item.product_id).filter(Boolean),
+              content_type: 'product'
             }
           }]
         };
