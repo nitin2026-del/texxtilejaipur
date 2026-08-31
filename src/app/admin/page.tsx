@@ -9,11 +9,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { compressVideo } from '@/utils/videoCompression';
 import { AdminReviews } from './AdminReviews';
 import { AdminShippingConfig } from '@/components/AdminShippingConfig';
+import { AdminBannersConfig } from '@/components/AdminBannersConfig';
 import { 
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video, RefreshCcw, Flame
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video, RefreshCcw, Flame, Image as ImageIcon
 } from 'lucide-react';
 
 interface Product {
@@ -147,7 +148,7 @@ function AdminPortalContent() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners'>('overview');
   const [reviewProductId, setReviewProductId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -228,6 +229,7 @@ function AdminPortalContent() {
   const [formCouponCode, setFormCouponCode] = useState('');
   const [formCouponType, setFormCouponType] = useState<'percent' | 'fixed'>('percent');
   const [formCouponValue, setFormCouponValue] = useState('');
+  const [formCouponMinOrder, setFormCouponMinOrder] = useState('');
 
   // Inquiries states
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -1331,6 +1333,7 @@ function AdminPortalContent() {
         code: formCouponCode.toUpperCase(),
         discount_type: formCouponType === 'percent' ? 'percentage' : 'fixed',
         discount_value: parseFloat(formCouponValue),
+        min_order_value: formCouponMinOrder ? parseFloat(formCouponMinOrder) : null,
         is_active: true
       }).select().single();
 
@@ -1340,12 +1343,14 @@ function AdminPortalContent() {
         id: data.id,
         code: data.code,
         type: formCouponType,
-        value: parseFloat(formCouponValue)
+        value: parseFloat(formCouponValue),
+        min_order_value: formCouponMinOrder ? parseFloat(formCouponMinOrder) : null
       };
       
       setCoupons([newCoupon, ...coupons]);
       setFormCouponCode('');
       setFormCouponValue('');
+      setFormCouponMinOrder('');
       showNotification('Coupon created successfully!');
     } catch (err) {
       console.error('Error creating coupon', err);
@@ -1720,6 +1725,16 @@ function AdminPortalContent() {
               }`}
             >
               <Truck className="h-3.5 w-3.5" /> Shipping
+            </button>
+            <button
+              onClick={() => setActiveTab('banners')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'banners'
+                  ? 'bg-brand-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <ImageIcon className="h-3.5 w-3.5" /> Banners
             </button>
           </div>
         </div>
@@ -2908,6 +2923,18 @@ function AdminPortalContent() {
                         required
                       />
                     </div>
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-700 mb-1.5">Minimum Order Value (Optional, ₹)</label>
+                      <input
+                        type="number"
+                        value={formCouponMinOrder}
+                        onChange={(e) => setFormCouponMinOrder(e.target.value)}
+                        placeholder="e.g. 2000"
+                        min="1"
+                        step="0.01"
+                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
                     <button
                       type="submit"
                       className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-4 py-2.5 text-sm font-bold transition-colors mt-4 flex justify-center items-center gap-2"
@@ -2925,13 +2952,14 @@ function AdminPortalContent() {
                         <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Code</th>
                         <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Type</th>
                         <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Value</th>
+                        <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500">Min Order</th>
                         <th className="px-6 py-3 text-[10px] uppercase tracking-wider font-bold text-zinc-500 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-100">
                       {coupons.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="px-6 py-8 text-center text-zinc-500 text-sm">
+                          <td colSpan={5} className="px-6 py-8 text-center text-zinc-500 text-sm">
                             No active coupons. Create one to get started.
                           </td>
                         </tr>
@@ -2951,6 +2979,11 @@ function AdminPortalContent() {
                             <td className="px-6 py-4">
                               <span className="text-sm font-bold text-zinc-900">
                                 {coupon.type === 'percent' ? `${coupon.value}%` : `₹${coupon.value}`}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="text-sm text-zinc-500">
+                                {coupon.min_order_value ? `₹${coupon.min_order_value}` : 'None'}
                               </span>
                             </td>
                             <td className="px-6 py-4 text-right">
@@ -3268,6 +3301,13 @@ function AdminPortalContent() {
         {activeTab === 'shipping' && (
           <div className="space-y-6">
             <AdminShippingConfig />
+          </div>
+        )}
+
+        {/* TAB 12: BANNERS */}
+        {activeTab === 'banners' && (
+          <div className="space-y-6">
+            <AdminBannersConfig />
           </div>
         )}
 

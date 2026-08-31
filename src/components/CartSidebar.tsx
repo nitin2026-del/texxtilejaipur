@@ -160,18 +160,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                       <span>-{formatPrice(getCartSubtotalInr() * (tierDiscountPercentage / 100))}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-xs text-zinc-400">
-                    <span>Shipping</span>
-                    <span className="text-gold font-bold uppercase tracking-wider">
-                      {shippingConfig ? (
-                        (shippingConfig.is_free_shipping || shippingConfig.standard_price === 0) 
-                          ? 'Free' 
-                          : formatPrice(shippingConfig.standard_price / 0.010769)
-                      ) : (
-                        'Calculated at checkout'
-                      )}
-                    </span>
-                  </div>
+
                   
                   {/* Promo Code Input */}
                   <div className="py-2 border-t border-zinc-800/50 mt-2">
