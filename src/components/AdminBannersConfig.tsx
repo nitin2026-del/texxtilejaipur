@@ -30,7 +30,7 @@ export const AdminBannersConfig = () => {
 
       if (data) {
         setBannerActive(data.is_active || false);
-        const ts = data.discount_value || Date.now();
+        const ts = data.discount_value || (Math.floor(Date.now() / 1000) % 10000000);
         setBannerUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products/sale-banner.png?v=${ts}`);
       }
     } catch (err) {
@@ -52,9 +52,10 @@ export const AdminBannersConfig = () => {
         .from('coupons')
         .select('id, discount_value')
         .eq('code', CONFIG_CODE)
-        .single();
+        .maybeSingle();
 
-      const ts = newTs || (existing?.discount_value || Date.now());
+      const defaultTs = Math.floor(Date.now() / 1000) % 10000000;
+      const ts = newTs || (existing?.discount_value || defaultTs);
 
       const payload = {
         code: CONFIG_CODE,
@@ -63,10 +64,12 @@ export const AdminBannersConfig = () => {
         is_active: active
       };
 
-      if (existing) {
-        await supabase.from('coupons').update(payload).eq('id', existing.id);
+      if (existing && existing.id) {
+        const { error } = await supabase.from('coupons').update(payload).eq('id', existing.id);
+        if (error) throw error;
       } else {
-        await supabase.from('coupons').insert([payload]);
+        const { error } = await supabase.from('coupons').insert([payload]);
+        if (error) throw error;
       }
       setMessage({ text: 'Banner settings saved successfully!', type: 'success' });
       setTimeout(() => setMessage({ text: '', type: '' }), 3000);
@@ -102,15 +105,15 @@ export const AdminBannersConfig = () => {
 
       if (error) throw error;
       
-      const newTs = Date.now();
+      const newTs = Math.floor(Date.now() / 1000) % 10000000;
       setBannerUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products/sale-banner.png?v=${newTs}`);
       await handleSave(bannerActive, newTs);
       
       setMessage({ text: 'Banner uploaded successfully!', type: 'success' });
       setTimeout(() => setMessage({ text: '', type: '' }), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error uploading banner:', err);
-      setMessage({ text: 'Error uploading banner.', type: 'error' });
+      setMessage({ text: err?.message || 'Error uploading banner.', type: 'error' });
     } finally {
       setUploading(false);
     }
