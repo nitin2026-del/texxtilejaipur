@@ -69,7 +69,7 @@ interface CartContextType {
   getCartTotalInr: () => number;
   getCartTotalDisplay: () => number;
   appliedCoupon: Coupon | null;
-  applyCoupon: (code: string) => Promise<{ success: boolean; message: string }>;
+  applyCoupon: (code: string) => Promise<{ success: boolean; message: string; shortfallInr?: number }>;
   removeCoupon: () => void;
 }
 
@@ -244,7 +244,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Check minimum order value
       if (couponData.min_order_value && getCartSubtotalInr() < couponData.min_order_value) {
-        return { success: false, message: `Minimum order value of ₹${couponData.min_order_value} required.` };
+        const shortfall = couponData.min_order_value - getCartSubtotalInr();
+        const formattedShortfall = formatPrice(shortfall);
+        return { success: false, message: `Add ${formattedShortfall} more to use this coupon!`, shortfallInr: shortfall };
       }
 
       const coupon: Coupon = {

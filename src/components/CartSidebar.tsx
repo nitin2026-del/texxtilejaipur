@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { X, ShoppingBag, Plus, Minus, Trash2, ShieldCheck, ArrowRight, Info } from 'lucide-react';
+import { X, ShoppingBag, Plus, Minus, Trash2, ShieldCheck, ArrowRight, Info, Sparkles } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
+  const [suggestedProducts, setSuggestedProducts] = useState<any[]>([]);
   const [shippingConfig, setShippingConfig] = useState<{ standard_price: number; is_free_shipping: boolean } | null>(null);
 
   useEffect(() => {
@@ -178,9 +180,21 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                       <button 
                         onClick={async () => {
                           if(!couponCode) return;
+                          setSuggestedProducts([]);
                           const res = await applyCoupon(couponCode);
                           setCouponMsg({ type: res.success ? 'success' : 'error', text: res.message });
-                          if(res.success) setCouponCode('');
+                          if(res.success) {
+                            setCouponCode('');
+                          } else if (res.shortfallInr) {
+                            // Fetch 2 products roughly around or slightly above the shortfall price
+                            const { data } = await supabase
+                              .from('products')
+                              .select('id, name, price, product_images(url, is_primary)')
+                              .gte('price', res.shortfallInr)
+                              .order('price', { ascending: true })
+                              .limit(2);
+                            if (data) setSuggestedProducts(data);
+                          }
                         }}
                         className="bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors"
                       >
@@ -188,9 +202,35 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                       </button>
                     </div>
                     {couponMsg.text && (
-                      <p className={`text-[10px] mt-1.5 ${couponMsg.type === 'success' ? 'text-amber-500' : 'text-red-400'}`}>
-                        {couponMsg.text}
-                      </p>
+                      <div className="mt-1.5">
+                        <p className={`text-[10px] ${couponMsg.type === 'success' ? 'text-amber-500' : 'text-red-400'}`}>
+                          {couponMsg.text}
+                        </p>
+                        {suggestedProducts.length > 0 && couponMsg.type === 'error' && (
+                          <div className="mt-3 bg-zinc-900 border border-zinc-800 rounded-lg p-2.5">
+                            <p className="text-[10px] text-zinc-400 mb-2 font-medium flex items-center gap-1">
+                              <Sparkles className="h-3 w-3 text-gold" /> Suggested Add-ons:
+                            </p>
+                            <div className="flex flex-col gap-2">
+                              {suggestedProducts.map(sp => {
+                                const imgUrl = sp.product_images?.find((img: any) => img.is_primary)?.url || sp.product_images?.[0]?.url;
+                                return (
+                                  <div key={sp.id} onClick={() => goToProduct(sp.id)} className="flex items-center gap-2.5 bg-zinc-950 p-1.5 rounded cursor-pointer hover:bg-zinc-800 transition-colors border border-zinc-800 hover:border-zinc-700">
+                                    <div className="h-10 w-8 rounded overflow-hidden bg-zinc-800 shrink-0">
+                                      {imgUrl && <img src={imgUrl} alt={sp.name} className="h-full w-full object-cover" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[10px] text-zinc-200 truncate font-medium">{sp.name}</p>
+                                      <p className="text-[10px] text-gold">{formatPrice(sp.price)}</p>
+                                    </div>
+                                    <ArrowRight className="h-3 w-3 text-zinc-600 mr-1" />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
 
