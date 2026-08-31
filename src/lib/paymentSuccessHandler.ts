@@ -1,5 +1,11 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { generateInvoiceBuffer } from './invoiceGenerator';
+import crypto from 'crypto';
+
+const hashMeta = (val?: string) => {
+  if (!val) return undefined;
+  return crypto.createHash('sha256').update(val.trim().toLowerCase()).digest('hex');
+};
 
 export async function handlePaymentSuccess(orderId: string, supabaseAdmin: SupabaseClient) {
   try {
@@ -99,7 +105,14 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
             event_id: orderId,
             action_source: 'website',
             user_data: {
-              // Hashing would go here if needed, but not strictly required by this prompt
+              em: hashMeta(userEmail) ? [hashMeta(userEmail)] : undefined,
+              ph: hashMeta(userPhone) ? [hashMeta(userPhone)] : undefined,
+              fn: hashMeta(userName?.split(' ')[0]) ? [hashMeta(userName?.split(' ')[0])] : undefined,
+              ct: hashMeta(userCity) ? [hashMeta(userCity)] : undefined,
+              st: hashMeta(userState) ? [hashMeta(userState)] : undefined,
+              zp: hashMeta(userZip) ? [hashMeta(userZip)] : undefined,
+              country: hashMeta(userCountry) ? [hashMeta(userCountry)] : undefined,
+              external_id: hashMeta(order?.user_id) ? [hashMeta(order?.user_id)] : undefined,
             },
             custom_data: {
               currency: 'USD',
