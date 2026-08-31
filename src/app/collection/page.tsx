@@ -74,5 +74,27 @@ export default async function CollectionPage() {
     console.error('Failed to fetch products', err);
   }
 
-  return <CollectionPageClient initialProducts={products} categories={categories} />;
+  let saleBanner = null;
+  try {
+    const bannerRes = await fetch(
+      `${url}/rest/v1/coupons?code=eq.SYS_BANNER_CONFIG&select=is_active,discount_value`,
+      {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        next: { revalidate: 60 }
+      }
+    );
+    if (bannerRes.ok) {
+      const bData = await bannerRes.json();
+      if (bData && bData.length > 0) {
+        const config = bData[0];
+        if (config.is_active) {
+          saleBanner = `${url}/storage/v1/object/public/products/sale-banner.png?v=${config.discount_value}`;
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch banner config', err);
+  }
+
+  return <CollectionPageClient initialProducts={products} categories={categories} saleBanner={saleBanner} />;
 }

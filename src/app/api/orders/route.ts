@@ -142,9 +142,11 @@ export async function POST(req: NextRequest) {
         
       if (shipConfig) {
         if (shipping_method === 'standard') {
-          dbShippingCostInr = shipConfig.usage_limit === 1 ? 0 : (shipConfig.min_order_value || 0);
+          const usdPrice = shipConfig.usage_limit === 1 ? 0 : (shipConfig.min_order_value || 0);
+          dbShippingCostInr = usdPrice / 0.010769;
         } else {
-          dbShippingCostInr = shipConfig.discount_value || 0;
+          const usdPrice = shipConfig.discount_value || 0;
+          dbShippingCostInr = usdPrice / 0.010769;
         }
       }
     } catch (err) {

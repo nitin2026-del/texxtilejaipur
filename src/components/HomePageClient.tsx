@@ -35,10 +35,9 @@ interface Category {
 interface HomePageClientProps {
   products: Product[];
   dbCategories: Category[];
-  saleBanner?: string | null;
 }
 
-export function HomePageClient({ products, dbCategories, saleBanner }: HomePageClientProps) {
+export function HomePageClient({ products, dbCategories }: HomePageClientProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMainCategory, setSelectedMainCategory] = useState('All');
   const [selectedSubCategory, setSelectedSubCategory] = useState('All');
@@ -138,17 +137,6 @@ export function HomePageClient({ products, dbCategories, saleBanner }: HomePageC
     <main className="min-h-screen text-zinc-900 pb-16 bg-[#FDFBF7]">
       {/* Navigation */}
       <Navbar onCartOpen={() => setCartOpen(true)} />
-
-      {saleBanner && (
-        <div className="w-full pt-[115px] md:pt-[125px] bg-zinc-900 flex justify-center border-b border-zinc-800">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
-            src={saleBanner} 
-            alt="Promotional Banner" 
-            className="w-full max-w-[1920px] max-h-[600px] object-cover sm:object-contain"
-          />
-        </div>
-      )}
 
       {/* Hero Section */}
       <section className="relative w-full h-[72vh] sm:h-screen min-h-[500px] sm:min-h-[700px] flex flex-col justify-end sm:justify-center overflow-hidden">

@@ -28,9 +28,10 @@ type SortOption = 'featured' | 'price-low-high' | 'price-high-low' | 'newest';
 interface CollectionPageClientProps {
   initialProducts: Product[];
   categories: string[];
+  saleBanner?: string | null;
 }
 
-export function CollectionPageClient({ initialProducts, categories }: CollectionPageClientProps) {
+export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ initialProducts, categories, saleBanner }) => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [products] = useState<Product[]>(initialProducts);
   
@@ -98,37 +99,17 @@ export function CollectionPageClient({ initialProducts, categories }: Collection
 
       <div className="pt-12 md:pt-16 pb-8 md:pb-24 max-w-[1400px] mx-auto px-4 md:px-6">
 
-        {/* Spider-Verse Sale Banner */}
-        <div className="mb-12 w-full bg-black rounded-xl shadow-[0_0_40px_rgba(220,38,38,0.2)] overflow-hidden relative group cursor-default border-2 border-red-600/30">
-          {/* Red/Blue Comic Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 via-black to-blue-600/20"></div>
-          
-          {/* Halftone / Comic Dot Pattern */}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dots-pattern.png')] opacity-20 mix-blend-overlay"></div>
-          
-          {/* Glitch / Web Animated Lines */}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/line-diagonal.png')] opacity-10"></div>
-          <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-red-500/10 to-transparent group-hover:animate-[shimmer_2s_infinite]"></div>
-
-          <div className="px-6 py-12 md:py-16 text-center relative z-10 flex flex-col items-center">
-            {/* Sale Tag */}
-            <div className="inline-flex items-center gap-2 px-5 py-1.5 bg-red-600 rounded-sm text-white text-xs md:text-sm font-black tracking-[0.25em] uppercase mb-6 shadow-[4px_4px_0_rgba(0,0,0,1)] border border-white/20 transform -skew-x-12">
-              <Sparkles className="h-4 w-4" />
-              <span>Limited Time Drop</span>
-            </div>
-            
-            {/* Main Headline */}
-            <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-red-100 to-red-500 mb-6 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)] tracking-tighter uppercase italic transform -skew-x-6">
-              Beyond The<br className="md:hidden" /> Spider-Verse Collection
-            </h2>
-            
-            {/* Subtext */}
-            <p className="text-base md:text-lg text-blue-100/80 max-w-2xl mx-auto font-medium leading-relaxed tracking-wide font-mono">
-              AN EXTRAORDINARILY RARE OPPORTUNITY. <br className="hidden md:block"/>
-              AQUIRE HANDCRAFTED JACKETS AT MULTIVERSE-SHATTERING PRICES.
-            </p>
+        {/* Dynamic Sale Banner */}
+        {saleBanner && (
+          <div className="mb-12 w-full flex justify-center bg-zinc-900 overflow-hidden rounded-xl border border-zinc-800">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src={saleBanner} 
+              alt="Promotional Banner" 
+              className="w-full max-h-[500px] object-cover sm:object-contain"
+            />
           </div>
-        </div>
+        )}
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Mobile Filter Toggle Pill */}
