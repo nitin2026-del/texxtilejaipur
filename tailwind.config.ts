@@ -38,7 +38,7 @@ const config: Config = {
         'fade-in': 'fadeIn 0.5s ease-out',
         'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
         'slow-zoom': 'slowZoom 10s linear infinite alternate',
-        'marquee': 'marquee 45s linear infinite',
+        'marquee': 'marquee 65s linear infinite',
         'float': 'float 3s ease-in-out infinite',
       },
       keyframes: {
