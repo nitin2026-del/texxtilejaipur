@@ -1607,7 +1607,7 @@ function AdminPortalContent() {
       <div className={`max-w-7xl mx-auto pt-28 px-6 space-y-8 ${isDenied ? 'opacity-0 pointer-events-none' : ''}`}>
         
         {/* Tab Controls Bar */}
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-zinc-200 pb-4">
+        <div className="flex flex-col gap-4 border-b border-zinc-200 pb-4">
           <div className="space-y-1">
             <h2 className="text-2xl font-black tracking-tight flex items-center gap-2">
               Welcome Back, Admin
@@ -1615,10 +1615,10 @@ function AdminPortalContent() {
             <p className="text-xs text-zinc-500">Manage catalog and ship Indian block-print textile orders globally.</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 bg-[#FDFBF7] border border-zinc-200 p-1 rounded-xl shrink-0">
+          <div className="flex items-center gap-2 bg-[#FDFBF7] border border-zinc-200 p-1 rounded-xl w-full overflow-x-auto hide-scrollbar touch-pan-x snap-x">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'overview'
                   ? 'bg-violet-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1628,7 +1628,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('catalog')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'catalog'
                   ? 'bg-violet-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1638,7 +1638,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => { resetProductForm(); setActiveTab('form'); }}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'form'
                   ? 'bg-violet-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1648,7 +1648,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('categories')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'categories'
                   ? 'bg-violet-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1658,7 +1658,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('blogs')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'blogs'
                   ? 'bg-violet-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1668,7 +1668,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('coupons')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'coupons'
                   ? 'bg-amber-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1678,7 +1678,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('inquiries')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'inquiries'
                   ? 'bg-rose-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1688,7 +1688,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('behind_the_scenes')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'behind_the_scenes'
                   ? 'bg-emerald-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1698,7 +1698,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('newsletters')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'newsletters'
                   ? 'bg-blue-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1708,7 +1708,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('reviews')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'reviews'
                   ? 'bg-indigo-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1718,7 +1718,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('shipping')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'shipping'
                   ? 'bg-brand-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'
@@ -1728,7 +1728,7 @@ function AdminPortalContent() {
             </button>
             <button
               onClick={() => setActiveTab('banners')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'banners'
                   ? 'bg-brand-600 text-white'
                   : 'text-zinc-500 hover:text-zinc-700'

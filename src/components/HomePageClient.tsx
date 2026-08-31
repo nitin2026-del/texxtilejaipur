@@ -140,7 +140,7 @@ export function HomePageClient({ products, dbCategories, saleBanner }: HomePageC
       <Navbar onCartOpen={() => setCartOpen(true)} />
 
       {saleBanner && (
-        <div className="w-full pt-[60px] md:pt-[72px] bg-zinc-900 flex justify-center border-b border-zinc-800">
+        <div className="w-full pt-[115px] md:pt-[125px] bg-zinc-900 flex justify-center border-b border-zinc-800">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src={saleBanner} 

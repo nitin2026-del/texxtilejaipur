@@ -271,7 +271,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
     <main className="min-h-screen text-zinc-900 pb-16">
       <Navbar onCartOpen={() => setCartOpen(true)} />
 
-      <div className="pt-4 md:pt-8 px-4 md:px-6 max-w-7xl mx-auto">
+      <div className="pt-28 md:pt-32 px-4 md:px-6 max-w-7xl mx-auto">
         {/* Back Button */}
         <Link 
           href={product ? `/collection#product-${product.id}` : '/collection'}

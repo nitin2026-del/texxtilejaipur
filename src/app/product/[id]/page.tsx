@@ -117,7 +117,7 @@ export default async function ProductPage({ params }: Props) {
     if (!product) return notFound();
 
     // 2. Fetch Related Products
-    const relatedRes = await fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&limit=4&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}`, {
+    const relatedRes = await fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
       next: { revalidate: 60 }
     });
