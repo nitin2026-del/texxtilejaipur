@@ -131,10 +131,27 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // B. Add shipping fee securely
-    // 0 for standard, $10 USD for express
-    const shippingCostInr = shipping_method === 'express' ? 10 / 0.010769 : 0; 
-    finalTotalInr += shippingCostInr;
+    // B. Add shipping fee securely via SYS_SHIPPING_CONFIG
+    let dbShippingCostInr = shipping_method === 'express' ? (10 / 0.010769) : 0;
+    try {
+      const { data: shipConfig } = await supabaseAdmin
+        .from('coupons')
+        .select('*')
+        .eq('code', 'SYS_SHIPPING_CONFIG')
+        .single();
+        
+      if (shipConfig) {
+        if (shipping_method === 'standard') {
+          dbShippingCostInr = shipConfig.usage_limit === 1 ? 0 : (shipConfig.min_order_value || 0);
+        } else {
+          dbShippingCostInr = shipConfig.discount_value || 0;
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch shipping config', err);
+    }
+    
+    finalTotalInr += dbShippingCostInr;
 
     // C. Apply Coupon Discount securely from DB
     if (coupon_code) {
