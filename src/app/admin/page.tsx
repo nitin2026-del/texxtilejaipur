@@ -177,6 +177,7 @@ function AdminPortalContent() {
   const [btsDescription, setBtsDescription] = useState('');
   const [btsProductId, setBtsProductId] = useState('');
   const [btsProductSearch, setBtsProductSearch] = useState('');
+  const [btsProductDropdownOpen, setBtsProductDropdownOpen] = useState(false);
   const [btsFile, setBtsFile] = useState<File | null>(null);
   const [btsUploadProgress, setBtsUploadProgress] = useState(0);
   const [editingBtsId, setEditingBtsId] = useState<string | null>(null);
@@ -3116,29 +3117,48 @@ function AdminPortalContent() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Linked Product (Optional)</label>
-                  <input
-                    type="text"
-                    list="bts-products-list"
-                    value={btsProductSearch}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setBtsProductSearch(val);
-                      // Try to match the exact string "Name (SKU)"
-                      const matched = products.find(p => `${p.name} (${p.sku})` === val);
-                      if (matched) {
-                        setBtsProductId(matched.id);
-                      } else {
-                        setBtsProductId('');
-                      }
-                    }}
-                    placeholder="Search by name or SKU..."
-                    className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
-                  />
-                  <datalist id="bts-products-list">
-                    {products.map(p => (
-                      <option key={p.id} value={`${p.name} (${p.sku})`} />
-                    ))}
-                  </datalist>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={btsProductSearch}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setBtsProductSearch(val);
+                        setBtsProductDropdownOpen(true);
+                        if (val === '') {
+                          setBtsProductId('');
+                        }
+                      }}
+                      onFocus={() => setBtsProductDropdownOpen(true)}
+                      onBlur={() => setTimeout(() => setBtsProductDropdownOpen(false), 200)}
+                      placeholder="Search by name or SKU..."
+                      className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
+                    />
+                    {btsProductDropdownOpen && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-zinc-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        {products.filter(p => `${p.name} ${p.sku}`.toLowerCase().includes(btsProductSearch.toLowerCase())).map(p => (
+                          <div
+                            key={p.id}
+                            className="flex items-center gap-3 p-2 hover:bg-emerald-50 cursor-pointer border-b border-zinc-100 last:border-0"
+                            onClick={() => {
+                              setBtsProductId(p.id);
+                              setBtsProductSearch(`${p.name} (${p.sku})`);
+                              setBtsProductDropdownOpen(false);
+                            }}
+                          >
+                            <img src={p.images?.[0] || '/placeholder.png'} alt={p.name} className="w-10 h-10 object-cover rounded-md border border-zinc-200" />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-zinc-900">{p.name}</span>
+                              <span className="text-[10px] text-zinc-500">SKU: {p.sku}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {products.filter(p => `${p.name} ${p.sku}`.toLowerCase().includes(btsProductSearch.toLowerCase())).length === 0 && (
+                          <div className="p-3 text-xs text-zinc-500 text-center">No products found.</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-4 mb-4">
