@@ -231,6 +231,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const cleanCode = code.trim().toUpperCase();
     
     try {
+      if (cleanCode.startsWith('SYS_')) {
+        return { success: false, message: 'Invalid or expired promo code.' };
+      }
+
       const { data: couponData, error } = await supabase
         .from('coupons')
         .select('*')

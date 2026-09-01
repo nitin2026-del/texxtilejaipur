@@ -670,6 +670,7 @@ function AdminPortalContent() {
         supabase
           .from('coupons')
           .select('*')
+          .not('code', 'like', 'SYS_%')
           .order('created_at', { ascending: false }),
         supabase
           .from('product_inquiries')

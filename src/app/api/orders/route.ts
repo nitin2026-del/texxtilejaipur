@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
     finalTotalInr += dbShippingCostInr;
 
     // C. Apply Coupon Discount securely from DB
-    if (coupon_code) {
+    if (coupon_code && !coupon_code.trim().toUpperCase().startsWith('SYS_')) {
       const { data: couponData } = await supabaseAdmin
         .from('coupons')
         .select('*')
