@@ -57,7 +57,7 @@ export default function ReturnsPage() {
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-zinc-900 mb-4">Returns & Exchanges</h1>
           <p className="text-zinc-600 max-w-lg mx-auto text-lg">
-            Not completely in love? We offer a hassle-free 30-day return policy. Enter your order details below to get started.
+            We value our artistic creations and only accept returns for items that are damaged or incorrect upon arrival. Enter your order details below to request a return under these conditions.
           </p>
         </div>
 
@@ -71,8 +71,8 @@ export default function ReturnsPage() {
                     <RefreshCcw className="h-6 w-6 text-brand-700" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">Start a Return</h2>
-                    <p className="text-xs text-zinc-500">Have your order number ready</p>
+                    <h2 className="text-xl font-bold">Request a Return</h2>
+                    <p className="text-xs text-zinc-500">For damaged or wrong items only</p>
                   </div>
                 </div>
 
@@ -122,7 +122,7 @@ export default function ReturnsPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-zinc-900 mb-3">Order Found!</h2>
                 <p className="text-zinc-600 mb-8">
-                  We've sent a secure link to <strong>{email}</strong>. Please check your inbox to select the items you wish to return.
+                  We've sent a secure link to <strong>{email}</strong>. Please check your inbox and reply with photos of the damaged or incorrect items.
                 </p>
                 <button 
                   onClick={() => setStep('form')}
@@ -145,9 +145,9 @@ export default function ReturnsPage() {
                 </div>
               </div>
               <div>
-                <h4 className="font-bold text-zinc-900 mb-1">14-Day Window</h4>
+                <h4 className="font-bold text-zinc-900 mb-1">Strict Limitations</h4>
                 <p className="text-sm text-zinc-600 leading-relaxed">
-                  You have 14 days from the date of delivery to return or exchange your items. Items must be unworn, unwashed, and have original tags attached.
+                  We do NOT accept returns for "change of mind" or sizing issues. Each piece is handmade art and must be treated with respect. Returns are ONLY accepted for damaged or incorrect items.
                 </p>
               </div>
             </div>
@@ -161,9 +161,9 @@ export default function ReturnsPage() {
                 </div>
               </div>
               <div>
-                <h4 className="font-bold text-zinc-900 mb-1">Fast Refunds</h4>
+                <h4 className="font-bold text-zinc-900 mb-1">3-Day Window</h4>
                 <p className="text-sm text-zinc-600 leading-relaxed">
-                  Once we receive your return, refunds are processed within 3-5 business days directly to your original payment method.
+                  If your item is damaged or incorrect, you must report it within 3 days of delivery. Items must be unworn, unwashed, and have original tags attached.
                 </p>
               </div>
             </div>

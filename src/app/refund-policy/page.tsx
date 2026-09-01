@@ -28,58 +28,50 @@ export default function RefundPolicyPage() {
       <BottomNav onCartOpen={() => setCartOpen(true)} />
 
       <div className="pt-32 px-6 max-w-3xl mx-auto">
-        <h1 className="text-4xl font-serif font-bold text-zinc-900 mb-8">Refund & Return Policy</h1>
+        <h1 className="text-4xl font-serif font-bold text-zinc-900 mb-8">Our Philosophy & Return Policy</h1>
         
         <div className="prose prose-zinc max-w-none text-zinc-700 space-y-6">
           <section className="mb-12">
             <h2 className="text-2xl font-serif text-zinc-900 mb-6 font-bold flex items-center gap-3">
-              <Heart className="h-6 w-6 text-brand-600" /> Our Promise
+              <Heart className="h-6 w-6 text-brand-600" /> Respecting the Art
             </h2>
             <div className="bg-white p-8 rounded-xl shadow-sm border border-zinc-100 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-brand-600"></div>
               <p className="text-zinc-600 leading-relaxed text-lg">
-                We stand behind the quality of our handcrafted garments. If you are not completely satisfied with your purchase, we're here to help with our <strong>14-Day Money Back Guarantee</strong>.
+                Every piece we create is a labor of love, woven with dedication, time, and the soul of our artisans. We do not operate a factory of mass-produced goods, but a studio of artistic expression. As such, we ask that you respect the craft and purchase with intention. 
               </p>
             </div>
           </section>
 
-          <div className="bg-brand-50 border border-brand-200 p-6 rounded-xl my-8">
-            <h3 className="text-lg font-serif font-bold text-brand-900 mb-2">Ready to initiate a return?</h3>
-            <p className="text-sm text-brand-800 mb-4">Use our automated self-service portal to generate your return label instantly.</p>
-            <Link href="/returns" className="inline-flex items-center gap-2 bg-brand-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-brand-800 transition-colors shadow-sm">
-              Go to Returns Portal <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          
           <section className="mb-12">
             <h2 className="text-2xl font-serif text-zinc-900 mb-6 font-bold flex items-center gap-3">
-              <ShieldCheck className="h-6 w-6 text-brand-600" /> Return Eligibility
+              <ShieldCheck className="h-6 w-6 text-brand-600" /> Strict Return Eligibility
             </h2>
             <div className="bg-white p-8 rounded-xl shadow-sm border border-zinc-100">
-              <p className="text-zinc-600 leading-relaxed">
-                To be eligible for a return, your item must be unused, unwashed, and in the same condition that you received it. It must also be in the original packaging with all tags attached. Returns must be initiated within 14 days of receiving your order.
+              <p className="text-zinc-600 leading-relaxed font-semibold">
+                We do NOT accept returns for "change of mind" or arbitrary reasons. Treating our handmade art as something to casually try and discard diminishes the immense effort poured into every thread.
+              </p>
+              <p className="text-zinc-600 leading-relaxed mt-4">
+                Returns or exchanges are <strong>strictly limited</strong> to the following rare circumstances:
+              </p>
+              <ul className="list-disc pl-5 mt-4 space-y-2 text-zinc-600">
+                <li>You received a <strong>damaged</strong> or defective product.</li>
+                <li>You received the <strong>wrong</strong> item.</li>
+              </ul>
+              <p className="text-zinc-600 leading-relaxed mt-4">
+                If your situation meets these criteria, you must contact us within <strong>3 days</strong> of receiving the item. It must be unworn, unwashed, and in its exact original condition with all tags attached.
               </p>
             </div>
           </section>
 
-          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">2. Non-returnable Items</h2>
+          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">How to Request a Valid Return</h2>
           <p>
-            Certain types of items cannot be returned, including:
-          </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li>Custom-made or personalized garments.</li>
-            <li>Items marked as "Final Sale".</li>
-            <li>Intimates or swimwear (for hygiene reasons).</li>
-          </ul>
-
-          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">3. Refunds</h2>
-          <p>
-            Once your return is received and inspected by our Quality Control team in Jaipur, we will send you an email to notify you of the approval or rejection of your refund. If approved, your refund will be processed, and a credit will automatically be applied to your credit card or original method of payment within 5-7 business days.
+            If you have received a damaged or incorrect piece, please email us directly with clear photos of the issue. Our team will review your case. We reserve the right to deny any return that does not explicitly meet our criteria or appears to take advantage of our policies.
           </p>
 
-          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">4. Shipping Costs</h2>
+          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">Refunds & Processing</h2>
           <p>
-            We offer free return shipping for defective or incorrect items. For all other returns (e.g., sizing issues, change of mind), the cost of return shipping will be deducted from your total refund amount.
+            Once a valid return is received and inspected in our studio, we will notify you of the approval. If approved, your refund or replacement will be processed. We appreciate your understanding and support in valuing authentic artisan craftsmanship over fast fashion convenience.
           </p>
         </div>
       </div>

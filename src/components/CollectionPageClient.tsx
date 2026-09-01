@@ -289,8 +289,8 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
               <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center text-emerald-600 shadow-sm mb-4">
                 <Undo2 className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-zinc-900 mb-2">14-Day Easy Returns</h3>
-              <p className="text-sm text-zinc-600">Don't love the fit? We offer a hassle-free 14-day return policy globally with no questions asked.</p>
+              <h3 className="font-bold text-zinc-900 mb-2">Artisanal Commitment</h3>
+              <p className="text-sm text-zinc-600">Please choose carefully. As an artisanal studio, we only accept returns for damaged or incorrect items within 3 days.</p>
             </div>
           </div>
         </div>

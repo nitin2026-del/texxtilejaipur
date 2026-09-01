@@ -41,8 +41,8 @@ const reviewsData = [
     date: 'May 15, 2026',
     stars: 4,
     title: '"Gorgeous, but a slightly warmer tone"',
-    body: 'The jacket is gorgeous, though the base fabric is slightly more of a warm tan/mustard tone than the cool beige I saw on my screen. I briefly considered using their 14-day return policy, but once I put it on, I fell in love with how the dimensional green floral patterns pop. It\'s an earthy, beautiful piece that I\'ve decided to keep!',
-    reply: 'Thank you for your review, Ava! You are completely right—because the fabric is raw cotton, the natural dye can vary slightly in warmth from batch to batch. We\'re so glad you decided to keep it! 🥰'
+    body: 'The jacket is gorgeous, though the base fabric is slightly more of a warm tan/mustard tone than the cool beige I saw on my screen. However, once I put it on, I fell in love with how the dimensional green floral patterns pop. It\'s an earthy, beautiful piece that I\'ve decided to keep!',
+    reply: 'Thank you for your review, Ava! You are completely right—because the fabric is raw cotton, the natural dye can vary slightly in warmth from batch to batch. We\'re so glad you love it! 🥰'
   },
   {
     initial: 'L',

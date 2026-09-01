@@ -14,7 +14,7 @@ const FAQS = [
   },
   {
     question: "What is your return policy?",
-    answer: "We accept returns within 14 days of delivery for unworn items in their original condition with tags attached. Custom orders are final sale."
+    answer: "To protect the artistic integrity of our handcrafted pieces, we do not accept returns for change of mind. We accept returns strictly for damaged or incorrect items reported within 3 days of delivery."
   },
   {
     question: "Can I request custom sizing?",

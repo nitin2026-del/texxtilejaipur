@@ -21,8 +21,8 @@ const reviewsData = [
     date: 'May 14, 2026',
     stars: 3,
     title: '"Beautiful outerwear, but sizing runs a bit small"',
-    body: 'I really wanted to love this. The heavy velvet is gorgeous and the vintage stitching is top tier. However, the jacket runs quite small across the shoulders for me. Also, you have to be careful as the intricate embroidery threads can catch on jewelry. I used the 14-day return policy to exchange it for a larger size, and customer support was fantastic in helping me process it.',
-    reply: 'We appreciate your honest feedback, Megan! Handcrafted sizing can occasionally vary slightly. We\'re so glad our support team could get that larger size sent out to you quickly! ✨'
+    body: 'I really wanted to love this. The heavy velvet is gorgeous and the vintage stitching is top tier. However, the jacket runs quite small across the shoulders for me. Also, you have to be careful as the intricate embroidery threads can catch on jewelry. I gifted it to my daughter and she looks incredible in it.',
+    reply: 'We appreciate your honest feedback, Megan! Handcrafted sizing can occasionally vary slightly. We\'re glad your daughter is enjoying this beautiful piece! ✨'
   },
   {
     initial: 'J',

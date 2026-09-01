@@ -82,10 +82,10 @@ const reviewsData = [
     location: '📍 Chicago, IL',
     date: 'February 2, 2026',
     stars: 2,
-    title: '"Too short for tall girls, but free returns"',
-    body: 'The embroidery is stunning, but the sleeves were just too short for me (I\'m 5\'10"). I used their automated portal for a free return label and dropped it off the same day. Great return policy, just wish they had a tall fit.',
+    title: '"Too short for tall girls"',
+    body: 'The embroidery is stunning, but the sleeves were just too short for me (I\'m 5\'10"). I ended up gifting it to my sister who loves it. Just wish they had a tall fit.',
     isVerified: true,
-    reply: 'Hi Nadia! We are so sorry the sleeve length wasn\'t a fit. Please note that you can always email us for custom sleeve lengths on your next order! 💛'
+    reply: 'Hi Nadia! We are so glad your sister loves it. Please note that you can always email us for custom sleeve lengths on your next order! 💛'
   },
   {
     initial: 'O',

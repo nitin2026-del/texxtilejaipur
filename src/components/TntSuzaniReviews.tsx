@@ -41,8 +41,8 @@ const reviewsData = [
     date: 'May 24, 2026',
     stars: 3,
     title: '"Beautiful, but sizing was tricky"',
-    body: 'The handcrafted floral embroidery on this cotton layer is stunning in person. However, I found the sizing across the bust to be a bit tighter than expected for my body type. Thankfully, their 14-day return policy is totally hassle-free. Customer support helped me process the exchange for a larger size immediately.',
-    reply: 'Thank you for your feedback, Sarah! Handcrafted cotton can occasionally have slight fit variations. We\'re so glad our support team could get that larger size sent out to you quickly! 💛'
+    body: 'The handcrafted floral embroidery on this cotton layer is stunning in person. However, I found the sizing across the bust to be a bit tighter than expected for my body type. I\'ll keep it and wear it open, it still looks fabulous.',
+    reply: 'Thank you for your feedback, Sarah! Next time, feel free to reach out to our team for custom sizing options before ordering! 💛'
   },
   {
     initial: 'M',
