@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Volume2, VolumeX, Heart, Share2, ShoppingBag, ChevronLeft } from 'lucide-react';
+import { Volume2, VolumeX, Heart, Share2, ShoppingBag, ChevronLeft, ChevronDown } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { CartSidebar } from '@/components/CartSidebar';
 import Link from 'next/link';
@@ -29,6 +29,34 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
   
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  // Handle scroll hint visibility
+  useEffect(() => {
+    if (reels.length <= 1) {
+      setShowScrollHint(false);
+      return;
+    }
+    
+    // Auto-hide after 6 seconds
+    const timer = setTimeout(() => setShowScrollHint(false), 6000);
+    
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (container.scrollTop > 20) {
+        setShowScrollHint(false);
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(timer);
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [reels.length]);
 
   // Handle scroll snapping to play/pause correct video
   useEffect(() => {
@@ -91,6 +119,16 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
 
             {/* Overlay UI */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 pointer-events-none" />
+            
+            {/* Scroll Hint Overlay (Only on first reel) */}
+            {index === 0 && showScrollHint && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20 transition-opacity duration-500">
+                <div className="flex flex-col items-center animate-bounce mt-48 bg-black/40 backdrop-blur-md px-6 py-4 rounded-3xl shadow-2xl border border-white/10">
+                  <span className="text-white font-bold text-sm mb-1 drop-shadow-md tracking-wide uppercase">Swipe Up</span>
+                  <ChevronDown className="w-8 h-8 text-white drop-shadow-md" />
+                </div>
+              </div>
+            )}
             
             {/* Top controls */}
             <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10">
