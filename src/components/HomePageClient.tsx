@@ -185,9 +185,9 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
               <a href="#categories" className="px-8 py-3 sm:px-10 sm:py-4 bg-white text-zinc-950 hover:bg-brand-50 text-xs sm:text-sm font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow-xl">
                 Explore Collection
               </a>
-              <div className="flex items-center gap-2 text-white/60 text-[10px] sm:text-xs font-medium">
-                <ShieldCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 shrink-0" />
-                <span>Secure Payments &bull; 14-Day Returns &bull; Fast UPS Express</span>
+              <div className="flex items-center justify-center gap-2 text-xs md:text-sm font-medium text-white/90">
+                <ShieldCheck className="h-4 w-4" />
+                <span>Secure Payments &bull; Artisanal Quality &bull; Fast UPS Express</span>
               </div>
             </div>
           </div>
@@ -199,14 +199,14 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
         <div className="whitespace-nowrap flex animate-marquee items-center text-xs font-bold tracking-widest uppercase opacity-90">
           <span className="mx-8">✦ FAST UPS EXPRESS WORLDWIDE</span>
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
-          <span className="mx-8">✦ 14-DAY MONEY BACK GUARANTEE</span>
+          <span className="mx-8">✦ 100% HANDCRAFTED ART</span>
           <span className="mx-8">✦ TRUSTED BY 3,200+ BUYERS</span>
           <span className="mx-8">✦ WE SHIP TO EVERY COUNTRY</span>
           <span className="mx-8">✦ SECURE PAYPAL CHECKOUT</span>
           <span className="mx-8">✦ 400+ YEARS OF CRAFT HERITAGE</span>
           <span className="mx-8">✦ FAST UPS EXPRESS WORLDWIDE</span>
           <span className="mx-8">✦ HANDCRAFTED IN JAIPUR</span>
-          <span className="mx-8">✦ 14-DAY MONEY BACK GUARANTEE</span>
+          <span className="mx-8">✦ 100% HANDCRAFTED ART</span>
           <span className="mx-8">✦ TRUSTED BY 3,200+ BUYERS</span>
           <span className="mx-8">✦ WE SHIP TO EVERY COUNTRY</span>
         </div>
@@ -502,7 +502,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
               { number: '3,200+', label: 'Happy Customers Worldwide', icon: '🌍' },
               { number: '400+', label: 'Years of Craft Heritage', icon: '🏺' },
               { number: '4.9★', label: 'Average Customer Rating', icon: '⭐' },
-              { number: '14-Day', label: 'No-Questions Returns', icon: '✅' },
+              { number: '3-Day', label: 'Damage Replacements', icon: '✅' },
             ].map((stat) => (
               <div key={stat.label} className="flex flex-col items-center text-center p-5 bg-white/5 rounded-2xl border border-white/10">
                 <span className="text-2xl mb-2">{stat.icon}</span>
@@ -525,7 +525,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
             {[
               { icon: '🚀', title: 'UPS Express — Delivered Worldwide', desc: 'All orders ship via UPS Express Worldwide. Fast, fully tracked delivery to every country on the globe. Full tracking number provided on dispatch.' },
               { icon: '🔒', title: 'Secure & Trusted Payments', desc: 'Pay by Visa, Mastercard, Amex or PayPal. All transactions are 256-bit SSL encrypted and PayPal buyer-protected. No hidden fees.' },
-              { icon: '🤝', title: '14-Day No-Questions Returns', desc: 'Not happy? Return your item within 14 days for a full refund — no questions asked. We want you to love every piece you order.' },
+              { icon: '🎨', title: 'Artisanal Commitment', desc: 'Please choose carefully. As an artisanal studio, we strictly accept returns only for damaged or incorrect items within 3 days.' },
               { icon: '🛃', title: 'We Handle All Customs & Duties', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork and customs declarations. You receive the package — we handle the rest.' },
               { icon: '🧵', title: '100% Genuinely Handcrafted', desc: 'Every product is hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur, Rajasthan. No factory production — ever.' },
               { icon: '💬', title: 'Real Customer Support', desc: 'Questions before you buy? Email us at textileofrajasthan.info[at]gmail.com or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },

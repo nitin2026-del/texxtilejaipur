@@ -59,11 +59,11 @@ export async function POST(req: NextRequest) {
     
     const finalEmail = email;
 
-    // 3. Verify 14-Day Window
+    // 3. Verify 3-Day Window
     const orderDate = new Date(orderData.created_at);
     const daysSinceOrder = (new Date().getTime() - orderDate.getTime()) / (1000 * 3600 * 24);
-    if (daysSinceOrder > 14) {
-      return NextResponse.json({ error: 'Order is past the 14-day return window.' }, { status: 400 });
+    if (daysSinceOrder > 3) {
+      return NextResponse.json({ error: 'Order is past the strict 3-day return window.' }, { status: 400 });
     }
 
     const finalName = (orderData.shipping_addresses as any)?.full_name || 'Customer';

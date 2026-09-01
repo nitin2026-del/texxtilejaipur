@@ -811,7 +811,10 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                           <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                         </summary>
                         <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          14-day hassle-free returns on all unworn items. We will take care of all taxes and duties.
+                          <h4 className="font-bold text-zinc-900 mb-1 text-sm">Strict Quality Assurance</h4>
+                          <p className="text-zinc-600 text-xs">
+                            Strictly 3-day returns for damaged or incorrect items only. We will take care of all taxes and duties.
+                          </p>
                         </div>
                       </details>
                     </div>
