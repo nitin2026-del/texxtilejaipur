@@ -1045,6 +1045,30 @@ function AdminPortalContent() {
     }
   };
 
+  const handleBtsMove = async (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= behindTheScenesItems.length) return;
+    
+    setActionLoading(true);
+    try {
+      const items = [...behindTheScenesItems];
+      const temp = items[index];
+      items[index] = items[newIndex];
+      items[newIndex] = temp;
+      
+      const updates = items.map((item, i) => 
+        supabase.from('behind_the_scenes').update({ display_order: i }).eq('id', item.id)
+      );
+      
+      await Promise.all(updates);
+      fetchDashboardData();
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to move item', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleBtsShuffle = async () => {
     if (!window.confirm('Are you sure you want to shuffle the display order of all published moments?')) return;
     setActionLoading(true);
@@ -3245,7 +3269,7 @@ function AdminPortalContent() {
                 </div>
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {behindTheScenesItems.map((item) => (
+                  {behindTheScenesItems.map((item, index) => (
                     <div key={item.id} className="relative group rounded-xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
                       <div className="aspect-[4/5] bg-zinc-100 relative">
                         {item.media_url?.toLowerCase().includes('.mp4') || item.media_url?.toLowerCase().includes('.mov') ? (
@@ -3254,6 +3278,18 @@ function AdminPortalContent() {
                           <img src={item.media_url} alt={item.title} className="w-full h-full object-cover" />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                          <div className="absolute top-2 left-2 flex gap-1 pointer-events-auto">
+                            {index > 0 && (
+                              <button onClick={() => handleBtsMove(index, 'up')} className="p-1.5 bg-zinc-800/80 hover:bg-zinc-700 text-white rounded-lg transition-colors" title="Move earlier">
+                                <ArrowLeft className="h-4 w-4" />
+                              </button>
+                            )}
+                            {index < behindTheScenesItems.length - 1 && (
+                              <button onClick={() => handleBtsMove(index, 'down')} className="p-1.5 bg-zinc-800/80 hover:bg-zinc-700 text-white rounded-lg transition-colors" title="Move later">
+                                <ArrowRight className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
                           <div className="absolute top-2 right-2 flex gap-2 pointer-events-auto">
                             <button
                               onClick={() => handleBtsEditClick(item)}
