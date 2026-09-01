@@ -69,6 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           .select('*')
           .eq('is_active', true)
           .not('code', 'ilike', 'VIP10-%')
+          .not('code', 'ilike', 'SYS_%')
           .limit(1)
           .maybeSingle();
           

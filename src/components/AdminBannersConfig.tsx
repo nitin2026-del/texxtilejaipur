@@ -23,14 +23,14 @@ export const AdminBannersConfig = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('coupons')
+        .from('site_settings')
         .select('*')
-        .eq('code', CONFIG_CODE)
+        .eq('key', CONFIG_CODE)
         .single();
 
-      if (data) {
-        setBannerActive(data.is_active || false);
-        const ts = data.discount_value || (Math.floor(Date.now() / 1000) % 10000000);
+      if (data && data.value) {
+        setBannerActive(data.value.is_active || false);
+        const ts = data.value.discount_value || (Math.floor(Date.now() / 1000) % 10000000);
         setBannerUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products/sale-banner.png?v=${ts}`);
       }
     } catch (err) {
@@ -49,26 +49,27 @@ export const AdminBannersConfig = () => {
     setSaving(true);
     try {
       const { data: existing } = await supabase
-        .from('coupons')
-        .select('id, discount_value')
-        .eq('code', CONFIG_CODE)
+        .from('site_settings')
+        .select('id, value')
+        .eq('key', CONFIG_CODE)
         .maybeSingle();
 
       const defaultTs = Math.floor(Date.now() / 1000) % 10000000;
-      const ts = newTs || (existing?.discount_value || defaultTs);
+      const ts = newTs || (existing?.value?.discount_value || defaultTs);
 
       const payload = {
-        code: CONFIG_CODE,
-        discount_type: 'fixed',
-        discount_value: ts,
-        is_active: active
+        key: CONFIG_CODE,
+        value: {
+          discount_value: ts,
+          is_active: active
+        }
       };
 
       if (existing && existing.id) {
-        const { error } = await supabase.from('coupons').update(payload).eq('id', existing.id);
+        const { error } = await supabase.from('site_settings').update(payload).eq('id', existing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('coupons').insert([payload]);
+        const { error } = await supabase.from('site_settings').insert([payload]);
         if (error) throw error;
       }
       setMessage({ text: 'Banner settings saved successfully!', type: 'success' });
