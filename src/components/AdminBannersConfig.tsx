@@ -50,7 +50,7 @@ export const AdminBannersConfig = () => {
     try {
       const { data: existing } = await supabase
         .from('site_settings')
-        .select('id, value')
+        .select('key, value')
         .eq('key', CONFIG_CODE)
         .maybeSingle();
 
@@ -65,8 +65,8 @@ export const AdminBannersConfig = () => {
         }
       };
 
-      if (existing && existing.id) {
-        const { error } = await supabase.from('site_settings').update(payload).eq('id', existing.id);
+      if (existing && existing.key) {
+        const { error } = await supabase.from('site_settings').update(payload).eq('key', existing.key);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('site_settings').insert([payload]);
