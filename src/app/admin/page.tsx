@@ -176,6 +176,7 @@ function AdminPortalContent() {
   const [btsTitle, setBtsTitle] = useState('');
   const [btsDescription, setBtsDescription] = useState('');
   const [btsProductId, setBtsProductId] = useState('');
+  const [btsProductSearch, setBtsProductSearch] = useState('');
   const [btsFile, setBtsFile] = useState<File | null>(null);
   const [btsUploadProgress, setBtsUploadProgress] = useState(0);
   const [editingBtsId, setEditingBtsId] = useState<string | null>(null);
@@ -987,6 +988,7 @@ function AdminPortalContent() {
       setBtsTitle('');
       setBtsDescription('');
       setBtsProductId('');
+      setBtsProductSearch('');
       setBtsFile(null);
       setEditingBtsId(null);
       fetchDashboardData();
@@ -1005,9 +1007,14 @@ function AdminPortalContent() {
       const [desc, pid] = item.description.split('|||');
       setBtsDescription(desc);
       setBtsProductId(pid);
+      if (pid) {
+        const prod = products.find(p => p.id === pid);
+        if (prod) setBtsProductSearch(`${prod.name} (${prod.sku})`);
+      }
     } else {
       setBtsDescription(item.description || '');
       setBtsProductId('');
+      setBtsProductSearch('');
     }
     setBtsFile(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1018,6 +1025,7 @@ function AdminPortalContent() {
     setBtsTitle('');
     setBtsDescription('');
     setBtsProductId('');
+    setBtsProductSearch('');
     setBtsFile(null);
   };
 
@@ -3108,16 +3116,29 @@ function AdminPortalContent() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold mb-1.5 text-zinc-600">Linked Product (Optional)</label>
-                  <select
-                    value={btsProductId}
-                    onChange={(e) => setBtsProductId(e.target.value)}
+                  <input
+                    type="text"
+                    list="bts-products-list"
+                    value={btsProductSearch}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setBtsProductSearch(val);
+                      // Try to match the exact string "Name (SKU)"
+                      const matched = products.find(p => `${p.name} (${p.sku})` === val);
+                      if (matched) {
+                        setBtsProductId(matched.id);
+                      } else {
+                        setBtsProductId('');
+                      }
+                    }}
+                    placeholder="Search by name or SKU..."
                     className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs focus:border-emerald-500 focus:outline-none"
-                  >
-                    <option value="">No Product Linked</option>
+                  />
+                  <datalist id="bts-products-list">
                     {products.map(p => (
-                      <option key={p.id} value={p.id}>{p.name} ({p.sku})</option>
+                      <option key={p.id} value={`${p.name} (${p.sku})`} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-4 mb-4">
