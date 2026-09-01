@@ -14,7 +14,7 @@ import {
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, Search, Video, RefreshCcw, Flame, Image as ImageIcon
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, ArrowRight, Search, Video, RefreshCcw, Flame, Image as ImageIcon
 } from 'lucide-react';
 
 interface Product {
