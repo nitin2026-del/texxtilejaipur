@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { X, ShoppingBag, Plus, Minus, Trash2, ShieldCheck, ArrowRight, Info, Sparkles } from 'lucide-react';
+import { X, ShoppingBag, Plus, Minus, Trash2, ShieldCheck, ArrowRight, Info, Sparkles, Video } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface CartSidebarProps {
@@ -75,6 +75,14 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   <ShoppingBag className="h-16 w-16 text-zinc-700 mb-4 stroke-[1.5]" />
                   <p className="text-zinc-400 font-medium">Your cart is empty</p>
                   <p className="text-zinc-600 text-xs mt-1">Explore our premium textiles to add items</p>
+                  
+                  <div className="mt-8 p-5 bg-zinc-900/50 border border-zinc-800/80 rounded-2xl max-w-[280px]">
+                    <Sparkles className="h-6 w-6 text-brand-400 mx-auto mb-2" />
+                    <p className="text-zinc-300 text-sm font-semibold mb-3">Discover the magic behind the craft.</p>
+                    <Link href="/the-artisan-edit" onClick={onClose} className="px-6 py-2.5 bg-brand-600/90 text-white hover:bg-brand-500 rounded-full font-bold text-xs transition-colors shadow-lg shadow-brand-500/20 inline-flex items-center gap-2 w-full justify-center">
+                      <Video className="h-3.5 w-3.5" /> Watch The Artisan Edit
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 cart.map((item) => (
@@ -232,6 +240,21 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                         )}
                       </div>
                     )}
+                  </div>
+
+                  <div className="mt-4 mb-2">
+                    <Link href="/the-artisan-edit" onClick={onClose} className="w-full bg-zinc-900 border border-zinc-800 hover:border-brand-600/50 rounded-xl p-3 flex items-center justify-between group transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-brand-950/30 flex items-center justify-center text-brand-400 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                          <Video className="h-4 w-4" />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-xs font-bold text-zinc-200">See How It's Made</p>
+                          <p className="text-[10px] text-zinc-500">Watch our artisans at work</p>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-zinc-600 group-hover:text-brand-400 transition-colors" />
+                    </Link>
                   </div>
 
                   <div className="flex justify-between text-base font-serif font-semibold text-white pt-2 border-t border-zinc-800">
