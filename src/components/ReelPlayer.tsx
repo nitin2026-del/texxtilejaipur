@@ -23,7 +23,7 @@ interface Reel {
 
 export function ReelPlayer({ reels }: { reels: Reel[] }) {
   const [currentReelIndex, setCurrentReelIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { addToCart, cart } = useCart();
   
@@ -68,7 +68,20 @@ export function ReelPlayer({ reels }: { reels: Reel[] }) {
           
           if (entry.isIntersecting) {
             setCurrentReelIndex(index);
-            video.play().catch(e => console.log('Autoplay prevented:', e));
+            
+            // Try to play with current mute state
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(e => {
+                console.log('Autoplay prevented:', e);
+                // If unmuted autoplay fails, fallback to muted
+                if (!video.muted) {
+                  video.muted = true;
+                  setIsMuted(true);
+                  video.play().catch(console.error);
+                }
+              });
+            }
           } else {
             video.pause();
             video.currentTime = 0;
