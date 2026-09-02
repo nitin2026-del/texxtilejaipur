@@ -78,7 +78,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   
                   <div className="mt-8 p-5 bg-zinc-900/50 border border-zinc-800/80 rounded-2xl max-w-[280px]">
                     <Sparkles className="h-6 w-6 text-brand-400 mx-auto mb-2" />
-                    <p className="text-zinc-300 text-sm font-semibold mb-3">Discover the magic behind the craft.</p>
+                    <p className="text-zinc-300 text-sm font-semibold mb-3">See how our community styles their pieces.</p>
                     <Link href="/the-artisan-edit" onClick={onClose} className="px-6 py-2.5 bg-brand-600/90 text-white hover:bg-brand-500 rounded-full font-bold text-xs transition-colors shadow-lg shadow-brand-500/20 inline-flex items-center gap-2 w-full justify-center">
                       <Video className="h-3.5 w-3.5" /> Watch The Artisan Edit
                     </Link>
@@ -249,8 +249,8 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                           <Video className="h-4 w-4" />
                         </div>
                         <div className="text-left">
-                          <p className="text-xs font-bold text-zinc-200">See How It's Made</p>
-                          <p className="text-[10px] text-zinc-500">Watch our artisans at work</p>
+                          <p className="text-xs font-bold text-zinc-200">Loved By Our Community</p>
+                          <p className="text-[10px] text-zinc-500">See our pieces in the wild</p>
                         </div>
                       </div>
                       <ArrowRight className="h-4 w-4 text-zinc-600 group-hover:text-brand-400 transition-colors" />

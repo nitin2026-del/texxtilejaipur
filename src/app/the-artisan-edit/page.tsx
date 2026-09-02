@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export const metadata: Metadata = {
   title: 'The Artisan Edit | Textile Jaipur',
-  description: 'Experience our handcrafted masterpieces in motion. Shop the look directly from our curated video lookbook.',
+  description: 'See how our global community styles their favorite pieces. Shop the looks directly from our curated video lookbook.',
 };
 
 export const revalidate = 60;
@@ -95,8 +95,8 @@ export default async function TheArtisanEditPage() {
       {
         id: 'fallback-1',
         videoUrl: 'https://player.vimeo.com/external/498802951.sd.mp4?s=d754b5df5b5e82845c22502efc2bcdd2d74a0c82&profile_id=165&oauth2_token_id=57447761',
-        title: 'The Velvet Suzani',
-        description: 'Hand-embroidered masterpiece from the heart of Jaipur.',
+        title: 'Styled in NYC',
+        description: 'Our favorite velvet suzani jacket out in the wild.',
         product: null
       }
     ];
