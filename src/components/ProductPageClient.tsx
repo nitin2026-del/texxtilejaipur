@@ -745,18 +745,21 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                   </div>
 
                   {/* Artisan Edit Nudge */}
-                  <div className="mt-5 max-w-md">
-                    <Link href="/the-artisan-edit" className="w-full bg-[#fdfbf7] border border-amber-200 hover:border-brand-400 rounded-xl p-4 flex items-center justify-between group transition-colors shadow-sm">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-brand-50 flex items-center justify-center text-brand-700 group-hover:bg-brand-600 group-hover:text-white transition-colors shrink-0">
-                          <Video className="h-5 w-5" />
+                  <div className="mt-6 max-w-md">
+                    <Link href="/the-artisan-edit" className="w-full bg-[#1a1464] border border-[#2a2484] hover:bg-[#110d44] rounded-xl p-4 flex items-center justify-between group transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden relative">
+                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1605001083437-017e47f97544?w=400&auto=format&fit=crop&q=80')] opacity-15 bg-cover bg-center mix-blend-overlay"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#1a1464] via-[#1a1464]/95 to-transparent"></div>
+                      
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className="h-12 w-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] group-hover:bg-[#D4AF37] group-hover:text-[#1a1464] transition-colors shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.3)] group-hover:shadow-[0_0_20px_rgba(212,175,55,0.6)] border border-[#D4AF37]/30">
+                          <Play className="h-5 w-5 ml-1" fill="currentColor" />
                         </div>
                         <div className="text-left">
-                          <p className="text-[13px] font-bold text-[#1a1464]">See it in the wild</p>
-                          <p className="text-[11px] text-[#555] mt-0.5">Watch how our community styles their pieces</p>
+                          <p className="text-[14px] font-bold text-white tracking-wide uppercase">Styled By You</p>
+                          <p className="text-[11.5px] text-zinc-300 mt-1 font-medium leading-snug">See how our customers enjoy wearing our products</p>
                         </div>
                       </div>
-                      <ArrowRight className="h-4 w-4 text-brand-600 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                      <ArrowRight className="h-5 w-5 text-[#D4AF37] group-hover:translate-x-1 transition-transform shrink-0 ml-2 relative z-10" />
                     </Link>
                   </div>
 
