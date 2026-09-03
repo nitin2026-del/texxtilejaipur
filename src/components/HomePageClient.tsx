@@ -233,27 +233,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
         </div>
       </section>
 
-      {/* Artisan Edit Teaser */}
-      <section className="w-full bg-zinc-950 text-white overflow-hidden relative group">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1605001083437-017e47f97544?w=1600&auto=format&fit=crop&q=80')] opacity-30 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent" />
-        <div className="max-w-7xl mx-auto px-6 py-16 md:py-20 relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-          <div className="flex-1 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-brand-400 text-xs font-bold uppercase tracking-widest mb-4">
-              <Video className="h-4 w-4" /> Real Customers, Real Joy
-            </div>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mb-4">
-              The Artisan Edit
-            </h2>
-            <p className="text-zinc-300 md:text-lg leading-relaxed max-w-xl">
-              See how our global community styles their favorite pieces. Watch our exclusive video lookbook of real customer experiences and shop their exact looks directly.
-            </p>
-          </div>
-          <a href="/the-artisan-edit" className="shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-brand-600 text-white rounded-full font-bold hover:bg-brand-500 transition-colors shadow-xl hover:shadow-brand-500/30">
-            <Video className="h-5 w-5" /> Watch The Edit
-          </a>
-        </div>
-      </section>
+
 
       {/* New Arrivals Section */}
       <section id="new-arrivals" className="px-6 sm:px-12 max-w-[1600px] mx-auto pt-24 pb-12">

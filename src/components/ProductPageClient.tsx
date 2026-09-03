@@ -13,7 +13,7 @@ import { getOptimizedUrl } from '@/utils/imageUtils';
 import { trackMetaEvent } from '@/utils/metaTracking';
 import Link from 'next/link';
 import { HappyCustomersSlider } from '@/components/HappyCustomersSlider';
-import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame } from 'lucide-react';
+import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, ArrowRight, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -742,6 +742,22 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5 object-contain" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" className="h-4 object-contain rounded-sm" />
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
+                  </div>
+
+                  {/* Artisan Edit Nudge */}
+                  <div className="mt-5 max-w-md">
+                    <Link href="/the-artisan-edit" className="w-full bg-[#fdfbf7] border border-amber-200 hover:border-brand-400 rounded-xl p-4 flex items-center justify-between group transition-colors shadow-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-brand-50 flex items-center justify-center text-brand-700 group-hover:bg-brand-600 group-hover:text-white transition-colors shrink-0">
+                          <Video className="h-5 w-5" />
+                        </div>
+                        <div className="text-left">
+                          <p className="text-[13px] font-bold text-[#1a1464]">See it in the wild</p>
+                          <p className="text-[11px] text-[#555] mt-0.5">Watch how our community styles their pieces</p>
+                        </div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-brand-600 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                    </Link>
                   </div>
 
                   {/* Structured Details */}
