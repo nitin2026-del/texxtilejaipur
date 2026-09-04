@@ -71,6 +71,7 @@ export default async function ProductPage({ params }: Props) {
   let product: any = null;
   let relatedProducts: any[] = [];
   let initialReviews: any[] = [];
+  let ugcVideos: any[] = [];
 
   try {
     // 1. Fetch Product
@@ -162,7 +163,6 @@ export default async function ProductPage({ params }: Props) {
     }
     
     // 4. Fetch UGC Videos
-    let ugcVideos: any[] = [];
     try {
       const ugcRes = await fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast`, {
         headers: { apikey: key, Authorization: `Bearer ${key}` },
@@ -170,15 +170,9 @@ export default async function ProductPage({ params }: Props) {
       });
       if (ugcRes.ok) {
         const ugcData = await ugcRes.json();
-        // Filter videos linked to this product (format: text|||product_id)
-        let linkedVideos = ugcData.filter((item: any) => item.description?.includes(`|||${id}`));
         
-        // If no linked videos, just take the latest 2 videos to always show something
-        if (linkedVideos.length === 0) {
-          linkedVideos = ugcData.slice(0, 2);
-        }
-        
-        ugcVideos = linkedVideos.map((item: any) => ({
+        // Use all available UGC videos to build maximum trust on every product page
+        ugcVideos = ugcData.map((item: any) => ({
             id: item.id,
             videoUrl: item.media_url,
             title: item.title,
