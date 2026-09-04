@@ -160,6 +160,35 @@ export default async function ProductPage({ params }: Props) {
           : (review.image_url ? [review.image_url] : [])
       }));
     }
+    
+    // 4. Fetch UGC Videos
+    let ugcVideos: any[] = [];
+    try {
+      const ugcRes = await fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast`, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        next: { revalidate: 60 }
+      });
+      if (ugcRes.ok) {
+        const ugcData = await ugcRes.json();
+        // Filter videos linked to this product (format: text|||product_id)
+        let linkedVideos = ugcData.filter((item: any) => item.description?.includes(`|||${id}`));
+        
+        // If no linked videos, just take the latest 2 videos to always show something
+        if (linkedVideos.length === 0) {
+          linkedVideos = ugcData.slice(0, 2);
+        }
+        
+        ugcVideos = linkedVideos.map((item: any) => ({
+            id: item.id,
+            videoUrl: item.media_url,
+            title: item.title,
+            description: item.description ? item.description.split('|||')[0] : ''
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch UGC videos', err);
+    }
+    
   } catch (err) {
     console.error('Failed to fetch product data', err);
   }
@@ -201,6 +230,7 @@ export default async function ProductPage({ params }: Props) {
         product={product} 
         relatedProducts={relatedProducts} 
         initialReviews={initialReviews} 
+        ugcVideos={ugcVideos}
       />
     </>
   );

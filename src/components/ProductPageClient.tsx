@@ -42,7 +42,7 @@ interface Product {
   };
 }
 
-export function ProductPageClient({ product, relatedProducts, initialReviews }: { product: any, relatedProducts: any[], initialReviews: any[] }) {
+export function ProductPageClient({ product, relatedProducts, initialReviews, ugcVideos = [] }: { product: any, relatedProducts: any[], initialReviews: any[], ugcVideos?: any[] }) {
     const { cart, addToCart, formatPrice, updateQuantity } = useCart();
     const id = product?.id;
     const pathname = usePathname();
@@ -744,24 +744,44 @@ export function ProductPageClient({ product, relatedProducts, initialReviews }: 
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
                   </div>
 
-                  {/* Artisan Edit Nudge */}
-                  <div className="mt-6 max-w-md">
-                    <Link href="/the-artisan-edit" className="w-full bg-[#1a1464] border border-[#2a2484] hover:bg-[#110d44] rounded-xl p-4 flex items-center justify-between group transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] overflow-hidden relative">
-                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1605001083437-017e47f97544?w=400&auto=format&fit=crop&q=80')] opacity-15 bg-cover bg-center mix-blend-overlay"></div>
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#1a1464] via-[#1a1464]/95 to-transparent"></div>
-                      
-                      <div className="flex items-center gap-4 relative z-10">
-                        <div className="h-12 w-12 rounded-full bg-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] group-hover:bg-[#D4AF37] group-hover:text-[#1a1464] transition-colors shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.3)] group-hover:shadow-[0_0_20px_rgba(212,175,55,0.6)] border border-[#D4AF37]/30">
-                          <Play className="h-5 w-5 ml-1" fill="currentColor" />
-                        </div>
-                        <div className="text-left">
-                          <p className="text-[14px] font-bold text-white tracking-wide uppercase">Styled By You</p>
-                          <p className="text-[11.5px] text-zinc-300 mt-1 font-medium leading-snug">See how our customers enjoy wearing our products</p>
-                        </div>
+                  {/* Artisan Edit / UGC Embedded Videos */}
+                  {ugcVideos && ugcVideos.length > 0 && (
+                    <div className="mt-8 max-w-md pt-6 border-t border-zinc-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Video className="h-4 w-4 text-[#1a1464]" />
+                        <h3 className="text-[13px] font-bold text-[#1a1464] uppercase tracking-wide">Styled By You</h3>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-[#D4AF37] group-hover:translate-x-1 transition-transform shrink-0 ml-2 relative z-10" />
-                    </Link>
-                  </div>
+                      <p className="text-[11.5px] text-[#555] mb-4">See how our customers enjoy wearing our products.</p>
+                      
+                      <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
+                        {ugcVideos.map((video: any) => (
+                          <Link href="/the-artisan-edit" key={video.id} className="relative w-[140px] h-[220px] shrink-0 rounded-xl overflow-hidden bg-zinc-900 snap-start shadow-md border border-zinc-200 group block">
+                            <video
+                              src={video.videoUrl}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0"></div>
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                               <div className="h-10 w-10 bg-white/90 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+                                  <Play className="h-4 w-4 text-[#1a1464] ml-1" fill="currentColor" />
+                               </div>
+                            </div>
+                            {video.title && (
+                              <div className="absolute bottom-3 left-3 right-3">
+                                <p className="text-white text-[11px] font-medium leading-tight drop-shadow-md line-clamp-2">
+                                  {video.title}
+                                </p>
+                              </div>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Structured Details */}
                   <div className="mt-6 pt-6 border-t border-zinc-200 max-w-md">
