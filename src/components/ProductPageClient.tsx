@@ -744,6 +744,36 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
                   </div>
 
+                  {/* Autumn Fair Exhibition Banner */}
+                  <div className="mt-8 max-w-md pt-6 border-t border-zinc-200">
+                    <div className="bg-gradient-to-br from-pink-50 to-white border border-pink-200 rounded-xl overflow-hidden shadow-sm relative">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-pink-300/30 to-transparent rounded-bl-full pointer-events-none"></div>
+                      <div className="p-4 bg-[#e84393]/10 border-b border-pink-100 flex items-center justify-between relative z-10">
+                        <div>
+                          <h3 className="text-[14px] font-black text-[#e84393] uppercase tracking-wide">Live at Autumn Fair! 🌟</h3>
+                          <p className="text-[12px] font-medium text-pink-900 mt-0.5">NEC Birmingham • Sept 6th–9th</p>
+                        </div>
+                        <span className="bg-[#e84393] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider animate-pulse whitespace-nowrap shadow-sm border border-pink-500">Stand 9J13</span>
+                      </div>
+                      
+                      <div className="p-4 relative z-10">
+                        <div className="flex gap-2.5 overflow-x-auto pb-3 snap-x hide-scrollbar">
+                          {[1, 2, 3].map((num) => (
+                            <img 
+                              key={num}
+                              src={`/exhibition/stall-${num}.jpg`} 
+                              alt={`Bless International Stand 9J13 at Autumn Fair - View ${num}`}
+                              className="w-[120px] h-[160px] object-cover rounded-lg shadow-sm border border-zinc-200 shrink-0 snap-start hover:scale-[1.02] transition-transform duration-300"
+                            />
+                          ))}
+                        </div>
+                        <p className="text-[12px] text-zinc-700 leading-relaxed font-medium mt-1">
+                          We are thrilled to showcase our exclusive new collections in person! If you're attending, we'd love to welcome you to discover the craftsmanship firsthand. Message us to schedule a meeting! ❤️
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Artisan Edit / UGC Embedded Videos */}
                   {ugcVideos && ugcVideos.length > 0 && (
                     <div className="mt-8 max-w-md pt-6 border-t border-zinc-200">
