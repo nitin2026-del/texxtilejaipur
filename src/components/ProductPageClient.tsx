@@ -13,7 +13,7 @@ import { getOptimizedUrl } from '@/utils/imageUtils';
 import { trackMetaEvent } from '@/utils/metaTracking';
 import Link from 'next/link';
 import { HappyCustomersSlider } from '@/components/HappyCustomersSlider';
-import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, ArrowRight, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame } from 'lucide-react';
+import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, ArrowRight, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame, X } from 'lucide-react';
 
 interface Product {
   id: string;
