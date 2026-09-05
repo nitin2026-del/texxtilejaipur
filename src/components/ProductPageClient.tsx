@@ -51,6 +51,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [exhibitionLightboxImg, setExhibitionLightboxImg] = useState<string | null>(null);
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -763,7 +764,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                               key={num}
                               src={`/exhibition/stall-${num}.jpg`} 
                               alt={`Bless International Stand 9J13 at Autumn Fair - View ${num}`}
-                              className="w-[120px] h-[160px] object-cover rounded-lg shadow-sm border border-zinc-200 shrink-0 snap-start hover:scale-[1.02] transition-transform duration-300"
+                              onClick={() => setExhibitionLightboxImg(`/exhibition/stall-${num}.jpg`)}
+                              className="w-[120px] h-[160px] object-cover rounded-lg shadow-sm border border-zinc-200 shrink-0 snap-start hover:scale-[1.02] transition-transform duration-300 cursor-zoom-in"
                             />
                           ))}
                         </div>
@@ -1393,6 +1395,27 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
           >
             Buy Now
           </button>
+        </div>
+      )}
+      {/* Exhibition Lightbox */}
+      {exhibitionLightboxImg && (
+        <div 
+          className="fixed inset-0 z-[99999] bg-black/95 flex flex-col items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setExhibitionLightboxImg(null)}
+        >
+          <button 
+            className="absolute top-4 right-4 md:top-6 md:right-6 z-50 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors backdrop-blur-md"
+            onClick={() => setExhibitionLightboxImg(null)}
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <img 
+            src={exhibitionLightboxImg} 
+            alt="Bless International Exhibition Stall"
+            className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl ring-1 ring-white/10"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <p className="text-white/80 mt-6 text-sm font-medium">Bless International at Autumn Fair, Stand 9J13</p>
         </div>
       )}
     </main>
