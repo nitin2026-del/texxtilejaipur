@@ -302,7 +302,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                           title="Click to view full quality"
                         >
                           <img 
-                            src={media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
+                            src={getOptimizedUrl(media.url, 800)} 
                             alt={`${product.name} view ${idx + 1}`}
                             loading={idx === 0 ? "eager" : "lazy"}
                             className="absolute inset-0 w-full h-full object-cover"
@@ -387,7 +387,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     >
                       <div className="absolute inset-0">
                         <img 
-                          src={media.type === 'image' ? (media.url || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80') : getOptimizedUrl(product.images?.[0])} 
+                          src={media.type === 'image' ? getOptimizedUrl(media.url, 200) : getOptimizedUrl(product.images?.[0], 200)} 
                           alt={`Thumbnail ${idx}`} 
                           loading="lazy"
                           className="absolute inset-0 w-full h-full object-cover" 
@@ -455,7 +455,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     {/* Fast Loading Preview Image */}
                     {imageLoading && (
                       <img
-                        src={mediaItems[selectedMediaIndex].url}
+                        src={getOptimizedUrl(mediaItems[selectedMediaIndex].url, 400)}
                         alt="Preview"
                         className={`${isZoomed ? 'object-contain w-full h-full' : 'absolute inset-0 w-full h-full object-contain'} opacity-60 blur-md transition-opacity duration-300`}
                         style={isZoomed ? { maxWidth: 'none' } : {}}
@@ -470,7 +470,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     )}
 
                     <img
-                      src={product.images?.[selectedMediaIndex] || mediaItems[selectedMediaIndex].url}
+                      src={getOptimizedUrl(product.images?.[selectedMediaIndex] || mediaItems[selectedMediaIndex].url, 1600)}
                       alt={`${product.name} – full quality`}
                       onLoad={() => setImageLoading(false)}
                       className={`${isZoomed ? 'object-contain w-full h-full' : 'absolute inset-0 w-full h-full object-contain'} ${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
