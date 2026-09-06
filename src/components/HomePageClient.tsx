@@ -10,6 +10,7 @@ import { BottomNav } from '@/components/BottomNav';
 import { StoryDrawer } from '@/components/StoryDrawer';
 import { Search, Sparkles, Filter, ShieldCheck, Truck, Clock, BookOpen, Video } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { getOptimizedUrl } from '@/utils/imageUtils';
 
 interface Product {
   id: string;
@@ -462,7 +463,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
                 className="relative group w-[45%] sm:w-[16%] aspect-square rounded-2xl overflow-hidden bg-white shadow-sm border border-zinc-100 block shrink-0"
               >
                 <img 
-                  src={prod.images?.[0] || 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'} 
+                  src={getOptimizedUrl(prod.images?.[0], 400)} 
                   alt="Instagram Post" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />

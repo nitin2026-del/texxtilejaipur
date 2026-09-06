@@ -7,7 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { X, ShoppingBag, Plus, Minus, Trash2, ShieldCheck, ArrowRight, Info, Sparkles, Video } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-
+import { getOptimizedUrl } from '@/utils/imageUtils';
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -85,7 +85,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                     {/* Item Image - clickable to product page */}
                     <button onClick={() => goToProduct(item.id)} className="h-20 w-20 rounded-md overflow-hidden bg-zinc-800 shrink-0 block hover:opacity-80 transition-opacity cursor-pointer">
                       <img 
-                        src={item.images?.[0] || 'https://via.placeholder.com/80'} 
+                        src={getOptimizedUrl(item.images?.[0], 200)} 
                         alt={item.name}
                         className="h-full w-full object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/80'; }}
@@ -217,7 +217,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                                 return (
                                   <div key={sp.id} onClick={() => goToProduct(sp.id)} className="flex items-center gap-2.5 bg-zinc-950 p-1.5 rounded cursor-pointer hover:bg-zinc-800 transition-colors border border-zinc-800 hover:border-zinc-700">
                                     <div className="h-10 w-8 rounded overflow-hidden bg-zinc-800 shrink-0">
-                                      {imgUrl && <img src={imgUrl} alt={sp.name} className="h-full w-full object-cover" />}
+                                      {imgUrl && <img src={getOptimizedUrl(imgUrl, 200)} alt={sp.name} className="h-full w-full object-cover" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-[10px] text-zinc-200 truncate font-medium">{sp.name}</p>
