@@ -91,7 +91,63 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
               </button>
             </div>
 
-            {/* Cart Items */}
+            {/* Combo Offer Gift Section - fixed above cart items */}
+            {cart.length > 0 && eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && comboOffer?.reward_category && (
+              <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-950">
+                <div className="bg-gradient-to-r from-pink-950/40 to-zinc-900/60 border border-pink-500/20 rounded-xl p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-3.5 w-3.5 text-pink-400" />
+                    <h4 className="text-xs font-bold text-pink-100">
+                      {isEligibleForFreeGift 
+                        ? "Choose Your Complimentary Gift!"
+                        : `Add ${comboOffer.required_qty - eligibleCountForFreeGift} more ${comboOffer.required_category || 'item'}${comboOffer.required_qty - eligibleCountForFreeGift > 1 ? 's' : ''} to unlock a free gift!`}
+                    </h4>
+                  </div>
+                  <div className="flex overflow-x-auto gap-2 pb-1 snap-x hide-scrollbar">
+                    {rewardProducts.length > 0 ? rewardProducts.map(p => (
+                      <div key={p.id} className="min-w-[100px] max-w-[100px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col">
+                        <img src={getOptimizedUrl(p.images?.[0], 200)} alt={p.name} className={`h-20 w-full object-cover ${!isEligibleForFreeGift ? 'opacity-40 grayscale' : ''}`} />
+                        <div className="p-1.5 flex-1 flex flex-col justify-between">
+                          <p className={`text-[9px] line-clamp-2 font-medium mb-1.5 ${isEligibleForFreeGift ? 'text-white' : 'text-zinc-500'}`}>{p.name}</p>
+                          {isEligibleForFreeGift ? (
+                            <button
+                              onClick={() => addFreeGift({
+                                id: p.id,
+                                sku: p.sku,
+                                name: p.name,
+                                price_inr: p.price || 0,
+                                images: p.images || [],
+                                category: p.categories?.name
+                              })}
+                              className="w-full py-1 bg-pink-600 hover:bg-pink-500 text-white text-[9px] font-bold rounded flex items-center justify-center gap-0.5 transition-colors"
+                            >
+                              <Plus className="h-2.5 w-2.5" /> FREE
+                            </button>
+                          ) : (
+                            <div className="w-full py-1 bg-zinc-800 text-zinc-600 text-[9px] font-bold rounded flex items-center justify-center">
+                              🔒
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )) : (
+                      Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="min-w-[100px] max-w-[100px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col animate-pulse">
+                          <div className="h-20 w-full bg-zinc-800" />
+                          <div className="p-1.5 flex-1 flex flex-col justify-between">
+                            <div className="h-2.5 bg-zinc-800 rounded w-full mb-1" />
+                            <div className="h-2.5 bg-zinc-800 rounded w-2/3 mb-1.5" />
+                            <div className="h-5 bg-zinc-800 rounded w-full" />
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Cart Items - scrollable */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {cart.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center">
@@ -101,59 +157,6 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                 </div>
               ) : (
                 <>
-                  {eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && comboOffer?.reward_category && (
-                    <div className="bg-pink-900/20 border border-pink-500/30 rounded-xl p-4 mb-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Sparkles className="h-4 w-4 text-pink-400" />
-                        <h4 className="text-sm font-bold text-pink-100">
-                          {isEligibleForFreeGift 
-                            ? "Choose Your Complimentary Gift!"
-                            : `Add ${comboOffer.required_qty - eligibleCountForFreeGift} more ${comboOffer.required_category || 'item'}${comboOffer.required_qty - eligibleCountForFreeGift > 1 ? 's' : ''} to unlock a free ${comboOffer.reward_category}!`}
-                        </h4>
-                      </div>
-                      <div className="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar">
-                        {rewardProducts.length > 0 ? rewardProducts.map(p => (
-                          <div key={p.id} className="min-w-[120px] max-w-[120px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col">
-                            <img src={getOptimizedUrl(p.images?.[0], 200)} alt={p.name} className={`h-24 w-full object-cover ${!isEligibleForFreeGift ? 'opacity-50' : ''}`} />
-                            <div className="p-2 flex-1 flex flex-col justify-between">
-                              <p className={`text-[10px] line-clamp-2 font-medium mb-2 ${isEligibleForFreeGift ? 'text-white' : 'text-zinc-400'}`}>{p.name}</p>
-                              {isEligibleForFreeGift ? (
-                                <button
-                                  onClick={() => addFreeGift({
-                                    id: p.id,
-                                    sku: p.sku,
-                                    name: p.name,
-                                    price_inr: p.price || 0,
-                                    images: p.images || [],
-                                    category: p.categories?.name
-                                  })}
-                                  className="w-full py-1.5 bg-pink-600 hover:bg-pink-500 text-white text-[10px] font-bold rounded flex items-center justify-center gap-1 transition-colors"
-                                >
-                                  <Plus className="h-3 w-3" /> Add for $0
-                                </button>
-                              ) : (
-                                <div className="w-full py-1.5 bg-zinc-800 text-zinc-500 text-[10px] font-bold rounded flex items-center justify-center text-center px-1">
-                                  Locked
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )) : (
-                          /* Skeleton placeholders while loading */
-                          Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="min-w-[120px] max-w-[120px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col animate-pulse">
-                              <div className="h-24 w-full bg-zinc-800" />
-                              <div className="p-2 flex-1 flex flex-col justify-between">
-                                <div className="h-3 bg-zinc-800 rounded w-full mb-1" />
-                                <div className="h-3 bg-zinc-800 rounded w-2/3 mb-2" />
-                                <div className="h-6 bg-zinc-800 rounded w-full" />
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  )}
                   {computedCart.map((item) => (
                     <div 
                       key={item.id}
