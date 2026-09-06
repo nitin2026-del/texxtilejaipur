@@ -648,14 +648,18 @@ function AdminPortalContent() {
   const fetchPromoConfig = async () => {
     try {
       const { data, error } = await supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle();
+      console.log('[Promo Load] DB response:', JSON.stringify(data), 'Error:', error);
       if (data && data.value) {
+        console.log('[Promo Load] Setting promoActive to:', !!data.value.is_active);
         setPromoActive(!!data.value.is_active);
         setPromoReqQty(data.value.required_qty?.toString() || '2');
         setPromoReqCat(data.value.required_category || '');
         setPromoRewardCat(data.value.reward_category || '');
+      } else {
+        console.log('[Promo Load] No data found, keeping defaults');
       }
     } catch (err) {
-      console.error('Failed to fetch combo promo', err);
+      console.error('[Promo Load] Failed to fetch combo promo', err);
     }
   };
 
@@ -674,16 +678,23 @@ function AdminPortalContent() {
         reward_category: promoRewardCat
       };
       
+      console.log('[Promo Save] Saving payload:', JSON.stringify(payload));
+      
       const response = await fetch('/api/admin/save-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const data = await response.json();
+      console.log('[Promo Save] Response:', response.status, JSON.stringify(data));
       if (!response.ok) throw new Error(data.error || 'Failed to save');
 
       showNotification('Combo Offer configuration saved successfully!');
+      // Re-fetch to confirm it actually saved
+      await fetchPromoConfig();
+      console.log('[Promo Save] After re-fetch, promoActive state:', promoActive);
     } catch (err: any) {
+      console.error('[Promo Save] ERROR:', err);
       showNotification(err.message || 'Failed to save promo', true);
     } finally {
       setActionLoading(false);
