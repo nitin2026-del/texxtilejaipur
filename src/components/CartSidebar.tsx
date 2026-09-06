@@ -25,35 +25,33 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
   const [rewardProducts, setRewardProducts] = useState<any[]>([]);
 
   useEffect(() => {
-    if (isOpen) {
-      fetch('/api/shipping-config')
-        .then(res => res.json())
-        .then(data => setShippingConfig(data))
-        .catch(console.error);
+    fetch('/api/shipping-config')
+      .then(res => res.json())
+      .then(data => setShippingConfig(data))
+      .catch(console.error);
 
-      // If they have at least 1 qualifying item and haven't claimed, fetch the reward products
-      if (eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && comboOffer?.reward_category) {
-        supabase
-          .from('products')
-          .select('id, name, price, categories!inner(name), product_images(url)')
-          .eq('categories.name', comboOffer.reward_category)
-          .limit(10)
-          .then(({ data, error }) => {
-            if (data && !error) {
-              const mappedData = data.map((p: any) => ({
-                id: p.id,
-                name: p.name,
-                sku: `HT-${p.id.slice(0, 8).toUpperCase()}`,
-                price: p.price,
-                categories: p.categories,
-                images: p.product_images?.map((img: any) => img.url) || []
-              }));
-              setRewardProducts(mappedData);
-            }
-          });
-      }
+    // If they have at least 1 qualifying item and haven't claimed, fetch the reward products
+    if (eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && comboOffer?.reward_category) {
+      supabase
+        .from('products')
+        .select('id, name, price, categories!inner(name), product_images(url)')
+        .eq('categories.name', comboOffer.reward_category)
+        .limit(10)
+        .then(({ data, error }) => {
+          if (data && !error) {
+            const mappedData = data.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              sku: `HT-${p.id.slice(0, 8).toUpperCase()}`,
+              price: p.price,
+              categories: p.categories,
+              images: p.product_images?.map((img: any) => img.url) || []
+            }));
+            setRewardProducts(mappedData);
+          }
+        });
     }
-  }, [isOpen, eligibleCountForFreeGift, hasClaimedFreeGift, comboOffer]);
+  }, [eligibleCountForFreeGift, hasClaimedFreeGift, comboOffer]);
 
   const goToProduct = (id: string) => {
     onClose();
@@ -101,7 +99,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                 </div>
               ) : (
                 <>
-                  {eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && rewardProducts.length > 0 && (
+                  {eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && comboOffer?.reward_category && (
                     <div className="bg-pink-900/20 border border-pink-500/30 rounded-xl p-4 mb-4">
                       <div className="flex items-center gap-2 mb-3">
                         <Sparkles className="h-4 w-4 text-pink-400" />
@@ -112,7 +110,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                         </h4>
                       </div>
                       <div className="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar">
-                        {rewardProducts.map(p => (
+                        {rewardProducts.length > 0 ? rewardProducts.map(p => (
                           <div key={p.id} className="min-w-[120px] max-w-[120px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col">
                             <img src={getOptimizedUrl(p.images?.[0], 200)} alt={p.name} className={`h-24 w-full object-cover ${!isEligibleForFreeGift ? 'opacity-50' : ''}`} />
                             <div className="p-2 flex-1 flex flex-col justify-between">
@@ -138,7 +136,19 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                               )}
                             </div>
                           </div>
-                        ))}
+                        )) : (
+                          /* Skeleton placeholders while loading */
+                          Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="min-w-[120px] max-w-[120px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col animate-pulse">
+                              <div className="h-24 w-full bg-zinc-800" />
+                              <div className="p-2 flex-1 flex flex-col justify-between">
+                                <div className="h-3 bg-zinc-800 rounded w-full mb-1" />
+                                <div className="h-3 bg-zinc-800 rounded w-2/3 mb-2" />
+                                <div className="h-6 bg-zinc-800 rounded w-full" />
+                              </div>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
                   )}
