@@ -73,6 +73,7 @@ interface CartContextType {
   applyCoupon: (code: string) => Promise<{ success: boolean; message: string; shortfallInr?: number }>;
   removeCoupon: () => void;
   comboOffer: any;
+  computedCart: CartItem[];
   eligibleCountForFreeGift: number;
   isEligibleForFreeGift: boolean;
   hasClaimedFreeGift: boolean;
@@ -378,6 +379,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         applyCoupon,
         removeCoupon,
         comboOffer,
+        computedCart,
         eligibleCountForFreeGift,
         isEligibleForFreeGift,
         hasClaimedFreeGift,

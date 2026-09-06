@@ -15,7 +15,7 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
-  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon, comboOffer, isEligibleForFreeGift, eligibleCountForFreeGift, hasClaimedFreeGift, addFreeGift } = useCart();
+  const { cart, computedCart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon, comboOffer, isEligibleForFreeGift, eligibleCountForFreeGift, hasClaimedFreeGift, addFreeGift } = useCart();
   const { userTier, tierDiscountPercentage } = useAuth();
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
@@ -142,7 +142,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                       </div>
                     </div>
                   )}
-                  {cart.map((item) => (
+                  {computedCart.map((item) => (
                     <div 
                       key={item.id}
                       className="flex gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/40 relative group"
