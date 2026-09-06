@@ -3143,7 +3143,9 @@ function AdminPortalContent() {
                       className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 transition-colors"
                     >
                       <option value="">Any Category (Entire Store)</option>
-                      {dbCategories.map(cat => (
+                      {dbCategories
+                        .filter(cat => !cat.toLowerCase().includes('bag'))
+                        .map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
                       ))}
                     </select>
