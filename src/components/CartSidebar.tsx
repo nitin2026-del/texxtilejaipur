@@ -35,7 +35,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
       if (eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && comboOffer?.reward_category) {
         supabase
           .from('products')
-          .select('id, name, sku, price, categories!inner(name), product_images(url)')
+          .select('id, name, price, categories!inner(name), product_images(url)')
           .eq('categories.name', comboOffer.reward_category)
           .limit(10)
           .then(({ data, error }) => {
@@ -43,7 +43,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
               const mappedData = data.map((p: any) => ({
                 id: p.id,
                 name: p.name,
-                sku: p.sku,
+                sku: `HT-${p.id.slice(0, 8).toUpperCase()}`,
                 price: p.price,
                 categories: p.categories,
                 images: p.product_images?.map((img: any) => img.url) || []
