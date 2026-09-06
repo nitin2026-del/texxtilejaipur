@@ -15,7 +15,7 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
-  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon, comboOffer, isEligibleForFreeGift, hasClaimedFreeGift, addFreeGift } = useCart();
+  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon, comboOffer, isEligibleForFreeGift, eligibleCountForFreeGift, hasClaimedFreeGift, addFreeGift } = useCart();
   const { userTier, tierDiscountPercentage } = useAuth();
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
@@ -31,8 +31,8 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
         .then(data => setShippingConfig(data))
         .catch(console.error);
 
-      // If eligible and hasn't claimed, fetch the reward products
-      if (isEligibleForFreeGift && !hasClaimedFreeGift && comboOffer?.reward_category) {
+      // If they have at least 1 qualifying item and haven't claimed, fetch the reward products
+      if (eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && comboOffer?.reward_category) {
         supabase
           .from('products')
           .select('id, name, sku, price, categories!inner(name), product_images(url)')
@@ -53,7 +53,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
           });
       }
     }
-  }, [isOpen, isEligibleForFreeGift, hasClaimedFreeGift, comboOffer]);
+  }, [isOpen, eligibleCountForFreeGift, hasClaimedFreeGift, comboOffer]);
 
   const goToProduct = (id: string) => {
     onClose();
@@ -101,31 +101,41 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                 </div>
               ) : (
                 <>
-                  {isEligibleForFreeGift && !hasClaimedFreeGift && rewardProducts.length > 0 && (
+                  {eligibleCountForFreeGift > 0 && !hasClaimedFreeGift && rewardProducts.length > 0 && (
                     <div className="bg-pink-900/20 border border-pink-500/30 rounded-xl p-4 mb-4">
                       <div className="flex items-center gap-2 mb-3">
                         <Sparkles className="h-4 w-4 text-pink-400" />
-                        <h4 className="text-sm font-bold text-pink-100">Choose Your Complimentary Gift!</h4>
+                        <h4 className="text-sm font-bold text-pink-100">
+                          {isEligibleForFreeGift 
+                            ? "Choose Your Complimentary Gift!"
+                            : `Add ${comboOffer.required_qty - eligibleCountForFreeGift} more ${comboOffer.required_category || 'item'}${comboOffer.required_qty - eligibleCountForFreeGift > 1 ? 's' : ''} to unlock a free ${comboOffer.reward_category}!`}
+                        </h4>
                       </div>
                       <div className="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar">
                         {rewardProducts.map(p => (
                           <div key={p.id} className="min-w-[120px] max-w-[120px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col">
-                            <img src={getOptimizedUrl(p.images?.[0], 200)} alt={p.name} className="h-24 w-full object-cover" />
+                            <img src={getOptimizedUrl(p.images?.[0], 200)} alt={p.name} className={`h-24 w-full object-cover ${!isEligibleForFreeGift ? 'opacity-50' : ''}`} />
                             <div className="p-2 flex-1 flex flex-col justify-between">
-                              <p className="text-[10px] text-white line-clamp-2 font-medium mb-2">{p.name}</p>
-                              <button
-                                onClick={() => addFreeGift({
-                                  id: p.id,
-                                  sku: p.sku,
-                                  name: p.name,
-                                  price_inr: p.price || 0,
-                                  images: p.images || [],
-                                  category: p.categories?.name
-                                })}
-                                className="w-full py-1.5 bg-pink-600 hover:bg-pink-500 text-white text-[10px] font-bold rounded flex items-center justify-center gap-1 transition-colors"
-                              >
-                                <Plus className="h-3 w-3" /> Add for $0
-                              </button>
+                              <p className={`text-[10px] line-clamp-2 font-medium mb-2 ${isEligibleForFreeGift ? 'text-white' : 'text-zinc-400'}`}>{p.name}</p>
+                              {isEligibleForFreeGift ? (
+                                <button
+                                  onClick={() => addFreeGift({
+                                    id: p.id,
+                                    sku: p.sku,
+                                    name: p.name,
+                                    price_inr: p.price || 0,
+                                    images: p.images || [],
+                                    category: p.categories?.name
+                                  })}
+                                  className="w-full py-1.5 bg-pink-600 hover:bg-pink-500 text-white text-[10px] font-bold rounded flex items-center justify-center gap-1 transition-colors"
+                                >
+                                  <Plus className="h-3 w-3" /> Add for $0
+                                </button>
+                              ) : (
+                                <div className="w-full py-1.5 bg-zinc-800 text-zinc-500 text-[10px] font-bold rounded flex items-center justify-center text-center px-1">
+                                  Locked
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}

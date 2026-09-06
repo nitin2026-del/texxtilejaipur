@@ -73,6 +73,7 @@ interface CartContextType {
   applyCoupon: (code: string) => Promise<{ success: boolean; message: string; shortfallInr?: number }>;
   removeCoupon: () => void;
   comboOffer: any;
+  eligibleCountForFreeGift: number;
   isEligibleForFreeGift: boolean;
   hasClaimedFreeGift: boolean;
   addFreeGift: (product: CartContextProduct) => void;
@@ -251,9 +252,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [cart, comboOffer]);
 
-  const isEligibleForFreeGift = React.useMemo(() => {
-    if (!comboOffer || !comboOffer.is_active) return false;
-    const eligibleCount = cart.reduce((sum, item) => {
+  const eligibleCountForFreeGift = React.useMemo(() => {
+    if (!comboOffer || !comboOffer.is_active) return 0;
+    return cart.reduce((sum, item) => {
       if (item.isFreeGift) return sum;
       const reqCat = comboOffer.required_category?.toLowerCase();
       if (!reqCat || reqCat === '' || item.category?.toLowerCase() === reqCat) {
@@ -261,8 +262,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return sum;
     }, 0);
-    return eligibleCount >= (comboOffer.required_qty || 2);
   }, [cart, comboOffer]);
+
+  const isEligibleForFreeGift = React.useMemo(() => {
+    if (!comboOffer || !comboOffer.is_active) return false;
+    return eligibleCountForFreeGift >= (comboOffer.required_qty || 2);
+  }, [comboOffer, eligibleCountForFreeGift]);
 
   const hasClaimedFreeGift = cart.some(item => item.isFreeGift);
 
@@ -361,6 +366,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         applyCoupon,
         removeCoupon,
         comboOffer,
+        eligibleCountForFreeGift,
         isEligibleForFreeGift,
         hasClaimedFreeGift,
         addFreeGift,
