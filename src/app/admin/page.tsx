@@ -148,7 +148,13 @@ function AdminPortalContent() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners' | 'promotions'>('overview');
+  
+  // Promotions states
+  const [promoActive, setPromoActive] = useState(false);
+  const [promoReqQty, setPromoReqQty] = useState('2');
+  const [promoReqCat, setPromoReqCat] = useState('');
+  const [promoRewardId, setPromoRewardId] = useState('');
   const [reviewProductId, setReviewProductId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -634,6 +640,52 @@ function AdminPortalContent() {
     } catch (e: any) {
       console.error('Error deleting category:', e);
       showNotification(e.message || 'Failed to delete category', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const fetchPromoConfig = async () => {
+    try {
+      const { data, error } = await supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle();
+      if (data && data.value) {
+        setPromoActive(!!data.value.is_active);
+        setPromoReqQty(data.value.required_qty?.toString() || '2');
+        setPromoReqCat(data.value.required_category || '');
+        setPromoRewardId(data.value.reward_product_id || '');
+      }
+    } catch (err) {
+      console.error('Failed to fetch combo promo', err);
+    }
+  };
+
+  useEffect(() => {
+    if (!isBypassed) return;
+    fetchPromoConfig();
+  }, [isBypassed]);
+
+  const handleSavePromo = async () => {
+    setActionLoading(true);
+    try {
+      const rewardProduct = products.find(p => p.id === promoRewardId);
+      const payload = {
+        is_active: promoActive,
+        required_qty: parseInt(promoReqQty) || 2,
+        required_category: promoReqCat,
+        reward_product_id: promoRewardId,
+        reward_product_name: rewardProduct ? rewardProduct.name : ''
+      };
+      
+      const { error } = await supabase.from('site_settings').upsert({
+        key: 'SYS_COMBO_OFFER',
+        value: payload,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
+
+      if (error) throw error;
+      showNotification('Combo Offer configuration saved successfully!');
+    } catch (err: any) {
+      showNotification(err.message || 'Failed to save promo', true);
     } finally {
       setActionLoading(false);
     }
@@ -1709,6 +1761,16 @@ function AdminPortalContent() {
               }`}
             >
               <Tag className="h-3.5 w-3.5" /> Coupons
+            </button>
+            <button
+              onClick={() => setActiveTab('promotions')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
+                activeTab === 'promotions'
+                  ? 'bg-pink-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5" /> Promotions
             </button>
             <button
               onClick={() => setActiveTab('inquiries')}
@@ -3034,6 +3096,87 @@ function AdminPortalContent() {
                       )}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'promotions' && (
+          <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-2xl font-serif font-bold text-zinc-900 mb-1">Gift With Purchase (Combo Offers)</h2>
+                <p className="text-zinc-500 text-sm">Automatically add a free gift to a customer's cart when they buy specific items.</p>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-3xl border border-zinc-200 p-8 shadow-sm">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-zinc-100">
+                <div>
+                  <h3 className="text-lg font-bold text-zinc-900">Enable Promotion</h3>
+                  <p className="text-sm text-zinc-500 mt-1">Turn the global promotional banner and cart logic on or off.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only peer" checked={promoActive} onChange={(e) => setPromoActive(e.target.checked)} />
+                  <div className="w-14 h-7 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-pink-600"></div>
+                </label>
+              </div>
+
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">Required Quantity</label>
+                    <input
+                      type="number"
+                      value={promoReqQty}
+                      onChange={(e) => setPromoReqQty(e.target.value)}
+                      placeholder="e.g. 2"
+                      min="1"
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                    />
+                    <p className="text-xs text-zinc-400 mt-1.5">How many items the customer must buy.</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">From Category (Optional)</label>
+                    <select
+                      value={promoReqCat}
+                      onChange={(e) => setPromoReqCat(e.target.value)}
+                      className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                    >
+                      <option value="">Any Category (Entire Store)</option>
+                      {dbCategories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-zinc-400 mt-1.5">Leave as 'Any Category' for sitewide offers.</p>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">Free Reward Product</label>
+                  <select
+                    value={promoRewardId}
+                    onChange={(e) => setPromoRewardId(e.target.value)}
+                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                  >
+                    <option value="">-- Select a product to give away --</option>
+                    {products.map(p => (
+                      <option key={p.id} value={p.id}>{p.name} (Stock: {p.stock_quantity})</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-zinc-400 mt-1.5">This product will be automatically added to the cart for ₹0.</p>
+                </div>
+
+                <div className="pt-8 flex justify-end">
+                  <button
+                    onClick={handleSavePromo}
+                    disabled={actionLoading}
+                    className="px-8 py-3 bg-zinc-900 hover:bg-zinc-800 text-white font-bold rounded-xl flex items-center gap-2 transition-all disabled:opacity-50"
+                  >
+                    {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                    Save Promotion Configuration
+                  </button>
                 </div>
               </div>
             </div>

@@ -101,39 +101,47 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
 
                       <div className="flex items-center justify-between">
                         {/* Quantity controls */}
-                        <div className="flex items-center border border-zinc-800 bg-zinc-950 rounded-md">
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            aria-label="Decrease Quantity"
-                            className="p-1 text-zinc-500 hover:text-white transition-colors"
-                          >
-                            <Minus className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="px-2 text-xs font-semibold text-white">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            aria-label="Increase Quantity"
-                            className="p-1 text-zinc-500 hover:text-white transition-colors"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
+                        {!item.isFreeGift ? (
+                          <div className="flex items-center border border-zinc-800 bg-zinc-950 rounded-md">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              aria-label="Decrease Quantity"
+                              className="p-1 text-zinc-500 hover:text-white transition-colors"
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </button>
+                            <span className="px-2 text-xs font-semibold text-white">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              aria-label="Increase Quantity"
+                              className="p-1 text-zinc-500 hover:text-white transition-colors"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-bold tracking-wider text-pink-500 bg-pink-500/10 px-2 py-1 rounded border border-pink-500/20 uppercase">
+                            Free Gift
+                          </span>
+                        )}
 
                         {/* Price */}
-                        <span className="text-sm font-bold text-white">
-                          {formatPrice(item.price_inr * item.quantity)}
+                        <span className={`text-sm font-bold ${item.isFreeGift ? 'text-pink-400' : 'text-white'}`}>
+                          {item.isFreeGift ? '₹0.00' : formatPrice(item.price_inr * item.quantity)}
                         </span>
                       </div>
                     </div>
 
                     {/* Remove button */}
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      aria-label="Remove Item"
-                      className="absolute top-3 right-3 text-zinc-600 hover:text-red-400 transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    {!item.isFreeGift && (
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        className="absolute top-2.5 right-2.5 p-1 text-zinc-600 hover:text-red-500 transition-colors bg-zinc-900 rounded-md"
+                        aria-label="Remove item"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
                   </div>
                 ))
               )}

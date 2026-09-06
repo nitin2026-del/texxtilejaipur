@@ -13,6 +13,7 @@ export interface CartItem {
   images: string[];
   quantity: number;
   category?: string;
+  isFreeGift?: boolean;
 }
 
 export interface Coupon {
@@ -80,8 +81,30 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currency, setCurrencyState] = useState<Currency>('USD'); // Default to international USD
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [comboOffer, setComboOffer] = useState<any>(null);
+  const [rewardProduct, setRewardProduct] = useState<CartContextProduct | null>(null);
 
   useEffect(() => {
+    // Load combo offer
+    supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle().then(async ({ data }) => {
+      if (data && data.value && data.value.is_active) {
+        setComboOffer(data.value);
+        if (data.value.reward_product_id) {
+          const { data: pData } = await supabase.from('products').select('id, name, sku, price, images, categories(name)').eq('id', data.value.reward_product_id).maybeSingle();
+          if (pData) {
+            setRewardProduct({
+              id: pData.id,
+              sku: pData.sku,
+              name: pData.name,
+              price_inr: pData.price || 0,
+              images: pData.images || [],
+              category: pData.categories?.name
+            });
+          }
+        }
+      }
+    });
+
     // Load guest cart from localStorage
     const savedCart = localStorage.getItem('textilejaipur_cart');
     if (savedCart) {
@@ -196,8 +219,39 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return `${symbol}${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
+  const computedCart = React.useMemo(() => {
+    if (!comboOffer || !comboOffer.is_active || !rewardProduct) return cart;
+    
+    const eligibleCount = cart.reduce((sum, item) => {
+      // Exclude free gifts from the count to prevent loops
+      if (item.isFreeGift) return sum;
+      
+      const reqCat = comboOffer.required_category?.toLowerCase();
+      if (!reqCat || reqCat === '' || item.category?.toLowerCase() === reqCat) {
+        return sum + item.quantity;
+      }
+      return sum;
+    }, 0);
+
+    if (eligibleCount >= (comboOffer.required_qty || 2)) {
+      if (!cart.find(i => i.id === rewardProduct.id && i.isFreeGift)) {
+        return [...cart, {
+          id: rewardProduct.id,
+          sku: rewardProduct.sku,
+          name: rewardProduct.name,
+          price_inr: 0,
+          images: rewardProduct.images,
+          quantity: 1,
+          category: rewardProduct.category,
+          isFreeGift: true
+        }];
+      }
+    }
+    return cart;
+  }, [cart, comboOffer, rewardProduct]);
+
   const getCartSubtotalInr = () => {
-    return cart.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
+    return computedCart.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
   };
 
 
@@ -275,7 +329,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <CartContext.Provider
       value={{
-        cart,
+        cart: computedCart,
         currency,
         currencySymbol: CURRENCY_SYMBOLS[currency],
         addToCart,
