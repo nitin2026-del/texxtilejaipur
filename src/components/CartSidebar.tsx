@@ -15,13 +15,14 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
-  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon } = useCart();
+  const { cart, removeFromCart, updateQuantity, formatPrice, getCartSubtotalInr, getCartTotalInr, appliedCoupon, applyCoupon, removeCoupon, comboOffer, isEligibleForFreeGift, hasClaimedFreeGift, addFreeGift } = useCart();
   const { userTier, tierDiscountPercentage } = useAuth();
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
   const [suggestedProducts, setSuggestedProducts] = useState<any[]>([]);
   const [shippingConfig, setShippingConfig] = useState<{ standard_price: number; is_free_shipping: boolean } | null>(null);
+  const [rewardProducts, setRewardProducts] = useState<any[]>([]);
 
   useEffect(() => {
     if (isOpen) {
@@ -29,8 +30,20 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
         .then(res => res.json())
         .then(data => setShippingConfig(data))
         .catch(console.error);
+
+      // If eligible and hasn't claimed, fetch the reward products
+      if (isEligibleForFreeGift && !hasClaimedFreeGift && comboOffer?.reward_category) {
+        supabase
+          .from('products')
+          .select('id, name, sku, price, images, categories!inner(name)')
+          .eq('categories.name', comboOffer.reward_category)
+          .limit(10)
+          .then(({ data, error }) => {
+            if (data && !error) setRewardProducts(data);
+          });
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, isEligibleForFreeGift, hasClaimedFreeGift, comboOffer]);
 
   const goToProduct = (id: string) => {
     onClose();
@@ -77,11 +90,43 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   <p className="text-zinc-600 text-xs mt-1">Explore our premium textiles to add items</p>
                 </div>
               ) : (
-                cart.map((item) => (
-                  <div 
-                    key={item.id}
-                    className="flex gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/40 relative group"
-                  >
+                <>
+                  {isEligibleForFreeGift && !hasClaimedFreeGift && rewardProducts.length > 0 && (
+                    <div className="bg-pink-900/20 border border-pink-500/30 rounded-xl p-4 mb-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Sparkles className="h-4 w-4 text-pink-400" />
+                        <h4 className="text-sm font-bold text-pink-100">Choose Your Complimentary Gift!</h4>
+                      </div>
+                      <div className="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar">
+                        {rewardProducts.map(p => (
+                          <div key={p.id} className="min-w-[120px] max-w-[120px] bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden snap-start flex flex-col">
+                            <img src={getOptimizedUrl(p.images?.[0], 200)} alt={p.name} className="h-24 w-full object-cover" />
+                            <div className="p-2 flex-1 flex flex-col justify-between">
+                              <p className="text-[10px] text-white line-clamp-2 font-medium mb-2">{p.name}</p>
+                              <button
+                                onClick={() => addFreeGift({
+                                  id: p.id,
+                                  sku: p.sku,
+                                  name: p.name,
+                                  price_inr: p.price || 0,
+                                  images: p.images || [],
+                                  category: p.categories?.name
+                                })}
+                                className="w-full py-1.5 bg-pink-600 hover:bg-pink-500 text-white text-[10px] font-bold rounded flex items-center justify-center gap-1 transition-colors"
+                              >
+                                <Plus className="h-3 w-3" /> Add for $0
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {cart.map((item) => (
+                    <div 
+                      key={item.id}
+                      className="flex gap-4 p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/40 relative group"
+                    >
                     {/* Item Image - clickable to product page */}
                     <button onClick={() => goToProduct(item.id)} className="h-20 w-20 rounded-md overflow-hidden bg-zinc-800 shrink-0 block hover:opacity-80 transition-opacity cursor-pointer">
                       <img 
@@ -143,7 +188,8 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                       </button>
                     )}
                   </div>
-                ))
+                ))}
+                </>
               )}
             </div>
 

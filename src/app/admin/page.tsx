@@ -154,7 +154,7 @@ function AdminPortalContent() {
   const [promoActive, setPromoActive] = useState(false);
   const [promoReqQty, setPromoReqQty] = useState('2');
   const [promoReqCat, setPromoReqCat] = useState('');
-  const [promoRewardId, setPromoRewardId] = useState('');
+  const [promoRewardCat, setPromoRewardCat] = useState('');
   const [reviewProductId, setReviewProductId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -652,7 +652,7 @@ function AdminPortalContent() {
         setPromoActive(!!data.value.is_active);
         setPromoReqQty(data.value.required_qty?.toString() || '2');
         setPromoReqCat(data.value.required_category || '');
-        setPromoRewardId(data.value.reward_product_id || '');
+        setPromoRewardCat(data.value.reward_category || '');
       }
     } catch (err) {
       console.error('Failed to fetch combo promo', err);
@@ -667,13 +667,11 @@ function AdminPortalContent() {
   const handleSavePromo = async () => {
     setActionLoading(true);
     try {
-      const rewardProduct = products.find(p => p.id === promoRewardId);
       const payload = {
         is_active: promoActive,
         required_qty: parseInt(promoReqQty) || 2,
         required_category: promoReqCat,
-        reward_product_id: promoRewardId,
-        reward_product_name: rewardProduct ? rewardProduct.name : ''
+        reward_category: promoRewardCat
       };
       
       const { error } = await supabase.from('site_settings').upsert({
@@ -3154,18 +3152,18 @@ function AdminPortalContent() {
                 </div>
 
                 <div className="pt-4">
-                  <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">Free Reward Product</label>
+                  <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">Free Reward Category</label>
                   <select
-                    value={promoRewardId}
-                    onChange={(e) => setPromoRewardId(e.target.value)}
+                    value={promoRewardCat}
+                    onChange={(e) => setPromoRewardCat(e.target.value)}
                     className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-pink-500 transition-colors"
                   >
-                    <option value="">-- Select a product to give away --</option>
-                    {products.map(p => (
-                      <option key={p.id} value={p.id}>{p.name} (Stock: {p.stock_quantity})</option>
+                    <option value="">-- Select a category to offer as a gift --</option>
+                    {dbCategories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
-                  <p className="text-xs text-zinc-400 mt-1.5">This product will be automatically added to the cart for ₹0.</p>
+                  <p className="text-xs text-zinc-400 mt-1.5">Customers can pick any 1 product from this category for ₹0.</p>
                 </div>
 
                 <div className="pt-8 flex justify-end">

@@ -52,6 +52,15 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   const [isZoomed, setIsZoomed] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [exhibitionLightboxImg, setExhibitionLightboxImg] = useState<string | null>(null);
+  const [comboOffer, setComboOffer] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle().then(({ data }) => {
+      if (data && data.value && data.value.is_active) {
+        setComboOffer(data.value);
+      }
+    });
+  }, []);
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -678,8 +687,23 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   </div>
                 </div>
 
+                {/* Combo Offer Notification */}
+                {comboOffer && (!comboOffer.required_category || comboOffer.required_category === product.category) && (
+                  <div className="pt-2 pb-4">
+                    <div className="bg-pink-50 border border-pink-200 rounded-lg p-3 flex items-start gap-3">
+                      <Sparkles className="h-5 w-5 text-pink-500 shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="text-sm font-bold text-pink-900 mb-0.5">Special Offer</h4>
+                        <p className="text-xs text-pink-700 font-medium">
+                          Buy {comboOffer.required_qty} {comboOffer.required_category || 'Items'}, choose a complimentary <span className="font-bold">{comboOffer.reward_category}</span> in your cart!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Add to Cart Actions */}
-                <div className="pt-6 pb-2">
+                <div className="pt-2 pb-2">
                   <div className="flex h-14 max-w-md">
                     {isInCart ? (
                       <button

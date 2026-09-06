@@ -21,7 +21,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [activeModal, setActiveModal] = useState<'blog' | 'about' | 'contact' | null>(null);
   const [categoriesExpanded, setCategoriesExpanded] = useState(false);
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
-  const [comboOffer, setComboOffer] = useState<any>(null);
   const [isPromoDismissed, setIsPromoDismissed] = useState(false);
   const [trustIndex, setTrustIndex] = useState(0);
   
@@ -65,12 +64,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   useEffect(() => {
     const fetchPromo = async () => {
       try {
-        // Fetch Combo Offer
-        const { data: comboData } = await supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle();
-        if (comboData && comboData.value && comboData.value.is_active) {
-          setComboOffer(comboData.value);
-        }
-
         // Fetch Standard Coupon
         const { data, error } = await supabase
           .from('coupons')
@@ -104,22 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   return (
     <>
     <header className="fixed top-0 left-0 right-0 z-40 w-full flex flex-col shadow-sm">
-      {comboOffer && !isPromoDismissed ? (
-        <div className="bg-gradient-to-r from-pink-600 via-rose-500 to-pink-600 text-white text-[11px] sm:text-xs py-2 px-4 text-center font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(225,29,72,0.3)] border-b border-rose-400/50 w-full relative">
-          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white animate-pulse shrink-0" />
-          <span className="drop-shadow-md">
-            Gift With Purchase: Buy {comboOffer.required_qty} {comboOffer.required_category || 'Items'}, Get a Complimentary <span className="bg-white/20 px-2 py-0.5 rounded-md font-mono mx-1 border border-white/40 shadow-inner">{comboOffer.reward_product_name || 'Gift'}</span>
-          </span>
-          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white animate-pulse shrink-0" />
-          <button 
-            onClick={() => setIsPromoDismissed(true)} 
-            className="absolute right-4 text-white/80 hover:text-white transition-colors"
-            aria-label="Dismiss Promo"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      ) : activePromo && !isPromoDismissed ? (
+      {activePromo && !isPromoDismissed && (
         <div className="bg-gradient-to-r from-brand-600 via-amber-500 to-brand-600 text-white text-[11px] sm:text-xs py-2 px-4 text-center font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(245,158,11,0.3)] border-b border-amber-400/50 w-full relative">
           <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white animate-pulse shrink-0" />
           <span className="drop-shadow-md">
@@ -134,7 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             <X className="h-4 w-4" />
           </button>
         </div>
-      ) : null}
+      )}
 
       {/* Slim Rotating Trust Bar */}
       <div className="bg-zinc-900 text-brand-100 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase py-1.5 px-4 text-center w-full flex items-center justify-center overflow-hidden border-b border-zinc-800">

@@ -72,6 +72,10 @@ interface CartContextType {
   appliedCoupon: Coupon | null;
   applyCoupon: (code: string) => Promise<{ success: boolean; message: string; shortfallInr?: number }>;
   removeCoupon: () => void;
+  comboOffer: any;
+  isEligibleForFreeGift: boolean;
+  hasClaimedFreeGift: boolean;
+  addFreeGift: (product: CartContextProduct) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -86,22 +90,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // Load combo offer
-    supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle().then(async ({ data }) => {
+    supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle().then(({ data }) => {
       if (data && data.value && data.value.is_active) {
         setComboOffer(data.value);
-        if (data.value.reward_product_id) {
-          const { data: pData } = await supabase.from('products').select('id, name, sku, price, images, categories(name)').eq('id', data.value.reward_product_id).maybeSingle();
-          if (pData) {
-            setRewardProduct({
-              id: pData.id,
-              sku: pData.sku,
-              name: pData.name,
-              price_inr: pData.price || 0,
-              images: pData.images || [],
-              category: pData.categories?.name
-            });
-          }
-        }
       }
     });
 
@@ -187,6 +178,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const addFreeGift = (product: CartContextProduct) => {
+    const newItem: CartItem = {
+      id: product.id,
+      sku: product.sku,
+      name: product.name,
+      price_inr: 0,
+      images: product.images,
+      quantity: 1,
+      category: product.category,
+      isFreeGift: true
+    };
+    // Remove any existing free gifts to enforce max 1 free gift per order
+    const filteredCart = cart.filter(item => !item.isFreeGift);
+    saveCart([...filteredCart, newItem]);
+  };
+
   const removeFromCart = (productId: string) => {
     const updated = cart.filter((item) => item.id !== productId);
     saveCart(updated);
@@ -220,7 +227,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const computedCart = React.useMemo(() => {
-    if (!comboOffer || !comboOffer.is_active || !rewardProduct) return cart;
+    if (!comboOffer || !comboOffer.is_active) return cart;
     
     const eligibleCount = cart.reduce((sum, item) => {
       // Exclude free gifts from the count to prevent loops
@@ -233,22 +240,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return sum;
     }, 0);
 
-    if (eligibleCount >= (comboOffer.required_qty || 2)) {
-      if (!cart.find(i => i.id === rewardProduct.id && i.isFreeGift)) {
-        return [...cart, {
-          id: rewardProduct.id,
-          sku: rewardProduct.sku,
-          name: rewardProduct.name,
-          price_inr: 0,
-          images: rewardProduct.images,
-          quantity: 1,
-          category: rewardProduct.category,
-          isFreeGift: true
-        }];
-      }
+    const isEligible = eligibleCount >= (comboOffer.required_qty || 2);
+
+    if (isEligible) {
+      // If eligible, ensure any item marked as FreeGift is priced at 0.
+      return cart.map(item => item.isFreeGift ? { ...item, price_inr: 0 } : item);
+    } else {
+      // If NOT eligible, completely remove any free gifts from the cart.
+      return cart.filter(item => !item.isFreeGift);
     }
-    return cart;
-  }, [cart, comboOffer, rewardProduct]);
+  }, [cart, comboOffer]);
+
+  const isEligibleForFreeGift = React.useMemo(() => {
+    if (!comboOffer || !comboOffer.is_active) return false;
+    const eligibleCount = cart.reduce((sum, item) => {
+      if (item.isFreeGift) return sum;
+      const reqCat = comboOffer.required_category?.toLowerCase();
+      if (!reqCat || reqCat === '' || item.category?.toLowerCase() === reqCat) {
+        return sum + item.quantity;
+      }
+      return sum;
+    }, 0);
+    return eligibleCount >= (comboOffer.required_qty || 2);
+  }, [cart, comboOffer]);
+
+  const hasClaimedFreeGift = cart.some(item => item.isFreeGift);
 
   const getCartSubtotalInr = () => {
     return computedCart.reduce((acc, item) => acc + item.price_inr * item.quantity, 0);
@@ -344,6 +360,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         appliedCoupon,
         applyCoupon,
         removeCoupon,
+        comboOffer,
+        isEligibleForFreeGift,
+        hasClaimedFreeGift,
+        addFreeGift,
       }}
     >
       {children}
