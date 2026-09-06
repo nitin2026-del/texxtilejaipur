@@ -3117,7 +3117,30 @@ function AdminPortalContent() {
                   <p className="text-sm text-zinc-500 mt-1">Turn the global promotional banner and cart logic on or off.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" checked={promoActive} onChange={(e) => setPromoActive(e.target.checked)} />
+                  <input type="checkbox" className="sr-only peer" checked={promoActive} onChange={async (e) => {
+                    const newVal = e.target.checked;
+                    setPromoActive(newVal);
+                    // Auto-save immediately when toggled
+                    try {
+                      const payload = {
+                        is_active: newVal,
+                        required_qty: parseInt(promoReqQty) || 2,
+                        required_category: promoReqCat,
+                        reward_category: promoRewardCat
+                      };
+                      const response = await fetch('/api/admin/save-promo', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                      });
+                      const data = await response.json();
+                      if (!response.ok) throw new Error(data.error || 'Failed to save');
+                      showNotification(newVal ? 'Promotion enabled!' : 'Promotion disabled!');
+                    } catch (err: any) {
+                      showNotification(err.message || 'Failed to save', true);
+                      setPromoActive(!newVal); // revert on failure
+                    }
+                  }} />
                   <div className="w-14 h-7 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-pink-600"></div>
                 </label>
               </div>
