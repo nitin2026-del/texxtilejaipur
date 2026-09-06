@@ -674,13 +674,14 @@ function AdminPortalContent() {
         reward_category: promoRewardCat
       };
       
-      const { error } = await supabase.from('site_settings').upsert({
-        key: 'SYS_COMBO_OFFER',
-        value: payload,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'key' });
+      const response = await fetch('/api/admin/save-promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to save');
 
-      if (error) throw error;
       showNotification('Combo Offer configuration saved successfully!');
     } catch (err: any) {
       showNotification(err.message || 'Failed to save promo', true);
