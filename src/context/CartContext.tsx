@@ -234,6 +234,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Exclude free gifts from the count to prevent loops
       if (item.isFreeGift) return sum;
       
+      const rewardCat = comboOffer.reward_category?.toLowerCase();
+      if (rewardCat && item.category?.toLowerCase() === rewardCat) {
+        return sum;
+      }
+
       const reqCat = comboOffer.required_category?.toLowerCase();
       if (!reqCat || reqCat === '' || item.category?.toLowerCase() === reqCat) {
         return sum + item.quantity;
@@ -256,6 +261,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!comboOffer || !comboOffer.is_active) return 0;
     return cart.reduce((sum, item) => {
       if (item.isFreeGift) return sum;
+      
+      // Do not count items from the reward category towards the trigger requirement
+      const rewardCat = comboOffer.reward_category?.toLowerCase();
+      if (rewardCat && item.category?.toLowerCase() === rewardCat) {
+        return sum;
+      }
+
       const reqCat = comboOffer.required_category?.toLowerCase();
       if (!reqCat || reqCat === '' || item.category?.toLowerCase() === reqCat) {
         return sum + item.quantity;
