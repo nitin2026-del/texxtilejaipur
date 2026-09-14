@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw, Truck, Undo2, ShieldCheck, Video, Heart, Plane } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { InfoModal } from './InfoModal';
+import { sortCategoriesCustom } from '@/utils/categorySort';
 
 interface NavbarProps {
   onCartOpen: () => void;
@@ -49,10 +50,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
       } catch (e) {}
 
       try {
-        const { data } = await supabase.from('categories').select('name').order('name');
+        const { data } = await supabase.from('categories').select('name');
         if (data && data.length > 0) {
           const catList = data.map(d => d.name).filter(Boolean);
-          setNavCategories(catList);
+          const sortedCatList = sortCategoriesCustom(catList);
+          setNavCategories(sortedCatList);
         }
       } catch (err) {
         console.error('Failed to fetch navbar categories', err);

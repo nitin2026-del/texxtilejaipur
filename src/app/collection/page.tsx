@@ -1,6 +1,7 @@
 import React from 'react';
 import { CollectionPageClient } from '@/components/CollectionPageClient';
 import { Metadata } from 'next';
+import { sortCategoriesCustom } from '@/utils/categorySort';
 
 export const metadata: Metadata = {
   title: 'Shop All Collections | Textile Jaipur',
@@ -75,7 +76,7 @@ export default async function CollectionPage() {
     if (catRes.ok) {
       const catData = await catRes.json();
       const fetchedCats = (catData as any[]).map(c => c.name);
-      categories = ['All', ...fetchedCats];
+      categories = ['All', ...sortCategoriesCustom(fetchedCats)];
     }
   } catch (err) {
     console.error('Failed to fetch products', err);
