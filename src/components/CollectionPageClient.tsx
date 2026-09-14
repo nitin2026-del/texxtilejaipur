@@ -111,17 +111,38 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-10">
-          {/* Mobile Filter Toggle Pill */}
-          <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
-            <button 
-              className="flex items-center gap-2 bg-zinc-900 text-white shadow-2xl px-6 py-3 rounded-full font-bold text-sm tracking-wide hover:scale-105 transition-transform border border-zinc-700"
-              onClick={() => setIsFilterOpen(true)}
-            >
-              <Filter className="h-4 w-4" />
-              Filters & Sort
-            </button>
+        {/* Mobile Top Category Scroller */}
+        <div className="lg:hidden mb-6 -mx-4 px-4 overflow-x-auto hide-scrollbar sticky top-[60px] z-30 bg-[#FDFBF7]/95 backdrop-blur-md py-3 border-b border-zinc-200 shadow-sm">
+          <div className="flex gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold border transition-colors shadow-sm ${
+                  selectedCategory === cat 
+                    ? 'bg-[#1a1464] text-white border-[#1a1464]' 
+                    : 'bg-white text-zinc-700 border-zinc-200 hover:border-brand-300'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
+        </div>
+
+        {/* Mobile Filter & Sort Top Button */}
+        <div className="lg:hidden flex justify-between items-center mb-6">
+          <p className="text-zinc-600 text-sm font-bold">{filteredAndSortedProducts.length} Products</p>
+          <button 
+            className="flex items-center gap-2 bg-white text-zinc-900 shadow-sm px-4 py-2 rounded-lg font-bold text-sm border border-zinc-200 hover:bg-zinc-50 transition-colors"
+            onClick={() => setIsFilterOpen(true)}
+          >
+            <Filter className="h-4 w-4 text-[#1a1464]" />
+            Sort & Filter
+          </button>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-10">
 
           {/* Mobile Filter Modal */}
           {isFilterOpen && (

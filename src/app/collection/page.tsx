@@ -66,9 +66,16 @@ export default async function CollectionPage() {
           created_at: item.created_at
         };
       });
+    }
 
-      const uniqueCats = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
-      categories = ['All', ...uniqueCats.sort()];
+    const catRes = await fetch(`${url}/rest/v1/categories?select=name&order=name`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      next: { revalidate: 60 }
+    });
+    if (catRes.ok) {
+      const catData = await catRes.json();
+      const fetchedCats = (catData as any[]).map(c => c.name);
+      categories = ['All', ...fetchedCats];
     }
   } catch (err) {
     console.error('Failed to fetch products', err);
