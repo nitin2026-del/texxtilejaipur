@@ -25,14 +25,16 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
   const [rewardProducts, setRewardProducts] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!isOpen) return;
     fetch('/api/shipping-config')
       .then(res => res.json())
       .then(data => setShippingConfig(data))
       .catch(console.error);
-  }, []);
+  }, [isOpen]);
 
   // Fetch reward products as soon as comboOffer is loaded and active
   useEffect(() => {
+    if (!isOpen) return;
     if (comboOffer?.is_active && comboOffer?.reward_category && !hasClaimedFreeGift) {
       supabase
         .from('products')
@@ -53,7 +55,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
           }
         });
     }
-  }, [comboOffer, hasClaimedFreeGift]);
+  }, [comboOffer, hasClaimedFreeGift, isOpen]);
 
   const goToProduct = (id: string) => {
     onClose();

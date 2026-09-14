@@ -45,7 +45,7 @@ interface Product {
 }
 
 export function ProductPageClient({ product, relatedProducts, initialReviews, ugcVideos = [] }: { product: any, relatedProducts: any[], initialReviews: any[], ugcVideos?: any[] }) {
-    const { cart, addToCart, formatPrice, updateQuantity } = useCart();
+    const { cart, addToCart, formatPrice, updateQuantity, comboOffer } = useCart();
     const id = product?.id;
     const pathname = usePathname();
     const [quantity, setQuantity] = useState(1);
@@ -53,16 +53,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  const [exhibitionLightboxImg, setExhibitionLightboxImg] = useState<string | null>(null);
-  const [comboOffer, setComboOffer] = useState<any>(null);
-
-  useEffect(() => {
-    supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle().then(({ data }) => {
-      if (data && data.value && data.value.is_active) {
-        setComboOffer(data.value);
-      }
-    });
-  }, []);
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -756,36 +746,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4 object-contain" />
                   </div>
 
-                  {/* Autumn Fair Exhibition Banner */}
-                  <div className="mt-8 max-w-md pt-6 border-t border-zinc-200">
-                    <div className="bg-gradient-to-br from-pink-50 to-white border border-pink-200 rounded-xl overflow-hidden shadow-sm relative">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-pink-300/30 to-transparent rounded-bl-full pointer-events-none"></div>
-                      <div className="p-4 bg-[#e84393]/10 border-b border-pink-100 flex items-center justify-between relative z-10">
-                        <div>
-                          <h3 className="text-[14px] font-black text-[#e84393] uppercase tracking-wide">Live at Autumn Fair! 🌟</h3>
-                          <p className="text-[12px] font-medium text-pink-900 mt-0.5">NEC Birmingham • Sept 6th–9th</p>
-                        </div>
-                        <span className="bg-[#e84393] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider animate-pulse whitespace-nowrap shadow-sm border border-pink-500">Stand 9J13</span>
-                      </div>
-                      
-                      <div className="p-4 relative z-10">
-                        <div className="flex gap-2.5 overflow-x-auto pb-3 snap-x hide-scrollbar">
-                          {[1, 2, 3].map((num) => (
-                            <img 
-                              key={num}
-                              src={`/exhibition/stall-${num}.jpg`} 
-                              alt={`Bless International Stand 9J13 at Autumn Fair - View ${num}`}
-                              onClick={() => setExhibitionLightboxImg(`/exhibition/stall-${num}.jpg`)}
-                              className="w-[120px] h-[160px] object-cover rounded-lg shadow-sm border border-zinc-200 shrink-0 snap-start hover:scale-[1.02] transition-transform duration-300 cursor-zoom-in"
-                            />
-                          ))}
-                        </div>
-                        <p className="text-[12px] text-zinc-700 leading-relaxed font-medium mt-1">
-                          We are thrilled to showcase our exclusive new collections in person! If you're attending, we'd love to welcome you to discover the craftsmanship firsthand. Message us to schedule a meeting! ❤️
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Artisan Edit / UGC Embedded Videos */}
                   {ugcVideos && ugcVideos.length > 0 && (
@@ -802,10 +762,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                             <video
                               src={video.videoUrl}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                              autoPlay
                               muted
                               loop
                               playsInline
+                              preload="metadata"
+                              onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
+                              onMouseLeave={(e) => e.currentTarget.pause()}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0"></div>
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
@@ -1409,27 +1371,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
           </button>
         </div>
       )}
-      {/* Exhibition Lightbox */}
-      {exhibitionLightboxImg && (
-        <div 
-          className="fixed inset-0 z-[99999] bg-black/95 flex flex-col items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200"
-          onClick={() => setExhibitionLightboxImg(null)}
-        >
-          <button 
-            className="absolute top-4 right-4 md:top-6 md:right-6 z-50 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors backdrop-blur-md"
-            onClick={() => setExhibitionLightboxImg(null)}
-          >
-            <X className="h-6 w-6" />
-          </button>
-          <img 
-            src={exhibitionLightboxImg} 
-            alt="Bless International Exhibition Stall"
-            className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl ring-1 ring-white/10"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <p className="text-white/80 mt-6 text-sm font-medium">Bless International at Autumn Fair, Stand 9J13</p>
-        </div>
-      )}
+
     </main>
   );
 }

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Heart } from 'lucide-react';
+import { getOptimizedUrl } from '@/utils/imageUtils';
 
 export function HappyCustomersSlider({ initialImages = [] }: { initialImages?: string[] }) {
   const [images, setImages] = useState<string[]>([]);
@@ -10,6 +11,8 @@ export function HappyCustomersSlider({ initialImages = [] }: { initialImages?: s
   useEffect(() => {
     supabase.from('reviews')
       .select('image_url, image_urls')
+      .neq('image_url', null)
+      .limit(15)
       .then(({ data, error }) => {
         let dbImages: string[] = [];
         if (!error && data) {
@@ -56,7 +59,7 @@ export function HappyCustomersSlider({ initialImages = [] }: { initialImages?: s
         <div className="flex animate-marquee shrink-0 gap-4 pr-4">
           {images.map((src, i) => (
             <div key={`set1-${i}`} className="w-[280px] md:w-[320px] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden shadow-sm bg-zinc-100 relative">
-              <img src={src} alt="Happy Customer" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
+              <img src={getOptimizedUrl(src, 320)} alt="Happy Customer" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
               <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm text-brand-600">
                 <Heart className="w-4 h-4 fill-brand-600" />
               </div>
@@ -66,7 +69,7 @@ export function HappyCustomersSlider({ initialImages = [] }: { initialImages?: s
         <div className="flex animate-marquee shrink-0 gap-4 pr-4">
           {images.map((src, i) => (
             <div key={`set2-${i}`} className="w-[280px] md:w-[320px] shrink-0 aspect-[4/5] rounded-2xl overflow-hidden shadow-sm bg-zinc-100 relative">
-              <img src={src} alt="Happy Customer" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
+              <img src={getOptimizedUrl(src, 320)} alt="Happy Customer" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
               <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm text-brand-600">
                 <Heart className="w-4 h-4 fill-brand-600" />
               </div>
