@@ -121,7 +121,7 @@ export default async function ProductPage({ params }: Props) {
     if (!product) return notFound();
 
     // 2. Fetch Related Products (requires product category)
-    const relatedRes = await fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}`, fetchOptions);
+    const relatedRes = await fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}&limit=10`, fetchOptions);
     
     if (relatedRes.ok) {
       const relatedData = await relatedRes.json();

@@ -1245,8 +1245,9 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                       />
                     ) : (
                       <img 
-                        src={rp.image || 'https://via.placeholder.com/400x500'} 
+                        src={getOptimizedUrl(rp.image, 400)} 
                         alt={rp.name}
+                        loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     )}
