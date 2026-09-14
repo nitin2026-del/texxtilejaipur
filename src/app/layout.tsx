@@ -1,12 +1,16 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import { Suspense } from 'react';
+import { Inter, Playfair_Display } from 'next/font/google';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { MetaPixel } from '@/components/MetaPixel';
 import './globals.css';
 import { FloatingSupport } from '@/components/FloatingSupport';
 import { GlobalModals } from '@/components/GlobalModals';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap' });
 
 export const viewport = {
   width: 'device-width',
@@ -215,7 +219,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
         />
       </head>
-      <body className="antialiased">
+      <body className={`antialiased ${inter.variable} ${playfair.variable}`}>
         <Suspense fallback={null}>
           <MetaPixel />
         </Suspense>

@@ -4,8 +4,10 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { CartSidebar } from '@/components/CartSidebar';
-import { CheckoutModal } from '@/components/CheckoutModal';
+import dynamic from 'next/dynamic';
+
+const CartSidebar = dynamic(() => import('@/components/CartSidebar').then(mod => mod.CartSidebar), { ssr: false });
+const CheckoutModal = dynamic(() => import('@/components/CheckoutModal').then(mod => mod.CheckoutModal), { ssr: false });
 
 import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
