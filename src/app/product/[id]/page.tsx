@@ -74,14 +74,17 @@ export default async function ProductPage({ params }: Props) {
   let ugcVideos: any[] = [];
 
   try {
-    // 1. Fetch Product
-    const res = await fetch(`${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&id=eq.${id}`, {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`
-      },
+    const fetchOptions = {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
       next: { revalidate: 60 }
-    });
+    };
+
+    // 1. Kick off independent fetches in parallel
+    const productPromise = fetch(`${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&id=eq.${id}`, fetchOptions);
+    const reviewsPromise = fetch(`${url}/rest/v1/reviews?product_id=eq.${id}&status=eq.approved&order=created_at.desc`, fetchOptions);
+    const ugcPromise = fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast`, fetchOptions);
+
+    const [res, reviewsRes, ugcRes] = await Promise.all([productPromise, reviewsPromise, ugcPromise]);
 
     if (res.ok) {
       const data = await res.json();
@@ -117,11 +120,8 @@ export default async function ProductPage({ params }: Props) {
     
     if (!product) return notFound();
 
-    // 2. Fetch Related Products
-    const relatedRes = await fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
-      next: { revalidate: 60 }
-    });
+    // 2. Fetch Related Products (requires product category)
+    const relatedRes = await fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}`, fetchOptions);
     
     if (relatedRes.ok) {
       const relatedData = await relatedRes.json();
@@ -136,12 +136,7 @@ export default async function ProductPage({ params }: Props) {
       }));
     }
 
-    // 3. Fetch Reviews
-    const reviewsRes = await fetch(`${url}/rest/v1/reviews?product_id=eq.${id}&status=eq.approved&order=created_at.desc`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
-      next: { revalidate: 60 }
-    });
-    
+    // 3. Process Reviews
     if (reviewsRes.ok) {
       const reviewsData = await reviewsRes.json();
       initialReviews = reviewsData.map((review: any) => ({
@@ -162,25 +157,15 @@ export default async function ProductPage({ params }: Props) {
       }));
     }
     
-    // 4. Fetch UGC Videos
-    try {
-      const ugcRes = await fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast`, {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        next: { revalidate: 60 }
-      });
-      if (ugcRes.ok) {
-        const ugcData = await ugcRes.json();
-        
-        // Use all available UGC videos to build maximum trust on every product page
-        ugcVideos = ugcData.map((item: any) => ({
-            id: item.id,
-            videoUrl: item.media_url,
-            title: item.title,
-            description: item.description ? item.description.split('|||')[0] : ''
-        }));
-      }
-    } catch (err) {
-      console.error('Failed to fetch UGC videos', err);
+    // 4. Process UGC Videos
+    if (ugcRes.ok) {
+      const ugcData = await ugcRes.json();
+      ugcVideos = ugcData.map((item: any) => ({
+          id: item.id,
+          videoUrl: item.media_url,
+          title: item.title,
+          description: item.description ? item.description.split('|||')[0] : ''
+      }));
     }
     
   } catch (err) {
