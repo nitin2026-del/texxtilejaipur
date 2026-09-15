@@ -766,7 +766,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                               muted
                               loop
                               playsInline
-                              preload="none"
+                              preload="metadata"
                               onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
                               onMouseLeave={(e) => e.currentTarget.pause()}
                             />
@@ -1205,7 +1205,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                         muted
                         loop
                         playsInline
-                        preload="none"
+                        preload="metadata"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
                         onMouseLeave={(e) => e.currentTarget.pause()}
