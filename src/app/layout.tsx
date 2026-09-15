@@ -173,12 +173,12 @@ export default function RootLayout({
         {/* Google tag (gtag.js) */}
         <Script
           id="google-tag-src"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src="https://www.googletagmanager.com/gtag/js?id=G-PTT2P19231"
         />
         <Script
           id="google-tag-init"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
