@@ -328,7 +328,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                             <video 
                               src={media.url} 
                               autoPlay={isActive} 
-                              preload="metadata"
+                              preload={isActive ? "auto" : "none"}
                               muted 
                               loop 
                               playsInline 
@@ -766,7 +766,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                               muted
                               loop
                               playsInline
-                              preload="metadata"
+                              preload="none"
                               onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
                               onMouseLeave={(e) => e.currentTarget.pause()}
                             />
@@ -1202,11 +1202,13 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     {rp.image.match(/\.(mp4|webm)(\?.*)?$/i) ? (
                       <video
                         src={rp.image}
-                        autoPlay
                         muted
                         loop
                         playsInline
+                        preload="none"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
+                        onMouseLeave={(e) => e.currentTarget.pause()}
                       />
                     ) : (
                       <img 
