@@ -214,6 +214,7 @@ function AdminPortalContent() {
   const [formVideoUrl, setFormVideoUrl] = useState('');
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [formIsBestseller, setFormIsBestseller] = useState(false);
+  const [formSiblingGroup, setFormSiblingGroup] = useState('');
   const [formDisplayRank, setFormDisplayRank] = useState('');
   
   // International AI features
@@ -1221,7 +1222,8 @@ function AdminPortalContent() {
           culturalContext: formCulturalContext,
           stylingAdvice: formStylingAdvice,
           translations: parsedTranslations,
-          isBestseller: formIsBestseller
+          isBestseller: formIsBestseller,
+          sibling_group: formSiblingGroup
         }
       };
 
@@ -1302,6 +1304,7 @@ function AdminPortalContent() {
     setFormVideoUrl(prod.details?.video_url || '');
     setFormIsFeatured(prod.is_featured || false);
     setFormIsBestseller(prod.details?.isBestseller || false);
+    setFormSiblingGroup(prod.details?.sibling_group || '');
     setFormDisplayRank(prod.display_rank?.toString() || '');
     setFormCulturalContext(prod.details?.culturalContext || '');
     setFormStylingAdvice(prod.details?.stylingAdvice || '');
@@ -1345,6 +1348,7 @@ function AdminPortalContent() {
     setFormVideoUrl('');
     setFormIsFeatured(false);
     setFormIsBestseller(false);
+    setFormSiblingGroup('');
     setFormDisplayRank('');
   };
 
@@ -2666,6 +2670,17 @@ function AdminPortalContent() {
                     placeholder="e.g. 1, 2, 3..."
                     className="w-full bg-[#FDFBF7] border border-zinc-200 rounded-xl py-3 px-3.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-brand-500 shadow-sm"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Linked Group ID (for Ads)</label>
+                  <input 
+                    type="text"
+                    value={formSiblingGroup}
+                    onChange={(e) => setFormSiblingGroup(e.target.value)}
+                    placeholder="e.g. meta-jackets-1"
+                    className="w-full bg-[#FDFBF7] border border-zinc-200 rounded-xl py-3 px-3.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-brand-500 shadow-sm"
+                  />
+                  <p className="text-[10px] text-zinc-400 mt-1">Products with the same Group ID will appear as clickable swatches on each other&apos;s product pages.</p>
                 </div>
               </div>
 

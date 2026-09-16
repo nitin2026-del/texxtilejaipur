@@ -41,10 +41,18 @@ interface Product {
       de?: string;
     };
     isBestseller?: boolean;
+    sibling_group?: string;
   };
 }
 
-export function ProductPageClient({ product, relatedProducts, initialReviews, ugcVideos = [] }: { product: any, relatedProducts: any[], initialReviews: any[], ugcVideos?: any[] }) {
+interface SiblingProduct {
+  id: string;
+  name: string;
+  price_inr: number;
+  image: string;
+}
+
+export function ProductPageClient({ product, relatedProducts, initialReviews, ugcVideos = [], siblingProducts = [] }: { product: any, relatedProducts: any[], initialReviews: any[], ugcVideos?: any[], siblingProducts?: SiblingProduct[] }) {
     const { cart, addToCart, formatPrice, updateQuantity, comboOffer } = useCart();
     const id = product?.id;
     const pathname = usePathname();
@@ -599,6 +607,36 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     </div>
                   )}
                 </div>
+
+                {/* Sibling Product Swatches */}
+                {siblingProducts && siblingProducts.length > 0 && (
+                  <div className="pt-2 pb-1">
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <span className="text-[11px] uppercase font-bold text-[#111] tracking-widest">Also featured in this ad:</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2.5">
+                      {/* Current Product */}
+                      <div className="relative w-14 h-14 rounded border-2 border-[#1a1464] shadow-sm overflow-hidden cursor-default">
+                        <img 
+                          src={getOptimizedUrl(product.images?.[0] || '', 100)}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      {/* Siblings */}
+                      {siblingProducts.map(sib => (
+                        <a key={sib.id} href={`/product/${sib.id}`} title={sib.name} className="relative w-14 h-14 rounded border border-zinc-200 hover:border-[#1a1464] hover:shadow-md transition-all overflow-hidden block group">
+                          <img 
+                            src={getOptimizedUrl(sib.image || '', 100)}
+                            alt={sib.name}
+                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Size Selector */}
                 <div className="space-y-3 pt-4">

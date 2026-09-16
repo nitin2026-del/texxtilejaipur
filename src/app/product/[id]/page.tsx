@@ -72,6 +72,7 @@ export default async function ProductPage({ params }: Props) {
   let relatedProducts: any[] = [];
   let initialReviews: any[] = [];
   let ugcVideos: any[] = [];
+  let siblingProducts: any[] = [];
 
   try {
     const fetchOptions = {
@@ -167,6 +168,24 @@ export default async function ProductPage({ params }: Props) {
           description: item.description ? item.description.split('|||')[0] : ''
       }));
     }
+
+    // 5. Fetch Sibling Products (lightweight: only if sibling_group exists)
+    const siblingGroup = product?.details?.sibling_group;
+    if (siblingGroup) {
+      const sibRes = await fetch(
+        `${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${id}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`,
+        fetchOptions
+      );
+      if (sibRes.ok) {
+        const sibData = await sibRes.json();
+        siblingProducts = sibData.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          price_inr: item.price,
+          image: item.product_images?.find((img: any) => img.is_primary)?.url || item.product_images?.[0]?.url || ''
+        }));
+      }
+    }
     
   } catch (err) {
     console.error('Failed to fetch product data', err);
@@ -210,6 +229,7 @@ export default async function ProductPage({ params }: Props) {
         relatedProducts={relatedProducts} 
         initialReviews={initialReviews} 
         ugcVideos={ugcVideos}
+        siblingProducts={siblingProducts}
       />
     </>
   );
