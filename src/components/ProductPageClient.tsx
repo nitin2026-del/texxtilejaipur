@@ -182,6 +182,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   const displayQuantity = cartItem ? cartItem.quantity : quantity;
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     try {
       const stored = JSON.parse(localStorage.getItem('textilejaipur_my_reviews') || '[]');
       setMyReviews(stored);
