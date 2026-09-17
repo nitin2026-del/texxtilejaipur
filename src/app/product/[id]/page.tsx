@@ -2,6 +2,7 @@ import React from 'react';
 import { ProductPageClient } from '@/components/ProductPageClient';
 import { notFound } from 'next/navigation';
 import { Metadata, ResolvingMetadata } from 'next';
+import { getOptimizedUrl } from '@/utils/imageUtils';
 
 export const revalidate = 60; // ISR cache for 60 seconds
 
@@ -220,6 +221,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <>
+      <link rel="preload" as="image" href={getOptimizedUrl(product.images[0], 800)} fetchPriority="high" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

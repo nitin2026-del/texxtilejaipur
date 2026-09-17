@@ -314,6 +314,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                             src={getOptimizedUrl(media.url, 800)} 
                             alt={`${product.name} view ${idx + 1}`}
                             loading={idx === 0 ? "eager" : "lazy"}
+                            fetchPriority={idx === 0 ? "high" : "auto"}
                             className="absolute inset-0 w-full h-full object-cover"
                           />
                           {isActive && (
