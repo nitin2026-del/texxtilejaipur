@@ -1267,6 +1267,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                 </a>
               ))}
             </div>
+            <div className="mt-8 flex justify-center">
+              <a href={`/collection?category=${encodeURIComponent(product.category)}`} className="inline-flex items-center gap-2 px-6 py-3 bg-[#FDFBF7] border border-zinc-200 text-zinc-800 font-bold text-sm rounded-xl hover:bg-zinc-100 hover:border-zinc-300 transition-all shadow-sm group">
+                See More {product.category}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+              </a>
+            </div>
           </div>
         )}
 
