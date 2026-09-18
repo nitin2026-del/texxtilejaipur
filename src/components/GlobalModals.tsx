@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { X, Sparkles, Mail, MoveRight } from 'lucide-react';
+import { SarcasticPopup } from '@/components/SarcasticPopup';
 
 export function GlobalModals() {
   const [vipModalOpen, setVipModalOpen] = useState(false);
@@ -156,6 +157,8 @@ export function GlobalModals() {
           </div>
         </div>
       )}
+      
+      <SarcasticPopup />
     </>
   );
 }
