@@ -18,7 +18,7 @@ export function SarcasticPopup() {
 
     // Check for test mode (3 seconds) vs production (120 seconds = 2 mins)
     const isTestMode = typeof window !== 'undefined' && window.location.search.includes('test-popup=true');
-    const delay = isTestMode ? 3000 : 120000;
+    const delay = isTestMode ? 3000 : 90000;
 
     const timer = setTimeout(() => {
       // Final check just in case they added to cart during the 2 minutes
