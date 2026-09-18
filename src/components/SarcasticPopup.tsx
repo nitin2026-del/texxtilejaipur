@@ -37,53 +37,61 @@ export function SarcasticPopup() {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Blurred overlay */}
       <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-[#1a1464]/20 backdrop-blur-md transition-opacity"
         onClick={() => setIsOpen(false)}
       />
       
       {/* Modal content */}
-      <div className="relative bg-[#FDFBF7] w-full max-w-sm rounded-[24px] shadow-2xl overflow-hidden border border-zinc-200 animate-in fade-in zoom-in duration-300">
+      <div className="relative bg-[#FDFBF7] w-full max-w-md rounded-[20px] shadow-2xl overflow-hidden border border-[#e5dcd3] animate-in fade-in zoom-in-95 duration-500">
         
-        {/* Top graphic area */}
-        <div className="bg-brand-50 pt-8 pb-6 px-6 text-center relative border-b border-brand-100">
-          <button 
-            onClick={() => setIsOpen(false)}
-            className="absolute top-4 right-4 text-brand-600/50 hover:text-brand-900 bg-white/50 hover:bg-white p-1.5 rounded-full transition-colors"
-          >
-            <X className="h-5 w-5" />
-          </button>
-          
-          <div className="text-6xl mb-2 drop-shadow-md animate-bounce" style={{ animationDuration: '2s' }}>
-            ??
+        {/* Top pattern bar */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300"></div>
+
+        <button 
+          onClick={() => setIsOpen(false)}
+          className="absolute top-5 right-5 text-zinc-400 hover:text-zinc-800 bg-white hover:bg-zinc-100 p-2 rounded-full transition-colors shadow-sm border border-zinc-200 z-10"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <div className="p-8 md:p-10 text-center relative">
+          <div className="mx-auto w-16 h-16 bg-white border border-[#e5dcd3] rounded-full flex items-center justify-center shadow-sm mb-6 relative">
+            <span className="text-3xl" role="img" aria-label="eyes">👀</span>
+            <div className="absolute -top-1 -right-1">
+              <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
+            </div>
           </div>
-          <h2 className="text-2xl font-serif font-bold text-[#1a1464] tracking-tight">
+          
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-[#1a1464] tracking-tight mb-4">
             Caught you staring!
           </h2>
-        </div>
+          
+          <p className="text-[15px] text-zinc-600 leading-relaxed font-medium mb-6">
+            We know our collections are <span className="text-brand-700 font-bold">dangerously attractive</span>, but they look even better on you.
+          </p>
 
-        {/* Text content */}
-        <div className="px-6 py-6 text-center space-y-4">
-          <p className="text-sm text-zinc-700 leading-relaxed font-medium">
-            We know our products are <span className="font-bold text-brand-700">dangerously attractive</span>, but they look even better on you.
-          </p>
-          <p className="text-[13px] text-zinc-500">
-            Toss <strong className="text-zinc-800">2 items</strong> into your cart right now and watch some magic happen! ???
-          </p>
+          <div className="bg-white border border-[#e5dcd3] rounded-xl p-4 mb-8 shadow-sm">
+            <p className="text-[13px] text-zinc-800 font-medium">
+              Toss <strong className="text-[#1a1464] font-bold text-sm">2 items</strong> into your cart right now and watch a little magic happen! <span className="text-lg inline-block translate-y-0.5">✨🪄</span>
+            </p>
+          </div>
           
-          <button
-            onClick={() => setIsOpen(false)}
-            className="w-full mt-4 flex items-center justify-center gap-2 bg-[#1a1464] hover:bg-brand-900 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all active:scale-95"
-          >
-            <Sparkles className="h-4 w-4" />
-            Let's see the magic!
-          </button>
-          
-          <button 
-            onClick={() => setIsOpen(false)}
-            className="text-[11px] text-zinc-400 hover:text-zinc-600 font-medium pt-2 underline underline-offset-2"
-          >
-            I'll just keep window shopping
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center justify-center gap-2 bg-[#1a1464] hover:bg-[#2a2484] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-[#1a1464]/20 transition-all active:scale-[0.98] group"
+            >
+              Let's see the magic
+              <Sparkles className="h-4 w-4 group-hover:rotate-12 transition-transform" />
+            </button>
+            
+            <button 
+              onClick={() => setIsOpen(false)}
+              className="text-xs text-zinc-400 hover:text-zinc-800 font-medium py-2 transition-colors"
+            >
+              No thanks, I'll keep window shopping
+            </button>
+          </div>
         </div>
       </div>
     </div>
