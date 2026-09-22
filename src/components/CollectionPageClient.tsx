@@ -113,14 +113,19 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
         )}
 
         {/* SEO Category Description */}
-        {seoDescriptions[selectedCategory] && (
-          <div className="mb-8 p-6 md:p-8 bg-white border border-brand-100 rounded-2xl shadow-sm text-center max-w-3xl mx-auto">
-            <h1 className="text-2xl md:text-3xl font-serif font-bold text-zinc-900 mb-4">{selectedCategory === 'All' ? 'Our Collection' : selectedCategory}</h1>
-            <p className="text-sm md:text-base text-zinc-600 leading-relaxed font-medium">
-              {seoDescriptions[selectedCategory]}
-            </p>
-          </div>
-        )}
+        {(() => {
+          const descKey = Object.keys(seoDescriptions).find(k => k.toLowerCase() === selectedCategory.toLowerCase());
+          const descText = descKey ? seoDescriptions[descKey] : null;
+          if (!descText) return null;
+          return (
+            <div className="mb-8 p-6 md:p-8 bg-white border border-brand-100 rounded-2xl shadow-sm text-center max-w-3xl mx-auto animate-fade-in-up">
+              <h1 className="text-2xl md:text-3xl font-serif font-bold text-zinc-900 mb-4">{selectedCategory === 'All' ? 'Our Collection' : selectedCategory}</h1>
+              <p className="text-sm md:text-base text-zinc-600 leading-relaxed font-medium">
+                {descText}
+              </p>
+            </div>
+          );
+        })()}
 
         {/* Mobile Top Category Scroller */}
         <div className="lg:hidden mb-6 -mx-4 px-4 overflow-x-auto hide-scrollbar sticky top-[60px] z-30 bg-[#FDFBF7]/95 backdrop-blur-md py-3 border-b border-zinc-200 shadow-sm">

@@ -2853,7 +2853,10 @@ function AdminPortalContent() {
                                 <ChevronDown className="h-4 w-4" />
                               </button>
                               <button
-                                onClick={() => setEditingCategoryDesc({name: catObj.name, desc: categoryDescriptions[catObj.name] || ''})}
+                                onClick={() => {
+                                  const exactKey = Object.keys(categoryDescriptions).find(k => k.toLowerCase() === catObj.name.toLowerCase());
+                                  setEditingCategoryDesc({name: catObj.name, desc: exactKey ? categoryDescriptions[exactKey] : ''});
+                                }}
                                 className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-violet-950/20 hover:border-violet-900/30 text-zinc-600 hover:text-brand-600 transition-colors text-[11px] font-medium"
                               >
                                 Edit SEO
