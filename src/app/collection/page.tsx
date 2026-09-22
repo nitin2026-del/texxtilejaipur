@@ -98,6 +98,7 @@ export default async function CollectionPage() {
         if (config.value?.is_active) {
           saleBanner = `${url}/storage/v1/object/public/products/sale-banner.png?v=${config.value?.discount_value}`;
         }
+      }
     }
   } catch (err) {
     console.error('Failed to fetch banner config', err);
