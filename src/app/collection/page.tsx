@@ -98,11 +98,29 @@ export default async function CollectionPage() {
         if (config.value?.is_active) {
           saleBanner = `${url}/storage/v1/object/public/products/sale-banner.png?v=${config.value?.discount_value}`;
         }
-      }
     }
   } catch (err) {
     console.error('Failed to fetch banner config', err);
   }
 
-  return <CollectionPageClient initialProducts={products} categories={categories} saleBanner={saleBanner} />;
+  let seoDescriptions: Record<string, string> = {};
+  try {
+    const seoRes = await fetch(
+      `${url}/rest/v1/site_settings?key=eq.SYS_CATEGORY_DESCRIPTIONS&select=value`,
+      {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        next: { revalidate: 60 }
+      }
+    );
+    if (seoRes.ok) {
+      const sData = await seoRes.json();
+      if (sData && sData.length > 0 && sData[0].value) {
+        seoDescriptions = sData[0].value;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to fetch SEO descriptions', err);
+  }
+
+  return <CollectionPageClient initialProducts={products} categories={categories} saleBanner={saleBanner} seoDescriptions={seoDescriptions} />;
 }

@@ -29,9 +29,10 @@ interface CollectionPageClientProps {
   initialProducts: Product[];
   categories: string[];
   saleBanner?: string | null;
+  seoDescriptions?: Record<string, string>;
 }
 
-export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ initialProducts, categories, saleBanner }) => {
+export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ initialProducts, categories, saleBanner, seoDescriptions = {} }) => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [products] = useState<Product[]>(initialProducts);
   
@@ -108,6 +109,16 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
               alt="Promotional Banner" 
               className="w-full max-h-[500px] object-cover sm:object-contain"
             />
+          </div>
+        )}
+
+        {/* SEO Category Description */}
+        {seoDescriptions[selectedCategory] && (
+          <div className="mb-8 p-6 md:p-8 bg-white border border-brand-100 rounded-2xl shadow-sm text-center max-w-3xl mx-auto">
+            <h1 className="text-2xl md:text-3xl font-serif font-bold text-zinc-900 mb-4">{selectedCategory === 'All' ? 'Our Collection' : selectedCategory}</h1>
+            <p className="text-sm md:text-base text-zinc-600 leading-relaxed font-medium">
+              {seoDescriptions[selectedCategory]}
+            </p>
           </div>
         )}
 

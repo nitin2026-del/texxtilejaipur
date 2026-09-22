@@ -192,6 +192,10 @@ function AdminPortalContent() {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryParentId, setNewCategoryParentId] = useState<string>('');
+  
+  // Category SEO Descriptions
+  const [categoryDescriptions, setCategoryDescriptions] = useState<Record<string, string>>({});
+  const [editingCategoryDesc, setEditingCategoryDesc] = useState<{name: string, desc: string} | null>(null);
 
   // Selected order details modal
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -646,6 +650,29 @@ function AdminPortalContent() {
     }
   };
 
+  const handleSaveCategoryDesc = async (catName: string, desc: string) => {
+    setActionLoading(true);
+    try {
+      const newMap = { ...categoryDescriptions, [catName]: desc };
+      
+      const { error } = await supabase.from('site_settings').upsert({
+        key: 'SYS_CATEGORY_DESCRIPTIONS',
+        value: newMap
+      }, { onConflict: 'key' });
+      
+      if (error) throw error;
+      
+      setCategoryDescriptions(newMap);
+      setEditingCategoryDesc(null);
+      showNotification('Category SEO description saved!');
+    } catch (err: any) {
+      console.error(err);
+      showNotification('Failed to save description', true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const fetchPromoConfig = async () => {
     try {
       const { data, error } = await supabase.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle();
@@ -761,6 +788,16 @@ function AdminPortalContent() {
         if (uniqueNames.length > 0) {
           setDbCategories(uniqueNames);
         }
+      }
+      
+      // Fetch SEO Descriptions
+      try {
+        const { data: seoData } = await supabase.from('site_settings').select('value').eq('key', 'SYS_CATEGORY_DESCRIPTIONS').maybeSingle();
+        if (seoData && seoData.value) {
+          setCategoryDescriptions(seoData.value);
+        }
+      } catch (err) {
+        console.error('Failed to load SEO descriptions', err);
       }
 
       // 1. Fetch Products
@@ -2816,6 +2853,12 @@ function AdminPortalContent() {
                                 <ChevronDown className="h-4 w-4" />
                               </button>
                               <button
+                                onClick={() => setEditingCategoryDesc({name: catObj.name, desc: categoryDescriptions[catObj.name] || ''})}
+                                className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-violet-950/20 hover:border-violet-900/30 text-zinc-600 hover:text-brand-600 transition-colors text-[11px] font-medium"
+                              >
+                                Edit SEO
+                              </button>
+                              <button
                                 onClick={() => handleDeleteCategory(catObj.name)}
                                 disabled={actionLoading}
                                 className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-red-950/20 hover:border-red-900/30 text-red-400/80 hover:text-red-400 transition-colors text-[11px] font-medium disabled:opacity-50"
@@ -3771,6 +3814,60 @@ function AdminPortalContent() {
                 >
                   {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                   Create
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CATEGORY SEO MODAL */}
+      {editingCategoryDesc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setEditingCategoryDesc(null)} />
+          <div className="relative bg-[#FDFBF7] w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-zinc-200">
+            <div className="p-6 md:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-zinc-900 font-serif">SEO Description</h3>
+                <button onClick={() => setEditingCategoryDesc(null)} className="p-2 bg-white border border-zinc-200 text-zinc-600 hover:text-brand-600 rounded-full">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Category</label>
+                  <p className="text-sm font-bold text-brand-600">{editingCategoryDesc.name}</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 mb-1.5">SEO Paragraph (100-200 words)</label>
+                  <textarea
+                    rows={6}
+                    value={editingCategoryDesc.desc}
+                    onChange={(e) => setEditingCategoryDesc({ ...editingCategoryDesc, desc: e.target.value })}
+                    className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-3 px-4 text-sm text-zinc-900 focus:outline-none focus:border-brand-500"
+                    placeholder="Enter rich text description for SEO here..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200">
+                <button
+                  type="button"
+                  onClick={() => setEditingCategoryDesc(null)}
+                  className="px-4 py-2 border border-zinc-200 bg-[#FDFBF7] rounded-xl text-xs font-bold text-zinc-600 hover:text-zinc-900 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSaveCategoryDesc(editingCategoryDesc.name, editingCategoryDesc.desc)}
+                  disabled={actionLoading}
+                  className="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 rounded-xl text-xs font-bold text-white flex items-center gap-1.5 shadow-lg transition-all"
+                >
+                  {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  Save SEO Description
                 </button>
               </div>
             </div>

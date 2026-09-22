@@ -116,7 +116,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
               {/* Primary Image */}
               <img 
                 src={getOptimizedUrl(primaryImage)} 
-                alt={product.name}
+                alt={`${product.name} - Handmade ${product.category}`}
                 loading="lazy"
                 className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && secondaryImage ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
               />
@@ -125,7 +125,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
               {secondaryImage && (
                 <img 
                   src={getOptimizedUrl(secondaryImage)} 
-                  alt={`${product.name} alternate view`}
+                  alt={`${product.name} back view - Handmade ${product.category}`}
                   loading="lazy"
                   className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
                 />

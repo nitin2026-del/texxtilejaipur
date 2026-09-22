@@ -313,7 +313,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                         >
                           <img 
                             src={getOptimizedUrl(media.url, 800)} 
-                            alt={`${product.name} view ${idx + 1}`}
+                            alt={`${product.name} view ${idx + 1} - ${product.category} from Textile Jaipur`}
                             loading={idx === 0 ? "eager" : "lazy"}
                             fetchPriority={idx === 0 ? "high" : "auto"}
                             className="absolute inset-0 w-full h-full object-cover"
