@@ -283,14 +283,24 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
       <Navbar onCartOpen={() => setCartOpen(true)} />
 
       <div className="pt-16 md:pt-24 px-4 md:px-6 max-w-7xl mx-auto">
-        {/* Back Button */}
-        <Link 
-          href={product ? `/collection#product-${product.id}` : '/collection'}
-          className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 font-medium mb-4 md:mb-6 transition-colors w-max"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Collection
-        </Link>
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-4 md:mb-6">
+          <ol className="flex items-center gap-1.5 text-xs md:text-sm font-medium text-zinc-400 flex-wrap">
+            <li>
+              <Link href="/" className="hover:text-zinc-900 transition-colors">Home</Link>
+            </li>
+            <li className="select-none">/</li>
+            <li>
+              <Link href={`/collection?category=${encodeURIComponent(product?.category || '')}`} className="hover:text-zinc-900 transition-colors">
+                {product?.category || 'Collection'}
+              </Link>
+            </li>
+            <li className="select-none">/</li>
+            <li className="text-zinc-700 font-semibold truncate max-w-[200px] md:max-w-none">
+              {product?.name || 'Product'}
+            </li>
+          </ol>
+        </nav>
         {!product ? (
           <div className="text-center py-20 text-zinc-500">Product not found</div>
         ) : (

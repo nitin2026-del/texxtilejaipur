@@ -196,16 +196,28 @@ export default async function ProductPage({ params }: Props) {
     return notFound();
   }
 
-  const jsonLd = {
+  // Build rich JSON-LD Product Schema
+  const avgRating = initialReviews.length > 0
+    ? (initialReviews.reduce((sum, r) => sum + r.stars, 0) / initialReviews.length).toFixed(1)
+    : null;
+
+  const jsonLdProduct: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    image: product.images[0],
+    image: product.images,
     description: product.description,
     sku: product.sku,
     brand: {
       '@type': 'Brand',
       name: 'Textile Jaipur'
+    },
+    material: product.details?.material || undefined,
+    countryOfOrigin: 'IN',
+    manufacturer: {
+      '@type': 'Organization',
+      name: 'Textile Jaipur',
+      url: 'https://textilejaipur.com'
     },
     offers: {
       '@type': 'Offer',
@@ -216,7 +228,72 @@ export default async function ProductPage({ params }: Props) {
       availability: product.stock_quantity > 0 
         ? 'https://schema.org/InStock' 
         : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'Textile Jaipur'
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'INR'
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 5, maxValue: 12, unitCode: 'DAY' }
+        }
+      }
     }
+  };
+
+  // Add aggregate rating only if reviews exist
+  if (avgRating && initialReviews.length > 0) {
+    jsonLdProduct.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: avgRating,
+      reviewCount: initialReviews.length,
+      bestRating: '5',
+      worstRating: '1'
+    };
+    jsonLdProduct.review = initialReviews.slice(0, 5).map(r => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.name },
+      datePublished: r.date,
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: r.stars,
+        bestRating: '5'
+      },
+      reviewBody: r.body
+    }));
+  }
+
+  // Breadcrumb JSON-LD
+  const jsonLdBreadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://textilejaipur.com'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: product.category,
+        item: `https://textilejaipur.com/collection?category=${encodeURIComponent(product.category)}`
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: product.name,
+        item: `https://textilejaipur.com/product/${product.id}`
+      }
+    ]
   };
 
   return (
@@ -224,7 +301,11 @@ export default async function ProductPage({ params }: Props) {
       <link rel="preload" as="image" href={getOptimizedUrl(product.images[0], 800)} fetchPriority="high" />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }}
       />
       <ProductPageClient 
         product={product} 

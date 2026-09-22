@@ -111,6 +111,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: 0.9,
         }));
       }
+
+      // Fetch categories for category-filtered collection pages
+      const catRes = await fetch(`${url}/rest/v1/categories?select=name`, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`
+        },
+        next: { revalidate: 3600 }
+      });
+
+      let categoryRoutes: MetadataRoute.Sitemap = [];
+      if (catRes.ok) {
+        const categories = await catRes.json();
+        categoryRoutes = categories.map((cat: any) => ({
+          url: `${baseUrl}/collection?category=${encodeURIComponent(cat.name)}`,
+          lastModified: now,
+          changeFrequency: 'daily' as const,
+          priority: 0.85,
+        }));
+      }
+
+      return [...staticRoutes, ...categoryRoutes, ...dynamicProductRoutes];
     }
   } catch (err) {
     console.error('Failed to fetch products for sitemap', err);
