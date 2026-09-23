@@ -42,6 +42,7 @@ interface Product {
     };
     isBestseller?: boolean;
     sibling_group?: string;
+    ad_hero_images?: string[];
   };
 }
 
@@ -626,19 +627,25 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   )}
                 </div>
 
-                {/* As Seen In Our Ad - Lightweight Banner */}
-                {product?.details?.ad_hero_image && (
+                {/* As Seen In Our Ad - Lightweight Banners */}
+                {product?.details?.ad_hero_images && product.details.ad_hero_images.length > 0 && (
                   <div className="pt-3 pb-1">
                     <div className="flex items-center gap-1.5 mb-2.5">
-                      <span className="text-[11px] uppercase font-bold text-[#111] tracking-widest">As Seen In Our Ad</span>
+                      <span className="text-[11px] uppercase font-bold text-[#111] tracking-widest">
+                        {product.details.ad_hero_images.length > 1 ? 'As Seen In Our Ads' : 'As Seen In Our Ad'}
+                      </span>
                     </div>
-                    <div className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm">
-                      <img 
-                        src={getOptimizedUrl(product.details.ad_hero_image, 500)} 
-                        alt={`${product.name} as seen in our ad`}
-                        loading="lazy"
-                        className="w-full h-auto object-cover"
-                      />
+                    <div className="flex flex-col gap-3">
+                      {product.details.ad_hero_images.map((imgUrl: string, idx: number) => (
+                        <div key={idx} className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm relative group">
+                          <img 
+                            src={getOptimizedUrl(imgUrl, 500)} 
+                            alt={`${product.name} as seen in our ad ${idx + 1}`}
+                            loading="lazy"
+                            className="w-full h-auto object-cover"
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

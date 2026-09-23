@@ -219,7 +219,8 @@ function AdminPortalContent() {
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [formIsBestseller, setFormIsBestseller] = useState(false);
   const [formSiblingGroup, setFormSiblingGroup] = useState('');
-  const [formAdHeroImage, setFormAdHeroImage] = useState('');
+  const [formAdImages, setFormAdImages] = useState<string[]>([]);
+  const [adImageUploadLoading, setAdImageUploadLoading] = useState(false);
   const [formDisplayRank, setFormDisplayRank] = useState('');
   
   // International AI features
@@ -964,6 +965,37 @@ function AdminPortalContent() {
     }
   };
 
+  const handleAdImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setAdImageUploadLoading(true);
+    
+    try {
+      const files = Array.from(e.target.files);
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
+        const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1200, useWebWorker: true, fileType: 'image/webp' };
+        const compressedFile = await imageCompression(file, options);
+        
+        const fileName = `${uuidv4()}.webp`;
+        const { error } = await supabase.storage.from('product-images').upload(fileName, compressedFile, { contentType: 'image/webp' });
+          
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+        uploadedUrls.push(publicUrl);
+      }
+
+      setFormAdImages(prev => [...prev, ...uploadedUrls]);
+      showNotification(`Successfully uploaded ${uploadedUrls.length} ad image(s).`);
+    } catch (err: any) {
+      console.error('Ad Upload Error:', err);
+      showNotification(err.message || 'Error uploading ad images', true);
+    } finally {
+      setAdImageUploadLoading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     setVideoUploadLoading(true);
@@ -1262,7 +1294,7 @@ function AdminPortalContent() {
           translations: parsedTranslations,
           isBestseller: formIsBestseller,
           sibling_group: formSiblingGroup,
-          ad_hero_image: formAdHeroImage || undefined
+          ad_hero_images: formAdImages.length > 0 ? formAdImages : undefined
         }
       };
 
@@ -1344,7 +1376,7 @@ function AdminPortalContent() {
     setFormIsFeatured(prod.is_featured || false);
     setFormIsBestseller(prod.details?.isBestseller || false);
     setFormSiblingGroup(prod.details?.sibling_group || '');
-    setFormAdHeroImage(prod.details?.ad_hero_image || '');
+    setFormAdImages(prod.details?.ad_hero_images || []);
     setFormDisplayRank(prod.display_rank?.toString() || '');
     setFormCulturalContext(prod.details?.culturalContext || '');
     setFormStylingAdvice(prod.details?.stylingAdvice || '');
@@ -1389,7 +1421,7 @@ function AdminPortalContent() {
     setFormIsFeatured(false);
     setFormIsBestseller(false);
     setFormSiblingGroup('');
-    setFormAdHeroImage('');
+    setFormAdImages([]);
     setFormDisplayRank('');
   };
 
@@ -2723,19 +2755,37 @@ function AdminPortalContent() {
                   />
                   <p className="text-[10px] text-zinc-400 mt-1">Products with the same Group ID will appear as clickable swatches on each other&apos;s product pages.</p>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Ad Landing Image URL</label>
-                  <input 
-                    type="text"
-                    value={formAdHeroImage}
-                    onChange={(e) => setFormAdHeroImage(e.target.value)}
-                    placeholder="Paste the Supabase image URL of your ad creative"
-                    className="w-full bg-[#FDFBF7] border border-zinc-200 rounded-xl py-3 px-3.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-brand-500 shadow-sm"
-                  />
-                  <p className="text-[10px] text-zinc-400 mt-1">Upload your ad image to Supabase Storage, then paste the URL here. It will appear as a &quot;As Seen In Our Ad&quot; banner on this product page.</p>
-                  {formAdHeroImage && (
-                    <div className="mt-2 rounded-lg overflow-hidden border border-zinc-200 w-32 h-20">
-                      <img src={formAdHeroImage} alt="Ad preview" className="w-full h-full object-cover" />
+                <div className="col-span-1 md:col-span-2">
+                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Ad Landing Images</label>
+                  <div className="flex items-center gap-3 mb-2">
+                    <label className="cursor-pointer px-4 py-2 border border-brand-200 bg-brand-50 hover:bg-brand-100 rounded-xl text-xs font-bold text-brand-700 transition-colors flex items-center gap-2">
+                      {adImageUploadLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <UploadCloud className="h-3 w-3" />}
+                      {adImageUploadLoading ? 'Uploading...' : 'Upload Ad Image(s)'}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple
+                        onChange={handleAdImageUpload} 
+                        disabled={adImageUploadLoading}
+                        className="hidden" 
+                      />
+                    </label>
+                    <p className="text-[10px] text-zinc-400">These images will appear as &quot;As Seen In Our Ad&quot; banners on this product page.</p>
+                  </div>
+                  {formAdImages.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {formAdImages.map((url, idx) => (
+                        <div key={idx} className="relative rounded-lg overflow-hidden border border-zinc-200 w-24 h-24 group">
+                          <img src={url} alt={`Ad preview ${idx}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setFormAdImages(prev => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-1 right-1 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 text-red-500"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
