@@ -43,7 +43,7 @@ interface Product {
     isBestseller?: boolean;
     sibling_group?: string;
     ad_showcase?: {
-      ad_image?: string;
+      ad_images?: string[];
       linked_products?: { id: string; name: string; image: string }[];
     };
   };
@@ -631,19 +631,23 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                 </div>
 
                 {/* ── AS SEEN IN OUR AD ── */}
-                {product?.details?.ad_showcase?.ad_image && (
+                {product?.details?.ad_showcase?.ad_images && product.details.ad_showcase.ad_images.length > 0 && (
                   <div className="pt-4 pb-2">
                     <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 mb-3">As Seen In Our Ad</p>
                     <div className="flex flex-col sm:flex-row gap-3 items-stretch">
 
-                      {/* Ad Photo */}
-                      <div className="flex-shrink-0 sm:w-48 rounded-2xl overflow-hidden border border-zinc-200 shadow-sm">
-                        <img
-                          src={getOptimizedUrl(product.details.ad_showcase.ad_image, 400)}
-                          alt={`${product.name} as seen in our ad`}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
+                      {/* Ad Photo(s) */}
+                      <div className="flex-shrink-0 sm:w-48 flex flex-col gap-2">
+                        {product.details.ad_showcase.ad_images.map((imgUrl: string, idx: number) => (
+                          <div key={idx} className="rounded-2xl overflow-hidden border border-zinc-200 shadow-sm">
+                            <img
+                              src={getOptimizedUrl(imgUrl, 400)}
+                              alt={`${product.name} as seen in our ad ${idx + 1}`}
+                              loading="lazy"
+                              className="w-full h-auto object-cover"
+                            />
+                          </div>
+                        ))}
                       </div>
 
                       {/* Arrow + Products */}

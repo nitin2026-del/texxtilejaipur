@@ -219,7 +219,7 @@ function AdminPortalContent() {
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [formIsBestseller, setFormIsBestseller] = useState(false);
   const [formSiblingGroup, setFormSiblingGroup] = useState('');
-  const [formAdImage, setFormAdImage] = useState('');
+  const [formAdImages, setFormAdImages] = useState<string[]>([]);
   const [formAdLinkedProducts, setFormAdLinkedProducts] = useState<{id:string;name:string;image:string}[]>([]);
   const [adImageUploadLoading, setAdImageUploadLoading] = useState(false);
   const [adProductSearch, setAdProductSearch] = useState('');
@@ -972,18 +972,23 @@ function AdminPortalContent() {
     if (!e.target.files || e.target.files.length === 0) return;
     setAdImageUploadLoading(true);
     try {
-      const file = e.target.files[0];
-      const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1400, useWebWorker: true, fileType: 'image/webp' };
-      const compressedFile = await imageCompression(file, options);
-      const fileName = `ad-${uuidv4()}.webp`;
-      const { error } = await supabase.storage.from('product-images').upload(fileName, compressedFile, { contentType: 'image/webp' });
-      if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
-      setFormAdImage(publicUrl);
-      showNotification('Ad photo uploaded successfully!');
+      const files = Array.from(e.target.files);
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
+        const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1400, useWebWorker: true, fileType: 'image/webp' };
+        const compressedFile = await imageCompression(file, options);
+        const fileName = `ad-${uuidv4()}.webp`;
+        const { error } = await supabase.storage.from('product-images').upload(fileName, compressedFile, { contentType: 'image/webp' });
+        if (error) throw error;
+        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+        uploadedUrls.push(publicUrl);
+      }
+      setFormAdImages(prev => [...prev, ...uploadedUrls]);
+      showNotification(`Ad photo(s) uploaded successfully!`);
     } catch (err: any) {
       console.error('Ad Upload Error:', err);
-      showNotification(err.message || 'Error uploading ad photo', true);
+      showNotification(err.message || 'Error uploading ad photo(s)', true);
     } finally {
       setAdImageUploadLoading(false);
       if (e.target) e.target.value = '';
@@ -1288,8 +1293,8 @@ function AdminPortalContent() {
           translations: parsedTranslations,
           isBestseller: formIsBestseller,
           sibling_group: formSiblingGroup,
-          ad_showcase: (formAdImage || formAdLinkedProducts.length > 0) ? {
-            ad_image: formAdImage || undefined,
+          ad_showcase: (formAdImages.length > 0 || formAdLinkedProducts.length > 0) ? {
+            ad_images: formAdImages.length > 0 ? formAdImages : undefined,
             linked_products: formAdLinkedProducts.length > 0 ? formAdLinkedProducts : undefined
           } : undefined
         }
@@ -1373,7 +1378,7 @@ function AdminPortalContent() {
     setFormIsFeatured(prod.is_featured || false);
     setFormIsBestseller(prod.details?.isBestseller || false);
     setFormSiblingGroup(prod.details?.sibling_group || '');
-    setFormAdImage(prod.details?.ad_showcase?.ad_image || '');
+    setFormAdImages(prod.details?.ad_showcase?.ad_images || (prod.details?.ad_showcase?.ad_image ? [prod.details.ad_showcase.ad_image] : []));
     setFormAdLinkedProducts(prod.details?.ad_showcase?.linked_products || []);
     setFormDisplayRank(prod.display_rank?.toString() || '');
     setFormCulturalContext(prod.details?.culturalContext || '');
@@ -1419,7 +1424,7 @@ function AdminPortalContent() {
     setFormIsFeatured(false);
     setFormIsBestseller(false);
     setFormSiblingGroup('');
-    setFormAdImage('');
+    setFormAdImages([]);
     setFormAdLinkedProducts([]);
     setAdProductSearch('');
     setAdProductDropdownOpen(false);
@@ -2769,33 +2774,36 @@ function AdminPortalContent() {
 
                   {/* LEFT: Ad Photo Upload */}
                   <div className="flex-1 bg-white rounded-2xl border border-amber-200 p-4 shadow-sm">
-                    <p className="text-[10px] uppercase font-bold text-amber-700 tracking-widest mb-3">① Ad Photo</p>
-                    <p className="text-[10px] text-zinc-500 mb-3">Upload the photo from your video ad (e.g., two women wearing jackets)</p>
+                    <p className="text-[10px] uppercase font-bold text-amber-700 tracking-widest mb-3">① Ad Photo(s)</p>
+                    <p className="text-[10px] text-zinc-500 mb-3">Upload the photo(s) from your video ad (e.g., two women wearing jackets)</p>
 
-                    {formAdImage ? (
-                      <div className="relative rounded-xl overflow-hidden border border-amber-200 shadow-sm group mb-3">
-                        <img src={formAdImage} alt="Ad photo" className="w-full h-40 object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => setFormAdImage('')}
-                          className="absolute top-2 right-2 bg-white/90 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 text-red-500 shadow"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                        <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold">Ad Photo</div>
+                    {formAdImages.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        {formAdImages.map((url, idx) => (
+                          <div key={idx} className="relative rounded-xl overflow-hidden border border-amber-200 shadow-sm group">
+                            <img src={url} alt={`Ad photo ${idx + 1}`} className="w-full h-24 object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => setFormAdImages(prev => prev.filter((_, i) => i !== idx))}
+                              className="absolute top-1 right-1 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 text-red-500 shadow"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ) : (
-                      <label className="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-amber-200 rounded-xl h-36 hover:bg-amber-50 transition-colors mb-3">
-                        {adImageUploadLoading ? (
-                          <Loader2 className="h-6 w-6 text-amber-500 animate-spin mb-2" />
-                        ) : (
-                          <UploadCloud className="h-6 w-6 text-amber-400 mb-2" />
-                        )}
-                        <span className="text-xs font-bold text-amber-700">{adImageUploadLoading ? 'Uploading...' : 'Upload Ad Photo'}</span>
-                        <span className="text-[10px] text-zinc-400 mt-1">JPG, PNG — compressed automatically</span>
-                        <input type="file" accept="image/*" onChange={handleAdImageUpload} disabled={adImageUploadLoading} className="hidden" />
-                      </label>
                     )}
+
+                    <label className="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-amber-200 rounded-xl h-24 hover:bg-amber-50 transition-colors mb-3">
+                      {adImageUploadLoading ? (
+                        <Loader2 className="h-5 w-5 text-amber-500 animate-spin mb-1" />
+                      ) : (
+                        <UploadCloud className="h-5 w-5 text-amber-400 mb-1" />
+                      )}
+                      <span className="text-xs font-bold text-amber-700">{adImageUploadLoading ? 'Uploading...' : 'Upload Ad Photo(s)'}</span>
+                      <span className="text-[10px] text-zinc-400 mt-1">JPG, PNG — auto compressed</span>
+                      <input type="file" accept="image/*" multiple onChange={handleAdImageUpload} disabled={adImageUploadLoading} className="hidden" />
+                    </label>
                   </div>
 
                   {/* ARROW CONNECTOR */}
