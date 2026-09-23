@@ -219,8 +219,10 @@ function AdminPortalContent() {
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [formIsBestseller, setFormIsBestseller] = useState(false);
   const [formSiblingGroup, setFormSiblingGroup] = useState('');
-  const [formAdImages, setFormAdImages] = useState<string[]>([]);
+  const [formAdImage, setFormAdImage] = useState('');
+  const [formAdLinkedProducts, setFormAdLinkedProducts] = useState<{id:string;name:string;image:string}[]>([]);
   const [adImageUploadLoading, setAdImageUploadLoading] = useState(false);
+  const [adProductSearch, setAdProductSearch] = useState('');
   const [formDisplayRank, setFormDisplayRank] = useState('');
   
   // International AI features
@@ -968,28 +970,19 @@ function AdminPortalContent() {
   const handleAdImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     setAdImageUploadLoading(true);
-    
     try {
-      const files = Array.from(e.target.files);
-      const uploadedUrls: string[] = [];
-
-      for (const file of files) {
-        const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1200, useWebWorker: true, fileType: 'image/webp' };
-        const compressedFile = await imageCompression(file, options);
-        
-        const fileName = `${uuidv4()}.webp`;
-        const { error } = await supabase.storage.from('product-images').upload(fileName, compressedFile, { contentType: 'image/webp' });
-          
-        if (error) throw error;
-        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
-        uploadedUrls.push(publicUrl);
-      }
-
-      setFormAdImages(prev => [...prev, ...uploadedUrls]);
-      showNotification(`Successfully uploaded ${uploadedUrls.length} ad image(s).`);
+      const file = e.target.files[0];
+      const options = { maxSizeMB: 0.5, maxWidthOrHeight: 1400, useWebWorker: true, fileType: 'image/webp' };
+      const compressedFile = await imageCompression(file, options);
+      const fileName = `ad-${uuidv4()}.webp`;
+      const { error } = await supabase.storage.from('product-images').upload(fileName, compressedFile, { contentType: 'image/webp' });
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+      setFormAdImage(publicUrl);
+      showNotification('Ad photo uploaded successfully!');
     } catch (err: any) {
       console.error('Ad Upload Error:', err);
-      showNotification(err.message || 'Error uploading ad images', true);
+      showNotification(err.message || 'Error uploading ad photo', true);
     } finally {
       setAdImageUploadLoading(false);
       if (e.target) e.target.value = '';
@@ -1294,7 +1287,10 @@ function AdminPortalContent() {
           translations: parsedTranslations,
           isBestseller: formIsBestseller,
           sibling_group: formSiblingGroup,
-          ad_hero_images: formAdImages.length > 0 ? formAdImages : undefined
+          ad_showcase: (formAdImage || formAdLinkedProducts.length > 0) ? {
+            ad_image: formAdImage || undefined,
+            linked_products: formAdLinkedProducts.length > 0 ? formAdLinkedProducts : undefined
+          } : undefined
         }
       };
 
@@ -1376,7 +1372,8 @@ function AdminPortalContent() {
     setFormIsFeatured(prod.is_featured || false);
     setFormIsBestseller(prod.details?.isBestseller || false);
     setFormSiblingGroup(prod.details?.sibling_group || '');
-    setFormAdImages(prod.details?.ad_hero_images || []);
+    setFormAdImage(prod.details?.ad_showcase?.ad_image || '');
+    setFormAdLinkedProducts(prod.details?.ad_showcase?.linked_products || []);
     setFormDisplayRank(prod.display_rank?.toString() || '');
     setFormCulturalContext(prod.details?.culturalContext || '');
     setFormStylingAdvice(prod.details?.stylingAdvice || '');
@@ -1421,7 +1418,9 @@ function AdminPortalContent() {
     setFormIsFeatured(false);
     setFormIsBestseller(false);
     setFormSiblingGroup('');
-    setFormAdImages([]);
+    setFormAdImage('');
+    setFormAdLinkedProducts([]);
+    setAdProductSearch('');
     setFormDisplayRank('');
   };
 
@@ -2755,41 +2754,153 @@ function AdminPortalContent() {
                   />
                   <p className="text-[10px] text-zinc-400 mt-1">Products with the same Group ID will appear as clickable swatches on each other&apos;s product pages.</p>
                 </div>
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Ad Landing Images</label>
-                  <div className="flex items-center gap-3 mb-2">
-                    <label className="cursor-pointer px-4 py-2 border border-brand-200 bg-brand-50 hover:bg-brand-100 rounded-xl text-xs font-bold text-brand-700 transition-colors flex items-center gap-2">
-                      {adImageUploadLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <UploadCloud className="h-3 w-3" />}
-                      {adImageUploadLoading ? 'Uploading...' : 'Upload Ad Image(s)'}
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        multiple
-                        onChange={handleAdImageUpload} 
-                        disabled={adImageUploadLoading}
-                        className="hidden" 
-                      />
-                    </label>
-                    <p className="text-[10px] text-zinc-400">These images will appear as &quot;As Seen In Our Ad&quot; banners on this product page.</p>
+              </div>
+
+              {/* ── AD SHOWCASE SECTION ────────────────────────────────── */}
+              <div className="mt-6 rounded-2xl border-2 border-dashed border-amber-200 bg-amber-50/40 p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-sm font-black text-zinc-900 uppercase tracking-widest">🎬 Ad Showcase</span>
+                  <span className="text-[10px] text-zinc-500 font-medium">— Link your video/photo ad to this product</span>
+                </div>
+
+                <div className="flex flex-col lg:flex-row items-stretch gap-0">
+
+                  {/* LEFT: Ad Photo Upload */}
+                  <div className="flex-1 bg-white rounded-2xl border border-amber-200 p-4 shadow-sm">
+                    <p className="text-[10px] uppercase font-bold text-amber-700 tracking-widest mb-3">① Ad Photo</p>
+                    <p className="text-[10px] text-zinc-500 mb-3">Upload the photo from your video ad (e.g., two women wearing jackets)</p>
+
+                    {formAdImage ? (
+                      <div className="relative rounded-xl overflow-hidden border border-amber-200 shadow-sm group mb-3">
+                        <img src={formAdImage} alt="Ad photo" className="w-full h-40 object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setFormAdImage('')}
+                          className="absolute top-2 right-2 bg-white/90 rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 text-red-500 shadow"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                        <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold">Ad Photo</div>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-amber-200 rounded-xl h-36 hover:bg-amber-50 transition-colors mb-3">
+                        {adImageUploadLoading ? (
+                          <Loader2 className="h-6 w-6 text-amber-500 animate-spin mb-2" />
+                        ) : (
+                          <UploadCloud className="h-6 w-6 text-amber-400 mb-2" />
+                        )}
+                        <span className="text-xs font-bold text-amber-700">{adImageUploadLoading ? 'Uploading...' : 'Upload Ad Photo'}</span>
+                        <span className="text-[10px] text-zinc-400 mt-1">JPG, PNG — compressed automatically</span>
+                        <input type="file" accept="image/*" onChange={handleAdImageUpload} disabled={adImageUploadLoading} className="hidden" />
+                      </label>
+                    )}
                   </div>
-                  {formAdImages.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {formAdImages.map((url, idx) => (
-                        <div key={idx} className="relative rounded-lg overflow-hidden border border-zinc-200 w-24 h-24 group">
-                          <img src={url} alt={`Ad preview ${idx}`} className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => setFormAdImages(prev => prev.filter((_, i) => i !== idx))}
-                            className="absolute top-1 right-1 bg-white/90 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 text-red-500"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </div>
-                      ))}
+
+                  {/* ARROW CONNECTOR */}
+                  <div className="flex items-center justify-center px-3 py-4 lg:py-0">
+                    <div className="flex flex-col items-center gap-1 text-amber-400">
+                      <div className="hidden lg:flex flex-col items-center gap-1">
+                        <div className="w-px h-8 bg-gradient-to-b from-transparent via-amber-300 to-amber-400"></div>
+                        <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg>
+                        <div className="w-px h-8 bg-gradient-to-b from-amber-400 via-amber-300 to-transparent"></div>
+                      </div>
+                      <div className="lg:hidden flex items-center gap-1">
+                        <div className="h-px w-8 bg-gradient-to-r from-transparent via-amber-300 to-amber-400"></div>
+                        <svg className="h-5 w-5 text-amber-500 rotate-90" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg>
+                        <div className="h-px w-8 bg-gradient-to-r from-amber-400 via-amber-300 to-transparent"></div>
+                      </div>
                     </div>
-                  )}
+                  </div>
+
+                  {/* RIGHT: Link Products */}
+                  <div className="flex-1 bg-white rounded-2xl border border-amber-200 p-4 shadow-sm">
+                    <p className="text-[10px] uppercase font-bold text-amber-700 tracking-widest mb-3">② Products In This Ad</p>
+                    <p className="text-[10px] text-zinc-500 mb-3">Search and link the products shown in the ad photo above</p>
+
+                    {/* Search box */}
+                    <div className="relative mb-3">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
+                      <input
+                        type="text"
+                        value={adProductSearch}
+                        onChange={e => setAdProductSearch(e.target.value)}
+                        placeholder="Search product name..."
+                        className="w-full pl-8 pr-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    {/* Search results */}
+                    {adProductSearch.trim().length > 0 && (
+                      <div className="max-h-36 overflow-y-auto border border-zinc-100 rounded-xl mb-3 shadow-sm">
+                        {products
+                          .filter(p => 
+                            p.name.toLowerCase().includes(adProductSearch.toLowerCase()) &&
+                            !formAdLinkedProducts.find(lp => lp.id === p.id)
+                          )
+                          .slice(0, 6)
+                          .map(p => (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => {
+                                setFormAdLinkedProducts(prev => [...prev, { id: p.id, name: p.name, image: p.images?.[0] || '' }]);
+                                setAdProductSearch('');
+                              }}
+                              className="flex items-center gap-3 w-full px-3 py-2 hover:bg-amber-50 transition-colors text-left border-b border-zinc-50 last:border-0"
+                            >
+                              {p.images?.[0] ? (
+                                <img src={p.images[0]} alt={p.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-zinc-100" />
+                              ) : (
+                                <div className="w-9 h-9 rounded-lg bg-zinc-100 flex-shrink-0 flex items-center justify-center">
+                                  <ImageIcon className="h-4 w-4 text-zinc-300" />
+                                </div>
+                              )}
+                              <div className="min-w-0">
+                                <p className="text-[11px] font-semibold text-zinc-900 truncate">{p.name}</p>
+                                <p className="text-[10px] text-zinc-400">₹{p.price_inr?.toLocaleString('en-IN')}</p>
+                              </div>
+                            </button>
+                          ))}
+                        {products.filter(p => p.name.toLowerCase().includes(adProductSearch.toLowerCase()) && !formAdLinkedProducts.find(lp => lp.id === p.id)).length === 0 && (
+                          <p className="text-[11px] text-zinc-400 text-center py-4">No products found</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Linked products */}
+                    {formAdLinkedProducts.length > 0 ? (
+                      <div className="space-y-2">
+                        {formAdLinkedProducts.map((lp, idx) => (
+                          <div key={lp.id} className="flex items-center gap-3 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 group">
+                            {lp.image ? (
+                              <img src={lp.image} alt={lp.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-amber-200" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg bg-amber-100 flex-shrink-0 flex items-center justify-center">
+                                <ImageIcon className="h-4 w-4 text-amber-300" />
+                              </div>
+                            )}
+                            <p className="text-[11px] font-semibold text-zinc-800 flex-1 truncate">{lp.name}</p>
+                            <button
+                              type="button"
+                              onClick={() => setFormAdLinkedProducts(prev => prev.filter((_, i) => i !== idx))}
+                              className="text-zinc-400 hover:text-red-500 transition-colors flex-shrink-0"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-zinc-400 text-center py-4 border border-dashed border-zinc-200 rounded-xl">
+                        Search and add products shown in the ad
+                      </p>
+                    )}
+                  </div>
+
                 </div>
               </div>
+              {/* ─────────────────────────────────────────────────────────── */}
+
 
               {/* Form Action Controls */}
               <div className="flex justify-end gap-3 pt-4 border-t border-zinc-200">

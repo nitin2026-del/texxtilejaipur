@@ -42,7 +42,10 @@ interface Product {
     };
     isBestseller?: boolean;
     sibling_group?: string;
-    ad_hero_images?: string[];
+    ad_showcase?: {
+      ad_image?: string;
+      linked_products?: { id: string; name: string; image: string }[];
+    };
   };
 }
 
@@ -627,28 +630,71 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   )}
                 </div>
 
-                {/* As Seen In Our Ad - Lightweight Banners */}
-                {product?.details?.ad_hero_images && product.details.ad_hero_images.length > 0 && (
-                  <div className="pt-3 pb-1">
-                    <div className="flex items-center gap-1.5 mb-2.5">
-                      <span className="text-[11px] uppercase font-bold text-[#111] tracking-widest">
-                        {product.details.ad_hero_images.length > 1 ? 'As Seen In Our Ads' : 'As Seen In Our Ad'}
-                      </span>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                      {product.details.ad_hero_images.map((imgUrl: string, idx: number) => (
-                        <div key={idx} className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm relative group">
-                          <img 
-                            src={getOptimizedUrl(imgUrl, 500)} 
-                            alt={`${product.name} as seen in our ad ${idx + 1}`}
-                            loading="lazy"
-                            className="w-full h-auto object-cover"
-                          />
-                        </div>
-                      ))}
+                {/* ── AS SEEN IN OUR AD ── */}
+                {product?.details?.ad_showcase?.ad_image && (
+                  <div className="pt-4 pb-2">
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 mb-3">As Seen In Our Ad</p>
+                    <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+
+                      {/* Ad Photo */}
+                      <div className="flex-shrink-0 sm:w-48 rounded-2xl overflow-hidden border border-zinc-200 shadow-sm">
+                        <img
+                          src={getOptimizedUrl(product.details.ad_showcase.ad_image, 400)}
+                          alt={`${product.name} as seen in our ad`}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Arrow + Products */}
+                      {product.details.ad_showcase.linked_products?.length > 0 && (
+                        <>
+                          {/* Arrow */}
+                          <div className="flex sm:flex-col items-center justify-center px-1 gap-1 text-zinc-300">
+                            <div className="hidden sm:block w-px flex-1 bg-gradient-to-b from-transparent via-zinc-200 to-zinc-300"></div>
+                            <svg className="h-5 w-5 text-zinc-400 flex-shrink-0 hidden sm:block" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/>
+                            </svg>
+                            <div className="hidden sm:block w-px flex-1 bg-gradient-to-b from-zinc-300 via-zinc-200 to-transparent"></div>
+                            {/* Mobile horizontal arrow */}
+                            <svg className="h-4 w-4 text-zinc-400 flex-shrink-0 sm:hidden rotate-90" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/>
+                            </svg>
+                          </div>
+
+                          {/* Linked Product Cards */}
+                          <div className="flex-1 flex flex-col gap-2 justify-center">
+                            <p className="text-[9px] uppercase font-bold tracking-widest text-zinc-400 mb-1">Also in this video</p>
+                            {product.details.ad_showcase.linked_products.map((lp: {id:string;name:string;image:string}) => (
+                              <a
+                                key={lp.id}
+                                href={`/product/${lp.id}`}
+                                className="flex items-center gap-3 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 rounded-xl px-3 py-2.5 transition-all group"
+                              >
+                                {lp.image && (
+                                  <img
+                                    src={getOptimizedUrl(lp.image, 80)}
+                                    alt={lp.name}
+                                    loading="lazy"
+                                    className="w-11 h-11 rounded-lg object-cover flex-shrink-0 border border-zinc-200"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[11px] font-bold text-zinc-800 truncate leading-tight">{lp.name}</p>
+                                  <p className="text-[10px] text-zinc-400 mt-0.5">Tap to view →</p>
+                                </div>
+                                <svg className="h-4 w-4 text-zinc-400 group-hover:text-zinc-600 group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </a>
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}
+
 
                 {/* Sibling Product Swatches */}
                 {siblingProducts && siblingProducts.length > 0 && (
