@@ -626,6 +626,23 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   )}
                 </div>
 
+                {/* As Seen In Our Ad - Lightweight Banner */}
+                {product?.details?.ad_hero_image && (
+                  <div className="pt-3 pb-1">
+                    <div className="flex items-center gap-1.5 mb-2.5">
+                      <span className="text-[11px] uppercase font-bold text-[#111] tracking-widest">As Seen In Our Ad</span>
+                    </div>
+                    <div className="rounded-xl overflow-hidden border border-zinc-200 shadow-sm">
+                      <img 
+                        src={getOptimizedUrl(product.details.ad_hero_image, 500)} 
+                        alt={`${product.name} as seen in our ad`}
+                        loading="lazy"
+                        className="w-full h-auto object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Sibling Product Swatches */}
                 {siblingProducts && siblingProducts.length > 0 && (
                   <div className="pt-2 pb-1">

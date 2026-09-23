@@ -219,6 +219,7 @@ function AdminPortalContent() {
   const [formIsFeatured, setFormIsFeatured] = useState(false);
   const [formIsBestseller, setFormIsBestseller] = useState(false);
   const [formSiblingGroup, setFormSiblingGroup] = useState('');
+  const [formAdHeroImage, setFormAdHeroImage] = useState('');
   const [formDisplayRank, setFormDisplayRank] = useState('');
   
   // International AI features
@@ -1260,7 +1261,8 @@ function AdminPortalContent() {
           stylingAdvice: formStylingAdvice,
           translations: parsedTranslations,
           isBestseller: formIsBestseller,
-          sibling_group: formSiblingGroup
+          sibling_group: formSiblingGroup,
+          ad_hero_image: formAdHeroImage || undefined
         }
       };
 
@@ -1342,6 +1344,7 @@ function AdminPortalContent() {
     setFormIsFeatured(prod.is_featured || false);
     setFormIsBestseller(prod.details?.isBestseller || false);
     setFormSiblingGroup(prod.details?.sibling_group || '');
+    setFormAdHeroImage(prod.details?.ad_hero_image || '');
     setFormDisplayRank(prod.display_rank?.toString() || '');
     setFormCulturalContext(prod.details?.culturalContext || '');
     setFormStylingAdvice(prod.details?.stylingAdvice || '');
@@ -1386,6 +1389,7 @@ function AdminPortalContent() {
     setFormIsFeatured(false);
     setFormIsBestseller(false);
     setFormSiblingGroup('');
+    setFormAdHeroImage('');
     setFormDisplayRank('');
   };
 
@@ -2718,6 +2722,22 @@ function AdminPortalContent() {
                     className="w-full bg-[#FDFBF7] border border-zinc-200 rounded-xl py-3 px-3.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-brand-500 shadow-sm"
                   />
                   <p className="text-[10px] text-zinc-400 mt-1">Products with the same Group ID will appear as clickable swatches on each other&apos;s product pages.</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-zinc-900 mb-1.5 uppercase tracking-widest">Ad Landing Image URL</label>
+                  <input 
+                    type="text"
+                    value={formAdHeroImage}
+                    onChange={(e) => setFormAdHeroImage(e.target.value)}
+                    placeholder="Paste the Supabase image URL of your ad creative"
+                    className="w-full bg-[#FDFBF7] border border-zinc-200 rounded-xl py-3 px-3.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-brand-500 shadow-sm"
+                  />
+                  <p className="text-[10px] text-zinc-400 mt-1">Upload your ad image to Supabase Storage, then paste the URL here. It will appear as a &quot;As Seen In Our Ad&quot; banner on this product page.</p>
+                  {formAdHeroImage && (
+                    <div className="mt-2 rounded-lg overflow-hidden border border-zinc-200 w-32 h-20">
+                      <img src={formAdHeroImage} alt="Ad preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
                 </div>
               </div>
 
