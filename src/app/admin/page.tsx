@@ -223,6 +223,7 @@ function AdminPortalContent() {
   const [formAdLinkedProducts, setFormAdLinkedProducts] = useState<{id:string;name:string;image:string}[]>([]);
   const [adImageUploadLoading, setAdImageUploadLoading] = useState(false);
   const [adProductSearch, setAdProductSearch] = useState('');
+  const [adProductDropdownOpen, setAdProductDropdownOpen] = useState(false);
   const [formDisplayRank, setFormDisplayRank] = useState('');
   
   // International AI features
@@ -1421,6 +1422,7 @@ function AdminPortalContent() {
     setFormAdImage('');
     setFormAdLinkedProducts([]);
     setAdProductSearch('');
+    setAdProductDropdownOpen(false);
     setFormDisplayRank('');
   };
 
@@ -2817,55 +2819,56 @@ function AdminPortalContent() {
                     <p className="text-[10px] uppercase font-bold text-amber-700 tracking-widest mb-3">② Products In This Ad</p>
                     <p className="text-[10px] text-zinc-500 mb-3">Search and link the products shown in the ad photo above</p>
 
-                    {/* Search box */}
+                    {/* Search box — same pattern as artisan section */}
                     <div className="relative mb-3">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
                       <input
                         type="text"
                         value={adProductSearch}
-                        onChange={e => setAdProductSearch(e.target.value)}
-                        placeholder="Search product name..."
-                        className="w-full pl-8 pr-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400"
+                        onChange={e => { setAdProductSearch(e.target.value); setAdProductDropdownOpen(true); }}
+                        onFocus={() => setAdProductDropdownOpen(true)}
+                        onBlur={() => setTimeout(() => setAdProductDropdownOpen(false), 200)}
+                        placeholder="Search by product name..."
+                        className="w-full pl-8 pr-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400"
                       />
-                    </div>
-
-                    {/* Search results */}
-                    {adProductSearch.trim().length > 0 && (
-                      <div className="max-h-36 overflow-y-auto border border-zinc-100 rounded-xl mb-3 shadow-sm">
-                        {products
-                          .filter(p => 
-                            p.name.toLowerCase().includes(adProductSearch.toLowerCase()) &&
-                            !formAdLinkedProducts.find(lp => lp.id === p.id)
-                          )
-                          .slice(0, 6)
-                          .map(p => (
-                            <button
-                              key={p.id}
-                              type="button"
-                              onClick={() => {
-                                setFormAdLinkedProducts(prev => [...prev, { id: p.id, name: p.name, image: p.images?.[0] || '' }]);
-                                setAdProductSearch('');
-                              }}
-                              className="flex items-center gap-3 w-full px-3 py-2 hover:bg-amber-50 transition-colors text-left border-b border-zinc-50 last:border-0"
-                            >
-                              {p.images?.[0] ? (
-                                <img src={p.images[0]} alt={p.name} className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-zinc-100" />
-                              ) : (
-                                <div className="w-9 h-9 rounded-lg bg-zinc-100 flex-shrink-0 flex items-center justify-center">
-                                  <ImageIcon className="h-4 w-4 text-zinc-300" />
+                      {/* Absolute dropdown — exactly like artisan */}
+                      {adProductDropdownOpen && (
+                        <div className="absolute z-50 w-full mt-1 bg-white border border-zinc-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
+                          {products
+                            .filter(p =>
+                              `${p.name} ${p.sku}`.toLowerCase().includes(adProductSearch.toLowerCase()) &&
+                              !formAdLinkedProducts.find(lp => lp.id === p.id)
+                            )
+                            .map(p => (
+                              <div
+                                key={p.id}
+                                className="flex items-center gap-3 p-2.5 hover:bg-amber-50 cursor-pointer border-b border-zinc-100 last:border-0"
+                                onMouseDown={() => {
+                                  setFormAdLinkedProducts(prev => [...prev, { id: p.id, name: p.name, image: p.images?.[0] || '' }]);
+                                  setAdProductSearch('');
+                                  setAdProductDropdownOpen(false);
+                                }}
+                              >
+                                <img
+                                  src={p.images?.[0] || '/placeholder.png'}
+                                  alt={p.name}
+                                  className="w-11 h-11 object-cover rounded-lg border border-zinc-200 flex-shrink-0"
+                                />
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-xs font-bold text-zinc-900 truncate">{p.name}</span>
+                                  <span className="text-[10px] text-zinc-500">SKU: {p.sku} · ₹{p.price_inr?.toLocaleString('en-IN')}</span>
                                 </div>
-                              )}
-                              <div className="min-w-0">
-                                <p className="text-[11px] font-semibold text-zinc-900 truncate">{p.name}</p>
-                                <p className="text-[10px] text-zinc-400">₹{p.price_inr?.toLocaleString('en-IN')}</p>
                               </div>
-                            </button>
-                          ))}
-                        {products.filter(p => p.name.toLowerCase().includes(adProductSearch.toLowerCase()) && !formAdLinkedProducts.find(lp => lp.id === p.id)).length === 0 && (
-                          <p className="text-[11px] text-zinc-400 text-center py-4">No products found</p>
-                        )}
-                      </div>
-                    )}
+                            ))}
+                          {products.filter(p =>
+                            `${p.name} ${p.sku}`.toLowerCase().includes(adProductSearch.toLowerCase()) &&
+                            !formAdLinkedProducts.find(lp => lp.id === p.id)
+                          ).length === 0 && (
+                            <div className="p-3 text-xs text-zinc-500 text-center">No products found</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Linked products */}
                     {formAdLinkedProducts.length > 0 ? (
@@ -2873,9 +2876,9 @@ function AdminPortalContent() {
                         {formAdLinkedProducts.map((lp, idx) => (
                           <div key={lp.id} className="flex items-center gap-3 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 group">
                             {lp.image ? (
-                              <img src={lp.image} alt={lp.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-amber-200" />
+                              <img src={lp.image} alt={lp.name} className="w-11 h-11 rounded-lg object-cover flex-shrink-0 border border-amber-200" />
                             ) : (
-                              <div className="w-10 h-10 rounded-lg bg-amber-100 flex-shrink-0 flex items-center justify-center">
+                              <div className="w-11 h-11 rounded-lg bg-amber-100 flex-shrink-0 flex items-center justify-center">
                                 <ImageIcon className="h-4 w-4 text-amber-300" />
                               </div>
                             )}
