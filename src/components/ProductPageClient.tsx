@@ -634,12 +634,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                 {product?.details?.ad_showcase?.ad_images && product.details.ad_showcase.ad_images.length > 0 && (
                   <div className="pt-4 pb-2">
                     <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 mb-3">As Seen In Our Ad</p>
-                    <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+                    <div className="flex flex-row gap-2 sm:gap-3 items-stretch">
 
                       {/* Ad Photo(s) */}
-                      <div className="flex-shrink-0 sm:w-48 flex flex-col gap-2">
+                      <div className="flex-shrink-0 w-[40%] sm:w-48 flex flex-col gap-2">
                         {product.details.ad_showcase.ad_images.map((imgUrl: string, idx: number) => (
-                          <div key={idx} className="rounded-2xl overflow-hidden border border-zinc-200 shadow-sm">
+                          <div key={idx} className="rounded-xl sm:rounded-2xl overflow-hidden border border-zinc-200 shadow-sm">
                             <img
                               src={getOptimizedUrl(imgUrl, 400)}
                               alt={`${product.name} as seen in our ad ${idx + 1}`}
@@ -654,16 +654,12 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                       {product.details.ad_showcase.linked_products?.length > 0 && (
                         <>
                           {/* Arrow */}
-                          <div className="flex sm:flex-col items-center justify-center px-1 gap-1 text-zinc-300">
-                            <div className="hidden sm:block w-px flex-1 bg-gradient-to-b from-transparent via-zinc-200 to-zinc-300"></div>
-                            <svg className="h-5 w-5 text-zinc-400 flex-shrink-0 hidden sm:block" fill="currentColor" viewBox="0 0 24 24">
+                          <div className="flex flex-col items-center justify-center px-0.5 sm:px-1 gap-1 text-zinc-300">
+                            <div className="w-px flex-1 bg-gradient-to-b from-transparent via-zinc-200 to-zinc-300"></div>
+                            <svg className="h-4 w-4 sm:h-5 sm:w-5 text-zinc-400 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/>
                             </svg>
-                            <div className="hidden sm:block w-px flex-1 bg-gradient-to-b from-zinc-300 via-zinc-200 to-transparent"></div>
-                            {/* Mobile horizontal arrow */}
-                            <svg className="h-4 w-4 text-zinc-400 flex-shrink-0 sm:hidden rotate-90" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/>
-                            </svg>
+                            <div className="w-px flex-1 bg-gradient-to-b from-zinc-300 via-zinc-200 to-transparent"></div>
                           </div>
 
                           {/* Linked Product Cards */}

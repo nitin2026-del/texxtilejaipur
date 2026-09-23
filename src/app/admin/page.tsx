@@ -1351,6 +1351,38 @@ function AdminPortalContent() {
         }
       }
 
+      // Auto-sync Ad Showcase to all linked products
+      if (formAdLinkedProducts.length > 0 && productId) {
+        try {
+          const linkedIds = formAdLinkedProducts.map(lp => lp.id);
+          const allSyncIds = Array.from(new Set([...linkedIds, productId]));
+          
+          const { data: syncProds } = await supabase
+            .from('products')
+            .select('id, details')
+            .in('id', allSyncIds);
+
+          if (syncProds) {
+            for (const sp of syncProds) {
+              // Don't update the one we just saved
+              if (sp.id === productId) continue;
+              
+              const updatedDetails = {
+                ...(sp.details || {}),
+                ad_showcase: basePayload.details.ad_showcase
+              };
+              
+              await supabase
+                .from('products')
+                .update({ details: updatedDetails })
+                .eq('id', sp.id);
+            }
+          }
+        } catch (syncErr) {
+          console.error('Failed to sync ad showcase:', syncErr);
+        }
+      }
+
       resetProductForm();
       fetchDashboardData();
       setActiveTab('catalog');
