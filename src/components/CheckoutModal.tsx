@@ -99,6 +99,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         content_type: 'product',
         num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
       });
+    } else if (!isOpen) {
+      // Reset so it tracks again if they reopen the modal
+      hasTrackedCheckout.current = false;
     }
   }, [isOpen, cart, getCartTotalInr]);
 

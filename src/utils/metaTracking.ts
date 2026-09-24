@@ -9,7 +9,10 @@ export const trackMetaEvent = async (
   
   // 1. Send via Browser Pixel
   if (typeof window !== 'undefined' && (window as any).fbq) {
+    console.log(`[Meta Pixel] Firing ${eventName}`, eventData);
     (window as any).fbq('track', eventName, eventData, { eventID: id });
+  } else if (typeof window !== 'undefined') {
+    console.warn(`[Meta Pixel] fbq not found for ${eventName}`);
   }
 
   // 2. Send via Server CAPI (by calling our internal API)
