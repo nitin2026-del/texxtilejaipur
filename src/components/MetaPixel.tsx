@@ -2,20 +2,24 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { trackMetaEvent } from '@/utils/metaTracking';
 
 export const MetaPixel = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [loaded, setLoaded] = useState(false);
+  const hasFiredFirst = useRef(false);
 
   useEffect(() => {
-    if (!loaded) return;
+    // Skip the very first render because the raw HTML script snippet already fires the first PageView
+    if (!hasFiredFirst.current) {
+      hasFiredFirst.current = true;
+      return;
+    }
     
-    // Track PageView on route change with unique event ID
+    // Track PageView on route change (subsequent navigations)
     trackMetaEvent('PageView');
-  }, [pathname, searchParams, loaded]);
+  }, [pathname, searchParams]);
 
   return (
     <>
@@ -33,9 +37,9 @@ export const MetaPixel = () => {
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '2857970634559091');
+            fbq('track', 'PageView');
           `
         }}
-        onLoad={() => setLoaded(true)}
       />
       <noscript>
         <img height="1" width="1" style={{ display: 'none' }} src="https://www.facebook.com/tr?id=2857970634559091&ev=PageView&noscript=1" alt="" />
