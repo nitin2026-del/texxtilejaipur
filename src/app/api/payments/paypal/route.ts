@@ -66,8 +66,13 @@ export async function POST(req: NextRequest) {
         // Don't throw — main order is already marked paid
       }
 
+      // Extract tracking parameters for CAPI
+      const clientIp = req.headers.get('x-forwarded-for') || req.ip;
+      const userAgent = req.headers.get('user-agent');
+      const metaData = { fbp, fbc, clientIp, userAgent };
+
       // Centralized success handler
-      await handlePaymentSuccess(orderId, supabaseAdmin);
+      await handlePaymentSuccess(orderId, supabaseAdmin, metaData);
 
       // Fetch customer details for Meta Pixel Advanced Matching
       const { data: orderData } = await supabaseAdmin

@@ -47,6 +47,13 @@ function PaymentCaptureHandler() {
     hasCaptured.current = true;
     const usdAmount = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_usd_amount') || 0) : 0;
 
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift() || '';
+      return undefined;
+    };
+
     fetch('/api/payments/paypal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -54,6 +61,8 @@ function PaymentCaptureHandler() {
         action: 'capture',
         paypalOrderId: token,
         orderId: orderId,
+        fbp: getCookie('_fbp'),
+        fbc: getCookie('_fbc')
       }),
     })
       .then((res) => res.json())

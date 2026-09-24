@@ -7,7 +7,11 @@ const hashMeta = (val?: string) => {
   return crypto.createHash('sha256').update(val.trim().toLowerCase()).digest('hex');
 };
 
-export async function handlePaymentSuccess(orderId: string, supabaseAdmin: SupabaseClient) {
+export async function handlePaymentSuccess(
+  orderId: string, 
+  supabaseAdmin: SupabaseClient,
+  metaData?: { fbp?: string; fbc?: string; clientIp?: string; userAgent?: string }
+) {
   try {
     // 0. Idempotency Check: Don't process if already completed
     const { data: existingOrder } = await supabaseAdmin
@@ -113,6 +117,10 @@ export async function handlePaymentSuccess(orderId: string, supabaseAdmin: Supab
               zp: hashMeta(userZip) ? [hashMeta(userZip)] : undefined,
               country: hashMeta(userCountry) ? [hashMeta(userCountry)] : undefined,
               external_id: hashMeta(order?.user_id) ? [hashMeta(order?.user_id)] : undefined,
+              fbp: metaData?.fbp,
+              fbc: metaData?.fbc,
+              client_ip_address: metaData?.clientIp,
+              client_user_agent: metaData?.userAgent
             },
             custom_data: {
               currency: 'USD',
