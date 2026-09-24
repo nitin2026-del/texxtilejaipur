@@ -44,8 +44,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, result });
-  } catch (error) {
+  } catch (error: any) {
     console.error('CAPI Handler Error:', error);
-    return NextResponse.json({ success: false }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || String(error) }, { status: 500 });
   }
 }
