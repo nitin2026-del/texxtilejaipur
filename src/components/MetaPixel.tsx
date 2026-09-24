@@ -2,6 +2,7 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
+import { trackMetaEvent } from '@/utils/metaTracking';
 
 export const MetaPixel = () => {
   const pathname = usePathname();
@@ -16,9 +17,7 @@ export const MetaPixel = () => {
     }
 
     // Fire PageView on client-side route changes (SPA navigation)
-    if (typeof window !== 'undefined' && (window as any).fbq) {
-      (window as any).fbq('track', 'PageView');
-    }
+    trackMetaEvent('PageView');
   }, [pathname, searchParams]);
 
   // No HTML output — the pixel script is in layout.tsx <head>
