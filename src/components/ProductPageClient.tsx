@@ -62,6 +62,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
     const id = product?.id;
     const pathname = usePathname();
     const [quantity, setQuantity] = useState(1);
+    const [selectedRing, setSelectedRing] = useState<string | null>(null);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -250,7 +251,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
         images: product.images,
         sku: product.sku,
         category: product.category
-      }, qtyToAdd);
+      }, qtyToAdd, selectedRing || undefined);
       if (quantity === 0) setQuantity(1);
       setCartOpen(true);
     }
@@ -266,7 +267,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
           images: product.images,
           sku: product.sku,
           category: product.category
-        }, quantity);
+        }, quantity, selectedRing || undefined);
       }
       setCartOpen(false);
       setCheckoutOpen(true);
@@ -436,7 +437,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                 </div>
               )}
               
-              <FreeRingWidget />
+              <FreeRingWidget selectedRingUrl={selectedRing} onSelectRing={setSelectedRing} />
             </div>
 
               {/* Lightbox - Full Quality Viewer */}

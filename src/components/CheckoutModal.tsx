@@ -471,8 +471,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <div className="space-y-2 border-b border-zinc-300 pb-3 mb-3">
                   <h4 className="text-xs font-bold text-zinc-800 uppercase tracking-wider mb-2">Order Items</h4>
                   {cart.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-start text-sm">
-                      <span className="text-zinc-800 pr-4">{item.quantity}x {item.name}</span>
+                    <div key={idx} className="flex flex-col mb-2">
+                      <div className="flex justify-between items-start text-sm">
+                        <span className="text-zinc-800 pr-4">{item.quantity}x {item.name}</span>
+                      </div>
+                      {item.selectedRingUrl && (
+                        <div className="mt-1 flex items-center gap-1.5 bg-rose-50 border border-rose-100 rounded p-1 max-w-max ml-6">
+                          <img src={item.selectedRingUrl} alt="Free Ring" className="w-5 h-5 rounded-sm object-cover" />
+                          <span className="text-[9px] text-rose-500 font-bold uppercase tracking-wider pr-1">Free Gift Included</span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
