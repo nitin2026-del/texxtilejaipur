@@ -588,6 +588,31 @@ function AdminPortalContent() {
     setActionLoading(false);
   };
 
+  const handleRenameCategory = async (catObj: any) => {
+    const newName = window.prompt(`Enter new name for category "${catObj.name}":`, catObj.name);
+    if (!newName || newName.trim() === '' || newName.trim() === catObj.name) return;
+
+    setActionLoading(true);
+    try {
+      const newSlug = newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const { error } = await supabase
+        .from('categories')
+        .update({ name: newName.trim(), slug: newSlug })
+        .eq('id', catObj.id);
+
+      if (error) throw error;
+      
+      setDbCategoryObjects(prev => prev.map(c => c.id === catObj.id ? { ...c, name: newName.trim(), slug: newSlug } : c));
+      setDbCategories(prev => prev.map(n => n === catObj.name ? newName.trim() : n));
+      showNotification('Category renamed successfully!');
+    } catch (err: any) {
+      console.error(err);
+      showNotification(`Failed to rename category: ${err.message}`, true);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDeleteCategory = async (categoryToDelete?: string) => {
     const target = categoryToDelete || formCategory;
     if (!target) return;
@@ -3086,6 +3111,12 @@ function AdminPortalContent() {
                                 title="Move Down"
                               >
                                 <ChevronDown className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleRenameCategory(catObj)}
+                                className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-[#FDFBF7] hover:bg-violet-950/20 hover:border-violet-900/30 text-zinc-600 hover:text-brand-600 transition-colors text-[11px] font-medium"
+                              >
+                                Rename
                               </button>
                               <button
                                 onClick={() => {
