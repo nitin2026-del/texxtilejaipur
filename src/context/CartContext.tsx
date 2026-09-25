@@ -14,7 +14,6 @@ export interface CartItem {
   quantity: number;
   category?: string;
   isFreeGift?: boolean;
-  selectedRingUrl?: string;
 }
 
 export interface Coupon {
@@ -61,7 +60,7 @@ interface CartContextType {
   cart: CartItem[];
   currency: Currency;
   currencySymbol: string;
-  addToCart: (product: CartContextProduct, quantity?: number, selectedRingUrl?: string) => void;
+  addToCart: (product: CartContextProduct, quantity?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -150,13 +149,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('textilejaipur_cart_updated_at', Date.now().toString());
   };
 
-  const addToCart = (product: CartContextProduct, quantity = 1, selectedRingUrl?: string) => {
+  const addToCart = (product: CartContextProduct, quantity = 1) => {
     const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
 
     const existing = cart.find((item) => item.id === product.id);
     if (existing) {
       const updated = cart.map((item) =>
-        item.id === product.id ? { ...item, quantity: item.quantity + quantity, selectedRingUrl: selectedRingUrl || item.selectedRingUrl } : item
+        item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
       );
       saveCart(updated);
     } else {
@@ -168,7 +167,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         images: product.images,
         quantity: quantity,
         category: product.category,
-        selectedRingUrl: selectedRingUrl,
       };
       saveCart([...cart, newItem]);
       

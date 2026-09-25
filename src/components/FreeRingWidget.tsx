@@ -43,14 +43,16 @@ export const FreeRingWidget = ({ onSelectRing, selectedRingUrl }: FreeRingWidget
   if (loading || !active || images.length === 0) return null;
 
   return (
-    <div className="w-full mt-6 bg-zinc-50 border border-zinc-200 rounded-xl p-4 shadow-sm">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="bg-rose-100 p-2 rounded-full text-rose-600">
+    <div className="w-full mt-4 bg-rose-50/50 border border-rose-200 rounded-xl p-4 shadow-sm animate-fade-in">
+      <div className="flex items-start gap-3 mb-4">
+        <div className="bg-rose-100 p-2 rounded-full text-rose-600 shrink-0 mt-1">
           <Gift className="w-5 h-5" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm uppercase tracking-wider font-bold text-rose-600 leading-tight">Choose Your Free Gift</span>
-          <span className="text-xs text-zinc-500 font-medium leading-tight">Select 1 free ring below to include with your purchase</span>
+          <span className="text-sm font-bold text-rose-700 leading-tight">A Little Surprise For You...</span>
+          <span className="text-xs text-rose-900/70 font-medium leading-relaxed mt-1">
+            This is specially for beautiful persons like you, from our side as a sign of love 😊 Please select your free gift below!
+          </span>
         </div>
       </div>
       
@@ -65,7 +67,7 @@ export const FreeRingWidget = ({ onSelectRing, selectedRingUrl }: FreeRingWidget
             >
               <img 
                 src={img}
-                alt={`Free Gift Ring Option ${idx + 1}`}
+                alt={`Free Gift Option ${idx + 1}`}
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="lazy"
               />

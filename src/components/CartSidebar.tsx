@@ -199,12 +199,6 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                       <div>
                         <button onClick={() => goToProduct(item.id)} className="text-sm font-semibold text-white line-clamp-1 pr-6 hover:text-amber-300 transition-colors block text-left w-full">{item.name}</button>
                         <span className="text-[10px] text-zinc-500 font-mono tracking-wider">{item.sku}</span>
-                        {item.selectedRingUrl && (
-                          <div className="mt-1 flex items-center gap-1.5 bg-rose-900/30 border border-rose-900/50 rounded p-1 max-w-max">
-                            <img src={item.selectedRingUrl} alt="Free Ring" className="w-5 h-5 rounded-sm object-cover" />
-                            <span className="text-[9px] text-rose-300 font-bold uppercase tracking-wider pr-1">Free Gift Included</span>
-                          </div>
-                        )}
                       </div>
 
                       <div className="flex items-center justify-between mt-2">
