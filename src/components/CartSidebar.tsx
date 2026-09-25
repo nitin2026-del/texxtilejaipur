@@ -20,6 +20,26 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
   const [couponMsg, setCouponMsg] = useState({ type: '', text: '' });
+  const [checkoutError, setCheckoutError] = useState('');
+
+  const handleCheckoutClick = () => {
+    const paidToteBagsCount = computedCart.reduce((sum, item) => {
+      if (!item.isFreeGift && item.category?.toUpperCase() === 'COTTON TOTE BAG') {
+        return sum + item.quantity;
+      }
+      return sum;
+    }, 0);
+
+    const hasOtherItems = computedCart.some(item => !item.isFreeGift && item.category?.toUpperCase() !== 'COTTON TOTE BAG');
+
+    if (paidToteBagsCount > 0 && paidToteBagsCount < 3 && !hasOtherItems) {
+      setCheckoutError('Due to high international shipping costs, minimum order quantity for Cotton Tote Bags is 3 bags (unless purchased with a jacket or other items). Please add more bags to your cart.');
+      return;
+    }
+
+    setCheckoutError('');
+    onCheckout();
+  };
   const [suggestedProducts, setSuggestedProducts] = useState<any[]>([]);
   const [shippingConfig, setShippingConfig] = useState<{ standard_price: number; is_free_shipping: boolean } | null>(null);
   const [rewardProducts, setRewardProducts] = useState<any[]>([]);
@@ -338,8 +358,14 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
                   <span>Cross-Border Direct Garment Export. Certified Origin & PCI Secure Checkout.</span>
                 </div>
 
+                {checkoutError && (
+                  <div className="p-3 bg-red-900/30 border border-red-800 rounded text-red-200 text-xs text-center leading-relaxed font-medium">
+                    {checkoutError}
+                  </div>
+                )}
+
                 <button
-                  onClick={onCheckout}
+                  onClick={handleCheckoutClick}
                   className="w-full py-3 px-4 rounded text-sm font-semibold text-zinc-950 btn-premium flex items-center justify-center gap-2 shadow-lg"
                 >
                   Proceed to Checkout

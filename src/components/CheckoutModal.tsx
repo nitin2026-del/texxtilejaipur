@@ -112,6 +112,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     setLoading(true);
     setError('');
 
+    // Check Cotton Tote Bag rule
+    const paidToteBagsCount = cart.reduce((sum, item) => {
+      if (!item.isFreeGift && item.category?.toUpperCase() === 'COTTON TOTE BAG') {
+        return sum + item.quantity;
+      }
+      return sum;
+    }, 0);
+    const hasOtherItems = cart.some(item => !item.isFreeGift && item.category?.toUpperCase() !== 'COTTON TOTE BAG');
+
+    if (paidToteBagsCount > 0 && paidToteBagsCount < 3 && !hasOtherItems) {
+      setError('Due to high international shipping costs, minimum order quantity for Cotton Tote Bags is 3 bags (unless purchased with a jacket or other items). Please add more bags to your cart.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const finalUserId = user?.id;
 
