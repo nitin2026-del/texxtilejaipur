@@ -149,7 +149,7 @@ function AdminPortalContent() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners' | 'promotions'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners' | 'promotions' | 'free_gifts'>('overview');
   
   // Promotions states
   const [promoActive, setPromoActive] = useState(false);
