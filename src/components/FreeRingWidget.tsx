@@ -43,7 +43,7 @@ export const FreeRingWidget = ({ onSelectRing, selectedRingUrl }: FreeRingWidget
   if (loading || !active || images.length === 0) return null;
 
   return (
-    <div className="w-full mt-4 bg-rose-50/50 border border-rose-200 rounded-xl p-4 shadow-sm animate-fade-in">
+    <div className="w-full mb-6 bg-rose-50/50 border border-rose-200 rounded-xl p-4 shadow-sm animate-fade-in">
       <div className="flex items-start gap-3 mb-4">
         <div className="bg-rose-100 p-2 rounded-full text-rose-600 shrink-0 mt-1">
           <Gift className="w-5 h-5" />

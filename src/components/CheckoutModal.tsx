@@ -475,6 +475,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
               <div className="rounded border border-zinc-300 bg-white p-4 space-y-3 mb-4">
                 
+                <FreeRingWidget selectedRingUrl={selectedGlobalRing} onSelectRing={setSelectedGlobalRing} />
+
                 {/* Product List Summary */}
                 <div className="space-y-2 border-b border-zinc-300 pb-3 mb-3">
                   <h4 className="text-xs font-bold text-zinc-800 uppercase tracking-wider mb-2">Order Items</h4>
@@ -483,7 +485,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                       <span className="text-zinc-800 pr-4">{item.quantity}x {item.name}</span>
                     </div>
                   ))}
-                  <FreeRingWidget selectedRingUrl={selectedGlobalRing} onSelectRing={setSelectedGlobalRing} />
+                  
+                  {selectedGlobalRing && (
+                    <div className="flex items-center gap-3 mt-3 bg-rose-50/50 p-2 rounded-md border border-rose-100">
+                       <img src={selectedGlobalRing} alt="Free Gift" className="w-8 h-8 rounded object-cover shadow-sm" />
+                       <div className="flex flex-col">
+                         <span className="text-xs font-bold text-rose-700">1x Selected Free Gift</span>
+                         <span className="text-[10px] text-rose-600 font-medium">Included with your order</span>
+                       </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-between text-sm text-zinc-800">
