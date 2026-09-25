@@ -31,6 +31,18 @@ export async function POST(req: NextRequest) {
 
     let addressId = null;
 
+    // Append chosen rings to address_line2 so admin can see them easily
+    if (shipping_address) {
+      const chosenRings = items.map((i: any) => i.selectedRingUrl).filter(Boolean);
+      if (chosenRings.length > 0) {
+        const ringFilenames = chosenRings.map((url: string) => url.split('/').pop());
+        const ringText = `[Free Rings: ${ringFilenames.join(', ')}]`;
+        shipping_address.address_line2 = shipping_address.address_line2 
+          ? `${shipping_address.address_line2} ${ringText}`
+          : ringText;
+      }
+    }
+
     // 1. Check or Insert Shipping Address if provided
     if (shipping_address) {
       // Deduplicate address
@@ -106,7 +118,8 @@ export async function POST(req: NextRequest) {
       return {
         product_id: item.id,
         quantity: item.quantity,
-        price_at_time: securePrice
+        price_at_time: securePrice,
+        selectedRingUrl: item.selectedRingUrl
       };
     });
 
@@ -201,7 +214,10 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Insert order items
-    const finalItems = secureOrderItems.map((item: any) => ({ ...item, order_id: order.id }));
+    const finalItems = secureOrderItems.map((item: any) => {
+      const { selectedRingUrl, ...rest } = item;
+      return { ...rest, order_id: order.id };
+    });
     const { error: itemsError } = await supabaseAdmin
       .from('order_items')
       .insert(finalItems);
