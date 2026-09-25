@@ -10,11 +10,12 @@ import { compressVideo } from '@/utils/videoCompression';
 import { AdminReviews } from './AdminReviews';
 import { AdminShippingConfig } from '@/components/AdminShippingConfig';
 import { AdminBannersConfig } from '@/components/AdminBannersConfig';
+import { AdminFreeGiftsConfig } from '@/components/AdminFreeGiftsConfig';
 import { 
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
   ArrowLeft, Loader2, DollarSign, Package, Truck, 
-  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, ArrowRight, Search, Video, RefreshCcw, Flame, Image as ImageIcon, Sparkles
+  CheckCircle, Save, Tag, BookOpen, ChevronUp, ChevronDown, UploadCloud, X, GripVertical, ChevronLeft, ChevronRight, Star, MessageCircleQuestion, ArrowUp, ArrowDown, ArrowRight, Search, Video, RefreshCcw, Flame, Image as ImageIcon, Sparkles, Gift
 } from 'lucide-react';
 
 interface Product {
@@ -1957,6 +1958,16 @@ function AdminPortalContent() {
             >
               <ImageIcon className="h-3.5 w-3.5" /> Banners
             </button>
+            <button
+              onClick={() => setActiveTab('free_gifts')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
+                activeTab === 'free_gifts'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Gift className="h-3.5 w-3.5" /> Free Rings
+            </button>
           </div>
         </div>
 
@@ -3849,6 +3860,13 @@ function AdminPortalContent() {
         {activeTab === 'banners' && (
           <div className="space-y-6">
             <AdminBannersConfig />
+          </div>
+        )}
+
+        {/* TAB 13: FREE GIFTS */}
+        {activeTab === 'free_gifts' && (
+          <div className="space-y-6">
+            <AdminFreeGiftsConfig />
           </div>
         )}
 

@@ -15,6 +15,7 @@ import { getOptimizedUrl } from '@/utils/imageUtils';
 import { trackMetaEvent } from '@/utils/metaTracking';
 import Link from 'next/link';
 import { HappyCustomersSlider } from '@/components/HappyCustomersSlider';
+import { FreeRingWidget } from '@/components/FreeRingWidget';
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, ArrowRight, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame, X } from 'lucide-react';
 
 interface Product {
@@ -316,7 +317,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
         ) : (
           <div className="flex flex-col md:flex-row gap-12 lg:gap-20">
             {/* Cinematic Media Gallery */}
-            <div className="w-full md:w-1/2 space-y-4">
+            <div className="w-full md:w-1/2 space-y-4 relative">
+              <FreeRingWidget />
               <div className="aspect-[4/5] rounded-lg bg-zinc-100 border border-zinc-200 relative overflow-hidden group">
                 {mediaItems.length > 0 ? mediaItems.map((media: any, idx: number) => {
                   const isActive = idx === selectedMediaIndex;
