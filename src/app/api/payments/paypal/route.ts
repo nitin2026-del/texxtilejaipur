@@ -126,10 +126,23 @@ export async function POST(req: NextRequest) {
 
       let secureTotalInr = order.total || 0;
       
-      const USD_RATE = 0.010769; // Calibrated: 6500 INR = $70 USD
-      const secureUsdAmount = Number((secureTotalInr * USD_RATE).toFixed(2));
+      const FX_RATES: Record<string, number> = {
+        INR: 1,
+        USD: 0.010769,
+        EUR: 0.009870,
+        GBP: 0.008340,
+        AED: 0.039480,
+        AUD: 0.016150,
+        NZD: 0.020000,
+        CAD: 0.016500,
+      };
 
-      if (secureUsdAmount <= 0) {
+      const targetCurrency = currency.toUpperCase();
+      const rate = FX_RATES[targetCurrency] || FX_RATES['USD'];
+      
+      const secureAmountInTargetCurrency = Number((secureTotalInr * rate).toFixed(2));
+
+      if (secureAmountInTargetCurrency <= 0) {
         return NextResponse.json({ error: 'Invalid order amount for PayPal' }, { status: 400 });
       }
 
@@ -141,8 +154,8 @@ export async function POST(req: NextRequest) {
         purchase_units: [{
           reference_id: orderId,
           amount: {
-            currency_code: currency.toUpperCase(),
-            value: secureUsdAmount.toString(),
+            currency_code: targetCurrency,
+            value: secureAmountInTargetCurrency.toString(),
           }
         }],
         application_context: {

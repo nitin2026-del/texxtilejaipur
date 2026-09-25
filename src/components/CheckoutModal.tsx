@@ -537,8 +537,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 return (
                   <PayPalPaymentForm 
                     orderId={createdOrderId} 
-                    amount={paypalUsdAmount}
-                    currency="USD" 
+                    amount={Number((effectiveInr * FX_RATES[currency]).toFixed(2))}
+                    currency={currency}
                     onSuccess={handlePaymentSuccess} 
                     onError={setError} 
                   />

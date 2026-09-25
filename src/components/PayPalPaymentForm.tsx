@@ -19,10 +19,10 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
 }) => {
   const [paypalLoading, setPaypalLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
-  const usdAmount = Number(Math.max(0, amount).toFixed(2));
+  const paymentAmount = Number(Math.max(0, amount).toFixed(2));
 
   // BUG-7 fix: If order is fully covered by JaiCoins (amount = 0), skip PayPal
-  if (usdAmount === 0) {
+  if (paymentAmount === 0) {
     return (
       <div className="space-y-3">
         <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4 text-center">
@@ -51,7 +51,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       localStorage.setItem('pending_order_id', orderId);
       localStorage.setItem('pending_jaicoins_used', coinsUsed);
       localStorage.setItem('pending_jaicoins_earned', coinsEarned);
-      localStorage.setItem('pending_usd_amount', usdAmount.toString());
+      localStorage.setItem('pending_usd_amount', paymentAmount.toString());
 
       // Extract Meta cookies (_fbp, _fbc)
       const getCookie = (name: string) => {
@@ -68,8 +68,8 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           orderId, 
-          amount: usdAmount, 
-          currency: 'USD', 
+          amount: paymentAmount, 
+          currency: currency, 
           landingPage,
           coinsUsed: Number(coinsUsed),
           fbp,
@@ -122,7 +122,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-3 text-center">
         <p className="text-xs text-zinc-400 mb-1">Total Amount</p>
         <p className="text-sm font-bold text-white">
-          <span className="text-yellow-400">${usdAmount} USD</span>
+          <span className="text-yellow-400">{paymentAmount} {currency}</span>
         </p>
       </div>
 
