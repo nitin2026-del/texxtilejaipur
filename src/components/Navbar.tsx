@@ -257,15 +257,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
               <IconMenu />
             </button>
 
-            <a href="/" className="flex items-center gap-2.5 group cursor-pointer select-none">
-              <div className="relative">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center shadow-md shadow-brand-600/20 group-hover:shadow-lg group-hover:shadow-brand-600/30 transition-shadow duration-300">
-                  <span className="text-white font-serif font-bold text-sm sm:text-base leading-none">T</span>
-                </div>
-              </div>
-              <div className="hidden sm:flex flex-col -space-y-0.5">
-                <span className="text-[15px] font-serif font-bold tracking-[0.08em] text-zinc-900">TEXTILE</span>
-                <span className="text-[15px] font-serif font-light tracking-[0.08em] text-brand-600">JAIPUR</span>
+            <a href="/" className="flex items-center gap-2 group cursor-pointer select-none">
+              <div className="text-xl sm:text-2xl font-serif tracking-wide font-bold text-zinc-900">
+                TEXTILE <span className="text-brand-600 font-light">JAIPUR</span>
               </div>
             </a>
             
@@ -343,10 +337,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
               href="https://instagram.com/textileofjaipur" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-pink-50 to-purple-50 hover:from-pink-100 hover:to-purple-100 rounded-full px-3 py-1.5 transition-all text-xs font-semibold border border-pink-200/60 hover:border-pink-300/80 group"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-pink-50 to-purple-50 hover:from-pink-100 hover:to-purple-100 rounded-full px-2 sm:px-3 py-1.5 transition-all text-xs font-semibold border border-pink-200/60 hover:border-pink-300/80 group"
             >
               <span className="text-pink-500 group-hover:text-pink-600 transition-colors"><IconInstagram /></span>
-              <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">textileofjaipur</span>
+              <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent hidden sm:inline">textileofjaipur</span>
             </a>
 
             {/* Cart Button */}
@@ -464,11 +458,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
       <div className={`fixed top-0 left-0 bottom-0 w-[300px] sm:w-[340px] bg-gradient-to-b from-zinc-950 to-zinc-900 shadow-2xl z-50 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Drawer Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/[0.06]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-600/30">
-              <span className="text-white font-serif font-bold text-sm">T</span>
-            </div>
-            <h2 className="text-lg font-serif font-bold text-white tracking-wide">TEXTILE <span className="text-brand-400 font-light">JAIPUR</span></h2>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-brand-400" />
+            <h2 className="text-xl font-serif font-bold text-white tracking-wide">TEXTILE <span className="text-brand-400 font-light">JAIPUR</span></h2>
           </div>
           <button 
             onClick={() => setIsDrawerOpen(false)}
