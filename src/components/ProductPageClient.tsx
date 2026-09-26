@@ -291,7 +291,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
         {/* Back Navigation */}
         <nav aria-label="Back" className="mb-5 md:mb-7">
           <Link 
-            href={`/collection?category=${encodeURIComponent(product?.category || '')}`}
+            href={`/collection?category=${encodeURIComponent(product?.category || '')}#product-${product?.id}`}
             className="inline-flex items-center gap-2 text-[11px] md:text-xs text-zinc-500 hover:text-[#1a1464] transition-colors uppercase font-bold tracking-widest"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
