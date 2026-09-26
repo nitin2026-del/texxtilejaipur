@@ -9,6 +9,7 @@ import confetti from 'canvas-confetti';
 import { trackMetaEvent } from '@/utils/metaTracking';
 import { PayPalPaymentForm } from './PayPalPaymentForm';
 import { FreeRingWidget } from './FreeRingWidget';
+import { getOptimizedUrl } from '@/utils/imageUtils';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -481,8 +482,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 <div className="space-y-2 border-b border-zinc-300 pb-3 mb-3">
                   <h4 className="text-xs font-bold text-zinc-800 uppercase tracking-wider mb-2">Order Items</h4>
                   {cart.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-start text-sm mb-2">
-                      <span className="text-zinc-800 pr-4">{item.quantity}x {item.name}</span>
+                    <div key={idx} className="flex items-center gap-3 text-sm mb-3">
+                      <img 
+                        src={getOptimizedUrl(item.images?.[0] || '', 100)} 
+                        alt={item.name} 
+                        className="w-10 h-10 rounded object-cover shadow-sm flex-shrink-0 border border-zinc-200 bg-zinc-50" 
+                      />
+                      <span className="text-zinc-800 pr-4 leading-tight">{item.quantity}x {item.name}</span>
                     </div>
                   ))}
                   
