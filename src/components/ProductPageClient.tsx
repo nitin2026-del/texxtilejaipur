@@ -288,29 +288,15 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
       <Navbar onCartOpen={() => setCartOpen(true)} />
 
       <div className="pt-16 md:pt-24 px-4 md:px-6 max-w-7xl mx-auto">
-        {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="mb-5 md:mb-7">
-          <ol className="flex items-center gap-2 text-[11px] md:text-xs tracking-wide">
-            <li>
-              <Link href="/" className="text-zinc-400 hover:text-brand-600 transition-colors uppercase font-semibold tracking-widest">
-                Home
-              </Link>
-            </li>
-            <li className="text-zinc-300 select-none">
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-            </li>
-            <li>
-              <Link href={`/collection?category=${encodeURIComponent(product?.category || '')}`} className="text-zinc-400 hover:text-brand-600 transition-colors uppercase font-semibold tracking-widest">
-                {(product?.category || 'Collection').split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')}
-              </Link>
-            </li>
-            <li className="text-zinc-300 select-none">
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-            </li>
-            <li className="text-zinc-600 font-bold truncate max-w-[180px] md:max-w-[300px]">
-              {product?.name || 'Product'}
-            </li>
-          </ol>
+        {/* Back Navigation */}
+        <nav aria-label="Back" className="mb-5 md:mb-7">
+          <Link 
+            href={`/collection?category=${encodeURIComponent(product?.category || '')}`}
+            className="inline-flex items-center gap-2 text-[11px] md:text-xs text-zinc-500 hover:text-[#1a1464] transition-colors uppercase font-bold tracking-widest"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to Collection
+          </Link>
         </nav>
         {!product ? (
           <div className="text-center py-20 text-zinc-500">Product not found</div>
