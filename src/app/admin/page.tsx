@@ -2021,8 +2021,8 @@ function AdminPortalContent() {
                   <DollarSign className="h-5 w-5" />
                 </div>
                 <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Verified Revenue</span>
-                <h4 className="text-2xl font-black tracking-tight text-zinc-900">{formatPrice(totalRevenue)}</h4>
-                <p className="text-[10px] text-zinc-600">Calculated direct from paid invoices</p>
+                <h4 className="text-2xl font-black tracking-tight text-zinc-900">₹{totalRevenue.toLocaleString()}</h4>
+                <p className="text-[10px] text-zinc-600 font-medium">({formatPrice(totalRevenue)} in local currency)</p>
               </div>
 
               <div className="p-6 rounded-2xl glass-card border border-zinc-200 space-y-2 relative overflow-hidden">
@@ -2141,7 +2141,8 @@ function AdminPortalContent() {
                               )}
                             </td>
                             <td className="p-4">
-                              <span className="font-extrabold text-zinc-900">{formatPrice(order.total)}</span>
+                              <span className="font-extrabold text-zinc-900 block">{order.total_display_currency ? (order.total_display_currency.toString().includes(order.display_currency) ? order.total_display_currency : `${order.total_display_currency} ${order.display_currency}`) : formatPrice(order.total)}</span>
+                              <span className="text-[9px] text-zinc-500 font-medium tracking-wider block mt-0.5">Base: ₹{order.total?.toLocaleString()} INR</span>
                             </td>
                             <td className="p-4">
                               <span className={`inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
