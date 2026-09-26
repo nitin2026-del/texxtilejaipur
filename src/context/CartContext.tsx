@@ -36,9 +36,9 @@ export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD' | 'NZD' | '
 
 export const FX_RATES: Record<Currency, number> = {
   INR: 1,
-  USD: 0.010769, // Calibrated so 6500 INR = $70.00 USD
-  EUR: 0.009870, // Scaled proportionally (was €73.65, now €64.15)
-  GBP: 0.008340, // Scaled proportionally (£54.21)
+  USD: 0.0104,
+  EUR: 0.0091,
+  GBP: 0.0079,
   AED: 0.039480, // Scaled proportionally
   AUD: 0.016150, // Scaled proportionally
   NZD: 0.020000, // Scaled proportionally (~130 NZD)

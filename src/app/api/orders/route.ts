@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
     }
 
     // B. Add shipping fee securely via SYS_SHIPPING_CONFIG
-    let dbShippingCostInr = shipping_method === 'express' ? (10 / 0.010769) : 0;
+    let dbShippingCostInr = shipping_method === 'express' ? (10 / 0.0104) : 0;
     try {
       const { data: shipConfig } = await supabaseAdmin
         .from('coupons')
@@ -156,10 +156,10 @@ export async function POST(req: NextRequest) {
       if (shipConfig) {
         if (shipping_method === 'standard') {
           const usdPrice = shipConfig.usage_limit === 1 ? 0 : (shipConfig.min_order_value || 0);
-          dbShippingCostInr = usdPrice / 0.010769;
+          dbShippingCostInr = usdPrice / 0.0104;
         } else {
           const usdPrice = shipConfig.discount_value || 0;
-          dbShippingCostInr = usdPrice / 0.010769;
+          dbShippingCostInr = usdPrice / 0.0104;
         }
       }
     } catch (err) {

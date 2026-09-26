@@ -62,7 +62,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const shippingCostInUsd = shippingMethod === 'express' ? baseExpressUsd : baseStandardUsd;
   
   // Convert shipping cost to INR using FX rate if needed, or stick to USD equivalent
-  const USD_RATE = 0.010769;
+  const USD_RATE = 0.0104;
   const shippingCostInr = shippingCostInUsd / USD_RATE;
 
   const effectiveInr = getCartTotalInr() + shippingCostInr;
@@ -95,7 +95,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
     if (isOpen && cart.length > 0 && !hasTrackedCheckout.current) {
       hasTrackedCheckout.current = true;
       trackMetaEvent('InitiateCheckout', {
-        value: Number((getCartTotalInr() * 0.010769).toFixed(2)),
+        value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
         currency: 'USD',
         content_ids: cart.map(item => item.id),
         content_type: 'product',

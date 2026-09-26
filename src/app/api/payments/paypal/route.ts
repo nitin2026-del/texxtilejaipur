@@ -128,9 +128,9 @@ export async function POST(req: NextRequest) {
       
       const FX_RATES: Record<string, number> = {
         INR: 1,
-        USD: 0.010769,
-        EUR: 0.009870,
-        GBP: 0.008340,
+        USD: 0.0104,
+        EUR: 0.0091,
+        GBP: 0.0079,
         AED: 0.039480,
         AUD: 0.016150,
         NZD: 0.020000,
