@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
       const targetCurrency = currency.toUpperCase();
       const rate = FX_RATES[targetCurrency] || FX_RATES['USD'];
       
-      const secureAmountInTargetCurrency = Number((secureTotalInr * rate).toFixed(2));
+      const secureAmountInTargetCurrency = Number((secureTotalInr * rate + 1e-9).toFixed(2));
 
       if (secureAmountInTargetCurrency <= 0) {
         return NextResponse.json({ error: 'Invalid order amount for PayPal' }, { status: 400 });
