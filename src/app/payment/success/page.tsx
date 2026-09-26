@@ -45,7 +45,9 @@ function PaymentCaptureHandler() {
     }
 
     hasCaptured.current = true;
-    const usdAmount = localStorage.getItem('pending_order_id') === orderId ? Number(localStorage.getItem('pending_usd_amount') || 0) : 0;
+    const isMatchingOrder = localStorage.getItem('pending_order_id') === orderId;
+    const paymentAmount = isMatchingOrder ? Number(localStorage.getItem('pending_payment_amount') || 0) : 0;
+    const paymentCurrency = isMatchingOrder ? (localStorage.getItem('pending_currency') || 'USD') : 'USD';
 
     const getCookie = (name: string) => {
       const value = `; ${document.cookie}`;
@@ -69,7 +71,8 @@ function PaymentCaptureHandler() {
       .then((data) => {
         localStorage.setItem(captureKey, 'done');
         localStorage.removeItem('pending_order_id');
-        localStorage.removeItem('pending_usd_amount');
+        localStorage.removeItem('pending_payment_amount');
+        localStorage.removeItem('pending_currency');
 
         if (data.success) {
           if (data.order_number) setOrderNumberState(data.order_number);
@@ -77,8 +80,8 @@ function PaymentCaptureHandler() {
           clearCart();
 
           trackMetaEvent('Purchase', {
-            value: usdAmount,
-            currency: 'USD',
+            value: paymentAmount,
+            currency: paymentCurrency,
             content_ids: cart.map(item => item.id),
             content_type: 'product'
           }, orderId, true);

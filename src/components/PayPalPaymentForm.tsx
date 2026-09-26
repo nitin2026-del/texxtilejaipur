@@ -51,7 +51,8 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       localStorage.setItem('pending_order_id', orderId);
       localStorage.setItem('pending_jaicoins_used', coinsUsed);
       localStorage.setItem('pending_jaicoins_earned', coinsEarned);
-      localStorage.setItem('pending_usd_amount', paymentAmount.toString());
+      localStorage.setItem('pending_payment_amount', paymentAmount.toString());
+      localStorage.setItem('pending_currency', currency);
 
       // Extract Meta cookies (_fbp, _fbc)
       const getCookie = (name: string) => {
