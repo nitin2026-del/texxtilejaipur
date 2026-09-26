@@ -4,10 +4,115 @@ import React, { useState, useEffect } from 'react';
 import { useCart, Currency } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, Globe, LogOut, Loader2, Sparkles, ChevronDown, Menu, X, Home, Tags, BookOpen, Info, Phone, RefreshCcw, Truck, Undo2, ShieldCheck, Video, Heart, Plane } from 'lucide-react';
+import { LogOut, Loader2, Sparkles, ChevronDown, X, Tags, BookOpen, Phone, Truck, Undo2, Heart, Plane } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import { InfoModal } from './InfoModal';
 import { sortCategoriesCustom } from '@/utils/categorySort';
+
+/* ─── Beautiful Custom SVG Icon Components ─── */
+const IconMenu = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+    <line x1="4" y1="7" x2="20" y2="7" />
+    <line x1="4" y1="12" x2="16" y2="12" />
+    <line x1="4" y1="17" x2="20" y2="17" />
+  </svg>
+);
+
+const IconShopAll = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 01-8 0" />
+  </svg>
+);
+
+const IconReviews = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  </svg>
+);
+
+const IconTrackOrder = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="3" width="15" height="13" rx="2" />
+    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+    <circle cx="5.5" cy="18.5" r="2.5" />
+    <circle cx="18.5" cy="18.5" r="2.5" />
+  </svg>
+);
+
+const IconAboutUs = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+  </svg>
+);
+
+const IconArtisanEdit = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="23 7 16 12 23 17 23 7" />
+    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+  </svg>
+);
+
+const IconGlobe = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+  </svg>
+);
+
+const IconBag = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 01-8 0" />
+  </svg>
+);
+
+const IconInstagram = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+
+const IconHome = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+    <polyline points="9 22 9 12 15 12 15 22" />
+  </svg>
+);
+
+const IconRefreshCcw = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="1 4 1 10 7 10" />
+    <polyline points="23 20 23 14 17 14" />
+    <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" />
+  </svg>
+);
+
+const IconDashboard = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+  </svg>
+);
+
+/* ─── Elegant Nav Link with Animated Underline ─── */
+const NavLink = ({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) => (
+  <a
+    href={href}
+    className="group relative flex items-center gap-2 text-[13px] font-medium text-zinc-500 hover:text-zinc-900 transition-colors duration-300"
+  >
+    <span className="text-zinc-400 group-hover:text-brand-600 transition-colors duration-300">{icon}</span>
+    <span>{label}</span>
+    <span className="absolute -bottom-[18px] left-0 right-0 h-[2px] bg-gradient-to-r from-brand-400 to-brand-600 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+  </a>
+);
 
 interface NavbarProps {
   onCartOpen: () => void;
@@ -24,6 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   const [activePromo, setActivePromo] = useState<{code: string; value: string} | null>(null);
   const [isPromoDismissed, setIsPromoDismissed] = useState(false);
   const [trustIndex, setTrustIndex] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   
   const trustMessages = [
     { icon: <Plane className="h-3.5 w-3.5" />, text: "Worldwide Express Shipping" },
@@ -36,6 +142,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
     'Banarasi Silk',
     'Sarees'
   ]);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -66,7 +178,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
   useEffect(() => {
     const fetchPromo = async () => {
       try {
-        // Fetch Standard Coupon
         const { data, error } = await supabase
           .from('coupons')
           .select('*')
@@ -96,100 +207,93 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
 
   const cartCount = cart.reduce((a, b) => a + b.quantity, 0);
 
+  const currencyFlags: Record<Currency, string> = {
+    USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', AED: '🇦🇪',
+    AUD: '🇦🇺', NZD: '🇳🇿', CAD: '🇨🇦', INR: '🇮🇳',
+  };
+
   return (
     <>
-    <header className="fixed top-0 left-0 right-0 z-40 w-full flex flex-col shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-40 w-full flex flex-col">
+      {/* ─── Promo Banner ─── */}
       {activePromo && !isPromoDismissed && (
-        <div className="bg-gradient-to-r from-brand-600 via-amber-500 to-brand-600 text-white text-[11px] sm:text-xs py-2 px-4 text-center font-bold tracking-widest uppercase flex items-center justify-center gap-3 shadow-[0_4px_15px_rgba(245,158,11,0.3)] border-b border-amber-400/50 w-full relative">
-          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white animate-pulse shrink-0" />
-          <span className="drop-shadow-md">
-            Use code <span className="bg-white/20 px-2 py-0.5 rounded-md font-mono mx-1.5 border border-white/40 shadow-inner">{activePromo.code}</span> for {activePromo.value} OFF!
+        <div className="bg-gradient-to-r from-brand-700 via-brand-600 to-brand-700 text-white text-[11px] sm:text-xs py-2.5 px-4 text-center font-semibold tracking-wider uppercase flex items-center justify-center gap-3 w-full relative overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.08)_50%,transparent_100%)] animate-[shimmer_3s_infinite]" />
+          <Sparkles className="h-3.5 w-3.5 text-amber-200 animate-pulse shrink-0 relative z-10" />
+          <span className="relative z-10">
+            Use code <span className="bg-white/15 px-2.5 py-0.5 rounded font-mono mx-1.5 border border-white/25 text-amber-100 font-bold">{activePromo.code}</span> for {activePromo.value} OFF!
           </span>
-          <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-white animate-pulse shrink-0" />
+          <Sparkles className="h-3.5 w-3.5 text-amber-200 animate-pulse shrink-0 relative z-10" />
           <button 
             onClick={() => setIsPromoDismissed(true)} 
-            className="absolute right-4 text-white/80 hover:text-white transition-colors"
+            className="absolute right-4 text-white/60 hover:text-white transition-colors z-10"
             aria-label="Dismiss Promo"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
 
-      {/* Slim Rotating Trust Bar */}
-      <div className="bg-zinc-900 text-brand-100 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase py-1.5 px-4 text-center w-full flex items-center justify-center overflow-hidden border-b border-zinc-800">
-        <div className="flex items-center gap-2 animate-fade-in" key={trustIndex}>
+      {/* ─── Trust Bar ─── */}
+      <div className="bg-zinc-950 text-zinc-300 text-[10px] sm:text-[11px] font-medium tracking-[0.15em] uppercase py-1.5 px-4 text-center w-full flex items-center justify-center overflow-hidden">
+        <div className="flex items-center gap-2.5 animate-fade-in" key={trustIndex}>
           <span className="text-brand-400">{trustMessages[trustIndex].icon}</span>
-          {trustMessages[trustIndex].text}
+          <span className="text-zinc-400">{trustMessages[trustIndex].text}</span>
         </div>
       </div>
-      <nav className="bg-white/90 backdrop-blur-md border-b border-zinc-200 px-6 py-4 w-full">
+
+      {/* ─── Main Navigation ─── */}
+      <nav className={`bg-white/95 backdrop-blur-xl border-b px-4 sm:px-8 w-full transition-all duration-300 ${scrolled ? 'py-2.5 border-zinc-200 shadow-lg shadow-black/[0.03]' : 'py-3.5 border-zinc-100'}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           
-          {/* Left Side: Drawer Toggle & Brand Logo */}
-          <div className="flex items-center gap-1 sm:gap-4">
+          {/* Left: Menu + Brand + Nav Links */}
+          <div className="flex items-center gap-3 sm:gap-5">
             <button 
               onClick={() => setIsDrawerOpen(true)}
-              className="p-2 -ml-2 rounded-lg hover:bg-zinc-100 transition-colors text-zinc-600 hover:text-zinc-900"
-              aria-label="Open Mobile Menu"
+              className="p-2 -ml-2 rounded-xl hover:bg-zinc-100 active:bg-zinc-200 transition-all text-zinc-500 hover:text-zinc-800"
+              aria-label="Open Menu"
               title="Menu"
             >
-              <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+              <IconMenu />
             </button>
 
-            <a 
-              href="/"
-              className="p-2 rounded-lg hover:bg-zinc-100 transition-colors text-zinc-600 hover:text-brand-600"
-              aria-label="Home"
-              title="Home"
-            >
-              <Home className="h-5 w-5 sm:h-6 sm:w-6" />
-            </a>
-
-            <a href="/" className="flex items-center gap-2 group cursor-pointer">
-              <div className="text-2xl font-serif tracking-wide select-none font-bold text-zinc-900 hidden sm:block">
-                TEXTILE <span className="text-brand-600 font-light">JAIPUR</span>
+            <a href="/" className="flex items-center gap-2.5 group cursor-pointer select-none">
+              <div className="relative">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center shadow-md shadow-brand-600/20 group-hover:shadow-lg group-hover:shadow-brand-600/30 transition-shadow duration-300">
+                  <span className="text-white font-serif font-bold text-sm sm:text-base leading-none">T</span>
+                </div>
+              </div>
+              <div className="hidden sm:flex flex-col -space-y-0.5">
+                <span className="text-[15px] font-serif font-bold tracking-[0.08em] text-zinc-900">TEXTILE</span>
+                <span className="text-[15px] font-serif font-light tracking-[0.08em] text-brand-600">JAIPUR</span>
               </div>
             </a>
             
-            <div className="hidden lg:flex items-center gap-6 ml-4 border-l border-zinc-200 pl-6">
-              <a href="/collection" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
-                <ShoppingBag className="h-4 w-4" />
-                Shop All
-              </a>
-              <a href="/reviews" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
-                <Heart className="h-4 w-4" />
-                Reviews
-              </a>
-              <a href="/track-order" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
-                <RefreshCcw className="h-4 w-4" />
-                Track Order
-              </a>
-              <a href="/about" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
-                <Info className="h-4 w-4" />
-                About Us
-              </a>
-              <a href="/the-artisan-edit" className="text-sm font-semibold text-zinc-600 hover:text-brand-600 transition-colors flex items-center gap-1.5">
-                <Video className="h-4 w-4" />
-                The Artisan Edit
-              </a>
+            {/* Desktop Nav Links */}
+            <div className="hidden lg:flex items-center gap-7 ml-6 pl-6 border-l border-zinc-200/80">
+              <NavLink href="/collection" icon={<IconShopAll />} label="Shop All" />
+              <NavLink href="/reviews" icon={<IconReviews />} label="Reviews" />
+              <NavLink href="/track-order" icon={<IconTrackOrder />} label="Track Order" />
+              <NavLink href="/about" icon={<IconAboutUs />} label="About Us" />
+              <NavLink href="/the-artisan-edit" icon={<IconArtisanEdit />} label="The Artisan Edit" />
             </div>
           </div>
 
-          {/* Action Controls */}
-          <div className="flex items-center gap-4">
-            {/* Currency Geopricing Dropdown */}
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Currency Selector */}
             <div className="relative">
               <button
                 onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
                 aria-label="Change Currency"
-                className="flex items-center gap-1.5 border border-zinc-200 bg-white hover:bg-zinc-50 rounded-lg px-2.5 py-1.5 transition-colors text-xs text-zinc-800 font-semibold focus:outline-none cursor-pointer shadow-sm"
+                className="flex items-center gap-1.5 bg-zinc-50 hover:bg-zinc-100 rounded-full px-3 py-1.5 transition-all text-xs text-zinc-700 font-medium focus:outline-none cursor-pointer border border-zinc-200/80"
               >
-                <Globe className="h-3.5 w-3.5 text-zinc-500" />
-                <span>
+                <IconGlobe />
+                <span className="hidden sm:inline">
                   {currency} ({currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'AED' ? 'د.إ' : currency === 'AUD' ? 'A$' : currency === 'NZD' ? 'NZ$' : currency === 'CAD' ? 'C$' : '₹'})
                 </span>
-                <ChevronDown className={`h-3 w-3 text-zinc-500 transition-transform duration-200 ${isCurrencyOpen ? 'rotate-180' : ''}`} />
+                <span className="sm:hidden text-[10px]">{currency}</span>
+                <ChevronDown className={`h-3 w-3 text-zinc-400 transition-transform duration-200 ${isCurrencyOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isCurrencyOpen && (
@@ -198,31 +302,35 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                     className="fixed inset-0 z-40 cursor-default" 
                     onClick={() => setIsCurrencyOpen(false)} 
                   />
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-zinc-200 rounded-lg shadow-xl py-1.5 z-50 flex flex-col animate-fade-in">
+                  <div className="absolute right-0 mt-3 w-52 bg-white border border-zinc-100 rounded-2xl shadow-2xl shadow-black/10 py-2 z-50 flex flex-col animate-fade-in overflow-hidden">
+                    <div className="px-3.5 pb-2 mb-1 border-b border-zinc-100">
+                      <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Select Currency</p>
+                    </div>
                     {(['USD', 'EUR', 'GBP', 'AED', 'AUD', 'NZD', 'CAD', 'INR'] as Currency[]).map((code) => {
                       const labels: Record<Currency, string> = {
-                        USD: 'USD ($)', EUR: 'EUR (€)', GBP: 'GBP (£)',
-                        AED: 'AED (د.إ)', AUD: 'AUD (A$)', NZD: 'NZD (NZ$)',
-                        CAD: 'CAD (C$)', INR: 'INR (₹)',
+                        USD: 'US Dollar ($)', EUR: 'Euro (€)', GBP: 'Pound (£)',
+                        AED: 'Dirham (د.إ)', AUD: 'AUD (A$)', NZD: 'NZD (NZ$)',
+                        CAD: 'CAD (C$)', INR: 'Rupee (₹)',
                       };
                       return (
                         <button
                           key={code}
                           onClick={() => { setCurrency(code); setIsCurrencyOpen(false); }}
-                          className={`w-full text-left px-3 py-2 text-xs transition-colors flex items-center justify-between ${
+                          className={`w-full text-left px-3.5 py-2 text-xs transition-all flex items-center gap-2.5 ${
                             currency === code 
-                              ? 'text-brand-700 bg-zinc-50 font-bold font-sans' 
-                              : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 font-sans'
+                              ? 'text-brand-700 bg-brand-50/60 font-semibold' 
+                              : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
                           }`}
                         >
-                          <span>{labels[code]}</span>
-                          {currency === code && <span className="h-1 w-1 rounded-full bg-brand-600" />}
+                          <span className="text-sm">{currencyFlags[code]}</span>
+                          <span className="flex-1">{labels[code]}</span>
+                          {currency === code && <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />}
                         </button>
                       );
                     })}
-                    <div className="px-3 py-2 mt-1 border-t border-zinc-100 bg-zinc-50/50">
-                      <p className="text-[10px] text-zinc-500 leading-relaxed font-medium">
-                        Don't see your currency? Don't worry! We ship <strong className="text-zinc-700">worldwide</strong>. You can comfortably checkout in USD.
+                    <div className="px-3.5 py-2.5 mt-1 border-t border-zinc-100 bg-zinc-50/50">
+                      <p className="text-[10px] text-zinc-400 leading-relaxed">
+                        We ship <strong className="text-zinc-600">worldwide</strong>. Checkout comfortably in any currency.
                       </p>
                     </div>
                   </div>
@@ -230,24 +338,32 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
               )}
             </div>
 
-            <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="hidden sm:flex items-center gap-1.5 border border-zinc-200 bg-white hover:bg-brand-50 hover:border-brand-200 rounded-lg px-2.5 py-1.5 transition-colors text-xs text-brand-700 font-bold shadow-sm">
-              <span className="font-bold">@</span>
-              <span>textileofjaipur</span>
+            {/* Instagram Badge */}
+            <a 
+              href="https://instagram.com/textileofjaipur" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-pink-50 to-purple-50 hover:from-pink-100 hover:to-purple-100 rounded-full px-3 py-1.5 transition-all text-xs font-semibold border border-pink-200/60 hover:border-pink-300/80 group"
+            >
+              <span className="text-pink-500 group-hover:text-pink-600 transition-colors"><IconInstagram /></span>
+              <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">textileofjaipur</span>
             </a>
 
+            {/* Cart Button */}
             <button
               onClick={onCartOpen}
               aria-label="Open Shopping Cart"
-              className="p-2.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 transition-colors relative shadow-sm"
+              className="p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 active:bg-zinc-200 transition-all relative border border-zinc-200/80 group"
             >
-              <ShoppingBag className="h-4 w-4 text-zinc-700" />
+              <span className="text-zinc-500 group-hover:text-zinc-700 transition-colors"><IconBag size={17} /></span>
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-brand-600 flex items-center justify-center text-[9px] font-bold text-white shadow-sm ring-2 ring-white">
+                <span className="absolute -top-1.5 -right-1.5 h-[18px] min-w-[18px] rounded-full bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-[9px] font-bold text-white shadow-md shadow-brand-600/30 ring-2 ring-white px-1">
                   {cartCount}
                 </span>
               )}
             </button>
 
+            {/* User Section */}
             {loading ? (
               <div className="w-8 h-8 rounded-full border border-zinc-200 flex items-center justify-center bg-zinc-50 shrink-0">
                 <Loader2 className="h-3.5 w-3.5 text-zinc-400 animate-spin" />
@@ -257,33 +373,33 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 {profile?.role === 'admin' && (
                   <a
                     href="/admin"
-                    className="flex px-3 py-1.5 rounded-lg border border-brand-200 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition-all"
+                    className="flex px-3 py-1.5 rounded-full border border-brand-200 bg-brand-50 hover:bg-brand-100 text-brand-700 text-xs font-bold transition-all"
                   >
-                    Admin Portal
+                    Admin
                   </a>
                 )}
                 <div className="relative">
                   <div 
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border shadow-sm cursor-pointer transition-colors ${
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border shadow-sm cursor-pointer transition-all ${
                       userTier === 'Platinum' ? 'bg-zinc-900 border-zinc-700 text-white hover:bg-zinc-800' :
-                      userTier === 'Gold' ? 'bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200' :
-                      'bg-zinc-100 border-zinc-300 text-zinc-700 hover:bg-zinc-200'
+                      userTier === 'Gold' ? 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100' :
+                      'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
                     }`}
                     title="Your VIP Tier"
                   >
-                    <Sparkles className={`h-3.5 w-3.5 shrink-0 ${userTier === 'Platinum' ? 'text-zinc-300' : userTier === 'Gold' ? 'text-amber-600' : 'text-zinc-500'}`} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">{userTier} TIER</span>
+                    <Sparkles className={`h-3.5 w-3.5 shrink-0 ${userTier === 'Platinum' ? 'text-zinc-300' : userTier === 'Gold' ? 'text-amber-500' : 'text-zinc-400'}`} />
+                    <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">{userTier}</span>
                   </div>
                 </div>
                 <a
                   href="/dashboard"
-                  className="hidden sm:flex px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-bold transition-colors shadow-sm"
+                  className="hidden sm:flex px-3 py-1.5 rounded-full border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 text-xs font-semibold transition-colors"
                 >
                   Dashboard
                 </a>
                 <button
                   onClick={() => signOut()}
-                  className="p-2 rounded-lg hover:bg-zinc-100 transition-colors text-zinc-400 hover:text-red-600 shrink-0"
+                  className="p-2 rounded-xl hover:bg-red-50 transition-all text-zinc-400 hover:text-red-500 shrink-0"
                   title="Sign Out"
                 >
                   <LogOut className="h-4 w-4" />
@@ -295,8 +411,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           </div>
         </div>
       </nav>
-
-      {/* Auth Modal removed */}
 
       {/* Info Modals */}
       <InfoModal
@@ -327,7 +441,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
               </a>
               <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 hover:bg-zinc-100 transition-colors border border-zinc-200">
                 <div className="p-2 rounded-full bg-white text-pink-600 shadow-sm border border-zinc-100">
-                  <span className="font-bold text-lg leading-none">@</span>
+                  <IconInstagram />
                 </div>
                 <div>
                   <div className="text-sm text-zinc-500">Instagram</div>
@@ -339,55 +453,57 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
         }
       />
 
-      {/* Mobile/Desktop Drawer Navigation */}
-      {/* Backdrop */}
+      {/* ─── Mobile/Desktop Drawer ─── */}
       {isDrawerOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity"
           onClick={() => setIsDrawerOpen(false)}
         />
       )}
       
-      {/* Drawer Panel */}
-      <div className={`fixed top-0 left-0 bottom-0 w-[280px] sm:w-[320px] bg-zinc-950 border-r border-zinc-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between p-6 border-b border-zinc-900">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-gold" />
-            <h2 className="text-xl font-serif font-bold text-white">TEXTILE <span className="text-gold font-light">JAIPUR</span></h2>
+      <div className={`fixed top-0 left-0 bottom-0 w-[300px] sm:w-[340px] bg-gradient-to-b from-zinc-950 to-zinc-900 shadow-2xl z-50 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between p-6 border-b border-white/[0.06]">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-600/30">
+              <span className="text-white font-serif font-bold text-sm">T</span>
+            </div>
+            <h2 className="text-lg font-serif font-bold text-white tracking-wide">TEXTILE <span className="text-brand-400 font-light">JAIPUR</span></h2>
           </div>
           <button 
             onClick={() => setIsDrawerOpen(false)}
-            aria-label="Close Mobile Menu"
-            className="p-2 rounded-lg hover:bg-zinc-900 transition-colors text-zinc-400 hover:text-white"
+            aria-label="Close Menu"
+            className="p-2 rounded-xl hover:bg-white/[0.06] transition-colors text-zinc-500 hover:text-white"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-2">
-          <a href="/" className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
-            <Home className="h-5 w-5 text-zinc-500" />
+        {/* Drawer Links */}
+        <div className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-0.5">
+          <a href="/" className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium group">
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><IconHome /></span>
             Home
           </a>
 
-          <a href="/collection" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
-            <ShoppingBag className="h-5 w-5 text-zinc-500" />
+          <a href="/collection" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium group">
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><IconShopAll /></span>
             Shop All Collections
           </a>
 
-          <a href="/about" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
-            <Heart className="h-5 w-5 text-zinc-500" />
+          <a href="/about" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium group">
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><IconAboutUs /></span>
             About Us
           </a>
 
-          <a href="/the-artisan-edit" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
-            <Video className="h-5 w-5 text-zinc-500" />
+          <a href="/the-artisan-edit" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium group">
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><IconArtisanEdit /></span>
             The Artisan Edit
           </a>
 
           {user && (
-            <a href="/dashboard" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium">
-              <Home className="h-5 w-5 text-gold" />
+            <a href="/dashboard" onClick={() => setIsDrawerOpen(false)} className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium group">
+              <span className="text-brand-400"><IconDashboard /></span>
               My Dashboard
             </a>
           )}
@@ -395,13 +511,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           <div className="flex flex-col">
             <button 
               onClick={() => setCategoriesExpanded(!categoriesExpanded)} 
-              className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full"
+              className="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium w-full group"
             >
-              <div className="flex items-center gap-4">
-                <Tags className="h-5 w-5 text-zinc-500" />
+              <div className="flex items-center gap-3.5">
+                <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><Tags className="h-5 w-5" /></span>
                 Categories
               </div>
-              <ChevronDown className={`h-4 w-4 text-zinc-500 transition-transform ${categoriesExpanded ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-4 w-4 text-zinc-600 transition-transform duration-200 ${categoriesExpanded ? 'rotate-180' : ''}`} />
             </button>
 
             {categoriesExpanded && (
@@ -415,7 +531,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                         window.location.href = `/collection?category=${encodeURIComponent(cat)}`;
                       }
                     }}
-                    className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-[10px] font-bold tracking-wider rounded-full transition-colors border border-zinc-800"
+                    className="px-3 py-1.5 bg-white/[0.04] hover:bg-white/[0.08] text-zinc-400 hover:text-white text-[10px] font-semibold tracking-wider rounded-full transition-all border border-white/[0.06] hover:border-white/[0.12]"
                   >
                     {cat}
                   </button>
@@ -424,63 +540,67 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
             )}
           </div>
           
-          <div className="h-px bg-zinc-900 my-2 mx-4" />
+          <div className="h-px bg-white/[0.04] my-3 mx-4" />
           
           <a 
             href="/blog"
             onClick={() => setIsDrawerOpen(false)}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+            className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium w-full text-left group"
           >
-            <BookOpen className="h-5 w-5 text-zinc-500" />
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><BookOpen className="h-5 w-5" /></span>
             Blog
           </a>
 
           <a 
             href="/reviews"
             onClick={() => setIsDrawerOpen(false)}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+            className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium w-full text-left group"
           >
-            <Heart className="h-5 w-5 text-zinc-500" />
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            </span>
             Customer Reviews
           </a>
 
           <a 
             href="/returns"
             onClick={() => setIsDrawerOpen(false)}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+            className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium w-full text-left group"
           >
-            <RefreshCcw className="h-5 w-5 text-zinc-500" />
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><IconRefreshCcw /></span>
             Returns Portal
           </a>
 
           <a 
             href="/track-order"
             onClick={() => setIsDrawerOpen(false)}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+            className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium w-full text-left group"
           >
-            <Truck className="h-5 w-5 text-zinc-500" />
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><Truck className="h-5 w-5" /></span>
             Track Order
           </a>
           
 
           <button 
             onClick={() => { setIsDrawerOpen(false); setActiveModal('contact'); }}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-zinc-300 hover:text-white font-medium w-full text-left"
+            className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-white/[0.06] transition-all text-zinc-300 hover:text-white font-medium w-full text-left group"
           >
-            <Phone className="h-5 w-5 text-zinc-500" />
+            <span className="text-zinc-500 group-hover:text-brand-400 transition-colors"><Phone className="h-5 w-5" /></span>
             Contact
           </button>
           
-          <div className="h-px bg-zinc-900 my-2 mx-4" />
+          <div className="h-px bg-white/[0.04] my-3 mx-4" />
           
           <button 
             onClick={() => { setIsDrawerOpen(false); onCartOpen(); }}
-            className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-zinc-900 transition-colors text-gold hover:text-gold-light font-medium w-full text-left mt-auto bg-gold/5 border border-gold/10"
+            className="flex items-center gap-3.5 px-4 py-3 rounded-xl hover:bg-brand-600/10 transition-all text-brand-300 hover:text-brand-200 font-semibold w-full text-left mt-auto bg-brand-500/[0.06] border border-brand-500/[0.1]"
           >
-            <ShoppingBag className="h-5 w-5" />
+            <IconBag size={20} />
             Shopping Cart
             {cartCount > 0 && (
-              <span className="ml-auto bg-gold text-zinc-950 text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="ml-auto bg-gradient-to-r from-brand-500 to-brand-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">
                 {cartCount}
               </span>
             )}
@@ -488,15 +608,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
         </div>
         
         {user && profile?.role === 'admin' && (
-          <div className="p-4 border-t border-zinc-900">
-            <a href="/admin" className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-violet-950/30 border border-violet-800/80 hover:bg-violet-900/40 text-violet-300 hover:text-white font-semibold transition-all">
+          <div className="p-4 border-t border-white/[0.04]">
+            <a href="/admin" className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-violet-500/10 border border-violet-500/20 hover:bg-violet-500/15 text-violet-300 hover:text-violet-200 font-semibold transition-all text-sm">
               Admin Portal
             </a>
           </div>
         )}
       </div>
     </header>
-    {/* Spacer to prevent page content from being hidden under the fixed header */}
+    {/* Spacer */}
     <div className={`w-full ${activePromo && !isPromoDismissed ? 'h-[116px] sm:h-[124px]' : 'h-[84px] sm:h-[92px]'}`} />
     </>
   );
