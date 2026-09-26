@@ -45,7 +45,39 @@ const IconFacebook = () => (
 
 export const Footer: React.FC = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [email, setEmail] = useState('');
+  const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [subMessage, setSubMessage] = useState('');
 
+  const handleSubscribe = async () => {
+    if (!email || !email.includes('@')) {
+      setSubStatus('error');
+      setSubMessage('Please enter a valid email address');
+      return;
+    }
+
+    setSubStatus('loading');
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        setSubStatus('success');
+        setSubMessage('Welcome! Check your email for a 10% off VIP code 🎉');
+        setEmail('');
+      } else {
+        setSubStatus('error');
+        setSubMessage(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (err) {
+      setSubStatus('error');
+      setSubMessage('Network error. Please try again.');
+    }
+  };
   return (
     <footer className="relative overflow-hidden">
       {/* ─── Decorative Top Border ─── */}
@@ -71,19 +103,60 @@ export const Footer: React.FC = () => {
                 Be the first to discover new handcrafted collections, exclusive offers, and stories from our artisans in Jaipur.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-              <div className="relative flex-1 lg:w-80">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <input 
-                  type="email" 
-                  placeholder="Enter your email address" 
-                  className="w-full pl-11 pr-4 py-3.5 bg-white/[0.06] border border-white/[0.08] rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.08] transition-all"
-                />
-              </div>
-              <button className="px-6 py-3.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-brand-600/20 hover:shadow-brand-500/30 flex items-center justify-center gap-2 group">
-                Subscribe
-                <Send className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </button>
+            <div className="flex flex-col gap-3 w-full lg:w-auto">
+              {subStatus === 'success' ? (
+                <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-5 py-4 animate-fade-in">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-emerald-300 font-medium">{subMessage}</p>
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1 lg:w-80">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                      <input 
+                        type="email"
+                        value={email}
+                        onChange={(e) => { setEmail(e.target.value); if (subStatus === 'error') setSubStatus('idle'); }}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
+                        placeholder="Enter your email address" 
+                        className={`w-full pl-11 pr-4 py-3.5 bg-white/[0.06] border rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-500/40 focus:bg-white/[0.08] transition-all ${
+                          subStatus === 'error' ? 'border-red-500/40' : 'border-white/[0.08]'
+                        }`}
+                        disabled={subStatus === 'loading'}
+                      />
+                    </div>
+                    <button 
+                      onClick={handleSubscribe}
+                      disabled={subStatus === 'loading'}
+                      className="px-6 py-3.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-brand-600/20 hover:shadow-brand-500/30 flex items-center justify-center gap-2 group min-w-[140px]"
+                    >
+                      {subStatus === 'loading' ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          Subscribing...
+                        </>
+                      ) : (
+                        <>
+                          Subscribe
+                          <Send className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {subStatus === 'error' && (
+                    <p className="text-xs text-red-400 font-medium pl-1 animate-fade-in">{subMessage}</p>
+                  )}
+                  <p className="text-[11px] text-zinc-600 pl-1">Subscribe & get an exclusive <span className="text-brand-400 font-semibold">10% off</span> VIP discount code instantly!</p>
+                </>
+              )}
             </div>
           </div>
         </div>
