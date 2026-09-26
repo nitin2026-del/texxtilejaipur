@@ -69,7 +69,16 @@ export async function POST(req: NextRequest) {
       // Extract tracking parameters for CAPI
       const clientIp = req.headers.get('x-forwarded-for') || req.ip;
       const userAgent = req.headers.get('user-agent') || undefined;
-      const metaData = { fbp, fbc, clientIp, userAgent };
+      
+      const { data: trackOrder } = await supabaseAdmin.from('orders').select('display_currency, total_display_currency').eq('id', orderId).single();
+      const metaData = { 
+        fbp, 
+        fbc, 
+        clientIp: typeof clientIp === 'string' ? clientIp : undefined, 
+        userAgent,
+        trackingCurrency: trackOrder?.display_currency,
+        trackingAmount: Number(trackOrder?.total_display_currency) || 0
+      };
 
       // Centralized success handler
       await handlePaymentSuccess(orderId, supabaseAdmin, metaData);

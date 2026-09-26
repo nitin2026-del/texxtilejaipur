@@ -170,12 +170,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       saveCart([...cart, newItem]);
       
-      const productPrice = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+      const productPrice = Number((parsedPriceInr * FX_RATES[currency]).toFixed(2));
       trackMetaEvent('AddToCart', {
         content_ids: [product.id],
         content_type: 'product',
         value: productPrice,
-        currency: 'USD'
+        currency: currency
       });
     }
   };

@@ -10,7 +10,7 @@ const hashMeta = (val?: string) => {
 export async function handlePaymentSuccess(
   orderId: string, 
   supabaseAdmin: SupabaseClient,
-  metaData?: { fbp?: string; fbc?: string; clientIp?: string; userAgent?: string }
+  metaData?: { fbp?: string; fbc?: string; clientIp?: string; userAgent?: string; trackingCurrency?: string; trackingAmount?: number }
 ) {
   try {
     // 0. Idempotency Check: Don't process if already completed
@@ -62,17 +62,14 @@ export async function handlePaymentSuccess(
           continue;
         }
 
-        // Calculate new stock (prevent going below 0)
-        const newStock = Math.max(0, (product.stock_quantity || 0) - item.quantity);
-
-        // Update product stock
-        const { error: updateError } = await supabaseAdmin
-          .from('products')
-          .update({ stock_quantity: newStock })
-          .eq('id', item.product_id);
+        // Atomically update product stock via RPC to prevent overselling on concurrent checkouts
+        const { error: updateError } = await supabaseAdmin.rpc('decrement_product_stock', {
+          prod_id: item.product_id,
+          qty: item.quantity
+        });
 
         if (updateError) {
-          console.error(`[handlePaymentSuccess] Failed to update stock for product ${item.product_id}:`, updateError);
+          console.error(`[handlePaymentSuccess] Failed to atomic update stock for product ${item.product_id}:`, updateError);
         }
       }
     }
@@ -123,8 +120,8 @@ export async function handlePaymentSuccess(
               client_user_agent: metaData?.userAgent
             },
             custom_data: {
-              currency: 'USD',
-              value: Number(((order?.total || 0) * 0.0104).toFixed(2)), // USD rate approx
+              currency: metaData?.trackingCurrency || order?.display_currency || 'INR',
+              value: metaData?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0,
               content_ids: (orderItems || []).map(item => item.product_id).filter(Boolean),
               content_type: 'product'
             }

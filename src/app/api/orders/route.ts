@@ -128,6 +128,8 @@ export async function POST(req: NextRequest) {
     const isComboEligible = comboOffer && comboOffer.is_active && eligibleCount >= (comboOffer.required_qty || 2);
 
     let realSubtotalInr = 0;
+    let claimedFreeGifts = 0;
+
     const secureOrderItems = items.map((item: any) => {
       const realProduct = realProducts?.find((p) => p.id === item.id);
       
@@ -137,9 +139,19 @@ export async function POST(req: NextRequest) {
       
       let securePrice = realProduct.sale_price || realProduct.price;
       
-      // Zero out price if securely eligible for free gift
+      // Securely zero out price for free gift
       if (item.isFreeGift && isComboEligible) {
-        securePrice = 0;
+        const catName = Array.isArray(realProduct.category) ? realProduct.category[0]?.name : (realProduct.category as any)?.name;
+        const rewardCat = comboOffer.reward_category?.toLowerCase();
+        
+        // Verify this product is ACTUALLY from the reward category
+        if (rewardCat && catName?.toLowerCase() === rewardCat) {
+          if (claimedFreeGifts < 1) {
+             securePrice = 0;
+             item.quantity = 1; // Forcibly limit quantity to 1 to prevent mass theft
+             claimedFreeGifts++;
+          }
+        }
       }
 
       realSubtotalInr += securePrice * item.quantity;
@@ -173,7 +185,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // B. Add shipping fee securely via SYS_SHIPPING_CONFIG
+    // B. Apply Coupon Discount securely from DB (BEFORE SHIPPING!)
+    if (coupon_code && !coupon_code.trim().toUpperCase().startsWith('SYS_')) {
+      const { data: couponData } = await supabaseAdmin
+        .from('coupons')
+        .select('*')
+        .eq('code', coupon_code.trim().toUpperCase())
+        .eq('is_active', true)
+        .single();
+        
+      if (couponData && (!couponData.min_order_value || realSubtotalInr >= couponData.min_order_value)) {
+        if (couponData.discount_type === 'percentage') {
+          finalTotalInr -= finalTotalInr * (couponData.discount_value / 100);
+        } else {
+          finalTotalInr -= couponData.discount_value;
+        }
+      }
+    }
+
+    // C. Add shipping fee securely via SYS_SHIPPING_CONFIG
     let dbShippingCostInr = shipping_method === 'express' ? (10 / 0.0104) : 0;
     try {
       const { data: shipConfig } = await supabaseAdmin
@@ -196,24 +226,6 @@ export async function POST(req: NextRequest) {
     }
     
     finalTotalInr += dbShippingCostInr;
-
-    // C. Apply Coupon Discount securely from DB
-    if (coupon_code && !coupon_code.trim().toUpperCase().startsWith('SYS_')) {
-      const { data: couponData } = await supabaseAdmin
-        .from('coupons')
-        .select('*')
-        .eq('code', coupon_code.trim().toUpperCase())
-        .eq('is_active', true)
-        .single();
-        
-      if (couponData && (!couponData.min_order_value || realSubtotalInr >= couponData.min_order_value)) {
-        if (couponData.discount_type === 'percentage') {
-          finalTotalInr -= finalTotalInr * (couponData.discount_value / 100);
-        } else {
-          finalTotalInr -= couponData.discount_value;
-        }
-      }
-    }
 
     finalTotalInr = Math.max(0, finalTotalInr);
 
