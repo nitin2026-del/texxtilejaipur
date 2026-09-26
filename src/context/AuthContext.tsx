@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         10000
       );
 
-      const { count: secureCount } = await withTimeout(supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('payment_status', 'completed'), 10000); if (secureCount !== null && secureCount !== undefined) { setOrderCountState(secureCount); localStorage.setItem('textilejaipur_order_count', secureCount.toString()); } if (!error && data) {
+      const { count: secureCount } = await withTimeout((supabase.from('orders').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('payment_status', 'completed') as Promise<any>), 10000); if (secureCount !== null && secureCount !== undefined) { setOrderCountState(secureCount); localStorage.setItem('textilejaipur_order_count', secureCount.toString()); } if (!error && data) {
         const name = [data.first_name, data.last_name].filter(Boolean).join(' ').trim() || email?.split('@')[0] || 'User';
         const mappedProfile: Profile = {
           id: data.id,

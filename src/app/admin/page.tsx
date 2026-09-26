@@ -2141,7 +2141,7 @@ function AdminPortalContent() {
                               )}
                             </td>
                             <td className="p-4">
-                              <span className="font-extrabold text-zinc-900 block">{order.total_display_currency ? (order.total_display_currency.toString().includes(order.display_currency) ? order.total_display_currency : `${order.total_display_currency} ${order.display_currency}`) : formatPrice(order.total)}</span>
+                              <span className="font-extrabold text-zinc-900 block">{(order as any).total_display_currency ? ((order as any).total_display_currency.toString().includes((order as any).display_currency) ? (order as any).total_display_currency : `${(order as any).total_display_currency} ${(order as any).display_currency}`) : formatPrice(order.total)}</span>
                               <span className="text-[9px] text-zinc-500 font-medium tracking-wider block mt-0.5">Base: ₹{order.total?.toLocaleString()} INR</span>
                             </td>
                             <td className="p-4">

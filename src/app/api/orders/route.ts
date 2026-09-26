@@ -96,13 +96,36 @@ export async function POST(req: NextRequest) {
     const productIds = items.map((i: any) => i.id);
     const { data: realProducts, error: prodError } = await supabaseAdmin
       .from('products')
-      .select('id, price, sale_price')
+      .select('id, price, sale_price, category:category_id(name)')
       .in('id', productIds);
 
     if (prodError) {
       console.error('Failed to fetch real products:', prodError);
       return NextResponse.json({ error: 'Failed to verify products' }, { status: 500 });
     }
+
+    // Fetch Combo Offer Settings for secure backend validation
+    const { data: comboSetting } = await supabaseAdmin.from('site_settings').select('value').eq('key', 'SYS_COMBO_OFFER').maybeSingle();
+    const comboOffer = comboSetting?.value;
+    
+    let eligibleCount = 0;
+    if (comboOffer && comboOffer.is_active) {
+      items.forEach((item: any) => {
+        if (item.isFreeGift) return;
+        const realProduct = realProducts?.find((p) => p.id === item.id);
+        if (!realProduct) return;
+        const catName = Array.isArray(realProduct.category) ? realProduct.category[0]?.name : (realProduct.category as any)?.name;
+        
+        const rewardCat = comboOffer.reward_category?.toLowerCase();
+        if (rewardCat && catName?.toLowerCase() === rewardCat) return;
+
+        const reqCat = comboOffer.required_category?.toLowerCase();
+        if (!reqCat || reqCat === '' || catName?.toLowerCase() === reqCat) {
+          eligibleCount += item.quantity;
+        }
+      });
+    }
+    const isComboEligible = comboOffer && comboOffer.is_active && eligibleCount >= (comboOffer.required_qty || 2);
 
     let realSubtotalInr = 0;
     const secureOrderItems = items.map((item: any) => {
@@ -112,7 +135,13 @@ export async function POST(req: NextRequest) {
         throw new Error(`Product pricing error for item ID: ${item.id}`);
       }
       
-      const securePrice = realProduct.sale_price || realProduct.price;
+      let securePrice = realProduct.sale_price || realProduct.price;
+      
+      // Zero out price if securely eligible for free gift
+      if (item.isFreeGift && isComboEligible) {
+        securePrice = 0;
+      }
+
       realSubtotalInr += securePrice * item.quantity;
       
       return {
