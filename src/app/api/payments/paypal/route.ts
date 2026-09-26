@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
       // Extract tracking parameters for CAPI
       const clientIp = req.headers.get('x-forwarded-for') || req.ip;
-      const userAgent = req.headers.get('user-agent');
+      const userAgent = req.headers.get('user-agent') || undefined;
       const metaData = { fbp, fbc, clientIp, userAgent };
 
       // Centralized success handler
