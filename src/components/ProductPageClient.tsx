@@ -4,18 +4,20 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import dynamic from 'next/dynamic';
-
-const CartSidebar = dynamic(() => import('@/components/CartSidebar').then(mod => mod.CartSidebar), { ssr: false });
-const CheckoutModal = dynamic(() => import('@/components/CheckoutModal').then(mod => mod.CheckoutModal), { ssr: false });
 
 import { useCart, FX_RATES } from '@/context/CartContext';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getOptimizedUrl } from '@/utils/imageUtils';
 import { trackMetaEvent } from '@/utils/metaTracking';
 import Link from 'next/link';
-import { HappyCustomersSlider } from '@/components/HappyCustomersSlider';
-import { FreeRingWidget } from '@/components/FreeRingWidget';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
+
+const CartSidebar = dynamic(() => import('@/components/CartSidebar').then(mod => mod.CartSidebar), { ssr: false });
+const CheckoutModal = dynamic(() => import('@/components/CheckoutModal').then(mod => mod.CheckoutModal), { ssr: false });
+const HappyCustomersSlider = dynamic(() => import('@/components/HappyCustomersSlider').then(mod => mod.HappyCustomersSlider), { ssr: false, loading: () => <div className="h-40 w-full animate-pulse bg-zinc-100 rounded-xl"></div> });
+const FreeRingWidget = dynamic(() => import('@/components/FreeRingWidget').then(mod => mod.FreeRingWidget), { ssr: false });
+
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, ArrowRight, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame, X } from 'lucide-react';
 
 interface Product {
@@ -405,12 +407,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                       }`}
                     >
                       <div className="absolute inset-0">
-                        <img 
-                          src={media.type === 'image' ? getOptimizedUrl(media.url, 200) : getOptimizedUrl(product.images?.[0], 200)} 
-                          alt={`Thumbnail ${idx}`} 
-                          loading="lazy"
-                          className="absolute inset-0 w-full h-full object-cover" 
-                        />
+                        <Image src={media.type === "image" ? getOptimizedUrl(media.url, 200) : getOptimizedUrl(product.images?.[0], 200)} alt={`Thumbnail ${idx}`} fill sizes="100px" className="absolute inset-0 w-full h-full object-cover" />
                       </div>
                       {media.type === 'video' && (
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center backdrop-blur-[1px]">
@@ -692,21 +689,13 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     <div className="flex flex-wrap gap-2.5">
                       {/* Current Product */}
                       <div className="relative w-14 h-14 rounded border-2 border-[#1a1464] shadow-sm overflow-hidden cursor-default">
-                        <img 
-                          src={getOptimizedUrl(product.images?.[0] || '', 100)}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
+                        <Image src={getOptimizedUrl(product.images?.[0] || "", 100)} alt={product.name} fill sizes="100px" className="w-full h-full object-cover" />
                       </div>
                       
                       {/* Siblings */}
                       {siblingProducts.map(sib => (
                         <a key={sib.id} href={`/product/${sib.id}`} title={sib.name} className="relative w-14 h-14 rounded border border-zinc-200 hover:border-[#1a1464] hover:shadow-md transition-all overflow-hidden block group">
-                          <img 
-                            src={getOptimizedUrl(sib.image || '', 100)}
-                            alt={sib.name}
-                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
-                          />
+                          <Image src={getOptimizedUrl(sib.image || "", 100)} alt={sib.name} fill sizes="100px" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
                         </a>
                       ))}
                     </div>
@@ -1324,12 +1313,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                         onMouseLeave={(e) => e.currentTarget.pause()}
                       />
                     ) : (
-                      <img 
-                        src={getOptimizedUrl(rp.image, 400)} 
-                        alt={rp.name}
-                        loading="lazy"
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      <Image src={getOptimizedUrl(rp.image, 400)} alt={rp.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     )}
                   </div>
                   <div className="p-4">
