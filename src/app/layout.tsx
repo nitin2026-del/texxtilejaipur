@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=1200&auto=format&fit=crop',
+        url: 'https://textilejaipur.com/about/img1.jpg',
         width: 1200,
         height: 630,
         alt: 'Textile Jaipur - Handcrafted Indian Ethnic Wear'
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Textile Jaipur | Handmade Indian Clothing & Suzani Jackets',
     description: 'Shop handmade Indian clothing from Jaipur, including Suzani jackets, boho kimonos, embroidered dresses, skirts and traditional textiles. Worldwide free shipping.',
-    images: ['https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=1200&auto=format&fit=crop'],
+    images: ['https://textilejaipur.com/about/img1.jpg'],
     creator: '@textileofjaipur',
     site: '@textileofjaipur'
   },
@@ -101,7 +101,7 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'Textile Jaipur',
   url: 'https://textilejaipur.com',
-  logo: 'https://textilejaipur.com/icon.png',
+  logo: 'https://textilejaipur.com/about/img1.jpg',
   description: 'Premium handcrafted Indian ethnic wear — embroidered jackets, Boho dresses, block print textiles, suzani masterpieces — shipped worldwide from Jaipur, Rajasthan.',
   address: {
     '@type': 'PostalAddress',
@@ -149,7 +149,7 @@ const storeSchema = {
   '@type': 'ClothingStore',
   name: 'Textile Jaipur',
   url: 'https://textilejaipur.com',
-  image: 'https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=80&w=1200&auto=format&fit=crop',
+  image: 'https://textilejaipur.com/about/img1.jpg',
   priceRange: '$$',
   currenciesAccepted: 'USD, EUR, GBP, INR',
   paymentAccepted: 'Credit Card, Debit Card, PayPal',
