@@ -210,7 +210,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       });
       
       trackMetaEvent('Purchase', {
-        value: 0,
+        value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
         currency: 'USD',
         content_ids: cart.map(item => item.id),
         content_type: 'product'
