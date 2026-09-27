@@ -214,23 +214,61 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
       </div>
 
       {/* Story Banner */}
-      <section className="w-full bg-brand-50 border-b border-brand-100 overflow-hidden relative cursor-pointer group" onClick={() => setStoryOpen(true)}>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80')] opacity-5 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
-        <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-          <div className="flex-1 max-w-2xl">
-            <div className="inline-flex items-center gap-2 text-brand-700 text-xs font-bold uppercase tracking-widest mb-4">
-              <Sparkles className="h-4 w-4" /> Discover Our Roots
-            </div>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-zinc-900 mb-4">
-              The Heart Behind <br className="hidden md:block" /> Textile Jaipur
-            </h2>
-            <p className="text-zinc-600 md:text-lg leading-relaxed max-w-xl">
-              From a dream at 21 to earning the trust of buyers worldwide. See how we preserve India's textile traditions alongside 60+ skilled artisans.
-            </p>
+      <section className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto py-12 md:py-20 cursor-pointer" onClick={() => setStoryOpen(true)}>
+        <div className="relative w-full rounded-[2rem] overflow-hidden bg-zinc-950 group shadow-2xl shadow-zinc-900/10">
+          {/* Background Images / Textures */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544816155-12df9643f363?w=1600&auto=format&fit=crop&q=80')] opacity-20 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/95 to-zinc-900/60" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
           </div>
-          <button className="shrink-0 inline-flex items-center gap-2 px-8 py-4 bg-zinc-900 text-white rounded-full font-bold hover:bg-brand-600 transition-colors shadow-xl hover:shadow-brand-500/20 group-hover:bg-brand-600">
-            <BookOpen className="h-5 w-5" /> Read Our Story
-          </button>
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between">
+            {/* Content Side */}
+            <div className="p-8 md:p-14 lg:p-20 flex-1 max-w-3xl">
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-300 text-xs font-bold uppercase tracking-[0.2em] mb-8 backdrop-blur-sm">
+                <Sparkles className="h-4 w-4" /> Discover Our Roots
+              </div>
+              
+              <h2 className="text-4xl md:text-5xl lg:text-[4rem] font-serif font-bold text-white mb-6 leading-[1.1]">
+                The Heart Behind <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-300 to-brand-500 italic font-medium">Textile Jaipur</span>
+              </h2>
+              
+              <p className="text-zinc-300 md:text-lg leading-relaxed max-w-xl mb-10 opacity-90">
+                From a dream at 21 to earning the trust of buyers worldwide. See how we preserve India's textile traditions alongside 60+ skilled artisans.
+              </p>
+              
+              <div className="flex items-center gap-6">
+                <button className="relative overflow-hidden inline-flex items-center gap-3 px-8 py-4 bg-brand-600 text-white rounded-full font-bold transition-all duration-300 group-hover:bg-brand-500 shadow-xl shadow-brand-900/20">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" /> Read Our Story
+                  </span>
+                </button>
+                <div className="hidden sm:flex items-center gap-3 text-zinc-500 text-sm font-semibold tracking-widest uppercase">
+                  <div className="w-12 h-px bg-zinc-700" />
+                  Est. Jaipur
+                </div>
+              </div>
+            </div>
+
+            {/* Visual Side - Only visible on lg+ */}
+            <div className="w-full lg:w-[45%] h-[400px] lg:h-[500px] relative hidden lg:block overflow-hidden">
+               <div className="absolute right-0 top-0 bottom-0 w-full bg-gradient-to-l from-transparent via-zinc-950/20 to-zinc-950 z-10" />
+               <img 
+                 src="https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?w=1000&auto=format&fit=crop&q=80" 
+                 alt="Jaipur Artisans" 
+                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+               />
+               
+               {/* Floating decorative dots */}
+               <div className="absolute bottom-10 right-10 z-20 flex gap-2">
+                 <div className="w-2 h-2 rounded-full bg-brand-400 animate-pulse" />
+                 <div className="w-2 h-2 rounded-full bg-brand-400/50" />
+                 <div className="w-2 h-2 rounded-full bg-brand-400/30" />
+               </div>
+            </div>
+          </div>
         </div>
       </section>
 
