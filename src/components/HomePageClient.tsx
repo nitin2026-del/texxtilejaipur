@@ -218,7 +218,10 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
         <div className="relative w-full rounded-[2rem] overflow-hidden bg-zinc-950 group shadow-2xl shadow-zinc-900/10">
           {/* Background Images / Textures */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[url('/heritage_craft.png')] opacity-20 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" />
+            <div 
+              className="absolute inset-0 opacity-[0.15] bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" 
+              style={{ backgroundImage: `url('${products.length > 0 ? getOptimizedUrl(products[0]?.images?.[0] || '', 1200) : '/heritage_craft.png'}')` }}
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/95 to-zinc-900/60" />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
           </div>
@@ -254,20 +257,35 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
 
             {/* Visual Side - Only visible on lg+ */}
             <div className="w-full lg:w-[45%] h-[400px] lg:h-[500px] relative hidden lg:block overflow-hidden">
-               <div className="absolute right-0 top-0 bottom-0 w-full bg-gradient-to-l from-transparent via-zinc-950/20 to-zinc-950 z-10" />
-               <img 
-                 src="/about/img1.jpg" 
-                 alt="Textile Jaipur Artisans" 
-                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                 onError={(e) => { e.currentTarget.src = '/heritage_craft.png' }}
-               />
+               <div className="absolute inset-0 bg-gradient-to-l from-transparent via-zinc-950/40 to-zinc-950 z-20 pointer-events-none" />
                
-               {/* Floating decorative dots */}
-               <div className="absolute bottom-10 right-10 z-20 flex gap-2">
-                 <div className="w-2 h-2 rounded-full bg-brand-400 animate-pulse" />
-                 <div className="w-2 h-2 rounded-full bg-brand-400/50" />
-                 <div className="w-2 h-2 rounded-full bg-brand-400/30" />
-               </div>
+               {products.length >= 3 ? (
+                 <div className="absolute inset-0 grid grid-cols-2 gap-4 p-4 transform rotate-6 scale-125 group-hover:rotate-2 transition-transform duration-1000 z-10 opacity-80 group-hover:opacity-100">
+                    <img 
+                      src={getOptimizedUrl(products[0]?.images?.[0] || '', 600)} 
+                      alt={products[0]?.name}
+                      className="w-full h-[110%] object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] -translate-y-8" 
+                    />
+                    <div className="flex flex-col gap-4">
+                      <img 
+                        src={getOptimizedUrl(products[1]?.images?.[0] || '', 400)} 
+                        alt={products[1]?.name}
+                        className="w-full h-[60%] object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] translate-y-4" 
+                      />
+                      <img 
+                        src={getOptimizedUrl(products[2]?.images?.[0] || '', 400)} 
+                        alt={products[2]?.name}
+                        className="w-full h-[40%] object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] translate-y-8" 
+                      />
+                    </div>
+                 </div>
+               ) : (
+                 <img 
+                   src="/heritage_craft.png" 
+                   alt="Textile Jaipur Artisans" 
+                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                 />
+               )}
             </div>
           </div>
         </div>
