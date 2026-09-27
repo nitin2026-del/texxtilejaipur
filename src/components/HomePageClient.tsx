@@ -218,7 +218,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
         <div className="relative w-full rounded-[2rem] overflow-hidden bg-zinc-950 group shadow-2xl shadow-zinc-900/10">
           {/* Background Images / Textures */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544816155-12df9643f363?w=1600&auto=format&fit=crop&q=80')] opacity-20 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-[url('/heritage_craft.png')] opacity-20 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/95 to-zinc-900/60" />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
           </div>
@@ -256,9 +256,10 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
             <div className="w-full lg:w-[45%] h-[400px] lg:h-[500px] relative hidden lg:block overflow-hidden">
                <div className="absolute right-0 top-0 bottom-0 w-full bg-gradient-to-l from-transparent via-zinc-950/20 to-zinc-950 z-10" />
                <img 
-                 src="https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?w=1000&auto=format&fit=crop&q=80" 
-                 alt="Jaipur Artisans" 
+                 src="/about/img1.jpg" 
+                 alt="Textile Jaipur Artisans" 
                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                 onError={(e) => { e.currentTarget.src = '/heritage_craft.png' }}
                />
                
                {/* Floating decorative dots */}
