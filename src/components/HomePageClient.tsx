@@ -8,7 +8,7 @@ import { CartSidebar } from '@/components/CartSidebar';
 import { CheckoutModal } from '@/components/CheckoutModal';
 import { BottomNav } from '@/components/BottomNav';
 import { StoryDrawer } from '@/components/StoryDrawer';
-import { Search, Sparkles, Filter, ShieldCheck, Truck, Clock, BookOpen, Video } from 'lucide-react';
+import { Search, Sparkles, Filter, ShieldCheck, Truck, Clock, BookOpen, Video, Globe, Award, Star, Lock, Palette, FileText, Scissors, MessageCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { getOptimizedUrl } from '@/utils/imageUtils';
 
@@ -554,20 +554,32 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
       </section>
 
       {/* Press Mentions & Trust Stats */}
-      <section className="w-full bg-zinc-950 py-14">
-        <div className="px-6 max-w-7xl mx-auto">
-          <p className="text-center text-zinc-500 text-xs font-bold tracking-[0.3em] uppercase mb-8">Trusted by Buyers in 30+ Countries Worldwide</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+      <section className="w-full bg-zinc-950 py-16 relative overflow-hidden">
+        {/* Subtle decorative background */}
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('/heritage_craft.png')] bg-repeat mix-blend-overlay" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-500/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-500/30 to-transparent" />
+        
+        <div className="px-6 max-w-7xl mx-auto relative z-10">
+          <div className="flex items-center justify-center gap-4 mb-12">
+             <div className="h-px w-12 bg-zinc-800" />
+             <p className="text-center text-brand-300 text-xs font-bold tracking-[0.3em] uppercase">Trusted Globally</p>
+             <div className="h-px w-12 bg-zinc-800" />
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-4">
             {[
-              { number: '3,200+', label: 'Happy Customers Worldwide', icon: '🌍' },
-              { number: '400+', label: 'Years of Craft Heritage', icon: '🏺' },
-              { number: '4.9★', label: 'Average Customer Rating', icon: '⭐' },
-              { number: '3-Day', label: 'Damage Replacements', icon: '✅' },
-            ].map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center text-center p-5 bg-white/5 rounded-2xl border border-white/10">
-                <span className="text-2xl mb-2">{stat.icon}</span>
-                <span className="text-2xl font-serif font-bold text-white">{stat.number}</span>
-                <span className="text-xs text-zinc-400 mt-1 font-medium">{stat.label}</span>
+              { number: '3,200+', label: 'Happy Customers', icon: Globe },
+              { number: '400+', label: 'Years of Craft Heritage', icon: Award },
+              { number: '4.9★', label: 'Average Rating', icon: Star },
+              { number: '3-Day', label: 'Damage Replacements', icon: ShieldCheck },
+            ].map((stat, i) => (
+              <div key={stat.label} className="group flex flex-col items-center text-center p-6 bg-gradient-to-b from-zinc-900 to-zinc-900/50 rounded-2xl border border-zinc-800/50 hover:border-brand-500/30 transition-colors duration-500 hover:shadow-[0_0_30px_-10px_rgba(182,128,91,0.2)]">
+                <div className="h-12 w-12 rounded-full bg-brand-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
+                  <stat.icon className="h-6 w-6 text-brand-400" strokeWidth={1.5} />
+                </div>
+                <span className="text-3xl font-serif font-bold text-white mb-1 group-hover:text-brand-300 transition-colors">{stat.number}</span>
+                <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">{stat.label}</span>
               </div>
             ))}
           </div>
@@ -575,25 +587,32 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
       </section>
 
       {/* Why Buy From Us Section */}
-      <section className="w-full bg-[#FDFBF7] border-y border-zinc-200 py-16">
-        <div className="px-6 max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-serif text-zinc-900 mb-3">Why Buyers Across the World Choose Us</h2>
-            <p className="text-sm text-zinc-500 font-medium">Trusted by boutiques, stylists, and individual shoppers in 30+ countries since 2015</p>
+      <section className="w-full bg-[#FDFBF7] border-b border-zinc-200 py-24 relative">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-64 h-64 bg-zinc-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none" />
+        
+        <div className="px-6 max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16 max-w-2xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-serif text-zinc-900 mb-6 leading-tight">Why Buyers Across the World Choose Us</h2>
+            <p className="text-base text-zinc-500 font-medium leading-relaxed">Trusted by boutiques, stylists, and individual shoppers in 30+ countries since 2015. We bring the authentic craft of Jaipur directly to your doorstep.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {[
-              { icon: '🚀', title: 'UPS Express — Delivered Worldwide', desc: 'All orders ship via UPS Express Worldwide. Fast, fully tracked delivery to every country on the globe. Full tracking number provided on dispatch.' },
-              { icon: '🔒', title: 'Secure & Trusted Payments', desc: 'Pay by Visa, Mastercard, Amex or PayPal. All transactions are 256-bit SSL encrypted and PayPal buyer-protected. No hidden fees.' },
-              { icon: '🎨', title: 'Artisanal Commitment', desc: 'Please choose carefully. As an artisanal studio, we strictly accept returns only for damaged or incorrect items within 3 days.' },
-              { icon: '🛃', title: 'We Handle All Customs & Duties', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork and customs declarations. You receive the package — we handle the rest.' },
-              { icon: '🧵', title: '100% Genuinely Handcrafted', desc: 'Every product is hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur, Rajasthan. No factory production — ever.' },
-              { icon: '💬', title: 'Real Customer Support', desc: 'Questions before you buy? Email us at textileofrajasthan.info[at]gmail.com or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
+              { icon: Truck, title: 'UPS Express Worldwide', desc: 'Fast, fully tracked delivery to every country on the globe. Full tracking number provided on dispatch.' },
+              { icon: Lock, title: 'Secure Payments', desc: 'Pay by Visa, Mastercard, Amex or PayPal. All transactions are 256-bit SSL encrypted and PayPal buyer-protected.' },
+              { icon: Palette, title: 'Artisanal Commitment', desc: 'As an artisanal studio, we strictly accept returns only for damaged or incorrect items within 3 days.' },
+              { icon: FileText, title: 'Customs & Duties Handled', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork. You receive the package — we handle the rest.' },
+              { icon: Scissors, title: '100% Genuinely Handcrafted', desc: 'Every product is hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur, Rajasthan.' },
+              { icon: MessageCircle, title: 'Real Customer Support', desc: 'Questions before you buy? Email or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
             ].map((item) => (
-              <div key={item.title} className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <span className="text-3xl block mb-3">{item.icon}</span>
-                <h3 className="text-sm font-bold text-zinc-900 mb-2">{item.title}</h3>
-                <p className="text-xs text-zinc-500 leading-relaxed">{item.desc}</p>
+              <div key={item.title} className="group bg-white rounded-3xl p-8 shadow-sm border border-zinc-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div className="h-14 w-14 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mb-6 group-hover:bg-brand-600 transition-colors duration-300">
+                  <item.icon className="h-7 w-7 text-brand-700 group-hover:text-white transition-colors duration-300" strokeWidth={1.5} />
+                </div>
+                <h3 className="text-lg font-bold text-zinc-900 mb-3 font-serif group-hover:text-brand-700 transition-colors">{item.title}</h3>
+                <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
