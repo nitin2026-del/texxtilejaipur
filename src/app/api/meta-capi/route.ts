@@ -3,7 +3,21 @@ import crypto from 'crypto';
 
 const hashMeta = (val?: string) => {
   if (!val) return undefined;
-  return crypto.createHash('sha256').update(val.trim().toLowerCase()).digest('hex');
+  return crypto.createHash('sha256').update(val).digest('hex');
+};
+
+const normStr = (val?: string) => val ? val.trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
+const normEmail = (val?: string) => val ? val.trim().toLowerCase() : undefined;
+const normPhone = (val?: string) => val ? val.replace(/\D/g, '') : undefined;
+const normCountry = (val?: string) => {
+  if (!val) return undefined;
+  const c = val.trim().toLowerCase();
+  if (c === 'united states' || c === 'usa') return 'us';
+  if (c === 'india' || c === 'ind') return 'in';
+  if (c === 'united kingdom' || c === 'uk') return 'gb';
+  if (c === 'australia') return 'au';
+  if (c === 'canada') return 'ca';
+  return c.length === 2 ? c : c.substring(0, 2);
 };
 
 export async function POST(req: Request) {
@@ -33,14 +47,14 @@ export async function POST(req: Request) {
             client_user_agent: userAgent,
             fbp: fbp || undefined,
             fbc: fbc || undefined,
-            em: hashMeta(userData?.email) ? [hashMeta(userData?.email)] : undefined,
-            ph: hashMeta(userData?.phone?.replace(/\D/g, '')) ? [hashMeta(userData?.phone?.replace(/\D/g, ''))] : undefined,
-            fn: hashMeta(userData?.firstName) ? [hashMeta(userData?.firstName)] : undefined,
-            ln: hashMeta(userData?.lastName) ? [hashMeta(userData?.lastName)] : undefined,
-            ct: hashMeta(userData?.city) ? [hashMeta(userData?.city)] : undefined,
-            st: hashMeta(userData?.state) ? [hashMeta(userData?.state)] : undefined,
-            zp: hashMeta(userData?.zip) ? [hashMeta(userData?.zip)] : undefined,
-            country: hashMeta(userData?.country) ? [hashMeta(userData?.country)] : undefined
+            em: hashMeta(normEmail(userData?.email)) ? [hashMeta(normEmail(userData?.email))] : undefined,
+            ph: hashMeta(normPhone(userData?.phone)) ? [hashMeta(normPhone(userData?.phone))] : undefined,
+            fn: hashMeta(normStr(userData?.firstName)) ? [hashMeta(normStr(userData?.firstName))] : undefined,
+            ln: hashMeta(normStr(userData?.lastName)) ? [hashMeta(normStr(userData?.lastName))] : undefined,
+            ct: hashMeta(normStr(userData?.city)) ? [hashMeta(normStr(userData?.city))] : undefined,
+            st: hashMeta(normStr(userData?.state)) ? [hashMeta(normStr(userData?.state))] : undefined,
+            zp: hashMeta(normStr(userData?.zip)) ? [hashMeta(normStr(userData?.zip))] : undefined,
+            country: hashMeta(normCountry(userData?.country)) ? [hashMeta(normCountry(userData?.country))] : undefined
           },
           custom_data: eventData
         }
