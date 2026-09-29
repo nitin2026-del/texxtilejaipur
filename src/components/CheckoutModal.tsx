@@ -190,16 +190,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               // Send Welcome Email
         const targetEmail = user?.email || email;
         const targetName = user?.user_metadata?.full_name || fullName || name;
-        if (targetEmail) {
-          try {
-            fetch('/api/auth/welcome', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: targetEmail, name: targetName })
-            });
-          } catch (e) {
-            console.error('Welcome email failed', e);
-          }
+        if (targetEmail && targetEmail.includes('@')) {
+          fetch('/api/auth/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: targetEmail, name: targetName }),
+            keepalive: true
+          }).catch(e => console.error('Welcome email failed', e));
         }
 
         setStep('payment');
