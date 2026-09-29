@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+const hashMeta = (val?: string) => {
+  if (!val) return undefined;
+  return crypto.createHash('sha256').update(val.trim().toLowerCase()).digest('hex');
+};
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { eventName, eventData, eventId, url, userAgent } = body;
+    const { eventName, eventData, eventId, url, userAgent, fbp, fbc, userData } = body;
     const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
 
     const PIXEL_ID = '2857970634559091';
@@ -24,7 +30,17 @@ export async function POST(req: Request) {
           action_source: 'website',
           user_data: {
             client_ip_address: clientIp,
-            client_user_agent: userAgent
+            client_user_agent: userAgent,
+            fbp: fbp || undefined,
+            fbc: fbc || undefined,
+            em: hashMeta(userData?.email) ? [hashMeta(userData?.email)] : undefined,
+            ph: hashMeta(userData?.phone?.replace(/\D/g, '')) ? [hashMeta(userData?.phone?.replace(/\D/g, ''))] : undefined,
+            fn: hashMeta(userData?.firstName) ? [hashMeta(userData?.firstName)] : undefined,
+            ln: hashMeta(userData?.lastName) ? [hashMeta(userData?.lastName)] : undefined,
+            ct: hashMeta(userData?.city) ? [hashMeta(userData?.city)] : undefined,
+            st: hashMeta(userData?.state) ? [hashMeta(userData?.state)] : undefined,
+            zp: hashMeta(userData?.zip) ? [hashMeta(userData?.zip)] : undefined,
+            country: hashMeta(userData?.country) ? [hashMeta(userData?.country)] : undefined
           },
           custom_data: eventData
         }

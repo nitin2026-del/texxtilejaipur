@@ -187,9 +187,26 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
       // 2. Initialize Payment Intent via API (Removed Stripe logic)
 
-              // Send Welcome Email
+              // Track AddPaymentInfo with full user data for EMQ
         const targetEmail = user?.email || email;
         const targetName = user?.user_metadata?.full_name || fullName || name;
+        trackMetaEvent('AddPaymentInfo', {
+          value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
+          currency: 'USD',
+          content_ids: cart.map(item => item.id),
+          content_type: 'product'
+        }, undefined, false, {
+          email: targetEmail,
+          phone: phone,
+          firstName: targetName?.split(' ')[0],
+          lastName: targetName?.split(' ')[1],
+          city: city,
+          state: state,
+          zip: postalCode,
+          country: country
+        });
+
+        // Send Welcome Email
         if (targetEmail && targetEmail.includes('@')) {
           fetch('/api/auth/welcome', {
             method: 'POST',
