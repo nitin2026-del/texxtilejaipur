@@ -81,10 +81,10 @@ export default async function ProductPage({ params }: Props) {
       next: { revalidate: 60 }
     };
 
-    // 1. Kick off independent fetches in parallel
+    // 1. Kick off independent fetches in parallel (added limits to prevent huge DB payloads)
     const productPromise = fetch(`${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&id=eq.${id}`, fetchOptions);
-    const reviewsPromise = fetch(`${url}/rest/v1/reviews?product_id=eq.${id}&status=eq.approved&order=created_at.desc`, fetchOptions);
-    const ugcPromise = fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast`, fetchOptions);
+    const reviewsPromise = fetch(`${url}/rest/v1/reviews?product_id=eq.${id}&status=eq.approved&order=created_at.desc&limit=10`, fetchOptions);
+    const ugcPromise = fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast&limit=6`, fetchOptions);
 
     const [res, reviewsRes, ugcRes] = await Promise.all([productPromise, reviewsPromise, ugcPromise]);
 
@@ -122,8 +122,14 @@ export default async function ProductPage({ params }: Props) {
     
     if (!product) return notFound();
 
-    // 2. Fetch Related Products (requires product category)
-    const relatedRes = await fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}&limit=4`, fetchOptions);
+    // 2. Fetch Related Products & Sibling Products IN PARALLEL (fixing waterfall)
+    const relatedPromise = fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}&limit=4`, fetchOptions);
+    const siblingGroup = product.details?.sibling_group;
+    const sibPromise = siblingGroup 
+      ? fetch(`${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${id}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`, fetchOptions)
+      : Promise.resolve(null);
+
+    const [relatedRes, sibRes] = await Promise.all([relatedPromise, sibPromise]);
     
     if (relatedRes.ok) {
       const relatedData = await relatedRes.json();
@@ -171,7 +177,7 @@ export default async function ProductPage({ params }: Props) {
     }
 
     // 5. Fetch Sibling Products (lightweight: only if sibling_group exists)
-    const siblingGroup = product?.details?.sibling_group;
+    // duplicate removed
     if (siblingGroup) {
       const sibRes = await fetch(
         `${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${id}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`,

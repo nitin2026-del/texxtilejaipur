@@ -27,7 +27,7 @@ interface Product {
   category: string;
   images: string[];
   stock: number;
-  details: { material?: string; origin?: string; care?: string; video_url?: string; translations?: any; culturalContext?: string; stylingAdvice?: string; isBestseller?: boolean };
+  details: { material?: string; origin?: string; care?: string; video_url?: string; translations?: any; culturalContext?: string; stylingAdvice?: string; isBestseller?: boolean; sibling_group?: string; ad_showcase?: any; };
   is_featured?: boolean;
   display_rank?: number;
   image_url?: string;
