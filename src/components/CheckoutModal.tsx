@@ -111,21 +111,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
   if (!isOpen) return null;
 
-  const handleEmailBlur = async () => {
-    if (email && email.includes('@') && !hasSentCartEmail && cart.length > 0) {
-      setHasSentCartEmail(true);
-      try {
-        await fetch('/api/emails/checkout-started', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, items: cart, total: getCartTotalInr() })
-        });
-      } catch (err) {
-        console.error('Failed to send checkout started email:', err);
-      }
-    }
-  };
-
   const handleShippingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -202,7 +187,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
       // 2. Initialize Payment Intent via API (Removed Stripe logic)
 
-      setStep('payment');
+              // Send Welcome Email
+        const targetEmail = user?.email || email;
+        const targetName = user?.user_metadata?.full_name || fullName || name;
+        if (targetEmail) {
+          try {
+            fetch('/api/auth/welcome', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: targetEmail, name: targetName })
+            });
+          } catch (e) {
+            console.error('Welcome email failed', e);
+          }
+        }
+
+        setStep('payment');
     } catch (err: any) {
       setError(err.message || 'Failed to initialize checkout');
     } finally {
@@ -411,7 +411,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="name@domain.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    onBlur={handleEmailBlur}
+                    
                     className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                   <p className="text-[10px] text-zinc-400 mt-1">We'll send your order summary and tracking link here.</p>
