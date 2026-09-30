@@ -1,5 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
 
+const getTestEventCode = () => {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCode = urlParams.get('test_event_code');
+    if (urlCode) {
+      sessionStorage.setItem('meta_test_event_code', urlCode);
+      return urlCode;
+    }
+    return sessionStorage.getItem('meta_test_event_code') || undefined;
+  } catch (e) {
+    return undefined;
+  }
+};
+
 const getCookie = (name: string) => {
   if (typeof document === 'undefined') return undefined;
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -40,7 +55,8 @@ export const trackMetaEvent = async (
           userAgent: navigator.userAgent,
           fbp,
           fbc,
-          userData
+          userData,
+          testEventCode: getTestEventCode()
         }),
         keepalive: true
       });

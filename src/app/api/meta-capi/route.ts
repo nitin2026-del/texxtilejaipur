@@ -23,7 +23,7 @@ const normCountry = (val?: string) => {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { eventName, eventData, eventId, url, userAgent, fbp, fbc, userData } = body;
+    const { eventName, eventData, eventId, url, userAgent, fbp, fbc, userData, testEventCode } = body;
     const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
 
     const PIXEL_ID = '2857970634559091';
@@ -58,7 +58,8 @@ export async function POST(req: Request) {
           },
           custom_data: eventData
         }
-      ]
+      ],
+      ...(testEventCode ? { test_event_code: testEventCode } : {})
     };
 
     const response = await fetch('https://graph.facebook.com/v19.0/' + PIXEL_ID + '/events?access_token=' + ACCESS_TOKEN, {

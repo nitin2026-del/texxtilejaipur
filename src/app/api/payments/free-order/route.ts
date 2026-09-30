@@ -10,7 +10,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { orderId, coinsUsed, coinsEarned } = body;
+    const { orderId, coinsUsed, coinsEarned, testEventCode } = body;
 
     if (!orderId) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
