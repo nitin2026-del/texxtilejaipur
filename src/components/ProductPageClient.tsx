@@ -799,7 +799,9 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   {product.stock_quantity > 0 && product.stock_quantity < 5 && (
                     <p className="text-amber-700 text-xs font-semibold flex items-center gap-1.5 animate-pulse">
                       <Flame className="h-4 w-4" /> 
-                      Rare piece � Only {product.stock_quantity} left in stock
+                      {product.stock_quantity < 3 
+                        ? "Rare piece � High in demand" 
+                        : `Rare piece � Only ${product.stock_quantity} left in stock`}
                     </p>
                   )}
                 </div>
