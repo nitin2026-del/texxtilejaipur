@@ -77,6 +77,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
     }
     return items;
   }, [product]);
+  const [viewers, setViewers] = useState(0);
+  useEffect(() => { setViewers(Math.floor(Math.random() * 13) + 12); }, []);
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [expandedQa, setExpandedQa] = useState<number | null>(null);
@@ -780,6 +782,26 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                       <a href="https://api.whatsapp.com/send?phone=919461858955&text=Need%20help%20with%20sizing%20and%20length" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold underline underline-offset-2">Contact us on WhatsApp</a> for helping in the size and the length.
                     </p>
                   </div>
+                </div>
+
+                
+                {/* Premium Live Viewers & Scarcity */}
+                <div className="flex flex-col mb-4 mt-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
+                    </span>
+                    <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-medium">
+                      High Demand &middot; Currently viewed by {viewers} others
+                    </p>
+                  </div>
+                  {product.stock_quantity > 0 && product.stock_quantity < 5 && (
+                    <p className="text-amber-700 text-xs font-semibold flex items-center gap-1.5 animate-pulse">
+                      <Flame className="h-4 w-4" /> 
+                      Rare piece � Only {product.stock_quantity} left in stock
+                    </p>
+                  )}
                 </div>
 
                 {/* Add to Cart Actions */}
