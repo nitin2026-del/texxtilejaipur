@@ -191,8 +191,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         const targetEmail = user?.email || email;
         const targetName = user?.user_metadata?.full_name || fullName || name;
         trackMetaEvent('AddPaymentInfo', {
-          value: Number((getCartTotalInr() * FX_RATES[currency]).toFixed(2)),
-          currency: currency,
+          value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
+          currency: 'USD',
           content_ids: cart.map(item => item.id),
           content_type: 'product'
         }, undefined, false, {
