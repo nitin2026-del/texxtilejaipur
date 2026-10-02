@@ -63,6 +63,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
     const { cart, addToCart, formatPrice, updateQuantity, comboOffer } = useCart();
     const id = product?.id;
     const pathname = usePathname();
+    const router = useRouter();
     const [quantity, setQuantity] = useState(1);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -292,13 +293,20 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
       <div className="pt-16 md:pt-24 px-4 md:px-6 max-w-7xl mx-auto">
         {/* Back Navigation */}
         <nav aria-label="Back" className="mb-5 md:mb-7">
-          <Link 
-            href="/collection"
-            className="inline-flex items-center gap-2 text-[11px] md:text-xs text-zinc-500 hover:text-[#1a1464] transition-colors uppercase font-bold tracking-widest"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Collection
-          </Link>
+          <button 
+              onClick={(e) => {
+                e.preventDefault();
+                if (window.history.length > 2) {
+                  router.back();
+                } else {
+                  router.push('/collection');
+                }
+              }}
+              className="inline-flex items-center gap-2 text-[11px] md:text-xs text-zinc-500 hover:text-[#1a1464] transition-colors uppercase font-bold tracking-widest"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to Collection
+            </button>
         </nav>
         {!product ? (
           <div className="text-center py-20 text-zinc-500">Product not found</div>
