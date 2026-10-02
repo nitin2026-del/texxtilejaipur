@@ -806,11 +806,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
 
                 {/* Add to Cart Actions */}
                 <div className="pt-2 pb-2">
-                  <div className="flex h-14 max-w-md">
+                  <div className="flex flex-col sm:flex-row gap-3 max-w-md">
                     {isInCart ? (
                       <button
                         onClick={() => setCartOpen(true)}
-                        className="flex-1 bg-white border-2 border-[#1a1464] text-[#1a1464] font-bold text-[13px] uppercase tracking-widest flex items-center justify-center gap-2 transition-colors hover:bg-[#f0f0f5]"
+                        className="flex-1 h-14 bg-white border-2 border-[#1a1464] text-[#1a1464] font-bold text-[13px] uppercase tracking-widest flex items-center justify-center gap-2 transition-colors hover:bg-[#f0f0f5]"
                       >
                         <Check className="h-4 w-4 stroke-[3]" />
                         <span>Added to Cart</span>
@@ -819,248 +819,102 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                       <button
                         onClick={handleAddToCart}
                         disabled={product.stock_quantity === 0}
-                        className="flex-1 bg-white border-2 border-[#1a1464] text-[#1a1464] font-bold text-[13px] uppercase tracking-widest flex items-center justify-center gap-2 transition-colors hover:bg-[#f0f0f5] disabled:opacity-50"
+                        className="flex-1 h-14 bg-white border-2 border-[#1a1464] text-[#1a1464] font-bold text-[13px] uppercase tracking-widest flex items-center justify-center gap-2 transition-colors hover:bg-[#f0f0f5] disabled:opacity-50"
                       >
-                        {product.stock_quantity === 0 ? 'Out of Stock' : `${formatPrice(product.price_inr)} | ADD TO CART`}
+                        {product.stock_quantity === 0 ? 'Out of Stock' : 'ADD TO CART'}
                       </button>
                     )}
-                    
-                    <div className="flex items-center justify-between px-4 border-2 border-l-0 border-[#1a1464] bg-white text-[#1a1464] w-28 shrink-0">
-                      <button
-                        onClick={() => {
-                          if (cartItem && product) {
-                            updateQuantity(product.id, cartItem.quantity - 1);
-                          }
-                          setQuantity(Math.max(0, quantity - 1));
-                        }}
-                        className="text-[#1a1464] hover:opacity-70 transition-opacity p-2 -ml-2"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="font-bold text-[15px]">{displayQuantity}</span>
-                      <button
-                        onClick={() => {
-                          if (cartItem && product) {
-                            updateQuantity(product.id, cartItem.quantity + 1);
-                          } else if (quantity === 0 && product) {
-                            addToCart({
-                              id: product.id,
-                              name: product.name,
-                              price_inr: product.price_inr,
-                              images: product.images,
-                              sku: product.sku,
-                              category: product.category
-                            }, 1);
-                            setQuantity(1);
-                          } else {
-                            setQuantity(Math.min(product.stock_quantity, quantity + 1));
-                          }
-                        }}
-                        className="text-[#1a1464] hover:opacity-70 transition-opacity p-2 -mr-2"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <button
+                      onClick={handleBuyNow}
+                      disabled={product.stock_quantity === 0}
+                      className="flex-1 h-14 bg-[#1a1464] text-white font-bold text-[13px] uppercase tracking-widest flex items-center justify-center transition-colors hover:bg-[#120e45] disabled:opacity-50"
+                    >
+                      Buy Now
+                    </button>
                   </div>
                   
-                  {/* Payment Badges under Add to Cart */}
-                  <div className="mt-3 flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-zinc-200 shadow-sm max-w-max">
+                  {/* Micro-Trust & Global Buyer Info */}
+                  <div className="flex items-center gap-3 mt-4 mb-3 text-[10px] text-zinc-500 uppercase tracking-widest font-medium">
+                    <span className="flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" /> Secure Checkout</span>
+                    <span>&middot;</span>
+                    <span className="flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> 4.9/5 Rating</span>
+                  </div>
+
+                  <div className="bg-[#fbfbf9] rounded-lg p-3.5 border border-[#e5e5df] text-[11px] text-zinc-700 space-y-2 mb-4 max-w-md">
+                    <p className="flex justify-between items-center border-b border-zinc-100 pb-1.5">
+                      <span className="text-zinc-500 flex items-center gap-1.5"><Truck className="h-3.5 w-3.5" /> Delivery:</span> 
+                      <strong className="text-zinc-900">5-9 Business Days (Global)</strong>
+                    </p>
+                    <p className="flex justify-between items-center border-b border-zinc-100 pb-1.5">
+                      <span className="text-zinc-500 flex items-center gap-1.5"><Globe className="h-3.5 w-3.5" /> Shipping Cost:</span> 
+                      <strong className="text-green-700">Free Worldwide Shipping</strong>
+                    </p>
+                    <p className="flex justify-between items-center border-b border-zinc-100 pb-1.5">
+                      <span className="text-zinc-500 flex items-center gap-1.5"><Award className="h-3.5 w-3.5" /> Duties & Taxes:</span> 
+                      <strong className="text-zinc-900">Pre-paid by us. No hidden fees.</strong>
+                    </p>
+                    <p className="flex justify-between items-center">
+                      <span className="text-zinc-500 flex items-center gap-1.5"><RefreshCw className="h-3.5 w-3.5" /> Returns:</span> 
+                      <strong className="text-zinc-900 text-right">7 Days | We pay return shipping on defects | Full Refund</strong>
+                    </p>
+                  </div>
+
+                  {/* Payment Badges */}
+                  <div className="mt-2 mb-6 flex items-center gap-3 bg-white px-3 py-2 rounded-lg border border-zinc-200 shadow-sm max-w-max">
                     <svg viewBox="0 0 256 83" className="h-3.5 object-contain" width="35" height="11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M111.4 81.36L129.28 0h30.06L140.48 81.36h-29.08zM242.06 8.35c-5.74-2.23-14.73-4.58-26.31-4.58-29.35 0-50.04 15.65-50.21 38.08-.18 16.59 14.88 25.86 26.23 31.42 11.69 5.75 15.63 9.4 15.6 14.51-.04 7.84-9.39 11.45-18.06 11.45-12.38 0-18.91-1.9-28.98-6.38l-4.08-1.91-4.22 26.23c6.88 3.19 19.67 5.96 32.96 6.11 31.06 0 51.48-15.35 51.71-39.11.21-13.4-8.08-23.75-25.26-31.95-10.45-5.32-15.02-8.83-15-13.79.03-4.69 5.34-9.59 17.06-9.59 9.8 0 16.73 2.12 21.95 4.54l2.67 1.25 4.24-26.26zM203.49 81.36h28.16L213.1 0h-23.94c-6.86 0-12.72 4.02-15.53 10.33l-34.99 71.03h29.68l5.92-16.48h36.31l3.43 16.48zm-19.98-38.38l12.44-34.33h.36l6.81 34.33h-19.61zM73.54 0L53.79 55.43 51.05 41.5C46.85 24.36 31.4 10.3 12.02 5.06l16.14 76.3h29.83l45.47-81.36H73.54z" fill="#1434CB"/><path d="M31.11 0C21.71 0 5.43 .72 .03 5.06c24.58 6.03 41.69 20.35 48.74 37.69l-7.39-36.9C39.77 2.37 36.39 0 31.11 0z" fill="#F2A900"/></svg>
                     <img src="/mastercard.svg" alt="Mastercard" className="h-5 object-contain" />
-                    <img src="/amex.svg" alt="American Express" className="h-4 object-contain rounded-sm" />
-                    <img src="/paypal.svg" alt="PayPal" className="h-4 object-contain" />
+                    <img src="/amex.svg" alt="Amex" className="h-4 object-contain" />
                   </div>
 
-
-                  {/* Artisan Edit / UGC Embedded Videos */}
-                  {ugcVideos && ugcVideos.length > 0 && (
-                    <div className="mt-8 max-w-md pt-6 border-t border-zinc-200">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Video className="h-4 w-4 text-[#1a1464]" />
-                        <h3 className="text-[13px] font-bold text-[#1a1464] uppercase tracking-wide">Styled By You</h3>
+                  {/* Collapsible Info Sections */}
+                  <div className="space-y-2 max-w-md">
+                    <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                        Shipping & Delivery
+                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                      </summary>
+                      <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                        We provide free, fully-tracked worldwide shipping via premium couriers. Estimated delivery is 5-9 business days to all global destinations. Need it sooner? Contact us for expedited options.
                       </div>
-                      <p className="text-[11.5px] text-[#555] mb-4">See how our customers enjoy wearing our products.</p>
-                      
-                      <div className="flex gap-3 overflow-x-auto pb-2 hide-scrollbar snap-x">
-                        {ugcVideos.map((video: any) => (
-                          <Link href="/the-artisan-edit" key={video.id} className="relative w-[140px] h-[220px] shrink-0 rounded-xl overflow-hidden bg-zinc-900 snap-start shadow-md border border-zinc-200 group block">
-                            <video
-                              src={video.videoUrl}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                              muted
-                              loop
-                              playsInline
-                              preload="metadata"
-                              onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
-                              onMouseLeave={(e) => e.currentTarget.pause()}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0"></div>
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                               <div className="h-10 w-10 bg-white/90 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-                                  <Play className="h-4 w-4 text-[#1a1464] ml-1" fill="currentColor" />
-                               </div>
-                            </div>
-                            {video.title && (
-                              <div className="absolute bottom-3 left-3 right-3">
-                                <p className="text-white text-[11px] font-medium leading-tight drop-shadow-md line-clamp-2">
-                                  {video.title}
-                                </p>
-                              </div>
-                            )}
-                          </Link>
-                        ))}
+                    </details>
+                    <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                        Customs & Duties
+                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                      </summary>
+                      <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                        There are NO custom fees or hidden charges for you. We prepay and take care of all import taxes and duties on your behalf.
                       </div>
-                    </div>
-                  )}
-
-                  {/* Structured Details */}
-                  <div className="mt-6 pt-6 border-t border-zinc-200 max-w-md">
-                    <h3 className="text-sm font-bold text-zinc-900 mb-3">Product Details</h3>
-                    <div className="space-y-2">
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          What is it?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          {(() => {
-                            const cat = product.category?.toLowerCase() || '';
-                            if (cat.includes('velvet suzani')) {
-                              return "This is a premium handcrafted Velvet Suzani piece, featuring intricate silk thread embroidery on plush velvet fabric, traditionally crafted by master artisans in Jaipur.";
-                            }
-                            if (cat.includes('tnt suzani') || cat.includes('tnt')) {
-                              return "This is an exquisite TNT (Tone-on-Tone) Suzani piece, showcasing detailed thread work on high-quality fabric where the embroidery matches the base color for an elegant, subtle texture.";
-                            }
-                            if (cat.includes('cotton suzani')) {
-                              return "This is a breathable and lightweight Cotton Suzani piece, adorned with vibrant hand-embroidery perfect for layering across seasons.";
-                            }
-                            return `A beautifully handcrafted ${product.category?.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())} piece, made with traditional techniques.`;
-                          })()}
-                        </div>
-                      </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          What is it made from?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Premium quality materials specific to the collection.
-                        </div>
-                      </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          How was it made?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Authentic hand embroidery & artisan crafting techniques.
-                        </div>
-                      </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          Where was it made?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Jaipur, Rajasthan (India)
-                        </div>
-                      </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          Shipping & Customs?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          We provide FREE worldwide shipping. There are NO custom fees or hidden charges—we take care of all taxes and duties for you.
-                        </div>
-                      </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          Returns?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          <h4 className="font-bold text-zinc-900 mb-1 text-sm">Strict Quality Assurance</h4>
-                          <p className="text-zinc-600 text-xs">
-                            Strictly 3-day returns for damaged or incorrect items only. We will take care of all taxes and duties.
-                          </p>
-                        </div>
-                      </details>
-                    </div>
-                  </div>
-
-                  {/* Frequently Asked Questions */}
-                  <div className="mt-6 pt-6 border-t border-zinc-200 max-w-md">
-                    <h3 className="text-sm font-bold text-zinc-900 mb-3">Customer Q&A</h3>
-                    <div className="space-y-2">
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          Are your garments truly handmade?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Yes! Absolutely. Our pieces are crafted by master artisans in Jaipur and rural Rajasthan using traditional techniques passed down through generations.
-                        </div>
-                      </details>
-
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          What is your return policy?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          To protect the artistic integrity of our handcrafted pieces, we do not accept returns for change of mind. We accept returns strictly for damaged or incorrect items reported within 3 days of delivery.
-                        </div>
-                      </details>
-
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          Can I request custom size?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          Yes! We offer a customization service for most of our garments. Please contact our support team with your measurements before placing an order.
-                        </div>
-                      </details>
-                      
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          In how many days will I receive my delivery?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          <p className="mb-2 mt-2">We offer free, fully tracked worldwide shipping on all orders via premium couriers. ✈️</p>
-                          <p className="font-bold mb-1">Estimated Delivery Times:</p>
-                          <ul className="list-disc pl-4 mb-2 space-y-0.5">
-                            <li><strong>USA:</strong> 5–9 Business Days</li>
-                            <li><strong>UK:</strong> 4–8 Business Days</li>
-                            <li><strong>Europe:</strong> 5–10 Business Days</li>
-                            <li><strong>Canada:</strong> 6–10 Business Days</li>
-                            <li><strong>Australia:</strong> 6–12 Business Days</li>
-                          </ul>
-                          <p className="mb-2 italic text-[#1a1464] font-medium">We deliver everywhere! If your country is not mentioned here, don't worry, we will deliver to you.</p>
-                          <div className="mt-3 p-2 bg-amber-50 rounded border border-amber-100 text-[11px]">
-                            <strong>Need it sooner?</strong> We can provide expedited fast shipping at no extra cost if you have a genuine reason (like a wedding, gift, or special event). <br/>
-                            <a href="https://wa.me/919461858955" target="_blank" rel="noopener noreferrer" className="text-[#1a1464] font-bold hover:underline inline-flex items-center gap-1 mt-1">
-                              Request Fast Shipping &rarr;
-                            </a>
-                          </div>
-                        </div>
-                      </details>
-                      <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
-                          What payment methods do you accept?
-                          <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                        </summary>
-                        <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                          We accept secure checkout via PayPal. Even if you don't have a PayPal account, you can select the "Pay with Debit or Credit Card" option during the PayPal checkout process. All transactions are 100% encrypted and secure.
-                        </div>
-                      </details>
-                    </div>
+                    </details>
+                    <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                        Returns & Exchanges
+                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                      </summary>
+                      <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                        We accept returns within 7 days for damaged or incorrect items, providing a full refund. We cover return shipping costs for defects. For change of mind, returns are generally not accepted to protect the artistic integrity of these handcrafted pieces.
+                      </div>
+                    </details>
+                    <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                        Care Instructions
+                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                      </summary>
+                      <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                        Dry clean only. Keep away from direct sunlight to preserve the vibrant natural dyes. Handle with care as these are delicate, handcrafted heritage pieces.
+                      </div>
+                    </details>
+                    <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="flex items-center justify-between p-3 cursor-pointer text-xs font-semibold text-zinc-900 group-open:bg-zinc-50 transition-colors">
+                        About Suzani Handwork
+                        <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                      </summary>
+                      <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
+                        Each piece features authentic Suzani embroidery, a traditional Central Asian art form. Artisans spend weeks hand-stitching intricate floral and geometric motifs, making every single item completely unique.
+                      </div>
+                    </details>
                   </div>
                 </div>
-
-
                 {/* Actions (Wishlist/Share) & AI Sizing */}
                 <div className="pt-4 flex flex-col gap-4 max-w-md">
                   <div className="flex justify-between items-center">
@@ -1312,7 +1166,143 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
         )}
 
 
-        {/* You May Also Like Section */}
+                {/* Customer Reviews Detailed Section */}
+        {dynamicReviews.length > 0 && (
+          <div className="mt-16 max-w-4xl mx-auto px-4">
+            <h3 className="text-2xl font-serif text-zinc-900 font-bold mb-8 flex items-center gap-2">
+              <Star className="h-6 w-6 text-amber-400 fill-amber-400" />
+              Real Reviews from Global Customers
+            </h3>
+            <div className="space-y-6">
+              {dynamicReviews.slice(0, 10).map((r, i) => (
+                <div key={i} className="bg-white p-5 rounded-2xl border border-zinc-200 shadow-sm">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="flex items-center gap-1 mb-1">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                          <Star key={idx} className={`h-4 w-4 ${idx < r.stars ? 'fill-amber-400 text-amber-400' : 'fill-zinc-100 text-zinc-200'}`} />
+                        ))}
+                      </div>
+                      <h4 className="font-bold text-zinc-900">{r.title || "Beautiful craftsmanship"}</h4>
+                    </div>
+                    <span className="text-xs text-zinc-400">{r.date}</span>
+                  </div>
+                  <p className="text-sm text-zinc-600 mb-4">{r.body}</p>
+                  
+                  {/* Reviewer Photos */}
+                  {r.imageUrls && r.imageUrls.length > 0 && (
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 snap-x">
+                      {r.imageUrls.map((img: string, idx: number) => (
+                        <div key={idx} className="shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-zinc-100 snap-center">
+                          <img src={getOptimizedUrl(img, 150)} alt="Customer photo" className="w-full h-full object-cover" loading="lazy" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
+                    <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold">
+                      {r.initial}
+                    </span>
+                    <span className="text-zinc-900">{r.name}</span>
+                    {r.location && (
+                      <>
+                        <span className="text-zinc-300">&bull;</span>
+                        <span className="flex items-center gap-1">
+                          <Globe className="h-3 w-3" /> {r.location}
+                        </span>
+                      </>
+                    )}
+                    {r.isVerified && (
+                      <>
+                        <span className="text-zinc-300">&bull;</span>
+                        <span className="flex items-center gap-1 text-green-600">
+                          <ShieldCheck className="h-3.5 w-3.5" /> Verified Buyer
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* FAQ Section with Schema */}
+        <div className="mt-20 max-w-4xl mx-auto px-4 mb-16">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "How long will delivery take?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "We offer free worldwide shipping. Delivery typically takes 5-9 business days depending on your country."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Do I have to pay customs and duties?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No. We prepay all customs and import duties. You will not face any hidden charges upon delivery."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "What is your return policy?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "We accept returns within 7 days for damaged or incorrect items and provide a full refund. We also cover return shipping on defects."
+                    }
+                  }
+                ]
+              })
+            }}
+          />
+          <h3 className="text-2xl font-serif text-zinc-900 font-bold mb-6 text-center">Frequently Asked Questions</h3>
+          <div className="space-y-4">
+            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
+              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
+                How long will delivery take?
+                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
+                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
+              </summary>
+              <p className="mt-3 text-sm text-zinc-600">We offer free worldwide shipping. Delivery typically takes 5-9 business days depending on your country via premium couriers like DHL/FedEx.</p>
+            </details>
+            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
+              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
+                Do I have to pay customs and duties?
+                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
+                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
+              </summary>
+              <p className="mt-3 text-sm text-zinc-600">No. We prepay all customs and import duties on your behalf. You will not face any hidden charges upon delivery�what you pay at checkout is final.</p>
+            </details>
+            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
+              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
+                What is your return policy?
+                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
+                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
+              </summary>
+              <p className="mt-3 text-sm text-zinc-600">We accept returns within 7 days for damaged or incorrect items and provide a full refund. We also cover return shipping on defects. Because our items are unique handcrafted artisan pieces, we generally do not accept returns for a simple change of mind.</p>
+            </details>
+            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
+              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
+                How should I care for my Suzani piece?
+                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
+                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
+              </summary>
+              <p className="mt-3 text-sm text-zinc-600">We recommend dry cleaning only to preserve the vibrant natural dyes and delicate hand embroidery. Keep the piece out of prolonged direct sunlight to prevent fading.</p>
+            </details>
+          </div>
+        </div>
+
+{/* You May Also Like Section */}
         {relatedProducts.length > 0 && (
           <div className="mt-20 pt-16 border-t border-zinc-200">
             <div className="flex items-center gap-2 mb-8">
