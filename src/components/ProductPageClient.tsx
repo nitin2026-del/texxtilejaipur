@@ -180,8 +180,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   
   // International AI features
   const [language, setLanguage] = useState<'en' | 'fr' | 'es' | 'ar' | 'de'>('en');
-  const [activeBadge, setActiveBadge] = useState<string | null>(null);
-  
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -571,58 +569,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                     </p>
                   </div>
                 </details>
-
-                {/* Circular Badges */}
-                <div className="flex flex-col gap-3 py-2">
-                  <div className="flex items-center gap-10">
-                    <div className="flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setActiveBadge(activeBadge === 'material' ? null : 'material')}>
-                      <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative group-hover:bg-[#f5f5f7] transition-colors">
-                        <ShieldCheck className="h-6 w-6 relative z-10" strokeWidth={1.5} />
-                        <div className="absolute -bottom-1 -left-1 w-5 h-5 bg-[#a3e635] rounded-full -z-0"></div>
-                      </div>
-                      <span className="text-[11px] text-[#444] font-medium text-center leading-tight line-clamp-2 max-w-[60px]">{product.details?.material || 'Premium Fabric'}</span>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-2 cursor-pointer group" onClick={() => setActiveBadge(activeBadge === 'shipping' ? null : 'shipping')}>
-                      <div className="w-14 h-14 rounded-full border-[1.5px] border-[#1a1464] flex items-center justify-center bg-white text-[#1a1464] relative group-hover:bg-[#f5f5f7] transition-colors">
-                        <Globe className="h-6 w-6 relative z-10" strokeWidth={1.5} />
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#93c5fd] rounded-full -z-0"></div>
-                      </div>
-                      <span className="text-[11px] text-[#444] font-medium text-center leading-tight">Free Global Shipping</span>
-                    </div>
-                  </div>
-
-                  {/* Badge Info Expandable Area */}
-                  {activeBadge === 'material' && (
-                    <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                      <strong className="text-[#1a1464] text-[13px] block mb-1">Material Details</strong>
-                      This garment is made using {product.details?.material || 'Premium Fabric'}. Our materials are carefully sourced to ensure maximum breathability, durability, and a luxurious feel against your skin.
-                    </div>
-                  )}
-                  {activeBadge === 'shipping' && (
-                    <div className="bg-[#fdfbf7] p-4 rounded-lg border border-amber-200 text-xs text-zinc-700 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
-                      <strong className="text-[#1a1464] text-[13px] block mb-2">Free Global Shipping</strong>
-                      We offer free, fully tracked worldwide shipping on all orders via premium couriers.
-                      <div className="mt-3 bg-white p-3 rounded border border-zinc-100">
-                        <strong className="block mb-1 text-zinc-800">✈️ Estimated Delivery Times:</strong>
-                        <ul className="space-y-0.5 text-[11px] text-zinc-600">
-                          <li>• USA: 5–9 Business Days</li>
-                          <li>• UK: 4–8 Business Days</li>
-                          <li>• Europe: 5–10 Business Days</li>
-                          <li>• Canada: 6–10 Business Days</li>
-                          <li>• Australia: 6–12 Business Days</li>
-                        </ul>
-                      </div>
-                      <div className="mt-3 text-[11px] bg-brand-50 p-2.5 rounded border border-brand-100 text-brand-800">
-                        <strong className="block mb-1 text-sm">Need it sooner?</strong>
-                        We can provide expedited fast shipping at <strong>no extra cost</strong> if you have a genuine reason (like a wedding, gift, or special event). 
-                        <a href="https://wa.me/919461858955" target="_blank" rel="noopener noreferrer" className="inline-block mt-2 px-3 py-1.5 bg-brand-700 text-white rounded font-bold hover:bg-brand-800 transition-colors shadow-sm">
-                          Request Fast Shipping
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
 
                 {/* ── AS SEEN IN OUR AD ── */}
                 {product?.details?.ad_showcase?.ad_images && product.details.ad_showcase.ad_images.length > 0 && (
