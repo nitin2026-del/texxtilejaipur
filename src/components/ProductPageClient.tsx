@@ -560,9 +560,17 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   </div>
                 </div>
 
-                <p className="text-[#555] text-[13px] leading-relaxed pr-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {language === 'en' ? product.description : (product.details?.translations?.[language as keyof typeof product.details.translations] || product.description)}
-                </p>
+                <details className="group mt-2 mb-4 [&_summary::-webkit-details-marker]:hidden">
+                  <summary className="flex items-center justify-between py-2 cursor-pointer text-[13px] font-bold text-[#1a1464] border-b border-zinc-100 transition-colors">
+                    Product Description
+                    <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
+                  </summary>
+                  <div className="pt-3 pb-2">
+                    <p className="text-[#555] text-[13px] leading-relaxed pr-2" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                      {language === 'en' ? product.description : (product.details?.translations?.[language as keyof typeof product.details.translations] || product.description)}
+                    </p>
+                  </div>
+                </details>
 
                 {/* Circular Badges */}
                 <div className="flex flex-col gap-3 py-2">
@@ -1227,80 +1235,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
             </div>
           </div>
         )}
-
-        {/* FAQ Section with Schema */}
-        <div className="mt-20 max-w-4xl mx-auto px-4 mb-16">
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "FAQPage",
-                "mainEntity": [
-                  {
-                    "@type": "Question",
-                    "name": "How long will delivery take?",
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": "We offer free worldwide shipping. Delivery typically takes 5-9 business days depending on your country."
-                    }
-                  },
-                  {
-                    "@type": "Question",
-                    "name": "Do I have to pay customs and duties?",
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": "No. We prepay all customs and import duties. You will not face any hidden charges upon delivery."
-                    }
-                  },
-                  {
-                    "@type": "Question",
-                    "name": "What is your return policy?",
-                    "acceptedAnswer": {
-                      "@type": "Answer",
-                      "text": "We accept returns within 7 days for damaged or incorrect items and provide a full refund. We also cover return shipping on defects."
-                    }
-                  }
-                ]
-              })
-            }}
-          />
-          <h3 className="text-2xl font-serif text-zinc-900 font-bold mb-6 text-center">Frequently Asked Questions</h3>
-          <div className="space-y-4">
-            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
-              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
-                How long will delivery take?
-                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
-                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
-              </summary>
-              <p className="mt-3 text-sm text-zinc-600">We offer free worldwide shipping. Delivery typically takes 5-9 business days depending on your country via premium couriers like DHL/FedEx.</p>
-            </details>
-            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
-              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
-                Do I have to pay customs and duties?
-                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
-                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
-              </summary>
-              <p className="mt-3 text-sm text-zinc-600">No. We prepay all customs and import duties on your behalf. You will not face any hidden charges upon delivery�what you pay at checkout is final.</p>
-            </details>
-            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
-              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
-                What is your return policy?
-                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
-                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
-              </summary>
-              <p className="mt-3 text-sm text-zinc-600">We accept returns within 7 days for damaged or incorrect items and provide a full refund. We also cover return shipping on defects. Because our items are unique handcrafted artisan pieces, we generally do not accept returns for a simple change of mind.</p>
-            </details>
-            <details className="group bg-white p-5 border border-zinc-200 rounded-xl">
-              <summary className="font-bold text-zinc-900 cursor-pointer flex justify-between items-center list-none [&::-webkit-details-marker]:hidden">
-                How should I care for my Suzani piece?
-                <Plus className="h-5 w-5 text-zinc-400 group-open:hidden" />
-                <Minus className="h-5 w-5 text-zinc-400 hidden group-open:block" />
-              </summary>
-              <p className="mt-3 text-sm text-zinc-600">We recommend dry cleaning only to preserve the vibrant natural dyes and delicate hand embroidery. Keep the piece out of prolonged direct sunlight to prevent fading.</p>
-            </details>
-          </div>
-        </div>
 
 {/* You May Also Like Section */}
         {relatedProducts.length > 0 && (
