@@ -169,15 +169,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         category: product.category,
       };
       saveCart([...cart, newItem]);
-      
-      const productPrice = Number((parsedPriceInr * FX_RATES[currency]).toFixed(2));
-      trackMetaEvent('AddToCart', {
-        content_ids: [product.id],
-        content_type: 'product',
-        value: productPrice,
-        currency: currency
-      });
     }
+    
+    // Fire AddToCart event (whether new or existing)
+    const productPrice = Number((parsedPriceInr * FX_RATES[currency]).toFixed(2));
+    trackMetaEvent('AddToCart', {
+      content_ids: [product.id],
+      content_type: 'product',
+      value: productPrice,
+      currency: currency
+    });
   };
 
   const addFreeGift = (product: CartContextProduct) => {
