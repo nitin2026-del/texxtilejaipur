@@ -5,7 +5,7 @@ export function getOptimizedUrl(url: string | undefined, width: number = 800): s
     // Weserv optimizes on the fly, avoiding Vercel quota limits
     // Note: We bumped quality to 90 and added &con=5 &sat=15 to globally fix the "dullness" 
     // caused by standard ICC profile stripping in WebP compression.
-    return `https://images.weserv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//, ''))}&output=webp&w=${width}&q=90&con=5&sat=15`;
+    return `https://images.weserv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//, ''))}&output=webp&w=${width}&q=90`;
   }
   return url;
 }

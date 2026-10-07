@@ -176,3 +176,9 @@ h1, h2, h3, h4, h5, h6 {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+/* Global Photography Vibrancy Boost */
+/* Counteracts web compression dullness natively in the browser */
+img.object-cover, img.object-contain {
+  filter: saturate(1.20) contrast(1.05) !important;
+}
