@@ -552,11 +552,6 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                           </div>
                           <span className="underline underline-offset-2 ml-1">4.9/5 Rating</span>
                         </div>
-                            {'☆'.repeat(5 - Math.round(dynamicReviews.reduce((sum, rev) => sum + rev.rating, 0) / dynamicReviews.length))}
-                          </div>
-                          <span className="underline underline-offset-2">{dynamicReviews.length} REVIEW{dynamicReviews.length !== 1 ? 'S' : ''}</span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Language Selector */}
