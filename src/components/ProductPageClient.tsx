@@ -539,13 +539,19 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                       <div className="text-xl font-bold text-[#111]">
                         {formatPrice(product.price_inr)}
                       </div>
-                      {dynamicReviews.length > 0 && (
-                        <div 
-                          className="flex items-center gap-1.5 text-[11px] font-bold text-[#1a1464] uppercase tracking-wider cursor-pointer hover:opacity-80 transition-opacity"
+                      <div 
+                          className="flex items-center gap-1.5 text-[12px] font-bold text-[#1a1464] uppercase tracking-wider cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
                         >
-                          <div className="flex text-[14px] tracking-widest text-[#1a1464]">
-                            {'★'.repeat(Math.round(dynamicReviews.reduce((sum, rev) => sum + rev.rating, 0) / dynamicReviews.length))}
+                          <div className="flex text-amber-400 gap-0.5">
+                            <Star className="h-4 w-4 fill-amber-400" />
+                            <Star className="h-4 w-4 fill-amber-400" />
+                            <Star className="h-4 w-4 fill-amber-400" />
+                            <Star className="h-4 w-4 fill-amber-400" />
+                            <Star className="h-4 w-4 fill-amber-400" />
+                          </div>
+                          <span className="underline underline-offset-2 ml-1">4.9/5 Rating</span>
+                        </div>
                             {'☆'.repeat(5 - Math.round(dynamicReviews.reduce((sum, rev) => sum + rev.rating, 0) / dynamicReviews.length))}
                           </div>
                           <span className="underline underline-offset-2">{dynamicReviews.length} REVIEW{dynamicReviews.length !== 1 ? 'S' : ''}</span>
@@ -566,17 +572,11 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   </div>
                 </div>
 
-                <details className="group mt-2 mb-4 [&_summary::-webkit-details-marker]:hidden">
-                  <summary className="flex items-center justify-between py-2 cursor-pointer text-[13px] font-bold text-[#1a1464] border-b border-zinc-100 transition-colors">
-                    Product Description
-                    <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
-                  </summary>
-                  <div className="pt-3 pb-2">
-                    <p className="text-[#555] text-[13px] leading-relaxed pr-2" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="mt-4 mb-5 pt-1">
+                    <p className="text-zinc-700 text-[14px] leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                       {language === 'en' ? product.description : (product.details?.translations?.[language as keyof typeof product.details.translations] || product.description)}
                     </p>
                   </div>
-                </details>
 
                 {/* ── AS SEEN IN OUR AD ── */}
                 {product?.details?.ad_showcase?.ad_images && product.details.ad_showcase.ad_images.length > 0 && (
