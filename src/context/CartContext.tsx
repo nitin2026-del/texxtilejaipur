@@ -83,7 +83,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { tierDiscountPercentage } = useAuth();
+  const { tierDiscountPercentage, user, profile } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currency, setCurrencyState] = useState<Currency>('USD'); // Default to international USD
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
@@ -178,6 +178,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       content_type: 'product',
       value: productPrice,
       currency: currency
+    }, undefined, false, {
+      email: profile?.email || user?.email,
+      firstName: profile?.first_name || profile?.name?.split(' ')[0],
+      lastName: profile?.name?.split(' ').slice(1).join(' ') || undefined
     });
   };
 
