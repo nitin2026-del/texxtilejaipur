@@ -314,13 +314,13 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
           <div className="flex flex-col md:flex-row gap-12 lg:gap-20">
             {/* Cinematic Media Gallery */}
             <div className="w-full md:w-1/2 space-y-4 relative">
-              <div className="aspect-[4/5] rounded-lg bg-zinc-100 border border-zinc-200 relative overflow-hidden group">
+              <div className="aspect-[3/4] rounded-lg bg-zinc-100 border border-zinc-200 relative overflow-hidden group">
                 {mediaItems.length > 0 ? mediaItems.map((media: any, idx: number) => {
                   const isActive = idx === selectedMediaIndex;
                   return (
                     <div 
                       key={idx} 
-                      className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
+                      className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isActive ? 'opacity-100 z-10 scale-100 blur-0' : 'opacity-0 z-0 scale-[1.04] blur-sm pointer-events-none'}`}
                     >
                       {media.type === 'image' ? (
                         <div
@@ -1342,36 +1342,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
 
       <Footer />
 
-      {/* Sticky Mobile Add-to-Cart Bar */}
-      {product && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-2xl p-3 flex items-center gap-3 md:hidden">
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-zinc-900 truncate">{product.name}</p>
-            <p className="text-sm font-serif font-bold text-brand-700">{formatPrice(product.price_inr)}</p>
-          </div>
-          <button
-            onClick={toggleWishlist}
-            className={`p-2.5 rounded-lg border shrink-0 transition-all ${wishlisted ? 'bg-red-50 border-red-200 text-red-500' : 'border-zinc-200 text-zinc-500'}`}
-          >
-            <Heart className={`h-4 w-4 ${wishlisted ? 'fill-red-500' : ''}`} />
-          </button>
-          <button
-            onClick={handleAddToCart}
-            disabled={product.stock_quantity === 0}
-            className="flex items-center gap-2 px-4 py-2.5 bg-brand-700 text-white text-xs font-bold rounded-lg disabled:opacity-50 shrink-0"
-          >
-            <ShoppingCart className="h-3.5 w-3.5" />
-            {isInCart ? 'Add More' : 'Add to Cart'}
-          </button>
-          <button
-            onClick={handleBuyNow}
-            disabled={product.stock_quantity === 0}
-            className="px-4 py-2.5 bg-zinc-900 text-white text-xs font-bold rounded-lg disabled:opacity-50 shrink-0"
-          >
-            Buy Now
-          </button>
-        </div>
-      )}
+      
 
     </main>
   );
