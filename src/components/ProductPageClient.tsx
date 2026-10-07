@@ -320,7 +320,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   return (
                     <div 
                       key={idx} 
-                      className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isActive ? 'opacity-100 z-10 scale-100 blur-0' : 'opacity-0 z-0 scale-[1.04] blur-sm pointer-events-none'}`}
+                      className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
                     >
                       {media.type === 'image' ? (
                         <div
