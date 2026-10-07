@@ -567,8 +567,9 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   </div>
                 </div>
 
-                <div className="mt-4 mb-5 pt-1">
-                    <p className="text-zinc-700 text-[14px] leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="mt-6 mb-5 pt-2 border-t border-zinc-100">
+                    <h3 className="text-[15px] font-bold text-[#1a1464] mb-3">Product Description</h3>
+                    <p className="text-zinc-700 text-[14.5px] leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                       {language === 'en' ? product.description : (product.details?.translations?.[language as keyof typeof product.details.translations] || product.description)}
                     </p>
                   </div>
