@@ -1,5 +1,4 @@
 'use client';
-import { JaipurGlobe } from './JaipurGlobe';
 
 import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
@@ -214,7 +213,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto"><JaipurGlobe /></div>
+
 
       {/* Story Banner */}
       <section className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto py-12 md:py-20 cursor-pointer" onClick={() => setStoryOpen(true)}>
@@ -698,6 +697,8 @@ function RecentlyViewedSection() {
     </section>
   );
 }
+
+
 
 
 
