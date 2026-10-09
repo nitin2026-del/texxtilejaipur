@@ -1,5 +1,6 @@
 'use client';
-import { JaipurGlobe } from './JaipurGlobe';
+import dynamic from 'next/dynamic';
+const JaipurGlobe = dynamic(() => import('./JaipurGlobe').then(mod => mod.JaipurGlobe), { ssr: false });
 
 import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
@@ -698,6 +699,7 @@ function RecentlyViewedSection() {
     </section>
   );
 }
+
 
 
 
