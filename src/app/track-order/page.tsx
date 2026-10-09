@@ -4,6 +4,35 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Package, Search, CheckCircle, Truck, MapPin, Clock, AlertCircle, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const Spinning3DBox = () => (
+  <div style={{ perspective: 1000 }} className="w-20 h-20 mx-auto relative flex items-center justify-center mb-6 mt-4">
+    <motion.div
+      animate={{ rotateX: [0, 360], rotateY: [0, 360] }}
+      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+      style={{ transformStyle: "preserve-3d" }}
+      className="relative w-12 h-12"
+    >
+      {/* Front */}
+      <div className="absolute inset-0 bg-[#d4af37]/90 border border-[#b8952a] flex items-center justify-center shadow-inner" style={{ transform: "translateZ(24px)" }}>
+        <Package className="w-5 h-5 text-white/80" />
+      </div>
+      {/* Back */}
+      <div className="absolute inset-0 bg-[#c5a130]/90 border border-[#b8952a]" style={{ transform: "rotateY(180deg) translateZ(24px)" }} />
+      {/* Right */}
+      <div className="absolute inset-0 bg-[#e0c050]/90 border border-[#b8952a]" style={{ transform: "rotateY(90deg) translateZ(24px)" }} />
+      {/* Left */}
+      <div className="absolute inset-0 bg-[#b8952a]/90 border border-[#b8952a]" style={{ transform: "rotateY(-90deg) translateZ(24px)" }} />
+      {/* Top (Flaps) */}
+      <div className="absolute inset-0 bg-[#eed575]/90 border border-[#b8952a] flex items-center justify-center" style={{ transform: "rotateX(90deg) translateZ(24px)" }}>
+        <div className="w-full h-0.5 bg-[#8a6d1c]/40" />
+      </div>
+      {/* Bottom */}
+      <div className="absolute inset-0 bg-[#9c7d20]/90 border border-[#b8952a]" style={{ transform: "rotateX(-90deg) translateZ(24px)" }} />
+    </motion.div>
+  </div>
+);
 
 interface OrderItem {
   quantity: number;
@@ -96,9 +125,7 @@ function TrackOrderContent() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         {/* Title */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-amber-50 border-2 border-amber-200 mb-4">
-            <Package className="h-8 w-8 text-amber-500" />
-          </div>
+          <Spinning3DBox />
           <h1 className="text-2xl font-bold text-zinc-900 mb-2">Track Your Order</h1>
           <p className="text-sm text-zinc-500 font-sans">Enter your email and order number to check your delivery status.</p>
         </div>
