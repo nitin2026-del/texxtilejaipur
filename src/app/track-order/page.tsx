@@ -6,30 +6,40 @@ import { useSearchParams } from 'next/navigation';
 import { Package, Search, CheckCircle, Truck, MapPin, Clock, AlertCircle, ArrowLeft, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const Spinning3DBox = () => (
-  <div style={{ perspective: 1000 }} className="w-20 h-20 mx-auto relative flex items-center justify-center mb-6 mt-4">
+const MovingDeliveryVan = () => (
+  <div className="relative w-64 h-24 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+    {/* Road moving backward */}
+    <div className="absolute bottom-2 w-[200%] flex gap-6" style={{ left: 0 }}>
+      <motion.div
+        animate={{ x: [0, -64] }}
+        transition={{ repeat: Infinity, duration: 0.5, ease: "linear" }}
+        className="flex gap-6 w-full"
+      >
+        {[...Array(12)].map((_, i) => (
+          <div key={i} className="h-1 w-10 bg-amber-100 rounded-full flex-shrink-0" />
+        ))}
+      </motion.div>
+    </div>
+
+    {/* The Van bouncing */}
     <motion.div
-      animate={{ rotateX: [0, 360], rotateY: [0, 360] }}
-      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-      style={{ transformStyle: "preserve-3d" }}
-      className="relative w-12 h-12"
+      animate={{ y: [0, -3, 0, -1.5, 0] }}
+      transition={{ repeat: Infinity, duration: 0.6, ease: "easeInOut" }}
+      className="relative z-10 text-amber-500 pb-2"
     >
-      {/* Front */}
-      <div className="absolute inset-0 bg-[#d4af37]/90 border border-[#b8952a] flex items-center justify-center shadow-inner" style={{ transform: "translateZ(24px)" }}>
-        <Package className="w-5 h-5 text-white/80" />
-      </div>
-      {/* Back */}
-      <div className="absolute inset-0 bg-[#c5a130]/90 border border-[#b8952a]" style={{ transform: "rotateY(180deg) translateZ(24px)" }} />
-      {/* Right */}
-      <div className="absolute inset-0 bg-[#e0c050]/90 border border-[#b8952a]" style={{ transform: "rotateY(90deg) translateZ(24px)" }} />
-      {/* Left */}
-      <div className="absolute inset-0 bg-[#b8952a]/90 border border-[#b8952a]" style={{ transform: "rotateY(-90deg) translateZ(24px)" }} />
-      {/* Top (Flaps) */}
-      <div className="absolute inset-0 bg-[#eed575]/90 border border-[#b8952a] flex items-center justify-center" style={{ transform: "rotateX(90deg) translateZ(24px)" }}>
-        <div className="w-full h-0.5 bg-[#8a6d1c]/40" />
-      </div>
-      {/* Bottom */}
-      <div className="absolute inset-0 bg-[#9c7d20]/90 border border-[#b8952a]" style={{ transform: "rotateX(-90deg) translateZ(24px)" }} />
+      {/* Speed lines */}
+      <motion.div
+        animate={{ x: [10, -80], opacity: [0, 1, 0] }}
+        transition={{ repeat: Infinity, duration: 0.7, ease: "linear" }}
+        className="absolute top-2 -left-8 w-12 h-0.5 bg-amber-200 rounded-full"
+      />
+      <motion.div
+        animate={{ x: [0, -60], opacity: [0, 1, 0] }}
+        transition={{ repeat: Infinity, duration: 0.5, ease: "linear", delay: 0.2 }}
+        className="absolute top-6 -left-4 w-8 h-1 bg-amber-300 rounded-full"
+      />
+      
+      <Truck size={64} strokeWidth={1.5} className="fill-white drop-shadow-sm" />
     </motion.div>
   </div>
 );
@@ -125,7 +135,7 @@ function TrackOrderContent() {
       <div className="max-w-2xl mx-auto px-4 py-12">
         {/* Title */}
         <div className="text-center mb-10">
-          <Spinning3DBox />
+          <MovingDeliveryVan />
           <h1 className="text-2xl font-bold text-zinc-900 mb-2">Track Your Order</h1>
           <p className="text-sm text-zinc-500 font-sans">Enter your email and order number to check your delivery status.</p>
         </div>
