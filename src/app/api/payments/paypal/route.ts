@@ -94,6 +94,9 @@ export async function POST(req: NextRequest) {
           total,
           shipping_addresses (
             full_name, phone, country, postal_code, city, state
+          ),
+          order_items (
+            product_id, quantity
           )
         `)
         .eq('id', orderId)
@@ -114,6 +117,7 @@ export async function POST(req: NextRequest) {
         order_number: orderData?.order_number || orderId,
         order_total: Number(trackOrder?.total_display_currency) || Number(orderData?.total) || 0,
         currency: trackOrder?.display_currency || 'USD',
+        items: orderData?.order_items || [],
         customer: {
           email,
           name: orderData?.shipping_addresses?.[0]?.full_name || '',

@@ -85,11 +85,17 @@ function PaymentCaptureHandler() {
           const verifiedAmount = Number(data.order_total ?? paymentAmount);
           const verifiedCurrency = data.currency || paymentCurrency;
 
+          const dbItems = Array.isArray(data.items) && data.items.length > 0
+            ? data.items.map((i: any) => ({ id: i.product_id, quantity: i.quantity }))
+            : null;
+          const itemsToTrack = dbItems || cart.map(item => ({ id: item.id, quantity: item.quantity }));
+          const contentIdsToTrack = itemsToTrack.map((item: any) => item.id).filter(Boolean);
+
           trackMetaEvent('Purchase', {
             value: verifiedAmount,
             currency: verifiedCurrency,
-            content_ids: cart.map(item => item.id),
-            contents: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+            content_ids: contentIdsToTrack,
+            contents: itemsToTrack,
             content_type: 'product',
             order_id: orderId
           }, orderId, true, {
