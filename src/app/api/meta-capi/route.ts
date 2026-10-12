@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const { eventName, eventData, eventId, url, userAgent, fbp, fbc, userData, testEventCode } = body;
     const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
 
-    const PIXEL_ID = '2857970634559091';
+    const PIXEL_ID = process.env.META_PIXEL_ID || '1118362323998364';
     const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
 
     if (!ACCESS_TOKEN) {
