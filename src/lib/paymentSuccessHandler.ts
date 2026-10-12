@@ -4,7 +4,21 @@ import crypto from 'crypto';
 
 const hashMeta = (val?: string) => {
   if (!val) return undefined;
-  return crypto.createHash('sha256').update(val.trim().toLowerCase()).digest('hex');
+  return crypto.createHash('sha256').update(val).digest('hex');
+};
+
+const normStr = (val?: string) => val ? val.trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
+const normEmail = (val?: string) => val ? val.trim().toLowerCase() : undefined;
+const normPhone = (val?: string) => val ? val.replace(/\D/g, '') : undefined;
+const normCountry = (val?: string) => {
+  if (!val) return undefined;
+  const c = val.trim().toLowerCase();
+  if (c === 'united states' || c === 'usa') return 'us';
+  if (c === 'india' || c === 'ind') return 'in';
+  if (c === 'united kingdom' || c === 'uk') return 'gb';
+  if (c === 'australia') return 'au';
+  if (c === 'canada') return 'ca';
+  return c.length === 2 ? c : c.substring(0, 2);
 };
 
 export async function handlePaymentSuccess(
@@ -78,22 +92,25 @@ export async function handlePaymentSuccess(
     const targetEmail = order?.user_id ? undefined : order?.guest_email;
     const hasEmailToNotify = !!(order?.user_id || targetEmail);
 
-    let userEmail = targetEmail;
-    let userName = 'Valued Customer';
-    let userPhone = order?.shipping_addresses?.phone || '';
-    let userCity = order?.shipping_addresses?.city || '';
-    let userState = order?.shipping_addresses?.state || '';
-    let userZip = order?.shipping_addresses?.postal_code || '';
-    let userCountry = order?.shipping_addresses?.country || '';
+    const addr = (Array.isArray(order?.shipping_addresses) ? order?.shipping_addresses[0] : order?.shipping_addresses) || {};
+    let userEmail = targetEmail || order?.guest_email || '';
+    let userName = addr?.full_name || 'Valued Customer';
+    let userPhone = addr?.phone || '';
+    let userCity = addr?.city || '';
+    let userState = addr?.state || '';
+    let userZip = addr?.postal_code || '';
+    let userCountry = addr?.country || '';
 
     if (order?.user_id) {
       const { data: authData } = await supabaseAdmin.auth.admin.getUserById(order.user_id);
       const { data: profileData } = await supabaseAdmin.from('profiles').select('full_name').eq('id', order.user_id).single();
-      userEmail = authData?.user?.email || targetEmail;
-      userName = profileData?.full_name || 'Valued Customer';
+      userEmail = authData?.user?.email || userEmail;
+      userName = profileData?.full_name || addr?.full_name || userName;
     }
 
-
+    const nameParts = (userName || '').trim().split(/\s+/);
+    const firstName = nameParts[0] && nameParts[0] !== 'Valued' ? nameParts[0] : undefined;
+    const lastName = nameParts.length > 1 && nameParts[1] !== 'Customer' ? nameParts.slice(1).join(' ') : undefined;
 
     // Send Meta CAPI Purchase Event
     const PIXEL_ID = process.env.META_PIXEL_ID || '1045219725239327';
@@ -106,13 +123,14 @@ export async function handlePaymentSuccess(
             event_id: orderId,
             action_source: 'website',
             user_data: {
-              em: hashMeta(userEmail) ? [hashMeta(userEmail)] : undefined,
-              ph: hashMeta(userPhone) ? [hashMeta(userPhone)] : undefined,
-              fn: hashMeta(userName?.split(' ')[0]) ? [hashMeta(userName?.split(' ')[0])] : undefined,
-              ct: hashMeta(userCity) ? [hashMeta(userCity)] : undefined,
-              st: hashMeta(userState) ? [hashMeta(userState)] : undefined,
-              zp: hashMeta(userZip) ? [hashMeta(userZip)] : undefined,
-              country: hashMeta(userCountry) ? [hashMeta(userCountry)] : undefined,
+              em: hashMeta(normEmail(userEmail)) ? [hashMeta(normEmail(userEmail))] : undefined,
+              ph: hashMeta(normPhone(userPhone)) ? [hashMeta(normPhone(userPhone))] : undefined,
+              fn: hashMeta(normStr(firstName)) ? [hashMeta(normStr(firstName))] : undefined,
+              ln: hashMeta(normStr(lastName)) ? [hashMeta(normStr(lastName))] : undefined,
+              ct: hashMeta(normStr(userCity)) ? [hashMeta(normStr(userCity))] : undefined,
+              st: hashMeta(normStr(userState)) ? [hashMeta(normStr(userState))] : undefined,
+              zp: hashMeta(normStr(userZip)) ? [hashMeta(normStr(userZip))] : undefined,
+              country: hashMeta(normCountry(userCountry)) ? [hashMeta(normCountry(userCountry))] : undefined,
               external_id: hashMeta(order?.user_id) ? [hashMeta(order?.user_id)] : undefined,
               fbp: metaData?.fbp,
               fbc: metaData?.fbc,
