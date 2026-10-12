@@ -100,6 +100,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
         currency: 'USD',
         content_ids: cart.map(item => item.id),
+        contents: cart.map(item => ({ id: item.id, quantity: item.quantity })),
         content_type: 'product',
         num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
       });

@@ -123,7 +123,9 @@ export async function handlePaymentSuccess(
               currency: metaData?.trackingCurrency || order?.display_currency || 'INR',
               value: metaData?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0,
               content_ids: (orderItems || []).map(item => item.product_id).filter(Boolean),
-              content_type: 'product'
+              contents: (orderItems || []).map(item => ({ id: item.product_id, quantity: item.quantity })),
+              content_type: 'product',
+              order_id: orderId
             }
           }]
         };

@@ -83,7 +83,9 @@ function PaymentCaptureHandler() {
             value: paymentAmount,
             currency: paymentCurrency,
             content_ids: cart.map(item => item.id),
-            content_type: 'product'
+            contents: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+            content_type: 'product',
+            order_id: orderId
           }, orderId, true);
 
           setStatus('success');

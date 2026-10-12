@@ -236,6 +236,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
       const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
       trackMetaEvent('ViewContent', {
         content_ids: [product.id],
+        content_name: product.name,
         content_type: 'product',
         value: priceUSD,
         currency: 'USD'

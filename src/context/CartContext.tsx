@@ -175,6 +175,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const productPrice = Number((parsedPriceInr * FX_RATES[currency]).toFixed(2));
     trackMetaEvent('AddToCart', {
       content_ids: [product.id],
+      content_name: product.name,
+      quantity: quantity,
       content_type: 'product',
       value: productPrice,
       currency: currency
