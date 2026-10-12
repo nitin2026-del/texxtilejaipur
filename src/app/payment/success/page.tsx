@@ -77,15 +77,17 @@ function PaymentCaptureHandler() {
         if (data.success) {
           if (data.order_number) setOrderNumberState(data.order_number);
           if (data.customer?.email) setCustomerEmail(data.customer.email);
-          clearCart();
 
           const customerNameParts = (data.customer?.name || '').trim().split(/\s+/);
           const firstName = customerNameParts[0] || undefined;
           const lastName = customerNameParts.length > 1 ? customerNameParts.slice(1).join(' ') : undefined;
 
+          const verifiedAmount = Number(data.order_total ?? paymentAmount);
+          const verifiedCurrency = data.currency || paymentCurrency;
+
           trackMetaEvent('Purchase', {
-            value: paymentAmount,
-            currency: paymentCurrency,
+            value: verifiedAmount,
+            currency: verifiedCurrency,
             content_ids: cart.map(item => item.id),
             contents: cart.map(item => ({ id: item.id, quantity: item.quantity })),
             content_type: 'product',
@@ -100,6 +102,8 @@ function PaymentCaptureHandler() {
             zip: data.customer?.zip,
             country: data.customer?.country
           });
+
+          clearCart();
 
           setStatus('success');
         } else {

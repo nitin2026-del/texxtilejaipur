@@ -96,9 +96,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   useEffect(() => {
     if (isOpen && cart.length > 0 && !hasTrackedCheckout.current) {
       hasTrackedCheckout.current = true;
+      const activeCurrency = currency || 'USD';
       trackMetaEvent('InitiateCheckout', {
-        value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
-        currency: 'USD',
+        value: Number((getCartTotalInr() * (FX_RATES[activeCurrency] || FX_RATES['USD'])).toFixed(2)),
+        currency: activeCurrency,
         content_ids: cart.map(item => item.id),
         contents: cart.map(item => ({ id: item.id, quantity: item.quantity })),
         content_type: 'product',
@@ -108,7 +109,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       // Reset so it tracks again if they reopen the modal
       hasTrackedCheckout.current = false;
     }
-  }, [isOpen, cart, getCartTotalInr]);
+  }, [isOpen, cart, getCartTotalInr, currency]);
 
   if (!isOpen) return null;
 
@@ -191,9 +192,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               // Track AddPaymentInfo with full user data for EMQ
         const targetEmail = user?.email || email;
         const targetName = user?.user_metadata?.full_name || fullName || name;
+        const activeCurrency = currency || 'USD';
         trackMetaEvent('AddPaymentInfo', {
-          value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
-          currency: 'USD',
+          value: Number((getCartTotalInr() * (FX_RATES[activeCurrency] || FX_RATES['USD'])).toFixed(2)),
+          currency: activeCurrency,
           content_ids: cart.map(item => item.id),
           content_type: 'product'
         }, undefined, false, {
@@ -240,11 +242,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         body: JSON.stringify({ orderId, coinsUsed, coinsEarned })
       });
       
+      const activeCurrency = currency || 'USD';
       trackMetaEvent('Purchase', {
-        value: Number((getCartTotalInr() * 0.0104).toFixed(2)),
-        currency: 'USD',
+        value: 0,
+        currency: activeCurrency,
         content_ids: cart.map(item => item.id),
-        content_type: 'product'
+        contents: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+        content_type: 'product',
+        order_id: orderId
       }, orderId, true);
       
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });

@@ -27,29 +27,41 @@ export async function handlePaymentSuccess(
   metaData?: { fbp?: string; fbc?: string; clientIp?: string; userAgent?: string; trackingCurrency?: string; trackingAmount?: number }
 ) {
   try {
-    // 0. Idempotency Check: Don't process if already completed
+    // 0. Idempotency Check: Don't process fulfillment if already completed, but allow attribution updates if metadata is present
     const { data: existingOrder } = await supabaseAdmin
       .from('orders')
       .select('payment_status')
       .eq('id', orderId)
       .single();
 
-    if (existingOrder?.payment_status === 'paid' || existingOrder?.payment_status === 'completed') {
+    const isAlreadyPaid = existingOrder?.payment_status === 'paid' || existingOrder?.payment_status === 'completed';
+    if (isAlreadyPaid && !metaData?.fbp && !metaData?.fbc && !metaData?.clientIp) {
       console.log(`[handlePaymentSuccess] Order ${orderId} is already processed. Skipping duplicate fulfillment.`);
       return { success: true };
     }
 
-    // 1. Standardize Order Status
-    const { data: order, error: orderError } = await supabaseAdmin
-      .from('orders')
-      .update({ payment_status: 'paid', status: 'processing' })
-      .eq('id', orderId)
-      .select('*, shipping_addresses(*)')
-      .single();
+    // 1. Standardize Order Status (only if not already paid)
+    let order: any = null;
+    if (!isAlreadyPaid) {
+      const { data: updatedOrder, error: orderError } = await supabaseAdmin
+        .from('orders')
+        .update({ payment_status: 'paid', status: 'processing' })
+        .eq('id', orderId)
+        .select('*, shipping_addresses(*)')
+        .single();
 
-    if (orderError) {
-      console.error(`[handlePaymentSuccess] Failed to update order ${orderId}:`, orderError);
-      throw new Error(`Failed to update order status: ${orderError.message}`);
+      if (orderError) {
+        console.error(`[handlePaymentSuccess] Failed to update order ${orderId}:`, orderError);
+        throw new Error(`Failed to update order status: ${orderError.message}`);
+      }
+      order = updatedOrder;
+    } else {
+      const { data: fetchedOrder } = await supabaseAdmin
+        .from('orders')
+        .select('*, shipping_addresses(*)')
+        .eq('id', orderId)
+        .single();
+      order = fetchedOrder;
     }
 
     // 2. Decrement Inventory & Fetch details for PDF
@@ -60,7 +72,7 @@ export async function handlePaymentSuccess(
 
     if (itemsError) {
       console.error(`[handlePaymentSuccess] Failed to fetch items for order ${orderId}:`, itemsError);
-    } else if (orderItems && orderItems.length > 0) {
+    } else if (!isAlreadyPaid && orderItems && orderItems.length > 0) {
       for (const item of orderItems) {
         if (!item.product_id || !item.quantity) continue;
         
@@ -121,6 +133,7 @@ export async function handlePaymentSuccess(
             event_name: 'Purchase',
             event_time: Math.floor(Date.now() / 1000),
             event_id: orderId,
+            event_source_url: process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com',
             action_source: 'website',
             user_data: {
               em: hashMeta(normEmail(userEmail)) ? [hashMeta(normEmail(userEmail))] : undefined,
@@ -134,7 +147,7 @@ export async function handlePaymentSuccess(
               external_id: hashMeta(order?.user_id) ? [hashMeta(order?.user_id)] : undefined,
               fbp: metaData?.fbp,
               fbc: metaData?.fbc,
-              client_ip_address: metaData?.clientIp,
+              client_ip_address: typeof metaData?.clientIp === 'string' ? metaData.clientIp.split(',')[0].trim() : undefined,
               client_user_agent: metaData?.userAgent
             },
             custom_data: {
@@ -148,7 +161,7 @@ export async function handlePaymentSuccess(
           }]
         };
 
-        const capiResponse = await fetch(`https://graph.facebook.com/v19.0/${PIXEL_ID}/events?access_token=${process.env.META_ACCESS_TOKEN}`, {
+        const capiResponse = await fetch(`https://graph.facebook.com/v21.0/${PIXEL_ID}/events?access_token=${process.env.META_ACCESS_TOKEN}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -162,7 +175,7 @@ export async function handlePaymentSuccess(
     }
 
 
-    if (hasEmailToNotify) {
+    if (!isAlreadyPaid && hasEmailToNotify) {
       try {
         const userData = { email: userEmail, full_name: userName };
         

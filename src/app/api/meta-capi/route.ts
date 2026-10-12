@@ -24,7 +24,16 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { eventName, eventData, eventId, url, userAgent, fbp, fbc, userData, testEventCode } = body;
-    const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
+
+    const ALLOWED_EVENTS = ['PageView', 'ViewContent', 'AddToCart', 'InitiateCheckout', 'AddPaymentInfo', 'Search', 'Lead', 'Contact'];
+    if (!ALLOWED_EVENTS.includes(eventName)) {
+      if (eventName === 'Purchase') {
+        return NextResponse.json({ success: true, message: 'Purchase handled server-side' }, { status: 200 });
+      }
+      return NextResponse.json({ success: false, error: 'Invalid event name' }, { status: 400 });
+    }
 
     const PIXEL_ID = process.env.META_PIXEL_ID || '1045219725239327';
     const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
@@ -62,7 +71,7 @@ export async function POST(req: Request) {
       ...(testEventCode ? { test_event_code: testEventCode } : {})
     };
 
-    const response = await fetch('https://graph.facebook.com/v19.0/' + PIXEL_ID + '/events?access_token=' + ACCESS_TOKEN, {
+    const response = await fetch('https://graph.facebook.com/v21.0/' + PIXEL_ID + '/events?access_token=' + ACCESS_TOKEN, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

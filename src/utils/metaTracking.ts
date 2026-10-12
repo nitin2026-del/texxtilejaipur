@@ -27,6 +27,28 @@ const getCookie = (name: string) => {
     val = `fb.1.${time}.${random}`;
     document.cookie = `_fbp=${val}; path=/; max-age=7776000; SameSite=Lax`; // 90 days expiration
   }
+
+  // Capture fbclid and auto-generate _fbc if missing (handles ad blockers and Safari ITP)
+  if (name === '_fbc' && !val) {
+    let fbclid: string | null = null;
+    try {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        fbclid = urlParams.get('fbclid');
+        if (fbclid) {
+          sessionStorage.setItem('meta_fbclid', fbclid);
+        } else {
+          fbclid = sessionStorage.getItem('meta_fbclid');
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    if (fbclid) {
+      val = `fb.1.${Date.now()}.${fbclid}`;
+      document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`; // 90 days expiration
+    }
+  }
   return val;
 };
 

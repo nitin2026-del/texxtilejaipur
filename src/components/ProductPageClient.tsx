@@ -60,7 +60,7 @@ interface SiblingProduct {
 }
 
 export function ProductPageClient({ product, relatedProducts, initialReviews, ugcVideos = [], siblingProducts = [] }: { product: any, relatedProducts: any[], initialReviews: any[], ugcVideos?: any[], siblingProducts?: SiblingProduct[] }) {
-    const { cart, addToCart, formatPrice, updateQuantity, comboOffer } = useCart();
+    const { cart, addToCart, formatPrice, updateQuantity, comboOffer, currency } = useCart();
     const id = product?.id;
     const pathname = usePathname();
     const router = useRouter();
@@ -233,16 +233,17 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   useEffect(() => {
     if (product) {
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
-      const priceUSD = Number((parsedPriceInr * FX_RATES['USD']).toFixed(2));
+      const activeCurrency = currency || 'USD';
+      const productPrice = Number((parsedPriceInr * (FX_RATES[activeCurrency] || FX_RATES['USD'])).toFixed(2));
       trackMetaEvent('ViewContent', {
         content_ids: [product.id],
         content_name: product.name,
         content_type: 'product',
-        value: priceUSD,
-        currency: 'USD'
+        value: productPrice,
+        currency: activeCurrency
       });
     }
-  }, [product, pathname]);
+  }, [product, pathname, currency]);
 
   const handleAddToCart = () => {
     const qtyToAdd = quantity === 0 ? 1 : quantity;
