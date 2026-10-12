@@ -96,7 +96,7 @@ export async function handlePaymentSuccess(
 
 
     // Send Meta CAPI Purchase Event
-    const PIXEL_ID = process.env.META_PIXEL_ID || '1118362323998364';
+    const PIXEL_ID = process.env.META_PIXEL_ID || '1045219725239327';
     if (process.env.META_ACCESS_TOKEN) {
       try {
         const payload = {

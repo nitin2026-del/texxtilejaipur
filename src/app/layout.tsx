@@ -231,13 +231,13 @@ export default function RootLayout({
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '1118362323998364');
+              fbq('init', '1045219725239327');
               fbq('track', 'PageView');
             `
           }}
         />
         <noscript>
-          <img height="1" width="1" style={{ display: 'none' }} src="https://www.facebook.com/tr?id=1118362323998364&ev=PageView&noscript=1" alt="" />
+          <img height="1" width="1" style={{ display: 'none' }} src="https://www.facebook.com/tr?id=1045219725239327&ev=PageView&noscript=1" alt="" />
         </noscript>
       </head>
       <body className={`antialiased ${inter.variable} ${playfair.variable}`}>
