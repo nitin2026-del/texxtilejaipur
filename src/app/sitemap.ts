@@ -93,7 +93,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     
     if (url && key) {
-      const res = await fetch(`${url}/rest/v1/products?select=id,updated_at&is_active=eq.true`, {
+      const res = await fetch(`${url}/rest/v1/products?select=id,updated_at,product_images(url)&status=eq.active`, {
         headers: {
           apikey: key,
           Authorization: `Bearer ${key}`
@@ -104,12 +104,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       if (res.ok) {
         const products = await res.json();
-        dynamicProductRoutes = products.map((product: any) => ({
-          url: `${baseUrl}/product/${product.id}`,
-          lastModified: product.updated_at ? new Date(product.updated_at) : now,
-          changeFrequency: 'daily',
-          priority: 0.9,
-        }));
+        if (Array.isArray(products)) {
+          dynamicProductRoutes = products.map((product: any) => {
+            const imageUrls = (product.product_images || [])
+              .map((img: any) => img.url)
+              .filter(Boolean);
+            return {
+              url: `${baseUrl}/product/${product.id}`,
+              lastModified: product.updated_at ? new Date(product.updated_at) : now,
+              changeFrequency: 'daily',
+              priority: 0.9,
+              ...(imageUrls.length > 0 ? { images: imageUrls } : {})
+            };
+          });
+        }
       }
 
       // Fetch categories for category-filtered collection pages
@@ -124,12 +132,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       let categoryRoutes: MetadataRoute.Sitemap = [];
       if (catRes.ok) {
         const categories = await catRes.json();
-        categoryRoutes = categories.map((cat: any) => ({
-          url: `${baseUrl}/collection?category=${encodeURIComponent(cat.name)}`,
-          lastModified: now,
-          changeFrequency: 'daily' as const,
-          priority: 0.85,
-        }));
+        if (Array.isArray(categories)) {
+          categoryRoutes = categories
+            .filter((cat: any) => cat.name && cat.name.toLowerCase() !== 'uncategorized')
+            .map((cat: any) => ({
+              url: `${baseUrl}/collection?category=${encodeURIComponent(cat.name)}`,
+              lastModified: now,
+              changeFrequency: 'daily' as const,
+              priority: 0.85,
+            }));
+        }
       }
 
       return [...staticRoutes, ...categoryRoutes, ...dynamicProductRoutes];

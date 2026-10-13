@@ -79,6 +79,9 @@ export const metadata: Metadata = {
     creator: '@textileofjaipur',
     site: '@textileofjaipur'
   },
+  verification: {
+    google: 'Apib7-x98H0j5cPqHWwSMm6dNU4GmODRoqxLiDzdx9I',
+  },
   category: 'fashion',
   classification: 'Clothing & Apparel',
   other: {

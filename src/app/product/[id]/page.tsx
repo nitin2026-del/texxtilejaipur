@@ -23,7 +23,7 @@ export async function generateMetadata(
   }
 
   try {
-    const res = await fetch(`${url}/rest/v1/products?select=name,description,product_images(url,is_primary)&id=eq.${id}`, {
+    const res = await fetch(`${url}/rest/v1/products?select=name,description,seo_title,seo_description,product_images(url,is_primary)&id=eq.${id}`, {
       headers: {
         apikey: key,
         Authorization: `Bearer ${key}`
@@ -39,15 +39,47 @@ export async function generateMetadata(
           || item.product_images?.[0]?.url 
           || 'https://textilejaipur.com/images/default-share.jpg';
 
+        const cleanRawDesc = (item.description || '')
+          .replace(/\*\*SEO Title:\*\*.*?\n/gi, '')
+          .replace(/\*\*SEO Description:\*\*.*?\n/gi, '')
+          .replace(/[*#_~`]/g, '')
+          .trim();
+
+        const metaTitle = item.seo_title 
+          || `${item.name} | Handmade Jaipur Ethnic Wear | Textile Jaipur`;
+
+        const metaDescription = item.seo_description 
+          || (cleanRawDesc ? cleanRawDesc.substring(0, 155) : `Buy authentic handmade ${item.name} from Textile Jaipur. Authentic artisan craftsmanship with free worldwide shipping.`);
+
+        const productUrl = `https://textilejaipur.com/product/${id}`;
+
         return {
-          title: `${item.name} | Textile Jaipur`,
-          description: item.description?.substring(0, 160) || `Buy ${item.name} at Textile Jaipur.`,
+          title: metaTitle,
+          description: metaDescription,
+          alternates: {
+            canonical: productUrl,
+          },
           openGraph: {
-            title: `${item.name} | Textile Jaipur`,
-            description: item.description?.substring(0, 160),
-            images: [primaryImage],
+            title: metaTitle,
+            description: metaDescription,
+            url: productUrl,
+            siteName: 'Textile Jaipur',
+            images: [
+              {
+                url: primaryImage,
+                width: 1200,
+                height: 1600,
+                alt: item.name
+              }
+            ],
             type: 'website',
           },
+          twitter: {
+            card: 'summary_large_image',
+            title: metaTitle,
+            description: metaDescription,
+            images: [primaryImage],
+          }
         };
       }
     }
@@ -229,14 +261,22 @@ export default async function ProductPage({ params }: Props) {
       '@type': 'Offer',
       url: `https://textilejaipur.com/product/${product.id}`,
       priceCurrency: 'INR',
-      price: product.price_inr,
+      priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       itemCondition: 'https://schema.org/NewCondition',
-      availability: product.stock_quantity > 0 
+      availability: (product.stock_quantity > 0 || product.stock > 0)
         ? 'https://schema.org/InStock' 
         : 'https://schema.org/OutOfStock',
       seller: {
         '@type': 'Organization',
         name: 'Textile Jaipur'
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'US',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 30,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn'
       },
       shippingDetails: {
         '@type': 'OfferShippingDetails',

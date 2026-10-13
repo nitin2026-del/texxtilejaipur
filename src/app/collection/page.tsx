@@ -4,16 +4,33 @@ import { Metadata } from 'next';
 import { sortCategoriesCustom } from '@/utils/categorySort';
 
 export const metadata: Metadata = {
-  title: 'Shop All Collections | Textile Jaipur',
-  description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover premium silk and cotton pieces, featuring traditional Jaipur block prints and intricate embroidery.',
+  title: 'Handmade Suzani Jackets & Indian Ethnic Wear Collections | Textile Jaipur',
+  description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover luxury velvet Suzani jackets, embroidered kimonos, and traditional Jaipur artisanal fashion with free worldwide shipping.',
+  alternates: {
+    canonical: 'https://textilejaipur.com/collection',
+  },
   openGraph: {
-    title: 'Shop All Collections | Textile Jaipur',
-    description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover premium silk and cotton pieces, featuring traditional Jaipur block prints and intricate embroidery.',
+    title: 'Handmade Suzani Jackets & Indian Ethnic Wear Collections | Textile Jaipur',
+    description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover luxury velvet Suzani jackets, embroidered kimonos, and traditional Jaipur artisanal fashion with free worldwide shipping.',
     url: 'https://textilejaipur.com/collection',
     siteName: 'Textile Jaipur',
-    locale: 'en_IN',
+    locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: 'https://textilejaipur.com/about/img1.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Textile Jaipur Collections'
+      }
+    ]
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Handmade Suzani Jackets & Indian Ethnic Wear Collections | Textile Jaipur',
+    description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover luxury velvet Suzani jackets, embroidered kimonos, and traditional Jaipur artisanal fashion.',
+    images: ['https://textilejaipur.com/about/img1.jpg'],
+  }
 };
 
 export const revalidate = 60; // ISR cache for 60 seconds
@@ -122,6 +139,32 @@ export default async function CollectionPage() {
   } catch (err) {
     console.error('Failed to fetch SEO descriptions', err);
   }
+  const jsonLdCollection = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Handmade Suzani Jackets & Indian Ethnic Wear Collections',
+    description: 'Explore our curated collection of handcrafted Indian ethnic wear. Discover luxury velvet Suzani jackets, embroidered kimonos, and traditional Jaipur artisanal fashion with free worldwide shipping.',
+    url: 'https://textilejaipur.com/collection',
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: products.length,
+      itemListElement: products.slice(0, 30).map((p, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `https://textilejaipur.com/product/${p.id}`,
+        name: p.name,
+        image: p.images?.[0]
+      }))
+    }
+  };
 
-  return <CollectionPageClient initialProducts={products} categories={categories} saleBanner={saleBanner} seoDescriptions={seoDescriptions} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdCollection) }}
+      />
+      <CollectionPageClient initialProducts={products} categories={categories} saleBanner={saleBanner} seoDescriptions={seoDescriptions} />
+    </>
+  );
 }
