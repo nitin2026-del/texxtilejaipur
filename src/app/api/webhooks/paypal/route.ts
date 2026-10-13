@@ -111,12 +111,12 @@ export async function POST(req: NextRequest) {
           const response = await client.execute(request);
           if (response.result.status === 'COMPLETED') {
             await supabaseAdmin.from('payments').update({ status: 'completed' }).eq('order_id', order.id);
-            await handlePaymentSuccess(order.id, supabaseAdmin);
+            await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true });
           }
         } catch (e: any) {
           const isAlreadyCaptured = e?.statusCode === 422 || JSON.stringify(e).includes('ORDER_ALREADY_CAPTURED');
           if (isAlreadyCaptured) {
-            await handlePaymentSuccess(order.id, supabaseAdmin);
+            await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true });
           }
         }
       }
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
           
         if (order && order.payment_status !== 'completed') {
           await supabaseAdmin.from('payments').update({ status: 'completed' }).eq('order_id', order.id);
-          await handlePaymentSuccess(order.id, supabaseAdmin);
+          await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true });
         }
       }
     }

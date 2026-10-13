@@ -23,7 +23,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned, fbp, fbc } = body;
+    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned, fbp, fbc, testEventCode } = body;
 
     if (action === 'capture') {
       if (!paypalOrderId || !orderId) {
@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
         clientIp: typeof clientIp === 'string' ? clientIp : undefined, 
         userAgent,
         trackingCurrency: trackOrder?.display_currency,
-        trackingAmount: Number(trackOrder?.total_display_currency) || 0
+        trackingAmount: Number(trackOrder?.total_display_currency) || 0,
+        testEventCode
       };
 
       // Centralized success handler

@@ -6,7 +6,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { CheckCircle, XCircle } from 'lucide-react';
-import { trackMetaEvent } from '@/utils/metaTracking';
+import { trackMetaEvent, getMetaCookie } from '@/utils/metaTracking';
 
 // This page handles the PayPal return for BOTH guest and logged-in users.
 // PayPal redirects to: /payment/success?token=PAYPAL_ORDER_ID&PayerID=xxx&order_id=xxx
@@ -49,12 +49,7 @@ function PaymentCaptureHandler() {
     const paymentAmount = isMatchingOrder ? Number(localStorage.getItem('pending_payment_amount') || 0) : 0;
     const paymentCurrency = isMatchingOrder ? (localStorage.getItem('pending_currency') || 'USD') : 'USD';
 
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift() || '';
-      return undefined;
-    };
+    const testEventCode = typeof window !== 'undefined' ? (sessionStorage.getItem('meta_test_event_code') || undefined) : undefined;
 
     fetch('/api/payments/paypal', {
       method: 'POST',
@@ -63,8 +58,9 @@ function PaymentCaptureHandler() {
         action: 'capture',
         paypalOrderId: token,
         orderId: orderId,
-        fbp: getCookie('_fbp'),
-        fbc: getCookie('_fbc')
+        fbp: getMetaCookie('_fbp'),
+        fbc: getMetaCookie('_fbc'),
+        testEventCode
       }),
     })
       .then((res) => res.json())

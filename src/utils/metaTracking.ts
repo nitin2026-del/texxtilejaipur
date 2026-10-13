@@ -15,7 +15,7 @@ const getTestEventCode = () => {
   }
 };
 
-const getCookie = (name: string) => {
+export const getMetaCookie = (name: string) => {
   if (typeof document === 'undefined') return undefined;
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
   let val = match ? match[2] : undefined;
@@ -31,25 +31,52 @@ const getCookie = (name: string) => {
   // Capture fbclid and auto-generate _fbc if missing (handles ad blockers and Safari ITP)
   if (name === '_fbc' && !val) {
     let fbclid: string | null = null;
+    let fbclidTs: string | null = null;
     try {
       if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         fbclid = urlParams.get('fbclid');
         if (fbclid) {
+          fbclidTs = Date.now().toString();
           sessionStorage.setItem('meta_fbclid', fbclid);
+          sessionStorage.setItem('meta_fbclid_ts', fbclidTs);
         } else {
           fbclid = sessionStorage.getItem('meta_fbclid');
+          fbclidTs = sessionStorage.getItem('meta_fbclid_ts');
         }
       }
     } catch (e) {
       // ignore
     }
     if (fbclid) {
-      val = `fb.1.${Date.now()}.${fbclid}`;
+      const creationTs = fbclidTs || Date.now().toString();
+      val = `fb.1.${creationTs}.${fbclid}`;
       document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`; // 90 days expiration
     }
   }
   return val;
+};
+
+export const initMetaCookies = () => {
+  if (typeof window === 'undefined') return;
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fbclid = urlParams.get('fbclid');
+    if (fbclid) {
+      sessionStorage.setItem('meta_fbclid', fbclid);
+      const now = Date.now().toString();
+      sessionStorage.setItem('meta_fbclid_ts', now);
+      document.cookie = `_fbc=fb.1.${now}.${fbclid}; path=/; max-age=7776000; SameSite=Lax`;
+    }
+    const testCode = urlParams.get('test_event_code');
+    if (testCode) {
+      sessionStorage.setItem('meta_test_event_code', testCode);
+    }
+    getMetaCookie('_fbp');
+    getMetaCookie('_fbc');
+  } catch (e) {
+    // ignore
+  }
 };
 
 export const trackMetaEvent = async (
@@ -72,8 +99,8 @@ export const trackMetaEvent = async (
   // 2. Send via Server CAPI (by calling our internal API)
   if (typeof window !== 'undefined' && !skipCapi) {
     try {
-      const fbp = getCookie('_fbp');
-      const fbc = getCookie('_fbc');
+      const fbp = getMetaCookie('_fbp');
+      const fbc = getMetaCookie('_fbc');
       
       await fetch('/api/meta-capi', {
         method: 'POST',

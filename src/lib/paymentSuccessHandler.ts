@@ -24,7 +24,17 @@ const normCountry = (val?: string) => {
 export async function handlePaymentSuccess(
   orderId: string, 
   supabaseAdmin: SupabaseClient,
-  metaData?: { fbp?: string; fbc?: string; clientIp?: string; userAgent?: string; trackingCurrency?: string; trackingAmount?: number }
+  metaData?: { 
+    fbp?: string; 
+    fbc?: string; 
+    clientIp?: string; 
+    userAgent?: string; 
+    trackingCurrency?: string; 
+    trackingAmount?: number;
+    testEventCode?: string;
+    skipCapi?: boolean;
+    isWebhook?: boolean;
+  }
 ) {
   try {
     // 0. Idempotency Check: Don't process fulfillment if already completed, but allow attribution updates if metadata is present
@@ -126,8 +136,25 @@ export async function handlePaymentSuccess(
 
     // Send Meta CAPI Purchase Event
     const PIXEL_ID = process.env.META_PIXEL_ID || '1045219725239327';
-    if (process.env.META_ACCESS_TOKEN) {
+    const shouldSkipCapi = metaData?.skipCapi || false;
+
+    // Check if CAPI was already sent for this order
+    const { data: existingPayment } = await supabaseAdmin
+      .from('payments')
+      .select('id, raw_response')
+      .eq('order_id', orderId)
+      .maybeSingle();
+
+    const capiAlreadySent = !!(existingPayment?.raw_response as any)?.meta_capi_sent;
+
+    // If webhook call arrived first for a recent order (< 10 min), defer CAPI so frontend redirect can send with rich cookies/IP
+    const orderAgeMs = order?.created_at ? Date.now() - new Date(order.created_at).getTime() : 0;
+    const isRecentOrder = orderAgeMs < 10 * 60 * 1000;
+    const shouldDeferWebhookCapi = metaData?.isWebhook && isRecentOrder && !metaData?.fbp;
+
+    if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent && !shouldDeferWebhookCapi) {
       try {
+        const testCode = metaData?.testEventCode || process.env.META_TEST_EVENT_CODE;
         const payload = {
           data: [{
             event_name: 'Purchase',
@@ -158,7 +185,8 @@ export async function handlePaymentSuccess(
               content_type: 'product',
               order_id: orderId
             }
-          }]
+          }],
+          ...(testCode ? { test_event_code: testCode } : {})
         };
 
         const capiResponse = await fetch(`https://graph.facebook.com/v21.0/${PIXEL_ID}/events?access_token=${process.env.META_ACCESS_TOKEN}`, {
@@ -168,6 +196,18 @@ export async function handlePaymentSuccess(
         });
         if (!capiResponse.ok) {
           console.error('[CAPI] Purchase event failed:', await capiResponse.text());
+        } else if (existingPayment?.id) {
+          const currentRaw = (existingPayment.raw_response as any) || {};
+          await supabaseAdmin
+            .from('payments')
+            .update({
+              raw_response: {
+                ...currentRaw,
+                meta_capi_sent: true,
+                meta_capi_timestamp: new Date().toISOString()
+              }
+            })
+            .eq('id', existingPayment.id);
         }
       } catch (err) {
         console.error('[CAPI] Error:', err);

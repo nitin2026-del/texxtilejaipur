@@ -69,6 +69,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const hasTrackedView = useRef<string | null>(null);
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -231,7 +232,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
 
 
   useEffect(() => {
-    if (product) {
+    if (product && hasTrackedView.current !== product.id) {
+      hasTrackedView.current = product.id;
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
       const activeCurrency = currency || 'USD';
       const productPrice = Number((parsedPriceInr * (FX_RATES[activeCurrency] || FX_RATES['USD'])).toFixed(2));

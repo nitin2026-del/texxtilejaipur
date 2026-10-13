@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
-    // Call the exact same logic that Stripe/PayPal webhooks use
-    await handlePaymentSuccess(orderId, supabaseAdmin);
+    // Call fulfillment logic with skipCapi: true to prevent polluting Meta conversion metrics
+    await handlePaymentSuccess(orderId, supabaseAdmin, { skipCapi: true });
     
     // Create a dummy payment record to satisfy constraints
     await supabaseAdmin

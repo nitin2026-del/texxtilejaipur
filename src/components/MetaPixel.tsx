@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { trackMetaEvent } from '@/utils/metaTracking';
+import { trackMetaEvent, initMetaCookies } from '@/utils/metaTracking';
 
 export const MetaPixel = () => {
   const pathname = usePathname();
@@ -10,6 +10,9 @@ export const MetaPixel = () => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
+    // Capture fbclid and initialize cookies immediately on mount
+    initMetaCookies();
+
     // Skip first render — the <head> script already fired the initial PageView
     if (isFirstRender.current) {
       isFirstRender.current = false;
