@@ -147,12 +147,7 @@ export async function handlePaymentSuccess(
 
     const capiAlreadySent = !!(existingPayment?.raw_response as any)?.meta_capi_sent;
 
-    // If webhook call arrived first for a recent order (< 10 min), defer CAPI so frontend redirect can send with rich cookies/IP
-    const orderAgeMs = order?.created_at ? Date.now() - new Date(order.created_at).getTime() : 0;
-    const isRecentOrder = orderAgeMs < 10 * 60 * 1000;
-    const shouldDeferWebhookCapi = metaData?.isWebhook && isRecentOrder && !metaData?.fbp;
-
-    if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent && !shouldDeferWebhookCapi) {
+    if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
       try {
         const testCode = metaData?.testEventCode || process.env.META_TEST_EVENT_CODE;
         const payload = {
