@@ -102,7 +102,8 @@ async function analyzeProduct(product, isDryRun = false) {
     parsed.seo_description = parsed.seo_description.substring(0, 152).trim() + '...';
   }
   if (parsed.seo_title && parsed.seo_title.length > 60) {
-    parsed.seo_title = parsed.seo_title.substring(0, 60).trim();
+    const lastSpace = parsed.seo_title.substring(0, 58).lastIndexOf(' ');
+    parsed.seo_title = (lastSpace > 30 ? parsed.seo_title.substring(0, lastSpace) : parsed.seo_title.substring(0, 58)).trim();
   }
 
   console.log(`\n[Generated SEO Title]: ${parsed.seo_title} (${parsed.seo_title?.length || 0} chars)`);
