@@ -242,8 +242,10 @@ export async function POST(req: NextRequest) {
         subtotal: realSubtotalInr,
         status: 'pending',
         payment_status: 'pending',
-        display_currency: display_currency || 'INR',
-        total_display_currency: total_display_currency || `₹${finalTotalInr}`,
+        display_currency: (display_currency || 'INR').toUpperCase(),
+        total_display_currency: (typeof total_display_currency === 'number' || (typeof total_display_currency === 'string' && !isNaN(Number(total_display_currency))))
+          ? Number(Number(total_display_currency).toFixed(2))
+          : total_display_currency || `₹${finalTotalInr}`,
         shipping_provider: shipping_method === 'express' ? 'UPS Express' : 'Standard'
       })
       .select('id')

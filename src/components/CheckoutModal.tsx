@@ -144,7 +144,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       // We pass the RAW cart total (including tier/coupon) to the backend.
       // The backend will independently verify this total, but we send it for logging/fallback.
       const orderTotalInr = effectiveInr;
-      const orderTotalDisplay = effectiveInr * FX_RATES[currency];
+      const orderTotalDisplay = Number((effectiveInr * (FX_RATES[currency] || FX_RATES['USD'])).toFixed(2));
 
       // Inject the globally selected ring to the first item (so the backend picks it up)
       const checkoutItems = cart.map(item => ({ ...item })) as any[];

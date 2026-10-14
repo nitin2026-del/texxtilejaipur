@@ -78,8 +78,9 @@ function PaymentCaptureHandler() {
           const firstName = customerNameParts[0] || undefined;
           const lastName = customerNameParts.length > 1 ? customerNameParts.slice(1).join(' ') : undefined;
 
-          const verifiedAmount = Number(data.order_total ?? paymentAmount);
-          const verifiedCurrency = data.currency || paymentCurrency;
+          const rawAmount = Number(data.order_total ?? paymentAmount);
+          const verifiedAmount = Number((isNaN(rawAmount) ? 0 : rawAmount).toFixed(2));
+          const verifiedCurrency = (data.currency || paymentCurrency || 'USD').toUpperCase();
 
           const dbItems = Array.isArray(data.items) && data.items.length > 0
             ? data.items.map((i: any) => ({ id: i.product_id, quantity: i.quantity }))

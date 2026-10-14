@@ -173,8 +173,8 @@ export async function handlePaymentSuccess(
               client_user_agent: metaData?.userAgent
             },
             custom_data: {
-              currency: metaData?.trackingCurrency || order?.display_currency || 'INR',
-              value: metaData?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0,
+              currency: (metaData?.trackingCurrency || order?.display_currency || 'USD').toUpperCase(),
+              value: Number((metaData?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0).toFixed(2)),
               content_ids: (orderItems || []).map(item => item.product_id).filter(Boolean),
               contents: (orderItems || []).map(item => ({ id: item.product_id, quantity: item.quantity })),
               content_type: 'product',

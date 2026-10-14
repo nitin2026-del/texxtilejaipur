@@ -65,7 +65,11 @@ export async function POST(req: Request) {
             zp: hashMeta(normStr(userData?.zip)) ? [hashMeta(normStr(userData?.zip))] : undefined,
             country: hashMeta(normCountry(userData?.country)) ? [hashMeta(normCountry(userData?.country))] : undefined
           },
-          custom_data: eventData
+          custom_data: eventData ? {
+            ...eventData,
+            ...(eventData.value !== undefined ? { value: Number((Number(eventData.value) || 0).toFixed(2)) } : {}),
+            ...(eventData.currency ? { currency: String(eventData.currency).toUpperCase() } : {})
+          } : undefined
         }
       ],
       ...(testEventCode ? { test_event_code: testEventCode } : {})

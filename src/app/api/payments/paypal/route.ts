@@ -70,15 +70,15 @@ export async function POST(req: NextRequest) {
       const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
       const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
       const userAgent = req.headers.get('user-agent') || undefined;
-      
       const { data: trackOrder } = await supabaseAdmin.from('orders').select('display_currency, total_display_currency').eq('id', orderId).single();
+      const rawTrackingAmount = Number(trackOrder?.total_display_currency) || 0;
       const metaData = { 
         fbp, 
         fbc, 
         clientIp: typeof clientIp === 'string' ? clientIp : undefined, 
         userAgent,
-        trackingCurrency: trackOrder?.display_currency,
-        trackingAmount: Number(trackOrder?.total_display_currency) || 0,
+        trackingCurrency: (trackOrder?.display_currency || 'USD').toUpperCase(),
+        trackingAmount: Number(rawTrackingAmount.toFixed(2)),
         testEventCode
       };
 
@@ -116,8 +116,8 @@ export async function POST(req: NextRequest) {
         success: true, 
         status: captureStatus,
         order_number: orderData?.order_number || orderId,
-        order_total: Number(trackOrder?.total_display_currency) || Number(orderData?.total) || 0,
-        currency: trackOrder?.display_currency || 'USD',
+        order_total: Number((Number(trackOrder?.total_display_currency) || Number(orderData?.total) || 0).toFixed(2)),
+        currency: (trackOrder?.display_currency || 'USD').toUpperCase(),
         items: orderData?.order_items || [],
         customer: {
           email,
