@@ -273,6 +273,7 @@ export async function handlePaymentSuccess(
           const mailOptions: any = {
             from: `"Textile Jaipur" <${process.env.SMTP_USER}>`,
             to: userEmail,
+            bcc: process.env.TRUSTPILOT_INVITE_BCC || 'textilejaipur.com+a774b29729@invite.trustpilot.com',
             subject: `✅ Order Confirmed — ${orderNumber} | Textile Jaipur`,
             html: `
               <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #fffdf7; border: 1px solid #e8dfc8;">
