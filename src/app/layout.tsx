@@ -81,6 +81,9 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'Apib7-x98H0j5cPqHWwSMm6dNU4GmODRoqxLiDzdx9I',
+    other: {
+      'trustpilot-one-time-domain-verification-id': '73cedff9-9716-41ff-bac6-1a94638ffd9f',
+    },
   },
   category: 'fashion',
   classification: 'Clothing & Apparel',
