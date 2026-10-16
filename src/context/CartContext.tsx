@@ -172,9 +172,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     // Fire AddToCart event (whether new or existing)
-    const productPrice = Number((parsedPriceInr * FX_RATES[currency]).toFixed(2));
+    const productPrice = Number((parsedPriceInr * quantity * FX_RATES[currency]).toFixed(2));
+    const fullNameParts = (profile?.full_name || '').trim().split(/\s+/);
     trackMetaEvent('AddToCart', {
       content_ids: [product.id],
+      contents: [{ id: product.id, quantity }],
       content_name: product.name,
       quantity: quantity,
       content_type: 'product',
@@ -182,8 +184,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currency: currency
     }, undefined, false, {
       email: profile?.email || user?.email,
-      firstName: profile?.first_name || profile?.name?.split(' ')[0],
-      lastName: profile?.name?.split(' ').slice(1).join(' ') || undefined
+      phone: profile?.phone || undefined,
+      firstName: fullNameParts[0] || undefined,
+      lastName: fullNameParts.length > 1 ? fullNameParts.slice(1).join(' ') : undefined
     });
   };
 

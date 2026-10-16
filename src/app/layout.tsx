@@ -229,6 +229,26 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              (function() {
+                try {
+                  var params = new URLSearchParams(window.location.search);
+                  var fbclid = params.get('fbclid');
+                  if (fbclid) {
+                    var m = document.cookie.match(/(^| )_fbc=([^;]+)/);
+                    var existingFbc = m ? m[2] : (localStorage.getItem('meta_fbc') || '');
+                    var fbcVal = (existingFbc && existingFbc.slice(-fbclid.length - 1) === '.' + fbclid)
+                      ? existingFbc
+                      : ('fb.1.' + Date.now() + '.' + fbclid);
+                    document.cookie = '_fbc=' + fbcVal + '; path=/; max-age=7776000; SameSite=Lax';
+                    localStorage.setItem('meta_fbc', fbcVal);
+                    sessionStorage.setItem('meta_fbc', fbcVal);
+                  }
+                  var mFbp = document.cookie.match(/(^| )_fbp=([^;]+)/);
+                  var fbpVal = mFbp ? mFbp[2] : (localStorage.getItem('meta_fbp') || ('fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1000000000)));
+                  document.cookie = '_fbp=' + fbpVal + '; path=/; max-age=7776000; SameSite=Lax';
+                  localStorage.setItem('meta_fbp', fbpVal);
+                } catch (e) {}
+              })();
               !function(f,b,e,v,n,t,s)
               {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
               n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -237,8 +257,9 @@ export default function RootLayout({
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
+              window.__INITIAL_PV_ID = 'pv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
               fbq('init', '1045219725239327');
-              fbq('track', 'PageView');
+              fbq('track', 'PageView', {}, { eventID: window.__INITIAL_PV_ID });
             `
           }}
         />

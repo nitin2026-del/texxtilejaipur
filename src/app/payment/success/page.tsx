@@ -65,12 +65,12 @@ function PaymentCaptureHandler() {
     })
       .then((res) => res.json())
       .then((data) => {
-        localStorage.setItem(captureKey, 'done');
-        localStorage.removeItem('pending_order_id');
-        localStorage.removeItem('pending_payment_amount');
-        localStorage.removeItem('pending_currency');
-
         if (data.success) {
+          localStorage.setItem(captureKey, 'done');
+          localStorage.removeItem('pending_order_id');
+          localStorage.removeItem('pending_payment_amount');
+          localStorage.removeItem('pending_currency');
+
           if (data.order_number) setOrderNumberState(data.order_number);
           if (data.customer?.email) setCustomerEmail(data.customer.email);
 

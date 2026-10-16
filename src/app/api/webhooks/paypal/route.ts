@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
           .eq('payment_id', paypalOrderId)
           .single();
           
-        if (order && order.payment_status !== 'completed') {
+        if (order && order.payment_status !== 'paid' && order.payment_status !== 'completed') {
           await supabaseAdmin.from('payments').update({ status: 'completed' }).eq('order_id', order.id);
           await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true, paypalEmail: webhookPayerEmail });
         }

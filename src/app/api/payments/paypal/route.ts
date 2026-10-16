@@ -208,9 +208,21 @@ export async function POST(req: NextRequest) {
       const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
       const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
       const userAgent = req.headers.get('user-agent') || undefined;
+      const eventSourceUrl = req.headers.get('referer') || `${siteUrl}/payment/success?order_id=${orderId}`;
 
-      // Record the payment attempt in the payments table with Meta attribution metadata
-      // Note: 'pending' satisfies payments_status_check ('intent_created' violated the constraint!)
+      // Record the payment attempt in the payments table with Meta attribution metadata.
+      // Stored as JSON in razorpay_order_id (verified TEXT column on payments table) since raw_response does not exist in schema.
+      const metaAttributionJson = JSON.stringify({
+        fbp: fbp || undefined,
+        fbc: fbc || undefined,
+        clientIp,
+        userAgent,
+        eventSourceUrl,
+        testEventCode: testEventCode || undefined,
+        trackingCurrency: targetCurrency,
+        trackingAmount: secureAmountInTargetCurrency
+      });
+
       const { error: insertPaymentError } = await supabaseAdmin
         .from('payments')
         .insert({
@@ -221,15 +233,7 @@ export async function POST(req: NextRequest) {
           amount: secureAmountInTargetCurrency,
           currency: targetCurrency,
           status: 'pending',
-          raw_response: {
-            fbp: fbp || undefined,
-            fbc: fbc || undefined,
-            clientIp,
-            userAgent,
-            testEventCode: testEventCode || undefined,
-            trackingCurrency: targetCurrency,
-            trackingAmount: secureAmountInTargetCurrency
-          }
+          razorpay_order_id: metaAttributionJson
         });
 
       if (insertPaymentError) {

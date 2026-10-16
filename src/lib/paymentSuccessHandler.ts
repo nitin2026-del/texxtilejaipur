@@ -82,6 +82,37 @@ const normCountry = (val?: string) => {
   return c.length === 2 ? c : c.substring(0, 2);
 };
 
+const COUNTRY_DIAL_MAP: Record<string, string> = {
+  us: '1', ca: '1', gb: '44', in: '91', au: '61', nz: '64',
+  de: '49', fr: '33', it: '39', es: '34', nl: '31', be: '32',
+  ch: '41', at: '43', se: '46', no: '47', dk: '45', fi: '358',
+  ie: '353', pt: '351', gr: '30', pl: '48', hu: '36', cz: '420',
+  ro: '40', hr: '385', si: '386', sk: '421', bg: '359', lu: '352',
+  mt: '356', cy: '357', ee: '372', lv: '371', lt: '370', is: '354',
+  mx: '52', br: '55', ar: '54', cl: '56', co: '57', pe: '51',
+  ae: '971', sa: '966', qa: '974', kw: '965', bh: '973', om: '968',
+  il: '972', tr: '90', sg: '65', hk: '852', jp: '81', kr: '82',
+  tw: '886', my: '60', th: '66', id: '62', ph: '63', vn: '84', za: '27'
+};
+
+const getPhoneHashes = (phone?: string, country?: string): string[] | undefined => {
+  const digits = normPhone(phone);
+  if (!digits) return undefined;
+  const cleaned = digits.replace(/^00+/, '');
+  const iso = normCountry(country);
+  const dial = iso ? COUNTRY_DIAL_MAP[iso] : undefined;
+  const candidates = new Set<string>();
+  if (dial) {
+    const withoutTrunkZero = cleaned.replace(/^0+/, '');
+    if (!withoutTrunkZero.startsWith(dial) || (dial === '1' && withoutTrunkZero.length === 10)) {
+      candidates.add(`${dial}${withoutTrunkZero}`);
+    }
+  }
+  candidates.add(cleaned);
+  const hashes = Array.from(candidates).map(p => hashMeta(p)).filter(Boolean) as string[];
+  return hashes.length > 0 ? hashes : undefined;
+};
+
 export async function handlePaymentSuccess(
   orderId: string, 
   supabaseAdmin: SupabaseClient,
@@ -200,16 +231,24 @@ export async function handlePaymentSuccess(
     const PIXEL_ID = process.env.META_PIXEL_ID || '1045219725239327';
     const shouldSkipCapi = metaData?.skipCapi || false;
 
-    // Check if CAPI was already sent for this order and recover stored browser attribution if called via webhook
+    // Check if CAPI was already sent for this order and recover stored browser attribution if called via webhook.
+    // Note: payments table uses razorpay_order_id (TEXT column) to store the JSON attribution object.
     const { data: existingPayments } = await supabaseAdmin
       .from('payments')
-      .select('id, raw_response')
+      .select('id, razorpay_order_id')
       .eq('order_id', orderId)
       .order('created_at', { ascending: false })
       .limit(1);
 
     const existingPayment = existingPayments?.[0];
-    const storedMeta = (existingPayment?.raw_response as any) || {};
+    let storedMeta: any = {};
+    if (existingPayment?.razorpay_order_id) {
+      try {
+        storedMeta = JSON.parse(existingPayment.razorpay_order_id);
+      } catch {
+        storedMeta = {};
+      }
+    }
     const capiAlreadySent = !!storedMeta?.meta_capi_sent;
 
     if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
@@ -222,6 +261,7 @@ export async function handlePaymentSuccess(
         const resolvedCurrency = (metaData?.trackingCurrency || storedMeta?.trackingCurrency || order?.display_currency || 'USD').toUpperCase();
         const resolvedAmount = Number((metaData?.trackingAmount || storedMeta?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0).toFixed(2));
         const testCode = metaData?.testEventCode || storedMeta?.testEventCode || process.env.META_TEST_EVENT_CODE;
+        const resolvedSourceUrl = storedMeta?.eventSourceUrl || `https://www.textilejaipur.com/payment/success?order_id=${orderId}`;
 
         const emailHashes = Array.from(new Set([
           hashMeta(normEmail(userEmail)),
@@ -233,11 +273,11 @@ export async function handlePaymentSuccess(
             event_name: 'Purchase',
             event_time: Math.floor(Date.now() / 1000),
             event_id: orderId,
-            event_source_url: process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com',
+            event_source_url: resolvedSourceUrl,
             action_source: 'website',
             user_data: {
               em: emailHashes.length > 0 ? emailHashes : undefined,
-              ph: hashMeta(normPhone(userPhone)) ? [hashMeta(normPhone(userPhone))] : undefined,
+              ph: getPhoneHashes(userPhone, userCountry),
               fn: hashMeta(normStr(firstName)) ? [hashMeta(normStr(firstName))] : undefined,
               ln: hashMeta(normStr(lastName)) ? [hashMeta(normStr(lastName))] : undefined,
               ct: hashMeta(normStr(userCity)) ? [hashMeta(normStr(userCity))] : undefined,
@@ -269,32 +309,38 @@ export async function handlePaymentSuccess(
         });
         if (!capiResponse.ok) {
           console.error('[CAPI] Purchase event failed:', await capiResponse.text());
-        } else if (existingPayment?.id) {
-          await supabaseAdmin
-            .from('payments')
-            .update({
-              raw_response: {
-                ...storedMeta,
-                meta_capi_sent: true,
-                meta_capi_timestamp: new Date().toISOString()
-              }
-            })
-            .eq('id', existingPayment.id);
         } else {
-          await supabaseAdmin
-            .from('payments')
-            .insert({
-              order_id: orderId,
-              payment_method: order?.payment_method || 'paypal',
-              transaction_id: order?.payment_id || orderId,
-              amount: order?.total || 0,
-              status: 'completed',
-              raw_response: {
-                ...storedMeta,
-                meta_capi_sent: true,
-                meta_capi_timestamp: new Date().toISOString()
-              }
-            });
+          const updatedMetaJson = JSON.stringify({
+            ...storedMeta,
+            fbp: resolvedFbp,
+            fbc: resolvedFbc,
+            clientIp: resolvedIp,
+            userAgent: resolvedUa,
+            meta_capi_sent: true,
+            meta_capi_timestamp: new Date().toISOString()
+          });
+          if (existingPayment?.id) {
+            await supabaseAdmin
+              .from('payments')
+              .update({
+                status: 'completed',
+                razorpay_order_id: updatedMetaJson
+              })
+              .eq('id', existingPayment.id);
+          } else {
+            await supabaseAdmin
+              .from('payments')
+              .insert({
+                order_id: orderId,
+                gateway: 'paypal',
+                provider: 'paypal',
+                provider_transaction_id: order?.payment_id || orderId,
+                amount: resolvedAmount,
+                currency: resolvedCurrency,
+                status: 'completed',
+                razorpay_order_id: updatedMetaJson
+              });
+          }
         }
       } catch (err) {
         console.error('[CAPI] Error:', err);

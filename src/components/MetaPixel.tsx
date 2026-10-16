@@ -13,9 +13,12 @@ export const MetaPixel = () => {
     // Capture fbclid and initialize cookies immediately on mount
     initMetaCookies();
 
-    // Skip first render — the <head> script already fired the initial PageView
+    // On first render, <head> already fired the Browser Pixel PageView with window.__INITIAL_PV_ID.
+    // We still forward the initial PageView to Server CAPI with that exact eventID so ad blockers / ITP never drop landing page views!
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      const initialPvId = typeof window !== 'undefined' ? (window as any).__INITIAL_PV_ID : undefined;
+      trackMetaEvent('PageView', {}, initialPvId, false, undefined, true);
       return;
     }
 

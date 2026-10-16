@@ -81,6 +81,37 @@ const normCountry = (val?: string) => {
   return c.length === 2 ? c : c.substring(0, 2);
 };
 
+const COUNTRY_DIAL_MAP: Record<string, string> = {
+  us: '1', ca: '1', gb: '44', in: '91', au: '61', nz: '64',
+  de: '49', fr: '33', it: '39', es: '34', nl: '31', be: '32',
+  ch: '41', at: '43', se: '46', no: '47', dk: '45', fi: '358',
+  ie: '353', pt: '351', gr: '30', pl: '48', hu: '36', cz: '420',
+  ro: '40', hr: '385', si: '386', sk: '421', bg: '359', lu: '352',
+  mt: '356', cy: '357', ee: '372', lv: '371', lt: '370', is: '354',
+  mx: '52', br: '55', ar: '54', cl: '56', co: '57', pe: '51',
+  ae: '971', sa: '966', qa: '974', kw: '965', bh: '973', om: '968',
+  il: '972', tr: '90', sg: '65', hk: '852', jp: '81', kr: '82',
+  tw: '886', my: '60', th: '66', id: '62', ph: '63', vn: '84', za: '27'
+};
+
+const getPhoneHashes = (phone?: string, country?: string): string[] | undefined => {
+  const digits = normPhone(phone);
+  if (!digits) return undefined;
+  const cleaned = digits.replace(/^00+/, '');
+  const iso = normCountry(country);
+  const dial = iso ? COUNTRY_DIAL_MAP[iso] : undefined;
+  const candidates = new Set<string>();
+  if (dial) {
+    const withoutTrunkZero = cleaned.replace(/^0+/, '');
+    if (!withoutTrunkZero.startsWith(dial) || (dial === '1' && withoutTrunkZero.length === 10)) {
+      candidates.add(`${dial}${withoutTrunkZero}`);
+    }
+  }
+  candidates.add(cleaned);
+  const hashes = Array.from(candidates).map(p => hashMeta(p)).filter(Boolean) as string[];
+  return hashes.length > 0 ? hashes : undefined;
+};
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -118,7 +149,7 @@ export async function POST(req: Request) {
             fbp: fbp || undefined,
             fbc: fbc || undefined,
             em: hashMeta(normEmail(userData?.email)) ? [hashMeta(normEmail(userData?.email))] : undefined,
-            ph: hashMeta(normPhone(userData?.phone)) ? [hashMeta(normPhone(userData?.phone))] : undefined,
+            ph: getPhoneHashes(userData?.phone, userData?.country),
             fn: hashMeta(normStr(userData?.firstName)) ? [hashMeta(normStr(userData?.firstName))] : undefined,
             ln: hashMeta(normStr(userData?.lastName)) ? [hashMeta(normStr(userData?.lastName))] : undefined,
             ct: hashMeta(normStr(userData?.city)) ? [hashMeta(normStr(userData?.city))] : undefined,
