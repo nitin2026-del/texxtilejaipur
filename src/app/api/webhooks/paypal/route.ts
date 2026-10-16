@@ -99,6 +99,11 @@ export async function POST(req: NextRequest) {
       const paypalOrderId = body.resource.id;
       const webhookPayerEmail = body.resource?.payer?.email_address || body.resource?.payment_source?.paypal?.email_address;
       
+      // Wait 6 seconds so the customer's browser redirect to /payment/success (Thank You page)
+      // finishes loading and captures the order first with live browser cookies (_fbp, _fbc, IP, UA).
+      // The webhook only steps in if the customer closed their browser before /payment/success loaded.
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+
       const { data: order } = await supabaseAdmin
         .from('orders')
         .select('id, payment_status')
@@ -129,6 +134,8 @@ export async function POST(req: NextRequest) {
       const paypalOrderId = body.resource?.supplementary_data?.related_ids?.order_id;
       const webhookPayerEmail = body.resource?.payer?.email_address || body.resource?.payment_source?.paypal?.email_address;
       if (paypalOrderId) {
+        await new Promise((resolve) => setTimeout(resolve, 6000));
+
         const { data: order } = await supabaseAdmin
           .from('orders')
           .select('id, payment_status')
