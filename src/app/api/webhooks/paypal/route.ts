@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
     // Handle CHECKOUT.ORDER.APPROVED (User approved, needs capture)
     if (body.event_type === 'CHECKOUT.ORDER.APPROVED') {
       const paypalOrderId = body.resource.id;
+      const webhookPayerEmail = body.resource?.payer?.email_address || body.resource?.payment_source?.paypal?.email_address;
       
       const { data: order } = await supabaseAdmin
         .from('orders')
@@ -110,13 +111,14 @@ export async function POST(req: NextRequest) {
           request.requestBody({});
           const response = await client.execute(request);
           if (response.result.status === 'COMPLETED') {
+            const capturedEmail = response.result?.payer?.email_address || response.result?.payment_source?.paypal?.email_address || webhookPayerEmail;
             await supabaseAdmin.from('payments').update({ status: 'completed' }).eq('order_id', order.id);
-            await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true });
+            await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true, paypalEmail: capturedEmail });
           }
         } catch (e: any) {
           const isAlreadyCaptured = e?.statusCode === 422 || JSON.stringify(e).includes('ORDER_ALREADY_CAPTURED');
           if (isAlreadyCaptured) {
-            await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true });
+            await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true, paypalEmail: webhookPayerEmail });
           }
         }
       }
@@ -125,6 +127,7 @@ export async function POST(req: NextRequest) {
     // Handle PAYMENT.CAPTURE.COMPLETED (Fallback if captured via frontend but fulfillment failed)
     if (body.event_type === 'PAYMENT.CAPTURE.COMPLETED') {
       const paypalOrderId = body.resource?.supplementary_data?.related_ids?.order_id;
+      const webhookPayerEmail = body.resource?.payer?.email_address || body.resource?.payment_source?.paypal?.email_address;
       if (paypalOrderId) {
         const { data: order } = await supabaseAdmin
           .from('orders')
@@ -134,7 +137,7 @@ export async function POST(req: NextRequest) {
           
         if (order && order.payment_status !== 'completed') {
           await supabaseAdmin.from('payments').update({ status: 'completed' }).eq('order_id', order.id);
-          await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true });
+          await handlePaymentSuccess(order.id, supabaseAdmin, { isWebhook: true, paypalEmail: webhookPayerEmail });
         }
       }
     }

@@ -31,16 +31,17 @@ export async function POST(req: NextRequest) {
       }
 
       let captureStatus = '';
+      let paypalPayerEmail = '';
       try {
         // Capture the PayPal order
         const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
         request.requestBody({});
         const response = await client.execute(request);
         captureStatus = response.result.status;
+        paypalPayerEmail = response.result?.payer?.email_address || response.result?.payment_source?.paypal?.email_address || '';
       } catch (captureError: any) {
         // If already captured (back button / duplicate request), treat as success
         const isAlreadyCaptured =
-          
           JSON.stringify(captureError).includes('ORDER_ALREADY_CAPTURED');
         if (isAlreadyCaptured) {
           captureStatus = 'COMPLETED'; // Already captured — order is paid
@@ -79,7 +80,8 @@ export async function POST(req: NextRequest) {
         userAgent,
         trackingCurrency: (trackOrder?.display_currency || 'USD').toUpperCase(),
         trackingAmount: Number(rawTrackingAmount.toFixed(2)),
-        testEventCode
+        testEventCode,
+        paypalEmail: paypalPayerEmail || undefined
       };
 
       // Centralized success handler
@@ -109,6 +111,8 @@ export async function POST(req: NextRequest) {
         email = userData?.user?.email || '';
       }
 
+      const shipAddr = (Array.isArray(orderData?.shipping_addresses) ? orderData?.shipping_addresses[0] : orderData?.shipping_addresses) as any || {};
+
       // The CAPI Gateway will automatically pick up the frontend Pixel event.
       // We do not fire a manual Graph API server event here to prevent duplicate server events.
 
@@ -120,13 +124,13 @@ export async function POST(req: NextRequest) {
         currency: (trackOrder?.display_currency || 'USD').toUpperCase(),
         items: orderData?.order_items || [],
         customer: {
-          email,
-          name: orderData?.shipping_addresses?.[0]?.full_name || '',
-          phone: orderData?.shipping_addresses?.[0]?.phone || '',
-          country: orderData?.shipping_addresses?.[0]?.country || '',
-          zip: orderData?.shipping_addresses?.[0]?.postal_code || '',
-          city: orderData?.shipping_addresses?.[0]?.city || '',
-          state: orderData?.shipping_addresses?.[0]?.state || ''
+          email: email || paypalPayerEmail || '',
+          name: shipAddr?.full_name || '',
+          phone: shipAddr?.phone || '',
+          country: shipAddr?.country || '',
+          zip: shipAddr?.postal_code || '',
+          city: shipAddr?.city || '',
+          state: shipAddr?.state || ''
         }
       }, { status: 200 });
     } else {
@@ -191,7 +195,7 @@ export async function POST(req: NextRequest) {
       // Get the approval URL so the frontend can redirect the user
       const approvalUrl = response.result.links?.find((l: any) => l.rel === 'approve')?.href || '';
 
-      // Update the order in Supabase with the PayPal order ID and Meta cookies
+      // Update the order in Supabase with the PayPal order ID
       await supabaseAdmin
         .from('orders')
         .update({ 
@@ -200,18 +204,37 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', orderId);
 
-      // Record the payment attempt in the payments table
-      await supabaseAdmin
+      // Extract client IP & User-Agent at the moment the customer clicks PayPal
+      const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+      const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
+      const userAgent = req.headers.get('user-agent') || undefined;
+
+      // Record the payment attempt in the payments table with Meta attribution metadata
+      // Note: 'pending' satisfies payments_status_check ('intent_created' violated the constraint!)
+      const { error: insertPaymentError } = await supabaseAdmin
         .from('payments')
         .insert({
           order_id: orderId,
           gateway: 'paypal',
           provider: 'paypal',
           provider_transaction_id: createdPaypalOrderId,
-          amount: amount,
-          currency: currency,
-          status: 'intent_created'
+          amount: secureAmountInTargetCurrency,
+          currency: targetCurrency,
+          status: 'pending',
+          raw_response: {
+            fbp: fbp || undefined,
+            fbc: fbc || undefined,
+            clientIp,
+            userAgent,
+            testEventCode: testEventCode || undefined,
+            trackingCurrency: targetCurrency,
+            trackingAmount: secureAmountInTargetCurrency
+          }
         });
+
+      if (insertPaymentError) {
+        console.error('Failed to insert pending payment record:', insertPaymentError);
+      }
 
       return NextResponse.json({ id: createdPaypalOrderId, approvalUrl }, { status: 200 });
     }

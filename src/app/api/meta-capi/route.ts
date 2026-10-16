@@ -6,17 +6,78 @@ const hashMeta = (val?: string) => {
   return crypto.createHash('sha256').update(val).digest('hex');
 };
 
-const normStr = (val?: string) => val ? val.trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
+const normStr = (val?: string) => val ? val.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
 const normEmail = (val?: string) => val ? val.trim().toLowerCase() : undefined;
 const normPhone = (val?: string) => val ? val.replace(/\D/g, '') : undefined;
+
+const COUNTRY_CODE_MAP: Record<string, string> = {
+  'united states': 'us', 'usa': 'us', 'united states of america': 'us',
+  'united kingdom': 'gb', 'uk': 'gb', 'great britain': 'gb', 'england': 'gb', 'scotland': 'gb', 'wales': 'gb',
+  'india': 'in', 'ind': 'in',
+  'australia': 'au', 'aus': 'au',
+  'canada': 'ca', 'can': 'ca',
+  'germany': 'de', 'deutschland': 'de',
+  'france': 'fr',
+  'italy': 'it', 'italia': 'it',
+  'spain': 'es', 'espana': 'es', 'españa': 'es',
+  'netherlands': 'nl', 'holland': 'nl', 'the netherlands': 'nl',
+  'belgium': 'be',
+  'switzerland': 'ch',
+  'austria': 'at',
+  'sweden': 'se',
+  'norway': 'no',
+  'denmark': 'dk',
+  'finland': 'fi',
+  'ireland': 'ie', 'republic of ireland': 'ie',
+  'portugal': 'pt',
+  'greece': 'gr',
+  'poland': 'pl',
+  'hungary': 'hu',
+  'czech republic': 'cz', 'czechia': 'cz',
+  'romania': 'ro',
+  'croatia': 'hr',
+  'slovenia': 'si',
+  'slovakia': 'sk',
+  'bulgaria': 'bg',
+  'luxembourg': 'lu',
+  'malta': 'mt',
+  'cyprus': 'cy',
+  'estonia': 'ee',
+  'latvia': 'lv',
+  'lithuania': 'lt',
+  'iceland': 'is',
+  'mexico': 'mx', 'méxico': 'mx',
+  'brazil': 'br', 'brasil': 'br',
+  'argentina': 'ar',
+  'chile': 'cl',
+  'colombia': 'co',
+  'peru': 'pe',
+  'new zealand': 'nz',
+  'united arab emirates': 'ae', 'uae': 'ae', 'dubai': 'ae',
+  'saudi arabia': 'sa',
+  'qatar': 'qa',
+  'kuwait': 'kw',
+  'bahrain': 'bh',
+  'oman': 'om',
+  'israel': 'il',
+  'turkey': 'tr', 'türkiye': 'tr',
+  'singapore': 'sg',
+  'hong kong': 'hk',
+  'japan': 'jp',
+  'south korea': 'kr', 'korea': 'kr',
+  'taiwan': 'tw',
+  'malaysia': 'my',
+  'thailand': 'th',
+  'indonesia': 'id',
+  'philippines': 'ph',
+  'vietnam': 'vn',
+  'south africa': 'za',
+};
+
 const normCountry = (val?: string) => {
   if (!val) return undefined;
   const c = val.trim().toLowerCase();
-  if (c === 'united states' || c === 'usa') return 'us';
-  if (c === 'india' || c === 'ind') return 'in';
-  if (c === 'united kingdom' || c === 'uk') return 'gb';
-  if (c === 'australia') return 'au';
-  if (c === 'canada') return 'ca';
+  if (COUNTRY_CODE_MAP[c]) return COUNTRY_CODE_MAP[c];
   return c.length === 2 ? c : c.substring(0, 2);
 };
 

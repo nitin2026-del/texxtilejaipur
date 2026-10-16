@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Sparkles, MapPin, Mail, Phone, ChevronDown, ChevronUp, ArrowUpRight, Heart, Send } from 'lucide-react';
+import { trackMetaEvent } from '@/utils/metaTracking';
 
 const FAQS = [
   {
@@ -56,12 +57,15 @@ export const Footer: React.FC = () => {
       return;
     }
 
+    const cleanEmail = email.trim().toLowerCase();
     setSubStatus('loading');
+    trackMetaEvent('Lead', { content_name: 'Footer VIP Newsletter' }, undefined, false, { email: cleanEmail });
+
     try {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: cleanEmail }),
       });
       const data = await res.json();
       

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { X, Sparkles, Mail, MoveRight } from 'lucide-react';
 import { SarcasticPopup } from '@/components/SarcasticPopup';
+import { trackMetaEvent } from '@/utils/metaTracking';
 
 export function GlobalModals() {
   const [vipModalOpen, setVipModalOpen] = useState(false);
@@ -39,11 +40,14 @@ export function GlobalModals() {
     e.preventDefault();
     if (!email) return;
     
+    const cleanEmail = email.trim().toLowerCase();
+    trackMetaEvent('Lead', { content_name: 'VIP 10% Popup' }, undefined, false, { email: cleanEmail });
+
     try {
       await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email: cleanEmail })
       });
     } catch (err) {
       console.error('Subscription error', err);

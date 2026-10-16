@@ -7,17 +7,78 @@ const hashMeta = (val?: string) => {
   return crypto.createHash('sha256').update(val).digest('hex');
 };
 
-const normStr = (val?: string) => val ? val.trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
+const normStr = (val?: string) => val ? val.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
 const normEmail = (val?: string) => val ? val.trim().toLowerCase() : undefined;
 const normPhone = (val?: string) => val ? val.replace(/\D/g, '') : undefined;
+
+const COUNTRY_CODE_MAP: Record<string, string> = {
+  'united states': 'us', 'usa': 'us', 'united states of america': 'us',
+  'united kingdom': 'gb', 'uk': 'gb', 'great britain': 'gb', 'england': 'gb', 'scotland': 'gb', 'wales': 'gb',
+  'india': 'in', 'ind': 'in',
+  'australia': 'au', 'aus': 'au',
+  'canada': 'ca', 'can': 'ca',
+  'germany': 'de', 'deutschland': 'de',
+  'france': 'fr',
+  'italy': 'it', 'italia': 'it',
+  'spain': 'es', 'espana': 'es', 'españa': 'es',
+  'netherlands': 'nl', 'holland': 'nl', 'the netherlands': 'nl',
+  'belgium': 'be',
+  'switzerland': 'ch',
+  'austria': 'at',
+  'sweden': 'se',
+  'norway': 'no',
+  'denmark': 'dk',
+  'finland': 'fi',
+  'ireland': 'ie', 'republic of ireland': 'ie',
+  'portugal': 'pt',
+  'greece': 'gr',
+  'poland': 'pl',
+  'hungary': 'hu',
+  'czech republic': 'cz', 'czechia': 'cz',
+  'romania': 'ro',
+  'croatia': 'hr',
+  'slovenia': 'si',
+  'slovakia': 'sk',
+  'bulgaria': 'bg',
+  'luxembourg': 'lu',
+  'malta': 'mt',
+  'cyprus': 'cy',
+  'estonia': 'ee',
+  'latvia': 'lv',
+  'lithuania': 'lt',
+  'iceland': 'is',
+  'mexico': 'mx', 'méxico': 'mx',
+  'brazil': 'br', 'brasil': 'br',
+  'argentina': 'ar',
+  'chile': 'cl',
+  'colombia': 'co',
+  'peru': 'pe',
+  'new zealand': 'nz',
+  'united arab emirates': 'ae', 'uae': 'ae', 'dubai': 'ae',
+  'saudi arabia': 'sa',
+  'qatar': 'qa',
+  'kuwait': 'kw',
+  'bahrain': 'bh',
+  'oman': 'om',
+  'israel': 'il',
+  'turkey': 'tr', 'türkiye': 'tr',
+  'singapore': 'sg',
+  'hong kong': 'hk',
+  'japan': 'jp',
+  'south korea': 'kr', 'korea': 'kr',
+  'taiwan': 'tw',
+  'malaysia': 'my',
+  'thailand': 'th',
+  'indonesia': 'id',
+  'philippines': 'ph',
+  'vietnam': 'vn',
+  'south africa': 'za',
+};
+
 const normCountry = (val?: string) => {
   if (!val) return undefined;
   const c = val.trim().toLowerCase();
-  if (c === 'united states' || c === 'usa') return 'us';
-  if (c === 'india' || c === 'ind') return 'in';
-  if (c === 'united kingdom' || c === 'uk') return 'gb';
-  if (c === 'australia') return 'au';
-  if (c === 'canada') return 'ca';
+  if (COUNTRY_CODE_MAP[c]) return COUNTRY_CODE_MAP[c];
   return c.length === 2 ? c : c.substring(0, 2);
 };
 
@@ -32,6 +93,7 @@ export async function handlePaymentSuccess(
     trackingCurrency?: string; 
     trackingAmount?: number;
     testEventCode?: string;
+    paypalEmail?: string;
     skipCapi?: boolean;
     isWebhook?: boolean;
   }
@@ -138,18 +200,34 @@ export async function handlePaymentSuccess(
     const PIXEL_ID = process.env.META_PIXEL_ID || '1045219725239327';
     const shouldSkipCapi = metaData?.skipCapi || false;
 
-    // Check if CAPI was already sent for this order
-    const { data: existingPayment } = await supabaseAdmin
+    // Check if CAPI was already sent for this order and recover stored browser attribution if called via webhook
+    const { data: existingPayments } = await supabaseAdmin
       .from('payments')
       .select('id, raw_response')
       .eq('order_id', orderId)
-      .maybeSingle();
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    const capiAlreadySent = !!(existingPayment?.raw_response as any)?.meta_capi_sent;
+    const existingPayment = existingPayments?.[0];
+    const storedMeta = (existingPayment?.raw_response as any) || {};
+    const capiAlreadySent = !!storedMeta?.meta_capi_sent;
 
     if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
       try {
-        const testCode = metaData?.testEventCode || process.env.META_TEST_EVENT_CODE;
+        const resolvedFbp = metaData?.fbp || storedMeta?.fbp || undefined;
+        const resolvedFbc = metaData?.fbc || storedMeta?.fbc || undefined;
+        const rawIp = metaData?.clientIp || storedMeta?.clientIp;
+        const resolvedIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
+        const resolvedUa = metaData?.userAgent || storedMeta?.userAgent || undefined;
+        const resolvedCurrency = (metaData?.trackingCurrency || storedMeta?.trackingCurrency || order?.display_currency || 'USD').toUpperCase();
+        const resolvedAmount = Number((metaData?.trackingAmount || storedMeta?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0).toFixed(2));
+        const testCode = metaData?.testEventCode || storedMeta?.testEventCode || process.env.META_TEST_EVENT_CODE;
+
+        const emailHashes = Array.from(new Set([
+          hashMeta(normEmail(userEmail)),
+          hashMeta(normEmail(metaData?.paypalEmail || storedMeta?.paypalEmail))
+        ].filter(Boolean) as string[]));
+
         const payload = {
           data: [{
             event_name: 'Purchase',
@@ -158,7 +236,7 @@ export async function handlePaymentSuccess(
             event_source_url: process.env.NEXT_PUBLIC_SITE_URL || 'https://textilejaipur.com',
             action_source: 'website',
             user_data: {
-              em: hashMeta(normEmail(userEmail)) ? [hashMeta(normEmail(userEmail))] : undefined,
+              em: emailHashes.length > 0 ? emailHashes : undefined,
               ph: hashMeta(normPhone(userPhone)) ? [hashMeta(normPhone(userPhone))] : undefined,
               fn: hashMeta(normStr(firstName)) ? [hashMeta(normStr(firstName))] : undefined,
               ln: hashMeta(normStr(lastName)) ? [hashMeta(normStr(lastName))] : undefined,
@@ -166,15 +244,15 @@ export async function handlePaymentSuccess(
               st: hashMeta(normStr(userState)) ? [hashMeta(normStr(userState))] : undefined,
               zp: hashMeta(normStr(userZip)) ? [hashMeta(normStr(userZip))] : undefined,
               country: hashMeta(normCountry(userCountry)) ? [hashMeta(normCountry(userCountry))] : undefined,
-              external_id: hashMeta(order?.user_id) ? [hashMeta(order?.user_id)] : undefined,
-              fbp: metaData?.fbp,
-              fbc: metaData?.fbc,
-              client_ip_address: typeof metaData?.clientIp === 'string' ? metaData.clientIp.split(',')[0].trim() : undefined,
-              client_user_agent: metaData?.userAgent
+              external_id: hashMeta(order?.user_id || orderId) ? [hashMeta(order?.user_id || orderId)] : undefined,
+              fbp: resolvedFbp,
+              fbc: resolvedFbc,
+              client_ip_address: resolvedIp,
+              client_user_agent: resolvedUa
             },
             custom_data: {
-              currency: (metaData?.trackingCurrency || order?.display_currency || 'USD').toUpperCase(),
-              value: Number((metaData?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0).toFixed(2)),
+              currency: resolvedCurrency,
+              value: resolvedAmount,
               content_ids: (orderItems || []).map(item => item.product_id).filter(Boolean),
               contents: (orderItems || []).map(item => ({ id: item.product_id, quantity: item.quantity })),
               content_type: 'product',
@@ -192,17 +270,31 @@ export async function handlePaymentSuccess(
         if (!capiResponse.ok) {
           console.error('[CAPI] Purchase event failed:', await capiResponse.text());
         } else if (existingPayment?.id) {
-          const currentRaw = (existingPayment.raw_response as any) || {};
           await supabaseAdmin
             .from('payments')
             .update({
               raw_response: {
-                ...currentRaw,
+                ...storedMeta,
                 meta_capi_sent: true,
                 meta_capi_timestamp: new Date().toISOString()
               }
             })
             .eq('id', existingPayment.id);
+        } else {
+          await supabaseAdmin
+            .from('payments')
+            .insert({
+              order_id: orderId,
+              payment_method: order?.payment_method || 'paypal',
+              transaction_id: order?.payment_id || orderId,
+              amount: order?.total || 0,
+              status: 'completed',
+              raw_response: {
+                ...storedMeta,
+                meta_capi_sent: true,
+                meta_capi_timestamp: new Date().toISOString()
+              }
+            });
         }
       } catch (err) {
         console.error('[CAPI] Error:', err);
