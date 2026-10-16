@@ -130,40 +130,34 @@ export async function handlePaymentSuccess(
   }
 ) {
   try {
-    // 0. Idempotency Check: Don't process fulfillment if already completed, but allow attribution updates if metadata is present
-    const { data: existingOrder } = await supabaseAdmin
+    // 0 & 1. Atomic Compare-and-Swap Order Status Update:
+    // Ensures that if PayPal Webhook and Browser /payment/success run at the exact same millisecond,
+    // PostgreSQL row-locking guarantees only ONE caller transitions payment_status to 'paid'.
+    const { data: claimedOrder } = await supabaseAdmin
       .from('orders')
-      .select('payment_status')
+      .update({ payment_status: 'paid', status: 'processing' })
       .eq('id', orderId)
-      .single();
+      .neq('payment_status', 'paid')
+      .neq('payment_status', 'completed')
+      .select('*, shipping_addresses(*)')
+      .maybeSingle();
 
-    const isAlreadyPaid = existingOrder?.payment_status === 'paid' || existingOrder?.payment_status === 'completed';
+    const isAlreadyPaid = !claimedOrder;
     if (isAlreadyPaid && !metaData?.fbp && !metaData?.fbc && !metaData?.clientIp) {
       console.log(`[handlePaymentSuccess] Order ${orderId} is already processed. Skipping duplicate fulfillment.`);
       return { success: true };
     }
 
-    // 1. Standardize Order Status (only if not already paid)
-    let order: any = null;
-    if (!isAlreadyPaid) {
-      const { data: updatedOrder, error: orderError } = await supabaseAdmin
+    let order: any = claimedOrder;
+    if (!order) {
+      const { data: fetchedOrder, error: fetchError } = await supabaseAdmin
         .from('orders')
-        .update({ payment_status: 'paid', status: 'processing' })
-        .eq('id', orderId)
         .select('*, shipping_addresses(*)')
+        .eq('id', orderId)
         .single();
-
-      if (orderError) {
-        console.error(`[handlePaymentSuccess] Failed to update order ${orderId}:`, orderError);
-        throw new Error(`Failed to update order status: ${orderError.message}`);
+      if (fetchError || !fetchedOrder) {
+        throw new Error(`Failed to fetch order ${orderId}: ${fetchError?.message || 'Not found'}`);
       }
-      order = updatedOrder;
-    } else {
-      const { data: fetchedOrder } = await supabaseAdmin
-        .from('orders')
-        .select('*, shipping_addresses(*)')
-        .eq('id', orderId)
-        .single();
       order = fetchedOrder;
     }
 
