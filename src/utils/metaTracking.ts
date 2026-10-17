@@ -174,6 +174,108 @@ export const initMetaCookies = () => {
   }
 };
 
+const COUNTRY_CODE_MAP: Record<string, string> = {
+  'united states': 'us', 'usa': 'us', 'united states of america': 'us',
+  'united kingdom': 'gb', 'uk': 'gb', 'great britain': 'gb', 'england': 'gb', 'scotland': 'gb', 'wales': 'gb',
+  'india': 'in', 'ind': 'in',
+  'australia': 'au', 'aus': 'au',
+  'canada': 'ca', 'can': 'ca',
+  'germany': 'de', 'deutschland': 'de',
+  'france': 'fr',
+  'italy': 'it', 'italia': 'it',
+  'spain': 'es', 'espana': 'es', 'españa': 'es',
+  'netherlands': 'nl', 'holland': 'nl', 'the netherlands': 'nl',
+  'belgium': 'be',
+  'switzerland': 'ch',
+  'austria': 'at',
+  'sweden': 'se',
+  'norway': 'no',
+  'denmark': 'dk',
+  'finland': 'fi',
+  'ireland': 'ie', 'republic of ireland': 'ie',
+  'portugal': 'pt',
+  'greece': 'gr',
+  'poland': 'pl',
+  'hungary': 'hu',
+  'czech republic': 'cz', 'czechia': 'cz',
+  'romania': 'ro',
+  'croatia': 'hr',
+  'slovenia': 'si',
+  'slovakia': 'sk',
+  'bulgaria': 'bg',
+  'luxembourg': 'lu',
+  'malta': 'mt',
+  'cyprus': 'cy',
+  'estonia': 'ee',
+  'latvia': 'lv',
+  'lithuania': 'lt',
+  'iceland': 'is',
+  'mexico': 'mx', 'méxico': 'mx',
+  'brazil': 'br', 'brasil': 'br',
+  'argentina': 'ar',
+  'chile': 'cl',
+  'colombia': 'co',
+  'peru': 'pe',
+  'new zealand': 'nz',
+  'united arab emirates': 'ae', 'uae': 'ae', 'dubai': 'ae',
+  'saudi arabia': 'sa',
+  'qatar': 'qa',
+  'kuwait': 'kw',
+  'bahrain': 'bh',
+  'oman': 'om',
+  'israel': 'il',
+  'turkey': 'tr', 'türkiye': 'tr',
+  'singapore': 'sg',
+  'hong kong': 'hk',
+  'japan': 'jp',
+  'south korea': 'kr', 'korea': 'kr',
+  'taiwan': 'tw',
+  'malaysia': 'my',
+  'thailand': 'th',
+  'indonesia': 'id',
+  'philippines': 'ph',
+  'vietnam': 'vn',
+  'south africa': 'za',
+};
+
+const COUNTRY_DIAL_MAP: Record<string, string> = {
+  us: '1', ca: '1', gb: '44', in: '91', au: '61', nz: '64',
+  de: '49', fr: '33', it: '39', es: '34', nl: '31', be: '32',
+  ch: '41', at: '43', se: '46', no: '47', dk: '45', fi: '358',
+  ie: '353', pt: '351', gr: '30', pl: '48', hu: '36', cz: '420',
+  ro: '40', hr: '385', si: '386', sk: '421', bg: '359', lu: '352',
+  mt: '356', cy: '357', ee: '372', lv: '371', lt: '370', is: '354',
+  mx: '52', br: '55', ar: '54', cl: '56', co: '57', pe: '51',
+  ae: '971', sa: '966', qa: '974', kw: '965', bh: '973', om: '968',
+  il: '972', tr: '90', sg: '65', hk: '852', jp: '81', kr: '82',
+  tw: '886', my: '60', th: '66', id: '62', ph: '63', vn: '84', za: '27'
+};
+
+const normAdvStr = (val?: string) =>
+  val ? val.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+
+const normAdvCountry = (val?: string) => {
+  if (!val) return '';
+  const c = val.trim().toLowerCase();
+  if (COUNTRY_CODE_MAP[c]) return COUNTRY_CODE_MAP[c];
+  return c.length === 2 ? c : c.substring(0, 2);
+};
+
+const normAdvPhone = (phone?: string, country?: string) => {
+  if (!phone) return '';
+  const digits = phone.replace(/\D/g, '').replace(/^00+/, '');
+  if (!digits) return '';
+  const iso = normAdvCountry(country);
+  const dial = iso ? COUNTRY_DIAL_MAP[iso] : undefined;
+  if (dial) {
+    const withoutTrunkZero = digits.replace(/^0+/, '');
+    if (!withoutTrunkZero.startsWith(dial) || (dial === '1' && withoutTrunkZero.length === 10)) {
+      return `${dial}${withoutTrunkZero}`;
+    }
+  }
+  return digits;
+};
+
 export const trackMetaEvent = async (
   eventName: string,
   eventData: Record<string, unknown> = {},
@@ -191,13 +293,20 @@ export const trackMetaEvent = async (
       if (mergedUserData && Object.keys(mergedUserData).length > 0) {
         const advancedMatching: Record<string, string> = {};
         if (mergedUserData.email) advancedMatching.em = mergedUserData.email.trim().toLowerCase();
-        if (mergedUserData.phone) advancedMatching.ph = mergedUserData.phone.replace(/\D/g, '');
-        if (mergedUserData.firstName) advancedMatching.fn = mergedUserData.firstName.trim().toLowerCase();
-        if (mergedUserData.lastName) advancedMatching.ln = mergedUserData.lastName.trim().toLowerCase();
-        if (mergedUserData.city) advancedMatching.ct = mergedUserData.city.trim().toLowerCase();
-        if (mergedUserData.state) advancedMatching.st = mergedUserData.state.trim().toLowerCase();
-        if (mergedUserData.zip) advancedMatching.zp = mergedUserData.zip.trim().toLowerCase();
-        if (mergedUserData.country) advancedMatching.country = mergedUserData.country.trim().toLowerCase().substring(0, 2);
+        const ph = normAdvPhone(mergedUserData.phone, mergedUserData.country);
+        if (ph) advancedMatching.ph = ph;
+        const fn = normAdvStr(mergedUserData.firstName);
+        if (fn) advancedMatching.fn = fn;
+        const ln = normAdvStr(mergedUserData.lastName);
+        if (ln) advancedMatching.ln = ln;
+        const ct = normAdvStr(mergedUserData.city);
+        if (ct) advancedMatching.ct = ct;
+        const st = normAdvStr(mergedUserData.state);
+        if (st) advancedMatching.st = st;
+        const zp = normAdvStr(mergedUserData.zip);
+        if (zp) advancedMatching.zp = zp;
+        const countryIso = normAdvCountry(mergedUserData.country);
+        if (countryIso) advancedMatching.country = countryIso;
         (window as any).fbq('init', PIXEL_ID, advancedMatching);
       }
     } catch (e) {}

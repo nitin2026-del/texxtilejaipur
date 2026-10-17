@@ -49,7 +49,7 @@ function PaymentCaptureHandler() {
     const paymentAmount = isMatchingOrder ? Number(localStorage.getItem('pending_payment_amount') || 0) : 0;
     const paymentCurrency = isMatchingOrder ? (localStorage.getItem('pending_currency') || 'USD') : 'USD';
 
-    const testEventCode = typeof window !== 'undefined' ? (sessionStorage.getItem('meta_test_event_code') || undefined) : undefined;
+    const testEventCode = typeof window !== 'undefined' ? (sessionStorage.getItem('meta_test_event_code') || localStorage.getItem('meta_test_event_code') || undefined) : undefined;
 
     fetch('/api/payments/paypal', {
       method: 'POST',
@@ -174,14 +174,14 @@ function PaymentCaptureHandler() {
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6">
       <div className="animate-spin h-12 w-12 border-4 border-amber-500 border-t-transparent rounded-full" />
       <div className="text-center">
-        <p className="text-zinc-800 font-bold text-base">Confirming your payment�</p>
+        <p className="text-zinc-800 font-bold text-base">Confirming your payment…</p>
         <p className="text-zinc-500 text-sm mt-1">Please do not close or refresh this page</p>
       </div>
       <div className="flex items-center gap-2 text-xs text-zinc-400 border border-zinc-200 rounded-full px-4 py-2 bg-white">
-        ?? Secured by PayPal � 256-bit SSL
+        🔒 Secured by PayPal · 256-bit SSL
       </div>
       <p className="text-center text-xs text-zinc-400 max-w-xs leading-relaxed mt-2">
-        If this page takes too long, don�t worry �{' '}
+        If this page takes too long, don’t worry —{' '}
         <a href="mailto:textileofrajasthan.info@gmail.com" className="text-amber-600 underline">email us</a>{' '}or{' '}
         <a href="https://wa.me/919929835848" target="_blank" rel="noopener noreferrer" className="text-amber-600 underline">WhatsApp us</a>.
       </p>

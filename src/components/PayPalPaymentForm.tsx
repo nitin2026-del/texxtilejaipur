@@ -58,7 +58,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       // Extract Meta cookies (_fbp, _fbc) with sessionStorage fbclid fallback
       const fbp = getMetaCookie('_fbp') || '';
       const fbc = getMetaCookie('_fbc') || '';
-      const testEventCode = typeof window !== 'undefined' ? (sessionStorage.getItem('meta_test_event_code') || undefined) : undefined;
+      const testEventCode = typeof window !== 'undefined' ? (sessionStorage.getItem('meta_test_event_code') || localStorage.getItem('meta_test_event_code') || undefined) : undefined;
 
       const res = await fetch('/api/payments/paypal', {
         method: 'POST',

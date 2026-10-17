@@ -239,6 +239,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
       const productPrice = Number((parsedPriceInr * (FX_RATES[activeCurrency] || FX_RATES['USD'])).toFixed(2));
       trackMetaEvent('ViewContent', {
         content_ids: [product.id],
+        contents: [{ id: product.id, quantity: 1 }],
         content_name: product.name,
         content_type: 'product',
         value: productPrice,
@@ -336,7 +337,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                         >
                           <img 
                             src={getOptimizedUrl(media.url, 1200)} /* Increased from 800 to 1200 for sharper details */ 
-                            alt={`${product.name} view ${idx + 1} - ${product.category} from Textile Jaipur`}
+                            alt={product.details?.image_analysis?.imageAltTexts?.[idx] || `${product.name} view ${idx + 1} - ${product.category} from Textile Jaipur`}
                             loading={idx === 0 ? "eager" : "lazy"}
                             fetchPriority={idx === 0 ? "high" : "auto"}
                             className="absolute inset-0 w-full h-full object-cover"

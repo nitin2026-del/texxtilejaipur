@@ -242,11 +242,20 @@ export default function RootLayout({
                     document.cookie = '_fbc=' + fbcVal + '; path=/; max-age=7776000; SameSite=Lax';
                     localStorage.setItem('meta_fbc', fbcVal);
                     sessionStorage.setItem('meta_fbc', fbcVal);
+                  } else {
+                    var mFbc = document.cookie.match(/(^| )_fbc=([^;]+)/);
+                    var storedFbc = mFbc ? mFbc[2] : (localStorage.getItem('meta_fbc') || sessionStorage.getItem('meta_fbc') || '');
+                    if (storedFbc) {
+                      document.cookie = '_fbc=' + storedFbc + '; path=/; max-age=7776000; SameSite=Lax';
+                      localStorage.setItem('meta_fbc', storedFbc);
+                      sessionStorage.setItem('meta_fbc', storedFbc);
+                    }
                   }
                   var mFbp = document.cookie.match(/(^| )_fbp=([^;]+)/);
                   var fbpVal = mFbp ? mFbp[2] : (localStorage.getItem('meta_fbp') || ('fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1000000000)));
                   document.cookie = '_fbp=' + fbpVal + '; path=/; max-age=7776000; SameSite=Lax';
                   localStorage.setItem('meta_fbp', fbpVal);
+                  sessionStorage.setItem('meta_fbp', fbpVal);
                 } catch (e) {}
               })();
               !function(f,b,e,v,n,t,s)
