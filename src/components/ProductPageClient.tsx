@@ -98,6 +98,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewError, setReviewError] = useState('');
   const [myReviews, setMyReviews] = useState<string[]>([]);
+  const [reviewLightbox, setReviewLightbox] = useState<{ urls: string[]; index: number } | null>(null);
 
   const handleInquirySubmit = async () => {
     setIsSubmittingInquiry(true);
@@ -1123,7 +1124,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
 
                 {/* Customer Reviews Detailed Section */}
         {dynamicReviews.length > 0 && (
-          <div className="mt-16 max-w-4xl mx-auto px-4">
+          <div id="customer-reviews" className="mt-16 max-w-4xl mx-auto px-4">
             <h3 className="text-2xl font-serif text-zinc-900 font-bold mb-8 flex items-center gap-2">
               <Star className="h-6 w-6 text-amber-400 fill-amber-400" />
               Real Reviews from Global Customers
@@ -1146,11 +1147,24 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   
                   {/* Reviewer Photos */}
                   {r.imageUrls && r.imageUrls.length > 0 && (
-                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 snap-x">
+                    <div className="flex gap-2.5 mb-4 overflow-x-auto pb-2 snap-x">
                       {r.imageUrls.map((img: string, idx: number) => (
-                        <div key={idx} className="shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-zinc-100 snap-center">
-                          <img src={getOptimizedUrl(img, 150)} alt="Customer photo" className="w-full h-full object-cover" loading="lazy" />
-                        </div>
+                        <button
+                          type="button"
+                          key={idx}
+                          onClick={() => setReviewLightbox({ urls: r.imageUrls, index: idx })}
+                          className="shrink-0 w-24 h-24 rounded-xl overflow-hidden border border-zinc-200 hover:border-brand-600 snap-center cursor-pointer group relative focus:outline-none focus:ring-2 focus:ring-brand-600"
+                          aria-label="Open review photo"
+                        >
+                          <img
+                            src={getOptimizedUrl(img, 180)}
+                            alt="Customer review photo"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
+                            decoding="async"
+                            fetchPriority="low"
+                          />
+                        </button>
                       ))}
                     </div>
                   )}
@@ -1179,6 +1193,70 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Review Photo Full-Screen Lightbox */}
+        {reviewLightbox && reviewLightbox.urls[reviewLightbox.index] && (
+          <div
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setReviewLightbox(null)}
+          >
+            <button
+              type="button"
+              onClick={() => setReviewLightbox(null)}
+              className="fixed top-5 right-5 z-[110] p-2.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+              aria-label="Close review photo"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {reviewLightbox.urls.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setReviewLightbox((prev) =>
+                      prev ? { ...prev, index: (prev.index - 1 + prev.urls.length) % prev.urls.length } : null
+                    );
+                  }}
+                  className="fixed left-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setReviewLightbox((prev) =>
+                      prev ? { ...prev, index: (prev.index + 1) % prev.urls.length } : null
+                    );
+                  }}
+                  className="fixed right-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+                  aria-label="Next photo"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+
+            <div
+              className="relative max-w-3xl max-h-[88vh] flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={reviewLightbox.urls[reviewLightbox.index]}
+                alt="Customer review photo full size"
+                className="max-h-[82vh] max-w-full w-auto h-auto object-contain rounded-xl shadow-2xl"
+              />
+              {reviewLightbox.urls.length > 1 && (
+                <div className="mt-3 text-white/80 text-xs font-medium tracking-wider uppercase">
+                  Photo {reviewLightbox.index + 1} of {reviewLightbox.urls.length}
+                </div>
+              )}
             </div>
           </div>
         )}

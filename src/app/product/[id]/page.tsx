@@ -115,7 +115,7 @@ export default async function ProductPage({ params }: Props) {
 
     // 1. Kick off independent fetches in parallel (added limits to prevent huge DB payloads)
     const productPromise = fetch(`${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&id=eq.${id}`, fetchOptions);
-    const reviewsPromise = fetch(`${url}/rest/v1/reviews?product_id=eq.${id}&status=eq.approved&order=created_at.desc&limit=10`, fetchOptions);
+    const reviewsPromise = fetch(`${url}/rest/v1/reviews?or=(product_id.eq.${id},product_id.is.null)&status=eq.approved&order=created_at.desc&limit=15`, fetchOptions);
     const ugcPromise = fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast&limit=6`, fetchOptions);
 
     const [res, reviewsRes, ugcRes] = await Promise.all([productPromise, reviewsPromise, ugcPromise]);
@@ -176,10 +176,15 @@ export default async function ProductPage({ params }: Props) {
       }));
     }
 
-    // 3. Process Reviews
+    // 3. Process Reviews (sort product-specific reviews first, then global store reviews)
     if (reviewsRes.ok) {
       const reviewsData = await reviewsRes.json();
-      initialReviews = reviewsData.map((review: any) => ({
+      const sortedReviews = [...reviewsData].sort((a: any, b: any) => {
+        const aSpecific = a.product_id === id ? 1 : 0;
+        const bSpecific = b.product_id === id ? 1 : 0;
+        return bSpecific - aSpecific;
+      });
+      initialReviews = sortedReviews.map((review: any) => ({
         id: review.id,
         initial: review.reviewer_name ? review.reviewer_name.charAt(0).toUpperCase() : 'A',
         name: review.reviewer_name || 'Anonymous',

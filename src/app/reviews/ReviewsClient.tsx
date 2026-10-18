@@ -1,11 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { Star, MessageCircleHeart, ShieldCheck } from 'lucide-react';
+import { Star, MessageCircleHeart, ShieldCheck, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getOptimizedUrl } from '@/utils/imageUtils';
 
 export function ReviewsClient({ reviews, averageRating }: { reviews: any[], averageRating: string }) {
+  const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null);
+
   return (
     <main className="min-h-screen bg-[#FDFBF7] flex flex-col selection:bg-brand-200">
       <Navbar onCartOpen={() => {}} />
@@ -50,25 +53,36 @@ export function ReviewsClient({ reviews, averageRating }: { reviews: any[], aver
                 {review.image_urls && review.image_urls.length > 0 ? (
                   <div className="mb-6 flex flex-wrap gap-2">
                     {review.image_urls.map((url: string, imgIdx: number) => (
-                      <div key={imgIdx} className="rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100 flex-1 min-w-[45%] max-w-full">
+                      <button
+                        type="button"
+                        key={imgIdx}
+                        onClick={() => setLightbox({ urls: review.image_urls, index: imgIdx })}
+                        className="rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100 flex-1 min-w-[45%] max-w-full cursor-pointer group focus:outline-none"
+                      >
                         <img 
-                          src={url} 
+                          src={getOptimizedUrl(url, 400)} 
                           alt={`Review photo ${imgIdx + 1} by ${review.reviewer_name}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           loading="lazy"
+                          decoding="async"
                         />
-                      </div>
+                      </button>
                     ))}
                   </div>
                 ) : review.image_url && (
-                  <div className="mb-6 rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100">
+                  <button
+                    type="button"
+                    onClick={() => setLightbox({ urls: [review.image_url], index: 0 })}
+                    className="mb-6 w-full rounded-2xl overflow-hidden aspect-[4/5] bg-zinc-100 cursor-pointer group focus:outline-none"
+                  >
                     <img 
-                      src={review.image_url} 
+                      src={getOptimizedUrl(review.image_url, 400)} 
                       alt={`Review by ${review.reviewer_name}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
+                      decoding="async"
                     />
-                  </div>
+                  </button>
                 )}
                 
                 <div className="flex justify-between items-start mb-4">
@@ -111,6 +125,60 @@ export function ReviewsClient({ reviews, averageRating }: { reviews: any[], aver
           </div>
         )}
       </div>
+
+      {lightbox && lightbox.urls[lightbox.index] && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="fixed top-5 right-5 z-[110] p-2.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+            aria-label="Close photo"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {lightbox.urls.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightbox((prev) => (prev ? { ...prev, index: (prev.index - 1 + prev.urls.length) % prev.urls.length } : null));
+                }}
+                className="fixed left-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightbox((prev) => (prev ? { ...prev, index: (prev.index + 1) % prev.urls.length } : null));
+                }}
+                className="fixed right-4 top-1/2 -translate-y-1/2 z-[110] p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+
+          <div
+            className="relative max-w-3xl max-h-[88vh] flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={lightbox.urls[lightbox.index]}
+              alt="Customer review photo full size"
+              className="max-h-[82vh] max-w-full w-auto h-auto object-contain rounded-xl shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
 
       <Footer />
     </main>
