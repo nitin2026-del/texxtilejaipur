@@ -751,23 +751,14 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
 
                 
                 {/* Premium Live Viewers & Scarcity */}
-                <div className="flex flex-col mb-4 mt-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
-                    </span>
-                    <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-medium">
-                      High Demand &middot; Currently viewed by {viewers} others
-                    </p>
-                  </div>
-                  {product.stock_quantity > 0 && product.stock_quantity < 3 && (
+                {product.stock_quantity > 0 && product.stock_quantity < 3 && (
+                  <div className="flex flex-col mb-4 mt-2">
                     <p className="text-amber-700 text-xs font-semibold flex items-center gap-1.5 animate-pulse">
                       <Flame className="h-4 w-4" /> 
                       High in demand
                     </p>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Add to Cart Actions */}
                 <div className="pt-2 pb-2">
