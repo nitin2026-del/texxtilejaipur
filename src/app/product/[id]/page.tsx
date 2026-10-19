@@ -255,6 +255,19 @@ export default async function ProductPage({ params }: Props) {
     : null;
 
   const formattedPrice = Number(product.price_inr || 0).toFixed(2);
+  const gmcCountries = [
+    'AE', 'AO', 'AR', 'AT', 'AU', 'BD', 'BE', 'BF', 'BG', 'BH',
+    'BR', 'BY', 'CA', 'CH', 'CI', 'CL', 'CM', 'CO', 'CR', 'CY',
+    'CZ', 'DE', 'DK', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ES', 'ET',
+    'FI', 'FR', 'GB', 'GE', 'GH', 'GR', 'GT', 'HK', 'HR', 'HU',
+    'ID', 'IE', 'IL', 'IN', 'IT', 'JO', 'JP', 'KE', 'KH', 'KR',
+    'KW', 'KZ', 'LB', 'LK', 'LT', 'LU', 'LV', 'MA', 'MG', 'MM',
+    'MT', 'MU', 'MX', 'MY', 'MZ', 'NG', 'NI', 'NL', 'NO', 'NP',
+    'NZ', 'OM', 'PA', 'PE', 'PH', 'PK', 'PL', 'PR', 'PT', 'PY',
+    'QA', 'RO', 'RU', 'SA', 'SE', 'SG', 'SI', 'SK', 'SN', 'SV',
+    'TH', 'TN', 'TR', 'TW', 'TZ', 'UA', 'UG', 'US', 'UY', 'UZ',
+    'VE', 'VN', 'ZA', 'ZM', 'ZW'
+  ];
 
   const jsonLdProduct: Record<string, any> = {
     '@context': 'https://schema.org',
@@ -291,7 +304,7 @@ export default async function ProductPage({ params }: Props) {
       },
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
-        applicableCountry: ['IN', 'US', 'GB', 'CA', 'AU', 'AE', 'NZ'],
+        applicableCountry: gmcCountries,
         returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
         merchantReturnDays: 30,
         returnMethod: 'https://schema.org/ReturnByMail',
@@ -306,7 +319,7 @@ export default async function ProductPage({ params }: Props) {
         },
         shippingDestination: {
           '@type': 'DefinedRegion',
-          addressCountry: ['IN', 'US', 'GB', 'CA', 'AU', 'AE', 'NZ']
+          addressCountry: gmcCountries
         },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',

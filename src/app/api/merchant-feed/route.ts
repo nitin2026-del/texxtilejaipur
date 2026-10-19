@@ -2,6 +2,21 @@ import { NextResponse } from 'next/server';
 
 export const revalidate = 300; // Cache feed for 5 minutes
 
+// All 95 official Google Merchant Center supported target countries (<= 100 limit per item)
+const GMC_COUNTRIES = [
+  'AE', 'AO', 'AR', 'AT', 'AU', 'BD', 'BE', 'BF', 'BG', 'BH',
+  'BR', 'BY', 'CA', 'CH', 'CI', 'CL', 'CM', 'CO', 'CR', 'CY',
+  'CZ', 'DE', 'DK', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ES', 'ET',
+  'FI', 'FR', 'GB', 'GE', 'GH', 'GR', 'GT', 'HK', 'HR', 'HU',
+  'ID', 'IE', 'IL', 'IN', 'IT', 'JO', 'JP', 'KE', 'KH', 'KR',
+  'KW', 'KZ', 'LB', 'LK', 'LT', 'LU', 'LV', 'MA', 'MG', 'MM',
+  'MT', 'MU', 'MX', 'MY', 'MZ', 'NG', 'NI', 'NL', 'NO', 'NP',
+  'NZ', 'OM', 'PA', 'PE', 'PH', 'PK', 'PL', 'PR', 'PT', 'PY',
+  'QA', 'RO', 'RU', 'SA', 'SE', 'SG', 'SI', 'SK', 'SN', 'SV',
+  'TH', 'TN', 'TR', 'TW', 'TZ', 'UA', 'UG', 'US', 'UY', 'UZ',
+  'VE', 'VN', 'ZA', 'ZM', 'ZW',
+].slice(0, 100);
+
 function escapeXml(unsafe: string): string {
   return (unsafe || '')
     .replace(/&/g, '&amp;')
@@ -54,6 +69,12 @@ export async function GET(request: Request) {
 
     const products = await res.json();
 
+    // Pre-build the worldwide shipping XML block in the exact same currency as the item price
+    const shippingXml = GMC_COUNTRIES.map(
+      (countryCode) =>
+        `      <g:shipping><g:country>${countryCode}</g:country><g:service>Free Worldwide Shipping</g:service><g:price>0.00 ${currency}</g:price><g:min_handling_time>1</g:min_handling_time><g:max_handling_time>3</g:max_handling_time><g:min_transit_time>5</g:min_transit_time><g:max_transit_time>12</g:max_transit_time></g:shipping>`
+    ).join('\n');
+
     const itemsXml = (products || [])
       .filter((p: any) => p.price && Number(p.price) > 0)
       .map((item: any) => {
@@ -82,7 +103,7 @@ export async function GET(request: Request) {
 
         const convertedPrice = (Number(item.price) * rate).toFixed(2);
         const availability =
-          (item.stock_quantity > 0 || item.stock > 0) ? 'in_stock' : 'out_of_stock';
+          item.stock_quantity > 0 || item.stock > 0 ? 'in_stock' : 'out_of_stock';
         const categoryName = item.categories?.name || 'Ethnic Wear';
         const color =
           item.details?.image_analysis?.colorPalette?.dominant || 'Multicolor';
@@ -93,7 +114,10 @@ export async function GET(request: Request) {
             : `https://textilejaipur.com/product/${item.id}?currency=${currency}`;
 
         const additionalImagesXml = additionalImages
-          .map((imgUrl: string) => `      <g:additional_image_link>${escapeXml(imgUrl)}</g:additional_image_link>`)
+          .map(
+            (imgUrl: string) =>
+              `      <g:additional_image_link>${escapeXml(imgUrl)}</g:additional_image_link>`
+          )
           .join('\n');
 
         return `    <item>
@@ -114,16 +138,7 @@ ${additionalImagesXml ? additionalImagesXml + '\n' : ''}      <g:availability>${
       <g:color>${escapeXml(color)}</g:color>
       <g:material>${escapeXml(material)}</g:material>
       <g:size>One Size</g:size>
-      <g:shipping>
-        <g:country>IN</g:country>
-        <g:service>Standard Free Shipping</g:service>
-        <g:price>0.00 ${currency}</g:price>
-      </g:shipping>
-      <g:shipping>
-        <g:country>US</g:country>
-        <g:service>International Express Free Shipping</g:service>
-        <g:price>0.00 ${currency}</g:price>
-      </g:shipping>
+${shippingXml}
     </item>`;
       })
       .join('\n');
