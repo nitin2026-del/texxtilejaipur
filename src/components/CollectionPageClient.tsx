@@ -40,17 +40,47 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(24);
+  const [returnProductId, setReturnProductId] = useState<string | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const hasRestoredScroll = useRef<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const cat = params.get('category');
+      let savedReturnId: string | null = null;
+      try {
+        savedReturnId = sessionStorage.getItem('textilejaipur_return_product_id');
+      } catch {}
+
       if (cat) {
         setSelectedCategory(cat);
+      } else if (savedReturnId) {
+        try {
+          const savedCat = sessionStorage.getItem('textilejaipur_collection_cat');
+          const savedSort = sessionStorage.getItem('textilejaipur_collection_sort') as SortOption | null;
+          if (savedSort) setSortBy(savedSort);
+          if (savedCat && savedCat !== 'All') {
+            const targetProd = products.find((p) => p.id === savedReturnId);
+            if (!targetProd || targetProd.category === savedCat) {
+              setSelectedCategory(savedCat);
+            }
+          }
+        } catch {}
+      }
+
+      if (savedReturnId) {
+        setReturnProductId(savedReturnId);
       }
     }
-  }, []);
+  }, [products]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('textilejaipur_collection_cat', selectedCategory);
+      sessionStorage.setItem('textilejaipur_collection_sort', sortBy);
+    } catch {}
+  }, [selectedCategory, sortBy]);
 
   // Cart
   const [cartOpen, setCartOpen] = useState(false);
@@ -87,9 +117,29 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
     return result;
   }, [products, selectedCategory, sortBy]);
 
+  // Ensure the clicked product is within the rendered slice and scroll to it
   useEffect(() => {
-    setVisibleCount(24);
-  }, [selectedCategory, sortBy]);
+    if (!returnProductId || hasRestoredScroll.current) return;
+    const idx = filteredAndSortedProducts.findIndex((p) => p.id === returnProductId);
+    if (idx === -1) return;
+    const requiredCount = Math.min(filteredAndSortedProducts.length, Math.max(24, idx + 12));
+    if (visibleCount < requiredCount) {
+      setVisibleCount(requiredCount);
+      return;
+    }
+
+    const el = document.getElementById(`product-${returnProductId}`);
+    if (el) {
+      hasRestoredScroll.current = true;
+      el.scrollIntoView({ block: 'center', behavior: 'instant' as ScrollBehavior });
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ block: 'center', behavior: 'instant' as ScrollBehavior });
+      });
+      try {
+        sessionStorage.removeItem('textilejaipur_return_product_id');
+      } catch {}
+    }
+  }, [returnProductId, filteredAndSortedProducts, visibleCount]);
 
   useEffect(() => {
     if (visibleCount >= filteredAndSortedProducts.length) return;

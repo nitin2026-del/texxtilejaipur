@@ -206,6 +206,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
     try {
       const wl = JSON.parse(localStorage.getItem('textilejaipur_wishlist') || '[]');
       setWishlisted(wl.includes(product.id));
+      sessionStorage.setItem('textilejaipur_return_product_id', product.id);
     } catch {}
   }, [product]);
 
@@ -304,6 +305,14 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
           <Link
             href="/collection"
             prefetch={true}
+            scroll={false}
+            onClick={() => {
+              if (product?.id) {
+                try {
+                  sessionStorage.setItem('textilejaipur_return_product_id', product.id);
+                } catch {}
+              }
+            }}
             className="inline-flex items-center gap-2 text-[11px] md:text-xs text-zinc-500 hover:text-[#1a1464] active:opacity-70 transition-colors uppercase font-bold tracking-widest"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
