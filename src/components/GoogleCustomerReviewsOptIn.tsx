@@ -90,40 +90,51 @@ export function GoogleCustomerReviewsOptIn({
   useEffect(() => {
     if (typeof window === 'undefined' || !orderId || !email) return;
 
-    const deliveryCountry = toIsoCountryCode(country);
-    const deliveryDate =
-      estimatedDeliveryDate ||
-      new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    // Delay loading by 1.5s so Meta Pixel Purchase event & CAPI network requests
+    // finish with 100% priority before Google's script even starts loading.
+    const timer = setTimeout(() => {
+      try {
+        const deliveryCountry = toIsoCountryCode(country);
+        const deliveryDate =
+          estimatedDeliveryDate ||
+          new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    (window as any).renderOptIn = function () {
-      if ((window as any).gapi) {
-        (window as any).gapi.load('surveyoptin', function () {
-          (window as any).gapi.surveyoptin.render({
-            merchant_id: 5837483254,
-            order_id: String(orderId),
-            email: String(email).trim(),
-            delivery_country: deliveryCountry,
-            estimated_delivery_date: deliveryDate,
-          });
-        });
-      }
-    };
+        (window as any).renderOptIn = function () {
+          try {
+            if ((window as any).gapi) {
+              (window as any).gapi.load('surveyoptin', function () {
+                try {
+                  (window as any).gapi.surveyoptin.render({
+                    merchant_id: 5837483254,
+                    order_id: String(orderId),
+                    email: String(email).trim(),
+                    delivery_country: deliveryCountry,
+                    estimated_delivery_date: deliveryDate,
+                  });
+                } catch {}
+              });
+            }
+          } catch {}
+        };
 
-    // If gapi is already loaded, invoke immediately; otherwise inject platform.js
-    if ((window as any).gapi) {
-      (window as any).renderOptIn();
-      return;
-    }
+        if ((window as any).gapi) {
+          (window as any).renderOptIn();
+          return;
+        }
 
-    const existingScript = document.getElementById('google-customer-reviews-optin');
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.id = 'google-customer-reviews-optin';
-      script.src = 'https://apis.google.com/js/platform.js?onload=renderOptIn';
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    }
+        const existingScript = document.getElementById('google-customer-reviews-optin');
+        if (!existingScript) {
+          const script = document.createElement('script');
+          script.id = 'google-customer-reviews-optin';
+          script.src = 'https://apis.google.com/js/platform.js?onload=renderOptIn';
+          script.async = true;
+          script.defer = true;
+          document.body.appendChild(script);
+        }
+      } catch {}
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, [orderId, email, country, estimatedDeliveryDate]);
 
   return null;

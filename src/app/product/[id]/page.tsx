@@ -52,8 +52,6 @@ export async function generateMetadata(
           || (cleanRawDesc ? cleanRawDesc.substring(0, 155) : `Buy authentic handmade ${item.name} from Textile Jaipur. Authentic artisan craftsmanship with free worldwide shipping.`);
 
         const productUrl = `https://textilejaipur.com/product/${id}`;
-        const formattedPrice = Number(item.price || 0).toFixed(2);
-        const availability = (item.stock_quantity > 0 || item.stock > 0) ? 'in stock' : 'out of stock';
 
         return {
           title: metaTitle,
@@ -81,14 +79,6 @@ export async function generateMetadata(
             title: metaTitle,
             description: metaDescription,
             images: [primaryImage],
-          },
-          other: {
-            'product:price:amount': formattedPrice,
-            'product:price:currency': 'INR',
-            'og:price:amount': formattedPrice,
-            'og:price:currency': 'INR',
-            'product:availability': availability,
-            'product:condition': 'new',
           }
         };
       }
