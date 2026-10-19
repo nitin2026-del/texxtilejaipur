@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { trackMetaEvent, getMetaCookie } from '@/utils/metaTracking';
+import { GoogleCustomerReviewsOptIn } from '@/components/GoogleCustomerReviewsOptIn';
 
 // This page handles the PayPal return for BOTH guest and logged-in users.
 // PayPal redirects to: /payment/success?token=PAYPAL_ORDER_ID&PayerID=xxx&order_id=xxx
@@ -20,6 +21,7 @@ function PaymentCaptureHandler() {
   const [orderIdState, setOrderIdState] = useState<string | null>(null);
   const [orderNumberState, setOrderNumberState] = useState<string | null>(null);
   const [customerEmail, setCustomerEmail] = useState<string | null>(null);
+  const [customerCountry, setCustomerCountry] = useState<string | null>(null);
 
   useEffect(() => {
     if (hasCaptured.current) return;
@@ -73,6 +75,7 @@ function PaymentCaptureHandler() {
 
           if (data.order_number) setOrderNumberState(data.order_number);
           if (data.customer?.email) setCustomerEmail(data.customer.email);
+          if (data.customer?.country) setCustomerCountry(data.customer.country);
 
           const customerNameParts = (data.customer?.name || '').trim().split(/\s+/);
           const firstName = customerNameParts[0] || undefined;
@@ -123,6 +126,11 @@ function PaymentCaptureHandler() {
   if (status === 'success') {
     return (
       <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center justify-center gap-6 px-6 py-12 text-center">
+        <GoogleCustomerReviewsOptIn
+          orderId={orderNumberState || orderIdState || ''}
+          email={customerEmail || user?.email || ''}
+          country={customerCountry || 'US'}
+        />
         <CheckCircle className="h-20 w-20 text-brand-600 animate-fade-in" />
         <div>
           <h1 className="text-3xl font-serif text-zinc-900 mb-2">Thank you for your order!</h1>
