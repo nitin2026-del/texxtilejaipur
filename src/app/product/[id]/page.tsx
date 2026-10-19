@@ -23,7 +23,7 @@ export async function generateMetadata(
   }
 
   try {
-    const res = await fetch(`${url}/rest/v1/products?select=name,description,price,stock,stock_quantity,seo_title,seo_description,product_images(url,is_primary)&id=eq.${id}`, {
+    const res = await fetch(`${url}/rest/v1/products?select=name,description,seo_title,seo_description,product_images(url,is_primary)&id=eq.${id}`, {
       headers: {
         apikey: key,
         Authorization: `Bearer ${key}`
