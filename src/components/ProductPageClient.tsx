@@ -186,6 +186,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   // Modal states
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [isNavigatingBack, setIsNavigatingBack] = useState(false);
 
   const isInCart = product ? cart.some((item) => item.id === product.id) : false;
   const cartItem = product ? cart.find((item) => item.id === product.id) : undefined;
@@ -307,16 +308,30 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
             prefetch={true}
             scroll={false}
             onClick={() => {
+              setIsNavigatingBack(true);
               if (product?.id) {
                 try {
                   sessionStorage.setItem('textilejaipur_return_product_id', product.id);
                 } catch {}
               }
             }}
-            className="inline-flex items-center gap-2 text-[11px] md:text-xs text-zinc-500 hover:text-[#1a1464] active:opacity-70 transition-colors uppercase font-bold tracking-widest"
+            className={`inline-flex items-center gap-2 text-[11px] md:text-xs uppercase font-bold tracking-widest rounded-lg px-3 py-1.5 -ml-3 transition-all ${
+              isNavigatingBack
+                ? 'bg-zinc-900 text-white shadow-sm pointer-events-none'
+                : 'text-zinc-600 hover:text-[#1a1464] hover:bg-zinc-100 active:scale-95'
+            }`}
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Collection
+            {isNavigatingBack ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Loading Collection...
+              </>
+            ) : (
+              <>
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back to Collection
+              </>
+            )}
           </Link>
         </nav>
         {!product ? (
