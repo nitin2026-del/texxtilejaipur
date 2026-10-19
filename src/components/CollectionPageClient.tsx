@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
@@ -39,6 +39,8 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState<number>(24);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -84,6 +86,26 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
 
     return result;
   }, [products, selectedCategory, sortBy]);
+
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [selectedCategory, sortBy]);
+
+  useEffect(() => {
+    if (visibleCount >= filteredAndSortedProducts.length) return;
+    const node = loadMoreRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 24, filteredAndSortedProducts.length));
+        }
+      },
+      { rootMargin: '1200px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [visibleCount, filteredAndSortedProducts.length]);
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] selection:bg-brand-200 selection:text-brand-900">
@@ -277,11 +299,16 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
           <div className="flex-1 min-h-[100vh]">
 
             {filteredAndSortedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-x-6 gap-y-10">
-                {filteredAndSortedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} onCartOpen={() => setCartOpen(true)} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-x-6 gap-y-10">
+                  {filteredAndSortedProducts.slice(0, visibleCount).map((product) => (
+                    <ProductCard key={product.id} product={product} onCartOpen={() => setCartOpen(true)} />
+                  ))}
+                </div>
+                {visibleCount < filteredAndSortedProducts.length && (
+                  <div ref={loadMoreRef} className="h-4 w-full" aria-hidden="true" />
+                )}
+              </>
             ) : (
               <div className="bg-white border border-zinc-200 rounded-3xl p-12 text-center">
                 <p className="text-zinc-500 text-lg mb-4">No products found in this category.</p>

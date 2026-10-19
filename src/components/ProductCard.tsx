@@ -69,17 +69,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
     setTimeout(() => setShareToast(false), 2000);
   };
 
-  // Track recently viewed
-  useEffect(() => {
-    try {
-      const rv: string[] = JSON.parse(localStorage.getItem('textilejaipur_recently_viewed') || '[]');
-      const updated = [product.id, ...rv.filter((id) => id !== product.id)].slice(0, 10);
-      localStorage.setItem('textilejaipur_recently_viewed', JSON.stringify(updated));
-      const rvProducts: Record<string, Product> = JSON.parse(localStorage.getItem('textilejaipur_rv_products') || '{}');
-      rvProducts[product.id] = product;
-      localStorage.setItem('textilejaipur_rv_products', JSON.stringify(rvProducts));
-    } catch {}
-  }, [product]);
 
   // Stock badge logic
   const isLowStock = product.stock > 0 && product.stock <= 4;

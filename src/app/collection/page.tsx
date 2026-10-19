@@ -45,15 +45,22 @@ export default async function CollectionPage() {
 
   let products: any[] = [];
   let categories = ['All'];
+  let saleBanner = null;
+  let seoDescriptions: Record<string, string> = {};
 
   try {
-    const res = await fetch(`${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&order=display_rank.asc.nullslast`, {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`
-      },
-      next: { revalidate: 60 }
-    });
+    const fetchHeaders = { apikey: key, Authorization: `Bearer ${key}` };
+    const fetchOpts = { headers: fetchHeaders, next: { revalidate: 60 } };
+
+    const [res, catRes, bannerRes, seoRes] = await Promise.all([
+      fetch(
+        `${url}/rest/v1/products?select=id,name,price,stock,stock_quantity,is_featured,display_rank,created_at,details,categories(name),product_images(url,is_primary,display_order)&order=display_rank.asc.nullslast`,
+        fetchOpts
+      ),
+      fetch(`${url}/rest/v1/categories?select=name&order=name`, fetchOpts),
+      fetch(`${url}/rest/v1/site_settings?key=eq.SYS_BANNER_CONFIG&select=value`, fetchOpts),
+      fetch(`${url}/rest/v1/site_settings?key=eq.SYS_CATEGORY_DESCRIPTIONS&select=value`, fetchOpts),
+    ]);
 
     if (res.ok) {
       const data = await res.json();
@@ -68,16 +75,16 @@ export default async function CollectionPage() {
           id: item.id,
           sku: `HT-${item.id.slice(0, 8).toUpperCase()}`,
           name: item.name,
-          description: item.description || '',
+          description: '',
           price_inr: item.price || 0,
           category: item.categories?.name || 'Ethnic Wear',
-          images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
+          images: sortedImages.length > 0 ? sortedImages.slice(0, 2) : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
           stock: item.stock_quantity || item.stock || 0,
           details: {
-            material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
-            origin: 'Jaipur, Rajasthan',
-            care: 'Dry clean only',
-            ...(item.details || {})
+            material: item.details?.material || 'Handloom Fabric',
+            origin: item.details?.origin || 'Jaipur, Rajasthan',
+            care: item.details?.care || 'Dry clean only',
+            isBestseller: item.details?.isBestseller || false,
           },
           is_featured: item.is_featured || false,
           display_rank: item.display_rank || 999,
@@ -86,28 +93,12 @@ export default async function CollectionPage() {
       });
     }
 
-    const catRes = await fetch(`${url}/rest/v1/categories?select=name&order=name`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
-      next: { revalidate: 60 }
-    });
     if (catRes.ok) {
       const catData = await catRes.json();
       const fetchedCats = (catData as any[]).map(c => c.name);
       categories = ['All', ...sortCategoriesCustom(fetchedCats)];
     }
-  } catch (err) {
-    console.error('Failed to fetch products', err);
-  }
 
-  let saleBanner = null;
-  try {
-    const bannerRes = await fetch(
-      `${url}/rest/v1/site_settings?key=eq.SYS_BANNER_CONFIG&select=value`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        next: { revalidate: 60 }
-      }
-    );
     if (bannerRes.ok) {
       const bData = await bannerRes.json();
       if (bData && bData.length > 0) {
@@ -117,19 +108,7 @@ export default async function CollectionPage() {
         }
       }
     }
-  } catch (err) {
-    console.error('Failed to fetch banner config', err);
-  }
 
-  let seoDescriptions: Record<string, string> = {};
-  try {
-    const seoRes = await fetch(
-      `${url}/rest/v1/site_settings?key=eq.SYS_CATEGORY_DESCRIPTIONS&select=value`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        next: { revalidate: 60 }
-      }
-    );
     if (seoRes.ok) {
       const sData = await seoRes.json();
       if (sData && sData.length > 0 && sData[0].value) {
@@ -137,7 +116,7 @@ export default async function CollectionPage() {
       }
     }
   } catch (err) {
-    console.error('Failed to fetch SEO descriptions', err);
+    console.error('Failed to fetch collection data', err);
   }
   const jsonLdCollection = {
     '@context': 'https://schema.org',
