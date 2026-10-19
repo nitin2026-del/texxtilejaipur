@@ -111,8 +111,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Geolocation detection mock
     const detectCurrency = async () => {
       try {
-        const userLocale = navigator.language;
-        if (userLocale.includes('IN')) {
+        const userLocale = navigator.language || '';
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        if (userLocale.includes('IN') || timeZone === 'Asia/Kolkata' || timeZone === 'Asia/Calcutta') {
           setCurrencyState('INR');
         } else if (userLocale.includes('GB')) {
           setCurrencyState('GBP');
@@ -133,6 +134,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrencyState('USD');
       }
     };
+
+    // Check URL query param (?currency=INR, etc.) first
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCurrency = urlParams.get('currency')?.toUpperCase() as Currency;
+    if (urlCurrency && FX_RATES[urlCurrency]) {
+      setCurrencyState(urlCurrency);
+      return;
+    }
 
     // Check if user has a saved preference first
     const savedCurrency = localStorage.getItem('textilejaipur_currency') as Currency;

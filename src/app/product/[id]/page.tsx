@@ -23,7 +23,7 @@ export async function generateMetadata(
   }
 
   try {
-    const res = await fetch(`${url}/rest/v1/products?select=name,description,seo_title,seo_description,product_images(url,is_primary)&id=eq.${id}`, {
+    const res = await fetch(`${url}/rest/v1/products?select=name,description,price,stock,stock_quantity,seo_title,seo_description,product_images(url,is_primary)&id=eq.${id}`, {
       headers: {
         apikey: key,
         Authorization: `Bearer ${key}`
@@ -52,6 +52,8 @@ export async function generateMetadata(
           || (cleanRawDesc ? cleanRawDesc.substring(0, 155) : `Buy authentic handmade ${item.name} from Textile Jaipur. Authentic artisan craftsmanship with free worldwide shipping.`);
 
         const productUrl = `https://textilejaipur.com/product/${id}`;
+        const formattedPrice = Number(item.price || 0).toFixed(2);
+        const availability = (item.stock_quantity > 0 || item.stock > 0) ? 'in stock' : 'out of stock';
 
         return {
           title: metaTitle,
@@ -79,6 +81,14 @@ export async function generateMetadata(
             title: metaTitle,
             description: metaDescription,
             images: [primaryImage],
+          },
+          other: {
+            'product:price:amount': formattedPrice,
+            'product:price:currency': 'INR',
+            'og:price:amount': formattedPrice,
+            'og:price:currency': 'INR',
+            'product:availability': availability,
+            'product:condition': 'new',
           }
         };
       }
@@ -244,6 +254,8 @@ export default async function ProductPage({ params }: Props) {
     ? (initialReviews.reduce((sum, r) => sum + r.stars, 0) / initialReviews.length).toFixed(1)
     : null;
 
+  const formattedPrice = Number(product.price_inr || 0).toFixed(2);
+
   const jsonLdProduct: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -266,6 +278,7 @@ export default async function ProductPage({ params }: Props) {
       '@type': 'Offer',
       url: `https://textilejaipur.com/product/${product.id}`,
       priceCurrency: 'INR',
+      price: formattedPrice,
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       itemCondition: 'https://schema.org/NewCondition',
       availability: (product.stock_quantity > 0 || product.stock > 0)
@@ -277,7 +290,7 @@ export default async function ProductPage({ params }: Props) {
       },
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'US',
+        applicableCountry: ['IN', 'US', 'GB', 'CA', 'AU', 'AE', 'NZ'],
         returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
         merchantReturnDays: 30,
         returnMethod: 'https://schema.org/ReturnByMail',
@@ -287,8 +300,12 @@ export default async function ProductPage({ params }: Props) {
         '@type': 'OfferShippingDetails',
         shippingRate: {
           '@type': 'MonetaryAmount',
-          value: '0',
+          value: '0.00',
           currency: 'INR'
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: ['IN', 'US', 'GB', 'CA', 'AU', 'AE', 'NZ']
         },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',
