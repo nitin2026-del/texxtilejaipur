@@ -279,6 +279,7 @@ export default async function ProductPage({ params }: Props) {
       url: `https://textilejaipur.com/product/${product.id}`,
       priceCurrency: 'INR',
       price: formattedPrice,
+      validFrom: '2026-01-01',
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       itemCondition: 'https://schema.org/NewCondition',
       availability: (product.stock_quantity > 0 || product.stock > 0)
