@@ -148,14 +148,18 @@ export async function POST(req: Request) {
             client_user_agent: userAgent,
             fbp: fbp || undefined,
             fbc: fbc || undefined,
-            em: hashMeta(normEmail(userData?.email)) ? [hashMeta(normEmail(userData?.email))] : undefined,
-            ph: getPhoneHashes(userData?.phone, userData?.country),
-            fn: hashMeta(normStr(userData?.firstName)) ? [hashMeta(normStr(userData?.firstName))] : undefined,
-            ln: hashMeta(normStr(userData?.lastName)) ? [hashMeta(normStr(userData?.lastName))] : undefined,
-            ct: hashMeta(normStr(userData?.city)) ? [hashMeta(normStr(userData?.city))] : undefined,
-            st: hashMeta(normStr(userData?.state)) ? [hashMeta(normStr(userData?.state))] : undefined,
-            zp: hashMeta(normStr(userData?.zip)) ? [hashMeta(normStr(userData?.zip))] : undefined,
-            country: hashMeta(normCountry(userData?.country)) ? [hashMeta(normCountry(userData?.country))] : undefined
+            // Meta best practice: Never send PII (email, phone, name) on PageView events.
+            // Sending emails on repeated PageViews triggers the "duplicate client Emails" warning in Meta Diagnostics.
+            ...(eventName !== 'PageView' ? {
+              em: hashMeta(normEmail(userData?.email)) ? [hashMeta(normEmail(userData?.email))] : undefined,
+              ph: getPhoneHashes(userData?.phone, userData?.country),
+              fn: hashMeta(normStr(userData?.firstName)) ? [hashMeta(normStr(userData?.firstName))] : undefined,
+              ln: hashMeta(normStr(userData?.lastName)) ? [hashMeta(normStr(userData?.lastName))] : undefined,
+              ct: hashMeta(normStr(userData?.city)) ? [hashMeta(normStr(userData?.city))] : undefined,
+              st: hashMeta(normStr(userData?.state)) ? [hashMeta(normStr(userData?.state))] : undefined,
+              zp: hashMeta(normStr(userData?.zip)) ? [hashMeta(normStr(userData?.zip))] : undefined,
+              country: hashMeta(normCountry(userData?.country)) ? [hashMeta(normCountry(userData?.country))] : undefined
+            } : {})
           },
           custom_data: eventData ? {
             ...eventData,

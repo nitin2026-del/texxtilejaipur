@@ -129,7 +129,7 @@ const getFbcCreationMs = (fbc?: string): number | undefined => {
  * from that same customer's earlier checkout session — matched by email, phone, or account (never by IP alone,
  * because mobile carriers share IPs across many users).
  */
-async function recoverFbcFromPriorSessions(
+export async function recoverFbcFromPriorSessions(
   supabaseAdmin: SupabaseClient,
   currentOrderId: string,
   opts: { emails: string[]; phone?: string; userId?: string }

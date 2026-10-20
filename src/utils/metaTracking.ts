@@ -285,7 +285,9 @@ export const trackMetaEvent = async (
   skipBrowserPixel: boolean = false
 ) => {
   const id = eventId || uuidv4();
-  const mergedUserData = getStoredMetaUserData(userData);
+  // Do not attach persistent user PII (like email/phone) to generic PageView events.
+  // Sending stored emails across multiple PageViews triggers Meta's "duplicate client Emails" diagnostics warning.
+  const mergedUserData = eventName === 'PageView' ? undefined : getStoredMetaUserData(userData);
   
   // 1. Send via Browser Pixel (with Manual Advanced Matching when userData is available)
   if (!skipBrowserPixel && typeof window !== 'undefined' && (window as any).fbq) {
