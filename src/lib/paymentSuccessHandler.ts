@@ -113,6 +113,88 @@ const getPhoneHashes = (phone?: string, country?: string): string[] | undefined 
   return hashes.length > 0 ? hashes : undefined;
 };
 
+// Meta's default click attribution window is 7 days, so only recover click IDs created within that window.
+const FBC_LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000;
+
+const getFbcCreationMs = (fbc?: string): number | undefined => {
+  const parts = fbc?.split('.');
+  const ts = parts && parts.length >= 4 ? Number(parts[2]) : NaN;
+  return Number.isFinite(ts) ? ts : undefined;
+};
+
+/**
+ * Cross-browser / cross-device fbc bridge.
+ * When a buyer clicks a Meta ad in the Facebook/Instagram in-app browser (where fbc exists) and later
+ * completes the purchase in Chrome or on another device (where fbc does not exist), recover the ad click ID
+ * from that same customer's earlier checkout session — matched by email, phone, or account (never by IP alone,
+ * because mobile carriers share IPs across many users).
+ */
+async function recoverFbcFromPriorSessions(
+  supabaseAdmin: SupabaseClient,
+  currentOrderId: string,
+  opts: { emails: string[]; phone?: string; userId?: string }
+): Promise<string | undefined> {
+  try {
+    const sinceIso = new Date(Date.now() - FBC_LOOKBACK_MS).toISOString();
+    const orderIds = new Set<string>();
+
+    const emails = Array.from(new Set(
+      opts.emails.filter(Boolean).flatMap(e => [e.trim(), e.trim().toLowerCase()])
+    ));
+    if (emails.length > 0) {
+      const { data } = await supabaseAdmin
+        .from('orders').select('id').in('guest_email', emails).gte('created_at', sinceIso).limit(50);
+      data?.forEach((r: any) => orderIds.add(r.id));
+    }
+
+    if (opts.userId) {
+      const { data } = await supabaseAdmin
+        .from('orders').select('id').eq('user_id', opts.userId).gte('created_at', sinceIso).limit(50);
+      data?.forEach((r: any) => orderIds.add(r.id));
+    }
+
+    // Compare the last 9 digits so "+61 481 180 816", "0481180816" and "61481180816" all match
+    const phoneTail = (normPhone(opts.phone) || '').slice(-9);
+    if (phoneTail.length >= 8) {
+      const { data: addrs } = await supabaseAdmin
+        .from('shipping_addresses').select('id, phone').gte('created_at', sinceIso).limit(2000);
+      const addrIds = (addrs || [])
+        .filter((a: any) => (normPhone(a.phone) || '').slice(-9) === phoneTail)
+        .map((a: any) => a.id);
+      if (addrIds.length > 0) {
+        const { data } = await supabaseAdmin
+          .from('orders').select('id').in('shipping_address_id', addrIds).gte('created_at', sinceIso).limit(50);
+        data?.forEach((r: any) => orderIds.add(r.id));
+      }
+    }
+
+    orderIds.delete(currentOrderId);
+    if (orderIds.size === 0) return undefined;
+
+    const { data: priorPayments } = await supabaseAdmin
+      .from('payments')
+      .select('razorpay_order_id, created_at')
+      .in('order_id', Array.from(orderIds))
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    for (const p of priorPayments || []) {
+      try {
+        const meta = JSON.parse(p.razorpay_order_id || '{}');
+        const createdMs = getFbcCreationMs(meta?.fbc);
+        if (meta?.fbc && createdMs && Date.now() - createdMs <= FBC_LOOKBACK_MS) {
+          return meta.fbc as string;
+        }
+      } catch {
+        // not a JSON attribution record
+      }
+    }
+  } catch (err) {
+    console.error('[CAPI] fbc recovery lookup failed:', err);
+  }
+  return undefined;
+}
+
 export async function handlePaymentSuccess(
   orderId: string, 
   supabaseAdmin: SupabaseClient,
@@ -248,7 +330,17 @@ export async function handlePaymentSuccess(
     if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
       try {
         const resolvedFbp = metaData?.fbp || storedMeta?.fbp || undefined;
-        const resolvedFbc = metaData?.fbc || storedMeta?.fbc || undefined;
+        let resolvedFbc: string | undefined = metaData?.fbc || storedMeta?.fbc || undefined;
+        let fbcRecovered = false;
+        if (!resolvedFbc) {
+          resolvedFbc = await recoverFbcFromPriorSessions(supabaseAdmin, orderId, {
+            emails: [userEmail, metaData?.paypalEmail || storedMeta?.paypalEmail].filter(Boolean) as string[],
+            phone: userPhone,
+            userId: order?.user_id || undefined
+          });
+          fbcRecovered = !!resolvedFbc;
+          if (fbcRecovered) console.log(`[CAPI] Recovered fbc from earlier session for order ${orderId}`);
+        }
         const rawIp = metaData?.clientIp || storedMeta?.clientIp;
         const resolvedIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
         const resolvedUa = metaData?.userAgent || storedMeta?.userAgent || undefined;
@@ -308,6 +400,7 @@ export async function handlePaymentSuccess(
             ...storedMeta,
             fbp: resolvedFbp,
             fbc: resolvedFbc,
+            ...(fbcRecovered ? { fbc_recovered: true } : {}),
             clientIp: resolvedIp,
             userAgent: resolvedUa,
             meta_capi_sent: true,

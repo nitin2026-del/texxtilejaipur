@@ -45,6 +45,13 @@ export async function POST(req: NextRequest) {
           JSON.stringify(captureError).includes('ORDER_ALREADY_CAPTURED');
         if (isAlreadyCaptured) {
           captureStatus = 'COMPLETED'; // Already captured — order is paid
+          // Still fetch the PayPal payer email so Meta gets it for Advanced Matching
+          try {
+            const getRes = await client.execute(new paypal.orders.OrdersGetRequest(paypalOrderId));
+            paypalPayerEmail = getRes.result?.payer?.email_address || getRes.result?.payment_source?.paypal?.email_address || '';
+          } catch {
+            // non-critical
+          }
         } else {
           throw captureError; // Real error — re-throw
         }
