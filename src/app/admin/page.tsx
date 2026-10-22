@@ -11,6 +11,8 @@ import { AdminReviews } from './AdminReviews';
 import { AdminShippingConfig } from '@/components/AdminShippingConfig';
 import { AdminBannersConfig } from '@/components/AdminBannersConfig';
 import { AdminFreeGiftsConfig } from '@/components/AdminFreeGiftsConfig';
+import { AdminSeoStudio } from '@/components/AdminSeoStudio';
+import { AdminVideoLooksConfig } from '@/components/AdminVideoLooksConfig';
 import { 
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
@@ -23,11 +25,26 @@ interface Product {
   sku: string;
   name: string;
   description: string;
+  seo_title?: string;
+  seo_description?: string;
   price_inr: number;
   category: string;
   images: string[];
   stock: number;
-  details: { material?: string; origin?: string; care?: string; video_url?: string; translations?: any; culturalContext?: string; stylingAdvice?: string; isBestseller?: boolean; sibling_group?: string; ad_showcase?: any; };
+  details: { 
+    material?: string; 
+    origin?: string; 
+    care?: string; 
+    video_url?: string; 
+    translations?: any; 
+    culturalContext?: string; 
+    stylingAdvice?: string; 
+    isBestseller?: boolean; 
+    sibling_group?: string; 
+    ad_showcase?: any; 
+    seo_keywords?: string[];
+    image_analysis?: any;
+  };
   is_featured?: boolean;
   display_rank?: number;
   image_url?: string;
@@ -149,7 +166,7 @@ function AdminPortalContent() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners' | 'promotions' | 'free_gifts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners' | 'promotions' | 'free_gifts' | 'seo_studio' | 'video_looks'>('overview');
   
   // Promotions states
   const [promoActive, setPromoActive] = useState(false);
@@ -209,6 +226,9 @@ function AdminPortalContent() {
   const [formName, setFormName] = useState('');
   const [formSku, setFormSku] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [formSeoTitle, setFormSeoTitle] = useState('');
+  const [formSeoDescription, setFormSeoDescription] = useState('');
+  const [formSeoKeywords, setFormSeoKeywords] = useState('');
   const [formPriceInr, setFormPriceInr] = useState('');
   const [formCategory, setFormCategory] = useState('');
   const [formStock, setFormStock] = useState('50');
@@ -342,6 +362,7 @@ function AdminPortalContent() {
     }
     setIsAiGenerating(true);
     try {
+      const firstImage = formImageUrl ? formImageUrl.split(',')[0].trim() : null;
       const res = await fetch('/api/admin/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -350,16 +371,19 @@ function AdminPortalContent() {
           category: formCategory, 
           material: formMaterial, 
           origin: formOrigin,
-          imageUrl: formImageUrl || null
+          imageUrl: firstImage || null
         })
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.message || data.error);
       setFormDescription(data.description || '');
+      if (data.seoTitle) setFormSeoTitle(data.seoTitle);
+      if (data.seoDescription) setFormSeoDescription(data.seoDescription);
+      if (data.seoKeywords) setFormSeoKeywords(Array.isArray(data.seoKeywords) ? data.seoKeywords.join(', ') : data.seoKeywords);
       if (data.culturalContext) setFormCulturalContext(data.culturalContext);
       if (data.stylingAdvice) setFormStylingAdvice(data.stylingAdvice);
       if (data.translations) setFormTranslations(JSON.stringify(data.translations, null, 2));
-      showNotification('AI completely generated all descriptions, context, and translations! ✨');
+      showNotification('AI Vision Analysis & SEO Copywriting complete! ✨');
     } catch (err: any) {
       console.error(err);
       showNotification(err.message || 'Failed to generate description', true);
@@ -369,13 +393,13 @@ function AdminPortalContent() {
   };
 
   const handleBulkGenerateDescriptions = async () => {
-    const emptyProducts = products.filter(p => !p.description || p.description.length < 20 || !p.details?.translations);
+    const emptyProducts = products.filter(p => !p.description || p.description.length < 20 || !p.details?.translations || !p.seo_title);
     if (emptyProducts.length === 0) {
-      showNotification('All products already have AI descriptions and translations!', true);
+      showNotification('All products already have AI descriptions and SEO metadata!', true);
       return;
     }
     
-    if (!confirm(`Are you sure you want to AI-generate descriptions for ${emptyProducts.length} products? This may take a few minutes.`)) {
+    if (!confirm(`Are you sure you want to AI-generate descriptions and SEO for ${emptyProducts.length} products? This may take a few minutes.`)) {
       return;
     }
 
@@ -394,7 +418,7 @@ function AdminPortalContent() {
             category: p.category, 
             material: p.details?.material, 
             origin: p.details?.origin,
-            imageUrl: p.image_url || null
+            imageUrl: p.images?.[0] || p.image_url || null
           })
         });
         const data = await res.json();
@@ -404,13 +428,19 @@ function AdminPortalContent() {
             ...p.details,
             culturalContext: data.culturalContext || p.details?.culturalContext,
             stylingAdvice: data.stylingAdvice || p.details?.stylingAdvice,
-            translations: data.translations || p.details?.translations
+            translations: data.translations || p.details?.translations,
+            seo_keywords: data.seoKeywords || p.details?.seo_keywords,
+            image_analysis: data.imageAnalysis || p.details?.image_analysis
           };
           
-          await supabase.from('products').update({ 
+          const updatePayload: any = { 
             description: data.description,
             details: updatedDetails
-          }).eq('id', p.id);
+          };
+          if (data.seoTitle) updatePayload.seo_title = data.seoTitle;
+          if (data.seoDescription) updatePayload.seo_description = data.seoDescription;
+
+          await supabase.from('products').update(updatePayload).eq('id', p.id);
           successCount++;
         }
       } catch (err) {
@@ -845,6 +875,8 @@ function AdminPortalContent() {
             sku: item.slug ? `HT-${item.slug.toUpperCase()}` : `HT-${item.id.slice(0, 8).toUpperCase()}`,
             name: item.name,
             description: item.description || '',
+            seo_title: item.seo_title || '',
+            seo_description: item.seo_description || '',
             price_inr: item.price || 0,
             category: item.categories?.name || 'Uncategorized',
             images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
@@ -1302,6 +1334,8 @@ function AdminPortalContent() {
       const basePayload = {
         name: formName,
         description: formDescription,
+        seo_title: formSeoTitle || undefined,
+        seo_description: formSeoDescription || undefined,
         price: price,
         stock: stockInt,
         stock_quantity: stockInt,
@@ -1317,6 +1351,7 @@ function AdminPortalContent() {
           culturalContext: formCulturalContext,
           stylingAdvice: formStylingAdvice,
           translations: parsedTranslations,
+          seo_keywords: formSeoKeywords ? formSeoKeywords.split(',').map(s => s.trim()).filter(Boolean) : undefined,
           isBestseller: formIsBestseller,
           sibling_group: formSiblingGroup,
           ad_showcase: (formAdImages.length > 0 || formAdLinkedProducts.length > 0) ? {
@@ -1425,6 +1460,9 @@ function AdminPortalContent() {
     setFormName(prod.name || '');
     setFormSku(prod.sku || '');
     setFormDescription(prod.description || '');
+    setFormSeoTitle(prod.seo_title || '');
+    setFormSeoDescription(prod.seo_description || '');
+    setFormSeoKeywords(prod.details?.seo_keywords?.join(', ') || '');
     setFormPriceInr(prod.price_inr?.toString() || '');
     setFormCategory(prod.category || '');
     setFormStock(prod.stock?.toString() || '0');
@@ -1471,6 +1509,9 @@ function AdminPortalContent() {
     setFormName('');
     setFormSku('');
     setFormDescription('');
+    setFormSeoTitle('');
+    setFormSeoDescription('');
+    setFormSeoKeywords('');
     setFormPriceInr('');
     setFormCategory('');
     setFormStock('50');
@@ -1874,6 +1915,26 @@ function AdminPortalContent() {
               <Database className="h-3.5 w-3.5" /> Catalog List
             </button>
             <button
+              onClick={() => setActiveTab('video_looks')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
+                activeTab === 'video_looks'
+                  ? 'bg-rose-600 text-white'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Video className="h-3.5 w-3.5" /> Video Looks
+            </button>
+            <button
+              onClick={() => setActiveTab('seo_studio')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
+                activeTab === 'seo_studio'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
+                  : 'text-amber-700 hover:text-amber-800 bg-amber-50/60'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5" /> AI SEO Studio
+            </button>
+            <button
               onClick={() => { resetProductForm(); setActiveTab('form'); }}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'form'
@@ -1992,6 +2053,16 @@ function AdminPortalContent() {
               }`}
             >
               <Gift className="h-3.5 w-3.5" /> Free Rings
+            </button>
+            <button
+              onClick={() => setActiveTab('seo_studio')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
+                activeTab === 'seo_studio'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5" /> AI Vision &amp; SEO Studio
             </button>
           </div>
         </div>
@@ -2332,9 +2403,18 @@ function AdminPortalContent() {
                                 <Flame className="h-2.5 w-2.5" /> Bestseller
                               </span>
                             )}
+                            {prod.seo_title ? (
+                              <span className="ml-2 inline-flex items-center gap-0.5 bg-emerald-100 text-emerald-800 text-[9px] px-1.5 py-0.5 rounded font-bold" title={prod.seo_title}>
+                                <Sparkles className="h-2 w-2" /> SEO
+                              </span>
+                            ) : (
+                              <span className="ml-2 inline-flex items-center gap-0.5 bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded font-bold">
+                                No SEO
+                              </span>
+                            )}
                           </span>
                           <span className="text-[10px] text-zinc-500 line-clamp-1 max-w-[200px] mt-0.5">
-                            {prod.description}
+                            {prod.seo_title || prod.description}
                           </span>
                         </td>
                         <td className="p-4">
@@ -2472,6 +2552,84 @@ function AdminPortalContent() {
                   onChange={(e) => setFormDescription(e.target.value)}
                   className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2.5 px-3.5 text-xs text-zinc-900 placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none"
                 />
+              </div>
+
+              {/* ── SEO & META TAGS SECTION ── */}
+              <div className="rounded-2xl border border-zinc-200 bg-white/70 p-5 space-y-4">
+                <div className="flex items-center justify-between border-b border-zinc-200/80 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 bg-amber-100 text-amber-700 rounded-lg">
+                      <Sparkles className="h-4 w-4" />
+                    </span>
+                    <h4 className="text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                      Google Search & SEO Optimization
+                    </h4>
+                  </div>
+                  <span className="text-[10px] text-zinc-500 font-medium">Controls SERP appearance & ranking</span>
+                </div>
+
+                {/* Google SERP Preview Box */}
+                {(formSeoTitle || formName) && (
+                  <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1">
+                    <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest block">Live Search Snippet Preview</span>
+                    <p className="text-[11px] text-zinc-500 font-mono">https://textilejaipur.com › product › {formSku || 'sample-sku'}</p>
+                    <p className="text-sm font-semibold text-[#1a0dab] hover:underline cursor-pointer">
+                      {formSeoTitle || `${formName} | Handmade Jaipur Ethnic Wear | Textile Jaipur`}
+                    </p>
+                    <p className="text-xs text-[#4d5156] line-clamp-2">
+                      {formSeoDescription || (formDescription ? formDescription.substring(0, 155) : 'Buy authentic handmade Jaipur textiles with free worldwide shipping at Textile Jaipur.')}
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold text-zinc-600">SEO Meta Title</label>
+                      <span className={`text-[10px] font-bold ${
+                        formSeoTitle.length >= 50 && formSeoTitle.length <= 68 ? 'text-emerald-600' : formSeoTitle.length > 68 ? 'text-red-500' : 'text-zinc-400'
+                      }`}>
+                        {formSeoTitle.length}/60 chars {formSeoTitle.length >= 50 && formSeoTitle.length <= 68 ? '✓' : ''}
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="E.g., Handmade Velvet Suzani Jacket - Boho Floral Coat | Textile Jaipur"
+                      value={formSeoTitle}
+                      onChange={(e) => setFormSeoTitle(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-violet-500"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold text-zinc-600">SEO Meta Description</label>
+                      <span className={`text-[10px] font-bold ${
+                        formSeoDescription.length >= 145 && formSeoDescription.length <= 165 ? 'text-emerald-600' : formSeoDescription.length > 165 ? 'text-red-500' : 'text-zinc-400'
+                      }`}>
+                        {formSeoDescription.length}/160 chars {formSeoDescription.length >= 145 && formSeoDescription.length <= 165 ? '✓' : ''}
+                      </span>
+                    </div>
+                    <textarea
+                      rows={2}
+                      placeholder="E.g., Discover authentic handmade velvet Suzani jackets in royal indigo. Hand-embroidered in Jaipur. Free worldwide shipping at Textile Jaipur."
+                      value={formSeoDescription}
+                      onChange={(e) => setFormSeoDescription(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-violet-500 resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 mb-1.5">Focus Keywords (comma-separated)</label>
+                    <input
+                      type="text"
+                      placeholder="E.g., suzani jacket, boho embroidered coat, vintage jaipur velvet, handmade clothing"
+                      value={formSeoKeywords}
+                      onChange={(e) => setFormSeoKeywords(e.target.value)}
+                      className="w-full bg-zinc-100/50 border border-zinc-200 rounded-xl py-2 px-3.5 text-xs text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-violet-500 font-mono text-[11px]"
+                    />
+                  </div>
+                </div>
               </div>
 
               {(formCulturalContext || formStylingAdvice || formTranslations) && (
@@ -3899,6 +4057,23 @@ function AdminPortalContent() {
         {activeTab === 'free_gifts' && (
           <div className="space-y-6">
             <AdminFreeGiftsConfig />
+          </div>
+        )}
+
+        {/* TAB 15: VIDEO AD LOOKS */}
+        {activeTab === 'video_looks' && (
+          <div className="space-y-6">
+            <AdminVideoLooksConfig />
+          </div>
+        )}
+
+        {/* TAB 14: AI SEO & VISION STUDIO */}
+        {activeTab === 'seo_studio' && (
+          <div className="space-y-6">
+            <AdminSeoStudio onEditProduct={(pId) => {
+              const prod = products.find(p => p.id === pId);
+              if (prod) handleEditProductClick(prod);
+            }} />
           </div>
         )}
 

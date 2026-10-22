@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "seo:scan": "node scripts/run-seo-studio.mjs scan",
-    "seo:batch": "node scripts/run-seo-studio.mjs batch"
+    "seo:batch": "node scripts/run-seo-studio.mjs batch",
+    "seo:catalog": "node scripts/run-seo-studio.mjs catalog",
+    "seo:export": "node scripts/run-seo-studio.mjs export"
   },
   "dependencies": {
     "@babel/parser": "^8.0.0",

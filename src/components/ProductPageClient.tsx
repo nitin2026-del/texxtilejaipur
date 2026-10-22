@@ -17,6 +17,8 @@ const CartSidebar = dynamic(() => import('@/components/CartSidebar').then(mod =>
 const CheckoutModal = dynamic(() => import('@/components/CheckoutModal').then(mod => mod.CheckoutModal), { ssr: false });
 const HappyCustomersSlider = dynamic(() => import('@/components/HappyCustomersSlider').then(mod => mod.HappyCustomersSlider), { ssr: false, loading: () => <div className="h-40 w-full animate-pulse bg-zinc-100 rounded-xl"></div> });
 const FreeRingWidget = dynamic(() => import('@/components/FreeRingWidget').then(mod => mod.FreeRingWidget), { ssr: false });
+// Video-ad Look Switcher: separate chunk, only requested after page load + idle when ?look= is present.
+const VideoLookSwitcher = dynamic(() => import('@/components/VideoLookSwitcher'), { ssr: false });
 
 import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Award, RefreshCw, Palette, User, MessageCircleQuestion, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Sparkles, ArrowLeft, ArrowRight, Trash2, CreditCard, Info, Play, ShoppingCart, Video, Loader2, Flame, X } from 'lucide-react';
 
@@ -59,7 +61,18 @@ interface SiblingProduct {
   image: string;
 }
 
-export function ProductPageClient({ product, relatedProducts, initialReviews, ugcVideos = [], siblingProducts = [] }: { product: any, relatedProducts: any[], initialReviews: any[], ugcVideos?: any[], siblingProducts?: SiblingProduct[] }) {
+type ProductPageClientProps = { product: any, relatedProducts: any[], initialReviews: any[], ugcVideos?: any[], siblingProducts?: SiblingProduct[] };
+
+// Keyed by product id so per-product state (incl. the video Look Switcher's
+// active jacket) always resets cleanly on real page-to-page navigation.
+export function ProductPageClient(props: ProductPageClientProps) {
+  return <ProductPageClientInner key={props.product?.id} {...props} />;
+}
+
+function ProductPageClientInner({ product: initialProduct, relatedProducts, initialReviews, ugcVideos = [], siblingProducts = [] }: ProductPageClientProps) {
+    // `product` is the jacket currently shown. It equals the server-rendered
+    // product unless a visitor switches jackets via the video Look Switcher.
+    const [product, setProduct] = useState<any>(initialProduct);
     const { cart, addToCart, formatPrice, updateQuantity, comboOffer, currency } = useCart();
     const id = product?.id;
     const pathname = usePathname();
@@ -69,7 +82,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  const hasTrackedView = useRef<string | null>(null);
+  // Product ids that already fired ViewContent on this page (once per jacket).
+  const trackedViewIds = useRef<Set<string>>(new Set());
 
   const mediaItems = useMemo(() => {
     if (!product) return [];
@@ -237,8 +251,8 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
 
 
   useEffect(() => {
-    if (product && hasTrackedView.current !== product.id) {
-      hasTrackedView.current = product.id;
+    if (product && !trackedViewIds.current.has(product.id)) {
+      trackedViewIds.current.add(product.id);
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
       const activeCurrency = currency || 'USD';
       const productPrice = Number((parsedPriceInr * (FX_RATES[activeCurrency] || FX_RATES['USD'])).toFixed(2));
@@ -294,7 +308,63 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
       handleBuyNow();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [buyParam, product]);
+  }, [buyParam]); // only on arrival (not when a video look is switched)
+
+  // ── Video Ad Look Switcher ──────────────────────────────────────────────
+  // Active only when the ad URL carries ?look=<slug>. Nothing is downloaded or
+  // fetched until the page has fully loaded AND the browser is idle, so the
+  // landing page loads exactly as it does without the feature.
+  const lookParam = searchParams.get('look');
+  const [lookSwitcherReady, setLookSwitcherReady] = useState(false);
+  const [lookProductsById, setLookProductsById] = useState<Record<string, any>>({});
+  const lookSwitcherVisible = Object.keys(lookProductsById).length > 1;
+
+  useEffect(() => {
+    let idleHandle: number | undefined;
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      const w = window as any;
+      if (typeof w.requestIdleCallback === 'function') {
+        idleHandle = w.requestIdleCallback(() => setLookSwitcherReady(true), { timeout: 2500 });
+      } else {
+        timeoutHandle = setTimeout(() => setLookSwitcherReady(true), 300);
+      }
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+    return () => {
+      window.removeEventListener('load', schedule);
+      const w = window as any;
+      if (idleHandle !== undefined && typeof w.cancelIdleCallback === 'function') w.cancelIdleCallback(idleHandle);
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+    };
+  }, []);
+
+  const handleLooksLoaded = (products: any[]) => {
+    const map: Record<string, any> = {};
+    products.forEach((p) => { if (p?.id) map[p.id] = p; });
+    setLookProductsById(map);
+  };
+
+  const handleSelectLook = (next: any) => {
+    if (!next || next.id === product?.id) return;
+    setProduct(next);
+    setSelectedMediaIndex(0);
+    setQuantity(1);
+    setLanguage('en');
+    setLightboxOpen(false);
+    setIsZoomed(false);
+  };
+
+  // Links to a jacket that is part of the active look switch in place instead
+  // of leaving the page.
+  const handleLookLinkClick = (e: React.MouseEvent, productId: string) => {
+    const target = lookProductsById[productId];
+    if (!target) return;
+    e.preventDefault();
+    handleSelectLook(target);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <main className="min-h-screen text-zinc-900 pb-16">
@@ -345,7 +415,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   const isActive = idx === selectedMediaIndex;
                   return (
                     <div 
-                      key={idx} 
+                      key={`${product.id}-${idx}`} 
                       className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
                     >
                       {media.type === 'image' ? (
@@ -361,7 +431,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                             fetchPriority={idx === 0 ? "high" : "auto"}
                             className="absolute inset-0 w-full h-full object-cover"
                           />
-                          {isActive && (
+                          {isActive && !lookSwitcherVisible && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
                               Click for full quality
@@ -402,6 +472,18 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                   />
                 )}
                 
+                {/* Video Ad Look Switcher (absolutely positioned → zero layout shift) */}
+                {lookSwitcherReady && (
+                  <VideoLookSwitcher
+                    lookSlug={lookParam || ''}
+                    landingProduct={initialProduct}
+                    activeProductId={product.id}
+                    cartIds={cart.map((item) => item.id)}
+                    onSelect={handleSelectLook}
+                    onLooksLoaded={handleLooksLoaded}
+                  />
+                )}
+
                 {/* Brand Logo Overlay */}
                 <div className="absolute top-4 right-4 z-20 opacity-90 drop-shadow-md pointer-events-none">
                   <img src="/icon.png" alt="Textile Jaipur" className="h-10 w-10 rounded-lg object-cover border border-white/30 shadow-lg" />
@@ -639,6 +721,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                               <a
                                 key={lp.id}
                                 href={`/product/${lp.id}`}
+                                onClick={(e) => handleLookLinkClick(e, lp.id)}
                                 className="flex min-w-0 items-center gap-2 sm:gap-3 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 rounded-xl px-2 py-2 sm:px-3 sm:py-2.5 transition-all group"
                               >
                                 {lp.image && (
@@ -680,7 +763,7 @@ export function ProductPageClient({ product, relatedProducts, initialReviews, ug
                       
                       {/* Siblings */}
                       {siblingProducts.map(sib => (
-                        <a key={sib.id} href={`/product/${sib.id}`} title={sib.name} className="relative w-14 h-14 rounded border border-zinc-200 hover:border-[#1a1464] hover:shadow-md transition-all overflow-hidden block group">
+                        <a key={sib.id} href={`/product/${sib.id}`} onClick={(e) => handleLookLinkClick(e, sib.id)} title={sib.name} className="relative w-14 h-14 rounded border border-zinc-200 hover:border-[#1a1464] hover:shadow-md transition-all overflow-hidden block group">
                           <Image src={getOptimizedUrl(sib.image || "", 100)} alt={sib.name} fill sizes="100px" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
                         </a>
                       ))}
