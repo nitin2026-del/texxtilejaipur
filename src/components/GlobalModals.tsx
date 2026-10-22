@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { X, Sparkles, Mail, MoveRight } from 'lucide-react';
-import { SarcasticPopup } from '@/components/SarcasticPopup';
 import { trackMetaEvent } from '@/utils/metaTracking';
 
 export function GlobalModals() {
@@ -161,8 +160,6 @@ export function GlobalModals() {
           </div>
         </div>
       )}
-      
-      <SarcasticPopup />
     </>
   );
 }
