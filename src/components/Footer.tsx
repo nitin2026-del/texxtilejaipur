@@ -24,28 +24,28 @@ const FAQS = [
 ];
 
 /* ─── Custom SVG Icons ─── */
-const IconInstagram = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+const IconInstagram = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
     <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
   </svg>
 );
 
-const IconWhatsApp = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+const IconWhatsApp = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
   </svg>
 );
 
-const IconFacebook = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+const IconFacebook = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
   </svg>
 );
 
-const IconYouTube = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+const IconYouTube = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
   </svg>
 );
@@ -197,35 +197,35 @@ export const Footer: React.FC = () => {
                   href="https://instagram.com/textileofjaipur" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-zinc-400 hover:text-pink-400 hover:bg-pink-500/10 hover:border-pink-500/20 transition-all group"
-                  title="Instagram"
+                  className="p-2.5 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 hover:text-pink-300 hover:bg-pink-500/20 hover:border-pink-500/40 transition-all group"
+                  title="Instagram @textileofjaipur"
                 >
-                  <IconInstagram />
+                  <IconInstagram className="h-4 w-4 text-pink-400" />
                 </a>
                 <a 
                   href="https://www.youtube.com/@TextileJaipur" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-zinc-400 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/20 transition-all group"
+                  className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 hover:text-red-400 hover:bg-red-500/20 hover:border-red-500/40 transition-all group"
                   title="YouTube @TextileJaipur"
                 >
-                  <IconYouTube />
+                  <IconYouTube className="h-4 w-4 text-red-500" />
                 </a>
                 <a 
                   href="https://wa.me/919461858955" 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-zinc-400 hover:text-green-400 hover:bg-green-500/10 hover:border-green-500/20 transition-all"
+                  className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all"
                   title="WhatsApp"
                 >
-                  <IconWhatsApp />
+                  <IconWhatsApp className="h-4 w-4 text-emerald-400" />
                 </a>
                 <a 
                   href="mailto:textileofrajasthan.info@gmail.com" 
-                  className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-zinc-400 hover:text-brand-400 hover:bg-brand-500/10 hover:border-brand-500/20 transition-all"
+                  className="p-2.5 rounded-xl bg-brand-500/10 border border-brand-500/20 text-brand-400 hover:text-brand-300 hover:bg-brand-500/20 hover:border-brand-500/40 transition-all"
                   title="Email"
                 >
-                  <Mail className="h-5 w-5" />
+                  <Mail className="h-4 w-4 text-brand-400" />
                 </a>
               </div>
 
@@ -304,18 +304,18 @@ export const Footer: React.FC = () => {
                 </li>
                 <li>
                   <a href="https://instagram.com/textileofjaipur" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group">
-                    <div className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.06] group-hover:border-pink-500/20 group-hover:bg-pink-500/10 transition-all shrink-0">
-                      <IconInstagram />
+                    <div className="p-2 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 group-hover:border-pink-500/40 group-hover:bg-pink-500/20 group-hover:text-pink-300 transition-all shrink-0">
+                      <IconInstagram className="h-4 w-4 text-pink-400" />
                     </div>
-                    <span className="text-[13px] text-zinc-400 group-hover:text-pink-300 font-medium transition-colors">@textileofjaipur</span>
+                    <span className="text-[13px] text-zinc-300 group-hover:text-pink-300 font-medium transition-colors">@textileofjaipur</span>
                   </a>
                 </li>
                 <li>
                   <a href="https://www.youtube.com/@TextileJaipur" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group">
-                    <div className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.06] group-hover:border-red-500/20 group-hover:bg-red-500/10 transition-all shrink-0">
-                      <IconYouTube />
+                    <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 group-hover:border-red-500/40 group-hover:bg-red-500/20 group-hover:text-red-400 transition-all shrink-0">
+                      <IconYouTube className="h-4 w-4 text-red-500" />
                     </div>
-                    <span className="text-[13px] text-zinc-400 group-hover:text-red-400 font-medium transition-colors">@TextileJaipur</span>
+                    <span className="text-[13px] text-zinc-300 group-hover:text-red-400 font-medium transition-colors">@TextileJaipur</span>
                   </a>
                 </li>
               </ul>
