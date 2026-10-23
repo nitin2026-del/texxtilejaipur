@@ -125,7 +125,8 @@ const organizationSchema = {
   sameAs: [
     'https://instagram.com/textileofjaipur',
     'https://www.facebook.com/textileofjaipur',
-    'https://www.youtube.com/@TextileJaipur'
+    'https://www.youtube.com/@TextileJaipur',
+    'https://www.pinterest.com/priyanshug863/'
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
