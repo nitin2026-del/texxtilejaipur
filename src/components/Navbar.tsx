@@ -78,6 +78,12 @@ const IconInstagram = () => (
   </svg>
 );
 
+const IconYouTube = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+  </svg>
+);
+
 const IconHome = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
@@ -440,6 +446,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                 <div>
                   <div className="text-sm text-zinc-500">Instagram</div>
                   <div className="text-zinc-900 font-semibold">@textileofjaipur</div>
+                </div>
+              </a>
+              <a href="https://www.youtube.com/@TextileJaipur" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 hover:bg-zinc-100 transition-colors border border-zinc-200">
+                <div className="p-2 rounded-full bg-white text-red-600 shadow-sm border border-zinc-100">
+                  <IconYouTube />
+                </div>
+                <div>
+                  <div className="text-sm text-zinc-500">YouTube</div>
+                  <div className="text-zinc-900 font-semibold">@TextileJaipur</div>
                 </div>
               </a>
             </div>
