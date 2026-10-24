@@ -14,8 +14,9 @@ export default function TrackOrderPage() {
   const [error, setError] = useState('');
   const [trackingDetails, setTrackingDetails] = useState<any>(null);
 
-  const handleTrack = async (e: React.FormEvent) => {
+  const handleTrack = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!trackingNumber.trim()) return;
 
     setLoading(true);
@@ -88,6 +89,7 @@ export default function TrackOrderPage() {
             <div className="flex items-end">
               <button
                 type="submit"
+                onClick={handleTrack}
                 disabled={loading}
                 className="w-full md:w-auto h-[58px] px-8 bg-gold hover:bg-yellow-500 text-zinc-950 font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
               >

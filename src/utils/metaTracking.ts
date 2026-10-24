@@ -284,6 +284,9 @@ export const trackMetaEvent = async (
   userData?: MetaUserData,
   skipBrowserPixel: boolean = false
 ) => {
+  if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/track') && eventName !== 'PageView') {
+    return;
+  }
   const id = eventId || uuidv4();
   // Do not attach persistent user PII (like email/phone) to generic PageView events.
   // Sending stored emails across multiple PageViews triggers Meta's "duplicate client Emails" diagnostics warning.
@@ -309,6 +312,7 @@ export const trackMetaEvent = async (
         if (zp) advancedMatching.zp = zp;
         const countryIso = normAdvCountry(mergedUserData.country);
         if (countryIso) advancedMatching.country = countryIso;
+        (window as any).fbq('set', 'autoConfig', false, PIXEL_ID);
         (window as any).fbq('init', PIXEL_ID, advancedMatching);
       }
     } catch (e) {}

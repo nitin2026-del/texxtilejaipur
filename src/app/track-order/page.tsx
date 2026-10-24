@@ -91,8 +91,11 @@ function TrackOrderContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSearch = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSearch = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!orderInput.trim() || !emailInput.trim()) {
       setError('Please enter both your email and order number.');
       return;
@@ -168,6 +171,7 @@ function TrackOrderContent() {
             </div>
             <button
               type="submit"
+              onClick={handleSearch}
               disabled={loading}
               className="w-full py-3 rounded-lg font-bold text-sm text-zinc-950 flex items-center justify-center gap-2 transition-all font-sans"
               style={{ background: loading ? '#e5c34a' : '#d4af37' }}
