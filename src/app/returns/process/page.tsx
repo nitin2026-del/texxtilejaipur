@@ -53,8 +53,9 @@ function ReturnProcessContent() {
     setSelectedItems(prev => ({ ...prev, [itemId]: !prev[itemId] }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const selectedItemIds = Object.keys(selectedItems).filter(id => selectedItems[id]);
 
     if (selectedItemIds.length === 0) {
@@ -224,6 +225,7 @@ function ReturnProcessContent() {
 
               <button 
                 type="submit"
+                onClick={handleSubmit}
                 disabled={submitting}
                 className="w-full bg-brand-700 hover:bg-brand-800 text-white font-bold py-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 disabled:opacity-70 mt-8"
               >

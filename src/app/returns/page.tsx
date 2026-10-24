@@ -19,8 +19,9 @@ export default function ReturnsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!orderId || !email) return;
 
     setLoading(true);
@@ -106,6 +107,7 @@ export default function ReturnsPage() {
                   </div>
                   <button 
                     type="submit"
+                    onClick={handleSubmit}
                     disabled={loading}
                     className="w-full mt-4 bg-brand-700 hover:bg-brand-800 text-white font-bold py-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 disabled:opacity-70"
                   >

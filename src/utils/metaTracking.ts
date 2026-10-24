@@ -284,8 +284,10 @@ export const trackMetaEvent = async (
   userData?: MetaUserData,
   skipBrowserPixel: boolean = false
 ) => {
-  if (typeof window !== 'undefined' && (window.location?.pathname?.startsWith('/admin') || (window.location?.pathname?.startsWith('/track') && eventName !== 'PageView'))) {
-    return;
+  if (typeof window !== 'undefined') {
+    const p = window.location?.pathname || '';
+    if (p.startsWith('/admin')) return;
+    if ((p.startsWith('/track') || p.startsWith('/returns/process') || p.startsWith('/dashboard')) && eventName !== 'PageView') return;
   }
   const id = eventId || uuidv4();
   // Do not attach persistent user PII (like email/phone) to generic PageView events.
