@@ -255,7 +255,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             )}
 
             <Link
-              href={`/product/${product.id}?buy=true`}
+              href={`/product/${product.id}`}
+              onClick={() => { try { sessionStorage.setItem('tj_buy_now', product.id); } catch {} }}
               className={`flex-1 px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center border border-brand-700 ${
                 product.stock === 0
                   ? 'bg-brand-50 text-brand-300 border-brand-200 cursor-not-allowed pointer-events-none'

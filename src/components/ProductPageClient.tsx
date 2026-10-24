@@ -293,7 +293,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
           images: product.images,
           sku: product.sku,
           category: product.category
-        }, quantity);
+        }, quantity === 0 ? 1 : quantity);
       }
       setCartOpen(false);
       setCheckoutOpen(true);
@@ -304,7 +304,8 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
   const buyParam = searchParams.get('buy');
   
   useEffect(() => {
-    if (buyParam === 'true' && product) {
+    if (product && typeof window !== 'undefined' && sessionStorage.getItem('tj_buy_now') === product.id) {
+      sessionStorage.removeItem('tj_buy_now');
       handleBuyNow();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

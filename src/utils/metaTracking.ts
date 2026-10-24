@@ -285,6 +285,10 @@ export const trackMetaEvent = async (
   skipBrowserPixel: boolean = false
 ) => {
   if (typeof window !== 'undefined') {
+    const ua = navigator?.userAgent || '';
+    if (navigator?.webdriver || /googlebot|bingbot|yandexbot|baiduspider|duckduckbot|slurp|applebot|facebookexternalhit|meta-externalagent|facebot|twitterbot|linkedinbot|pinterestbot|ahrefsbot|semrushbot|mj12bot|dotbot|petalbot|bytespider|gptbot|claudebot|perplexitybot|headlesschrome|phantomjs|lighthouse|pagespeed|gtmetrix|pingdom|uptimerobot|statuscake/i.test(ua)) {
+      return;
+    }
     const p = window.location?.pathname || '';
     if (p.startsWith('/admin')) return;
     if ((p.startsWith('/track') || p.startsWith('/returns/process') || p.startsWith('/dashboard')) && eventName !== 'PageView') return;

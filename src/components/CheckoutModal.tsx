@@ -104,6 +104,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         contents: cart.map(item => ({ id: item.id, quantity: item.quantity })),
         content_type: 'product',
         num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
+      }, undefined, false, {
+        email: profile?.email || user?.email,
+        phone: profile?.phone || undefined,
+        firstName: (profile?.full_name || '').trim().split(/\s+/)[0] || undefined,
+        lastName: (profile?.full_name || '').trim().split(/\s+/).slice(1).join(' ') || undefined
       });
     } else if (!isOpen) {
       // Reset so it tracks again if they reopen the modal

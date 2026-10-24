@@ -116,6 +116,21 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { eventName, eventData, eventId, url, userAgent, fbp, fbc, userData, testEventCode } = body;
+    const uaToCheck = String(userAgent || req.headers.get('user-agent') || '');
+    if (/googlebot|bingbot|yandexbot|baiduspider|duckduckbot|slurp|applebot|facebookexternalhit|meta-externalagent|facebot|twitterbot|linkedinbot|pinterestbot|ahrefsbot|semrushbot|mj12bot|dotbot|petalbot|bytespider|gptbot|claudebot|perplexitybot|headlesschrome|phantomjs|lighthouse|pagespeed|gtmetrix|pingdom|uptimerobot|statuscake/i.test(uaToCheck)) {
+      return NextResponse.json({ success: true, skipped: 'bot' }, { status: 200 });
+    }
+    if (typeof url === 'string') {
+      try {
+        const parsedPath = new URL(url).pathname;
+        if (parsedPath.startsWith('/admin')) {
+          return NextResponse.json({ success: true, skipped: 'admin' }, { status: 200 });
+        }
+        if ((parsedPath.startsWith('/track') || parsedPath.startsWith('/returns/process') || parsedPath.startsWith('/dashboard')) && eventName !== 'PageView') {
+          return NextResponse.json({ success: true, skipped: 'non-conversion-page' }, { status: 200 });
+        }
+      } catch {}
+    }
     const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
     const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
 
