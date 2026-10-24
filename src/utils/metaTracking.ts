@@ -292,6 +292,8 @@ export const trackMetaEvent = async (
     const p = window.location?.pathname || '';
     if (p.startsWith('/admin')) return;
     if ((p.startsWith('/track') || p.startsWith('/returns/process') || p.startsWith('/dashboard')) && eventName !== 'PageView') return;
+    if (eventName === 'ViewContent' && !p.startsWith('/product/')) return;
+    if ((eventName === 'ViewContent' || eventName === 'AddToCart' || eventName === 'InitiateCheckout' || eventName === 'AddPaymentInfo') && (!Array.isArray(eventData?.content_ids) || eventData.content_ids.length === 0)) return;
   }
   const id = eventId || uuidv4();
   // Do not attach persistent user PII (like email/phone) to generic PageView events.
@@ -323,7 +325,8 @@ export const trackMetaEvent = async (
       }
     } catch (e) {}
     console.log('[Meta Pixel] Firing ' + eventName, eventData);
-    (window as any).fbq('track', eventName, eventData, { eventID: id });
+    try { (window as any).__ALLOW_META_TRACK = true; (window as any).fbq('track', eventName, eventData, { eventID: id }); } finally { (window as any).__ALLOW_META_TRACK = false; }
+    try { if (eventName !== 'PageView' && typeof (window as any).clarity === 'function') { (window as any).clarity('event', 'Meta_' + eventName); (window as any).clarity('set', 'meta_event', eventName); } } catch (e) {}
   } else if (!skipBrowserPixel && typeof window !== 'undefined') {
     console.warn('[Meta Pixel] fbq not found for ' + eventName);
   }

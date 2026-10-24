@@ -129,7 +129,13 @@ export async function POST(req: Request) {
         if ((parsedPath.startsWith('/track') || parsedPath.startsWith('/returns/process') || parsedPath.startsWith('/dashboard')) && eventName !== 'PageView') {
           return NextResponse.json({ success: true, skipped: 'non-conversion-page' }, { status: 200 });
         }
+        if (eventName === 'ViewContent' && !parsedPath.startsWith('/product/')) {
+          return NextResponse.json({ success: true, skipped: 'invalid-viewcontent-path' }, { status: 200 });
+        }
       } catch {}
+    }
+    if ((eventName === 'ViewContent' || eventName === 'AddToCart' || eventName === 'InitiateCheckout' || eventName === 'AddPaymentInfo') && (!Array.isArray(eventData?.content_ids) || eventData.content_ids.length === 0)) {
+      return NextResponse.json({ success: true, skipped: 'missing-content-ids' }, { status: 200 });
     }
     const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
     const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
