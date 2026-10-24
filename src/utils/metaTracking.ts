@@ -284,7 +284,7 @@ export const trackMetaEvent = async (
   userData?: MetaUserData,
   skipBrowserPixel: boolean = false
 ) => {
-  if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/track') && eventName !== 'PageView') {
+  if (typeof window !== 'undefined' && (window.location?.pathname?.startsWith('/admin') || (window.location?.pathname?.startsWith('/track') && eventName !== 'PageView'))) {
     return;
   }
   const id = eventId || uuidv4();

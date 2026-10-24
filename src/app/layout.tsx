@@ -260,7 +260,7 @@ export default function RootLayout({
                 } catch (e) {}
               })();
               !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){if(window.location&&window.location.pathname&&window.location.pathname.indexOf('/track')===0){var cmd=arguments[0],ev=(cmd==='trackSingle'||cmd==='trackSingleCustom')?arguments[2]:arguments[1];if((cmd==='track'||cmd==='trackSingle'||cmd==='trackCustom'||cmd==='trackSingleCustom')&&ev&&ev!=='PageView')return;}n.callMethod?
+              {if(f.fbq)return;n=f.fbq=function(){if(window.location&&window.location.pathname){var p=window.location.pathname;if(p.indexOf('/admin')===0&&arguments[0]!=='set'&&arguments[0]!=='init')return;if(p.indexOf('/track')===0){var cmd=arguments[0],ev=(cmd==='trackSingle'||cmd==='trackSingleCustom')?arguments[2]:arguments[1];if((cmd==='track'||cmd==='trackSingle'||cmd==='trackCustom'||cmd==='trackSingleCustom')&&ev&&ev!=='PageView')return;}}n.callMethod?
               n.callMethod.apply(n,arguments):n.queue.push(arguments)};
               if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
               n.queue=[];t=b.createElement(e);t.async=!0;
