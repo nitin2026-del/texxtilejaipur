@@ -35,7 +35,7 @@ export const saveMetaUserData = (data?: MetaUserData) => {
     const existingRaw = localStorage.getItem('meta_user_data');
     const existing: MetaUserData = existingRaw ? JSON.parse(existingRaw) : {};
     const merged: MetaUserData = {
-      email: data.email?.trim().toLowerCase() || existing.email,
+      email: (data.email && !/@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(data.email.trim()) ? data.email.trim().toLowerCase() : undefined) || existing.email,
       phone: data.phone?.replace(/\D/g, '') || existing.phone,
       firstName: data.firstName?.trim().toLowerCase() || existing.firstName,
       lastName: data.lastName?.trim().toLowerCase() || existing.lastName,

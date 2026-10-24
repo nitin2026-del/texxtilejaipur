@@ -70,6 +70,7 @@ export const Footer: React.FC = () => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    if (/@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(cleanEmail)) { setSubStatus('error'); setSubMessage('Please enter a valid email address'); return; }
     setSubStatus('loading');
     trackMetaEvent('Lead', { content_name: 'Footer VIP Newsletter' }, undefined, false, { email: cleanEmail });
 

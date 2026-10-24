@@ -40,6 +40,7 @@ export function GlobalModals() {
     if (!email) return;
     
     const cleanEmail = email.trim().toLowerCase();
+    if (/@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(cleanEmail)) return;
     trackMetaEvent('Lead', { content_name: 'VIP 10% Popup' }, undefined, false, { email: cleanEmail });
 
     try {
