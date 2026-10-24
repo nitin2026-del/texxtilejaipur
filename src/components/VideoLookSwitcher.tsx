@@ -70,11 +70,15 @@ export default function VideoLookSwitcher({ lookSlug, landingProduct, activeProd
         const campaigns: VideoLookCampaign[] = data?.value?.campaigns || [];
         // 1. Try matching by slug if provided in URL (?look=video1)
         let campaign = slug ? campaigns.find((c) => c && c.active && sanitizeLookSlug(c.slug) === slug) : undefined;
-        // 2. Option B: Auto-detect active look for this product even without ?look= in URL
+        // 2. Auto-detect active look ONLY on the designated landing product page
         if (!campaign) {
-          campaign = campaigns.find((c) => c && c.active && (c.landing_product_id === landingProduct.id || (c.product_ids && c.product_ids.includes(landingProduct.id))));
+          campaign = campaigns.find((c) => c && c.active && c.landing_product_id === landingProduct.id);
         }
         if (!campaign) return;
+
+        // Strict isolation: only show the switcher on the ad's designated landing page
+        // (Prevents the video look carousel from appearing when browsing other jackets directly or organically)
+        if (campaign.landing_product_id && landingProduct.id !== campaign.landing_product_id) return;
 
         const ids = Array.from(new Set((campaign.product_ids || []).filter(Boolean)));
         // Only activate on pages that are part of this look.
