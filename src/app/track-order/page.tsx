@@ -151,7 +151,7 @@ function TrackOrderContent() {
               <input
                 type="email"
                 required
-                placeholder="name@domain.com"
+                placeholder="Enter your email address"
                 value={emailInput}
                 onChange={e => setEmailInput(e.target.value)}
                 className="w-full border border-zinc-300 rounded-lg py-3 px-4 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-amber-400 transition-colors font-sans"
