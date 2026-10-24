@@ -9,6 +9,9 @@ export async function POST(request: Request) {
     if (!email) {
       return NextResponse.json({ success: false, error: 'Email is required' }, { status: 400 });
     }
+    if (/@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(String(email).trim())) {
+      return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
+    }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';

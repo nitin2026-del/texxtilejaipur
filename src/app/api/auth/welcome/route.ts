@@ -9,6 +9,9 @@ export async function POST(req: NextRequest) {
     if (!email || !process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
       return NextResponse.json({ success: false, message: 'Missing email or SMTP config' }, { status: 400 });
     }
+    if (/@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(String(email).trim())) {
+      return NextResponse.json({ success: true, skipped: 'placeholder-email' }, { status: 200 });
+    }
 
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,

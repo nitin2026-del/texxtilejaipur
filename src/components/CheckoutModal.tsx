@@ -140,6 +140,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
     try {
       const finalUserId = user?.id;
+      if (!user && /@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(email.trim())) { setError('Please enter a valid email address.'); setLoading(false); return; }
 
       // Guest checkout — no account creation, just use email for order confirmation
 
