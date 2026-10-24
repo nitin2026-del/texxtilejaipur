@@ -140,7 +140,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
 
     try {
       const finalUserId = user?.id;
-      if (!user && /@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(email.trim())) { setError('Please enter a valid email address.'); setLoading(false); return; }
+      const cleanEmail = email.trim();
+      if (!user && (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(cleanEmail) || /@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(cleanEmail))) { setError('Please enter a valid email address.'); setLoading(false); return; }
 
       // Guest checkout — no account creation, just use email for order confirmation
 
@@ -167,7 +168,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         },
         body: JSON.stringify({
           user_id: finalUserId,
-          guest_email: email,
+          guest_email: cleanEmail,
           items: checkoutItems,
           coupon_code: appliedCoupon?.code,
           total_inr: orderTotalInr,
@@ -196,7 +197,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       // 2. Initialize Payment Intent via API (Removed Stripe logic)
 
         // Track AddPaymentInfo with full user data for EMQ
-        const targetEmail = user?.email || email;
+        const targetEmail = (user?.email || cleanEmail).trim();
         const targetName = (user?.user_metadata?.full_name || fullName || name || '').trim();
         const targetNameParts = targetName.split(/\s+/);
         const activeCurrency = currency || 'USD';
