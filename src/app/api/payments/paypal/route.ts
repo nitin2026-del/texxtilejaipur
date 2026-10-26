@@ -165,7 +165,9 @@ export async function POST(req: NextRequest) {
         CAD: 0.016500,
       };
 
-      const targetCurrency = currency.toUpperCase();
+      const PAYPAL_SUPPORTED = ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD'];
+      const rawCurr = currency.toUpperCase();
+      const targetCurrency = PAYPAL_SUPPORTED.includes(rawCurr) ? rawCurr : 'USD';
       const rate = FX_RATES[targetCurrency] || FX_RATES['USD'];
       
       const secureAmountInTargetCurrency = Number((secureTotalInr * rate + 1e-9).toFixed(2));
