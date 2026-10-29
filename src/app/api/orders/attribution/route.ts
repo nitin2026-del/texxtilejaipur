@@ -42,11 +42,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if we already have an attribution record for this order
+    // Note: status='pending' + gateway='attribution' is used because the payments table
+    // has a CHECK constraint limiting status to known values (pending/completed/failed/etc.)
     const { data: existing } = await supabaseAdmin
       .from('payments')
       .select('id, razorpay_order_id')
       .eq('order_id', orderId)
-      .eq('status', 'attribution')
+      .eq('gateway', 'attribution')
       .maybeSingle();
 
     if (existing) {
@@ -64,18 +66,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, updated: true });
     }
 
-    // Insert a new attribution-only record (status = 'attribution' — not a real payment)
+    // Insert a new attribution-only record
+    // status='pending' because the DB has a CHECK constraint on status values
+    // gateway='attribution' is how we distinguish this from a real PayPal payment attempt
     const { error: insertErr } = await supabaseAdmin
       .from('payments')
       .insert({
         order_id: orderId,
         gateway: 'attribution',
-        provider: 'meta',
+        provider: 'paypal',
         provider_transaction_id: `attr_${orderId}`,
         amount: 0,
         currency: 'USD',
-        status: 'attribution',  // special status — not a real payment attempt
-        razorpay_order_id: attrJson  // stores fbc/fbp JSON (reusing this TEXT column)
+        status: 'pending',          // must be 'pending' due to DB CHECK constraint
+        razorpay_order_id: attrJson // stores fbc/fbp JSON (reusing this TEXT column)
       });
 
     if (insertErr) {

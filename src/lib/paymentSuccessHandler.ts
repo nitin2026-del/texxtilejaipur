@@ -317,12 +317,13 @@ export async function handlePaymentSuccess(
     // we never lose that ad-click attribution across delayed purchases.
     const { data: allOrderPayments } = await supabaseAdmin
       .from('payments')
-      .select('id, razorpay_order_id, status')
+      .select('id, razorpay_order_id, status, gateway')
       .eq('order_id', orderId)
       .order('created_at', { ascending: false });
 
     // Most recent REAL payment record (not the attribution placeholder) — used for updating status / CAPI-sent flag
-    const existingPayment = (allOrderPayments || []).find(p => p.status !== 'attribution') || allOrderPayments?.[0];
+    // We identify attribution rows by gateway='attribution' (status='pending' is used due to DB CHECK constraint)
+    const existingPayment = (allOrderPayments || []).find(p => p.gateway !== 'attribution') || allOrderPayments?.[0];
     let storedMeta: any = {};
     if (existingPayment?.razorpay_order_id) {
       try {
