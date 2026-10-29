@@ -309,14 +309,20 @@ export async function handlePaymentSuccess(
 
     // Check if CAPI was already sent for this order and recover stored browser attribution if called via webhook.
     // Note: payments table uses razorpay_order_id (TEXT column) to store the JSON attribution object.
-    const { data: existingPayments } = await supabaseAdmin
+    //
+    // IMPORTANT: Fetch ALL payment attempts for this order (no limit) ordered newest-first.
+    // When a customer initiates checkout today but pays 1-2 days later (very common on mobile/iOS),
+    // their browser _fbc cookie gets wiped by iOS ITP between sessions. The _fbc was captured in
+    // their FIRST payment attempt (when they originally clicked PayPal). We scan ALL attempts so
+    // we never lose that ad-click attribution across delayed purchases.
+    const { data: allOrderPayments } = await supabaseAdmin
       .from('payments')
       .select('id, razorpay_order_id')
       .eq('order_id', orderId)
-      .order('created_at', { ascending: false })
-      .limit(1);
+      .order('created_at', { ascending: false });
 
-    const existingPayment = existingPayments?.[0];
+    // Most recent payment record — used for updating status / CAPI-sent flag
+    const existingPayment = allOrderPayments?.[0];
     let storedMeta: any = {};
     if (existingPayment?.razorpay_order_id) {
       try {
@@ -327,18 +333,40 @@ export async function handlePaymentSuccess(
     }
     const capiAlreadySent = !!storedMeta?.meta_capi_sent;
 
+    // Recover _fbc from any PRIOR payment attempt on this SAME order.
+    // e.g. customer clicked a Meta ad → InitiateCheckout → left → came back next day and paid.
+    // Their _fbc cookie is gone on return (iOS ITP), but we stored it when they first clicked PayPal.
+    let recoveredOrderFbc: string | undefined;
+    if (!storedMeta?.fbc && !metaData?.fbc) {
+      for (const p of (allOrderPayments || [])) {
+        try {
+          const m = JSON.parse(p.razorpay_order_id || '{}');
+          const createdMs = getFbcCreationMs(m?.fbc);
+          if (m?.fbc && createdMs && (Date.now() - createdMs) <= FBC_LOOKBACK_MS) {
+            recoveredOrderFbc = m.fbc;
+            console.log(`[CAPI] Recovered _fbc from prior payment attempt on same order ${orderId}`);
+            break;
+          }
+        } catch { /* not a JSON attribution record */ }
+      }
+    }
+
     if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
       try {
         const resolvedFbp = metaData?.fbp || storedMeta?.fbp || undefined;
-        let resolvedFbc: string | undefined = metaData?.fbc || storedMeta?.fbc || undefined;
-        let fbcRecovered = false;
+        let resolvedFbc: string | undefined = metaData?.fbc || storedMeta?.fbc || recoveredOrderFbc || undefined;
+        let fbcRecovered = !!recoveredOrderFbc && !metaData?.fbc && !storedMeta?.fbc;
         if (!resolvedFbc) {
-          resolvedFbc = await recoverFbcFromPriorSessions(supabaseAdmin, orderId, {
+          // Cross-order fallback: look at OTHER orders from same customer within 7 days
+          const crossSessionFbc = await recoverFbcFromPriorSessions(supabaseAdmin, orderId, {
             emails: [userEmail, metaData?.paypalEmail || storedMeta?.paypalEmail].filter(Boolean) as string[],
             phone: userPhone,
             userId: order?.user_id || undefined
           });
-          fbcRecovered = !!resolvedFbc;
+          if (crossSessionFbc) {
+            resolvedFbc = crossSessionFbc;
+            fbcRecovered = true;
+          }
           if (fbcRecovered) console.log(`[CAPI] Recovered fbc from earlier session for order ${orderId}`);
         }
         const rawIp = metaData?.clientIp || storedMeta?.clientIp;
