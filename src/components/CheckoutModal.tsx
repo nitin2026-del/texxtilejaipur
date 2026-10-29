@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { X, CreditCard, ShoppingBag, ShieldCheck, User, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { trackMetaEvent } from '@/utils/metaTracking';
+import { trackMetaEvent, getMetaCookie } from '@/utils/metaTracking';
 import { PayPalPaymentForm } from './PayPalPaymentForm';
 import { FreeRingWidget } from './FreeRingWidget';
 import { getOptimizedUrl } from '@/utils/imageUtils';
@@ -193,6 +193,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       const orderId = orderData.orderId;
       if (orderData.orderNumber) setConfirmedOrderNumber(orderData.orderNumber);
       setCreatedOrderId(orderId);
+
+      // Save Meta attribution (fbc/fbp) to DB right now at order creation — the EARLIEST capture point.
+      // Even if the customer leaves and returns days later without cookies, fbc is safe in the DB.
+      try {
+        const checkoutFbc = getMetaCookie('_fbc');
+        const checkoutFbp = getMetaCookie('_fbp');
+        if (checkoutFbc || checkoutFbp) {
+          const attrJson = JSON.stringify({
+            fbp: checkoutFbp || undefined,
+            fbc: checkoutFbc || undefined,
+            capturedAt: 'checkout_shipping_submit',
+            eventSourceUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+            userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+            trackingCurrency: currency || 'USD',
+            trackingAmount: orderTotalDisplay
+          });
+          fetch('/api/orders/attribution', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, attrJson }),
+            keepalive: true
+          }).catch(() => {});
+        }
+      } catch { /* non-critical */ }
 
       // 2. Initialize Payment Intent via API (Removed Stripe logic)
 

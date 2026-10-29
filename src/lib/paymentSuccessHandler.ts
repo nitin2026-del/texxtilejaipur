@@ -317,12 +317,12 @@ export async function handlePaymentSuccess(
     // we never lose that ad-click attribution across delayed purchases.
     const { data: allOrderPayments } = await supabaseAdmin
       .from('payments')
-      .select('id, razorpay_order_id')
+      .select('id, razorpay_order_id, status')
       .eq('order_id', orderId)
       .order('created_at', { ascending: false });
 
-    // Most recent payment record — used for updating status / CAPI-sent flag
-    const existingPayment = allOrderPayments?.[0];
+    // Most recent REAL payment record (not the attribution placeholder) — used for updating status / CAPI-sent flag
+    const existingPayment = (allOrderPayments || []).find(p => p.status !== 'attribution') || allOrderPayments?.[0];
     let storedMeta: any = {};
     if (existingPayment?.razorpay_order_id) {
       try {
@@ -333,9 +333,11 @@ export async function handlePaymentSuccess(
     }
     const capiAlreadySent = !!storedMeta?.meta_capi_sent;
 
-    // Recover _fbc from any PRIOR payment attempt on this SAME order.
-    // e.g. customer clicked a Meta ad → InitiateCheckout → left → came back next day and paid.
-    // Their _fbc cookie is gone on return (iOS ITP), but we stored it when they first clicked PayPal.
+    // Recover _fbc from any PRIOR payment/attribution record on this SAME order.
+    // Sources in allOrderPayments (newest-first):
+    //   1. 'attribution' record — written at checkout shipping-submit (EARLIEST, even before PayPal click)
+    //   2. 'pending' PayPal record — written when customer first clicked PayPal button
+    // This covers the ATC → leave → return 1-2 days later scenario where iOS ITP wiped the cookie.
     let recoveredOrderFbc: string | undefined;
     if (!storedMeta?.fbc && !metaData?.fbc) {
       for (const p of (allOrderPayments || [])) {
