@@ -194,7 +194,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       if (orderData.orderNumber) setConfirmedOrderNumber(orderData.orderNumber);
       setCreatedOrderId(orderId);
 
-      // Save Meta attribution (fbc/fbp) to DB right now at order creation — the EARLIEST capture point.
+      // Save Meta attribution (fbc/fbp) to DB right now at order creation  the EARLIEST capture point.
       // Even if the customer leaves and returns days later without cookies, fbc is safe in the DB.
       try {
         const checkoutFbc = getMetaCookie('_fbc');
