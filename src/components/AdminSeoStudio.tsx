@@ -48,6 +48,7 @@ interface SeoStats {
 
 export function AdminSeoStudio({ onEditProduct }: { onEditProduct?: (productId: string) => void }) {
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [stats, setStats] = useState<SeoStats | null>(null);
   const [products, setProducts] = useState<AuditedProduct[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,6 +70,7 @@ export function AdminSeoStudio({ onEditProduct }: { onEditProduct?: (productId: 
 
   const fetchScanData = async () => {
     setLoading(true);
+    setFetchError(null);
     try {
       const res = await fetch('/api/admin/seo-copywriting', {
         method: 'POST',
@@ -76,13 +78,16 @@ export function AdminSeoStudio({ onEditProduct }: { onEditProduct?: (productId: 
         body: JSON.stringify({ action: 'scan' })
       });
       const data = await res.json();
-      if (!data.success) throw new Error(data.error);
+      if (!data.success) throw new Error(data.error || 'Failed to scan catalog');
 
       setStats(data.stats);
       setProducts(data.products || []);
+      setFetchError(null);
     } catch (err: any) {
       console.error('Scan error:', err);
-      showNotification(err.message || 'Failed to scan catalog', 'error');
+      const msg = err.message || 'Failed to scan catalog';
+      setFetchError(msg);
+      showNotification(msg, 'error');
     } finally {
       setLoading(false);
     }
@@ -269,7 +274,7 @@ export function AdminSeoStudio({ onEditProduct }: { onEditProduct?: (productId: 
 
             <button
               onClick={handleRunBatchOptimization}
-              disabled={loading || isBatchRunning || (stats?.healthScore === 100)}
+              disabled={loading || isBatchRunning || !stats || stats.totalProducts === 0 || (stats.missingSeoTitle === 0 && stats.missingSeoDescription === 0)}
               className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all shadow-md disabled:opacity-50"
             >
               {isBatchRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4 fill-white" />}
@@ -286,16 +291,24 @@ export function AdminSeoStudio({ onEditProduct }: { onEditProduct?: (productId: 
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Catalog SEO Health</span>
             <div className="flex items-baseline gap-2">
               <span className={`text-2xl font-black ${
-                (stats?.healthScore || 0) >= 80 ? 'text-emerald-600' : (stats?.healthScore || 0) >= 50 ? 'text-amber-600' : 'text-red-500'
+                loading || !stats
+                  ? 'text-zinc-400'
+                  : stats.totalProducts === 0
+                  ? 'text-zinc-600'
+                  : stats.healthScore >= 80
+                  ? 'text-emerald-600'
+                  : stats.healthScore >= 50
+                  ? 'text-amber-600'
+                  : 'text-red-500'
               }`}>
-                {stats?.healthScore || 0}%
+                {loading ? '...' : !stats ? '--%' : `${stats.healthScore}%`}
               </span>
               <span className="text-[10px] text-zinc-400">Score</span>
             </div>
             <div className="w-full bg-zinc-100 rounded-full h-1.5 overflow-hidden mt-2">
               <div 
                 className="bg-emerald-500 h-1.5 rounded-full transition-all duration-700"
-                style={{ width: `${stats?.healthScore || 0}%` }}
+                style={{ width: `${loading || !stats ? 0 : stats.healthScore}%` }}
               />
             </div>
           </div>
@@ -405,11 +418,41 @@ export function AdminSeoStudio({ onEditProduct }: { onEditProduct?: (productId: 
             <Loader2 className="h-8 w-8 text-amber-600 animate-spin mx-auto" />
             <p className="text-xs text-zinc-500">Auditing product image metadata and SEO health...</p>
           </div>
+        ) : fetchError ? (
+          <div className="p-16 text-center space-y-4">
+            <div className="p-3 bg-red-100 text-red-600 rounded-full w-fit mx-auto">
+              <AlertCircle className="h-8 w-8" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-bold text-zinc-900">Failed to load SEO catalog</p>
+              <p className="text-xs text-red-600 font-mono max-w-md mx-auto">{fetchError}</p>
+            </div>
+            <button
+              onClick={fetchScanData}
+              className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-sm"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Retry Scan
+            </button>
+          </div>
         ) : filteredProducts.length === 0 ? (
           <div className="p-16 text-center space-y-2">
-            <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto" />
-            <p className="text-sm font-bold text-zinc-800">No matching products found</p>
-            <p className="text-xs text-zinc-500">All products in this category may already be optimized.</p>
+            {products.length === 0 ? (
+              <>
+                <FileText className="h-10 w-10 text-zinc-400 mx-auto" />
+                <p className="text-sm font-bold text-zinc-800">No products found in catalog</p>
+                <p className="text-xs text-zinc-500">Add products to your catalog to begin AI vision and SEO copywriting.</p>
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto" />
+                <p className="text-sm font-bold text-zinc-800">No matching products found</p>
+                <p className="text-xs text-zinc-500">
+                  {filterMode === 'needs_seo' 
+                    ? 'All products are already fully optimized! 🎉' 
+                    : 'Try clearing your search or filter settings.'}
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">

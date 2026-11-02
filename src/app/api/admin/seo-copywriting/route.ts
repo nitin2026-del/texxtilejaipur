@@ -26,7 +26,7 @@ async function handleSeoAction(body: any) {
       const supabase = getSupabaseAdmin();
       const { data: products, error } = await supabase
         .from('products')
-        .select('id, name, sku, seo_title, seo_description, description, details, product_images(url, is_primary)')
+        .select('id, name, slug, seo_title, seo_description, description, details, product_images(url, is_primary)')
         .order('name', { ascending: true });
 
       if (error) {
@@ -52,10 +52,12 @@ async function handleSeoAction(body: any) {
 
         const isFullyOptimized = hasTitle && hasDesc && hasVision && hasTranslations;
 
+        const computedSku = p.slug ? `HT-${p.slug.toUpperCase()}` : `HT-${(p.id || '').slice(0, 8).toUpperCase()}`;
+
         return {
           id: p.id,
           name: p.name,
-          sku: p.sku,
+          sku: computedSku,
           hasSeoTitle: hasTitle,
           hasSeoDescription: hasDesc,
           hasVisionAnalysis: hasVision,
@@ -227,7 +229,7 @@ async function handleSeoAction(body: any) {
             results.push({
               id: prod.id,
               name: prod.name,
-              sku: prod.sku,
+              sku: prod.slug ? `HT-${prod.slug.toUpperCase()}` : `HT-${(prod.id || '').slice(0, 8).toUpperCase()}`,
               success: true,
               seoTitle: seoResult.seoTitle,
               seoDescription: seoResult.seoDescription,
