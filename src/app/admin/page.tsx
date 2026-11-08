@@ -2056,6 +2056,16 @@ function AdminPortalContent() {
               <Gift className="h-3.5 w-3.5" /> Free Rings
             </button>
             <button
+              onClick={() => setActiveTab('recommendations')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
+                activeTab === 'recommendations'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-700'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5" /> AI Recommendations
+            </button>
+            <button
               onClick={() => setActiveTab('seo_studio')}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 snap-start ${
                 activeTab === 'seo_studio'
