@@ -188,11 +188,25 @@ export const AdminRecommendationsConfig: React.FC<AdminRecommendationsConfigProp
             onChange={(e) => setSelectedCatId(e.target.value)}
             className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-zinc-900 focus:outline-none focus:border-amber-500"
           >
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name} ({products.filter(p => p.category_id === cat.id || (p.category && p.category.toLowerCase() === cat.name.toLowerCase())).length} products)
-              </option>
-            ))}
+            {/* Group into AI Stylist 3 Categories & Other categories */}
+            <optgroup label="✨ AI Stylist Categories (Customer Active)">
+              {categories
+                .filter(cat => ['velvet suzani jacket', 'cotton suzani jacket', 'tnt suzani jacket'].includes(cat.name.toLowerCase().trim()))
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    ⭐ {cat.name} ({products.filter(p => p.category_id === cat.id || (p.category && p.category.toLowerCase() === cat.name.toLowerCase())).length} jackets)
+                  </option>
+                ))}
+            </optgroup>
+            <optgroup label="Other Store Categories">
+              {categories
+                .filter(cat => !['velvet suzani jacket', 'cotton suzani jacket', 'tnt suzani jacket', 'uncategorized'].includes(cat.name.toLowerCase().trim()))
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name} ({products.filter(p => p.category_id === cat.id || (p.category && p.category.toLowerCase() === cat.name.toLowerCase())).length} items)
+                  </option>
+                ))}
+            </optgroup>
           </select>
           <p className="text-[11px] text-zinc-500">
             Select the jacket/kimono category the customer inquired about.
