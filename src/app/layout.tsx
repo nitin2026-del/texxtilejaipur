@@ -8,6 +8,7 @@ import { MetaPixel } from '@/components/MetaPixel';
 import './globals.css';
 import { FloatingSupport } from '@/components/FloatingSupport';
 import { GlobalModals } from '@/components/GlobalModals';
+import { StyleFinderButton } from '@/components/StyleFinderButton';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap' });
@@ -18,8 +19,8 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Textile Jaipur | Handmade Indian Clothing & Suzani Jackets',
-  description: 'Shop handmade Indian clothing from Jaipur, including Suzani jackets, boho kimonos, embroidered dresses, skirts and traditional textiles. Worldwide free shipping.',
+  title: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
+  description: "Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur. Explore women's bohemian clothing with worldwide shipping.",
   keywords: [
     'Indian ethnic wear online', 'buy Indian textiles USA', 'handmade embroidered jacket', 'suzani jacket Europe',
     'boho dress India export', 'Jaipur textile online shop', 'Indian export clothing UK', 'authentic Rajasthani clothing',
@@ -56,8 +57,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Textile Jaipur | Handmade Indian Clothing & Suzani Jackets',
-    description: 'Shop handmade Indian clothing from Jaipur, including Suzani jackets, boho kimonos, embroidered dresses, skirts and traditional textiles. Worldwide free shipping.',
+    title: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
+    description: "Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur. Explore women's bohemian clothing with worldwide shipping.",
     url: 'https://textilejaipur.com',
     siteName: 'Textile Jaipur',
     locale: 'en_US',
@@ -73,8 +74,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Textile Jaipur | Handmade Indian Clothing & Suzani Jackets',
-    description: 'Shop handmade Indian clothing from Jaipur, including Suzani jackets, boho kimonos, embroidered dresses, skirts and traditional textiles. Worldwide free shipping.',
+    title: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
+    description: "Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur. Explore women's bohemian clothing with worldwide shipping.",
     images: ['https://textilejaipur.com/about/img1.jpg'],
     creator: '@textileofjaipur',
     site: '@textileofjaipur'
@@ -287,6 +288,7 @@ export default function RootLayout({
             <div className="bg-mesh" />
             <FloatingSupport />
             <GlobalModals />
+            <StyleFinderButton />
             {children}
           </CartProvider>
         </AuthProvider>

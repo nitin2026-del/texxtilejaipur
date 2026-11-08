@@ -13,6 +13,7 @@ import { AdminBannersConfig } from '@/components/AdminBannersConfig';
 import { AdminFreeGiftsConfig } from '@/components/AdminFreeGiftsConfig';
 import { AdminSeoStudio } from '@/components/AdminSeoStudio';
 import { AdminVideoLooksConfig } from '@/components/AdminVideoLooksConfig';
+import { AdminRecommendationsConfig } from '@/components/AdminRecommendationsConfig';
 import { 
   ShieldCheck, AlertCircle, ShoppingBag, 
   Trash2, Edit, Plus, LayoutDashboard, Database, 
@@ -166,7 +167,7 @@ function AdminPortalContent() {
   const [adminLoginLoading, setAdminLoginLoading] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners' | 'promotions' | 'free_gifts' | 'seo_studio' | 'video_looks'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'catalog' | 'form' | 'categories' | 'blogs' | 'coupons' | 'inquiries' | 'behind_the_scenes' | 'newsletters' | 'reviews' | 'shipping' | 'banners' | 'promotions' | 'free_gifts' | 'seo_studio' | 'video_looks' | 'recommendations'>('overview');
   
   // Promotions states
   const [promoActive, setPromoActive] = useState(false);
@@ -4054,6 +4055,22 @@ function AdminPortalContent() {
         )}
 
         {/* TAB 13: FREE GIFTS */}
+        {activeTab === 'recommendations' && (
+          <AdminRecommendationsConfig
+            products={products}
+            categories={dbCategoryObjects.length > 0 ? dbCategoryObjects : dbCategories.map(c => ({ id: c, name: c }))}
+            showToast={(msg, type) => {
+              if (type === 'success') {
+                setSuccessMessage(msg);
+                setTimeout(() => setSuccessMessage(''), 4000);
+              } else {
+                setErrorMessage(msg);
+                setTimeout(() => setErrorMessage(''), 4000);
+              }
+            }}
+          />
+        )}
+
         {activeTab === 'free_gifts' && (
           <div className="space-y-6">
             <AdminFreeGiftsConfig />
