@@ -72,18 +72,30 @@ export const StyleFinderModal: React.FC<StyleFinderModalProps> = ({
   const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
+  const [liveCategories, setLiveCategories] = useState<Array<{ id: string; name: string }>>(categories || []);
 
-  // Filter out non-clothing categories if desired (like Uncategorized or Tote Bag if preferred)
-  const availableCategories = (categories && categories.length > 0)
-    ? categories.filter(c => c.name.toLowerCase() !== 'uncategorized')
+  useEffect(() => {
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setLiveCategories(data.map((c: any) => ({ id: c.id, name: c.name })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const catsToUse = liveCategories.length > 0 ? liveCategories : categories;
+  const availableCategories = (catsToUse && catsToUse.length > 0)
+    ? catsToUse.filter(c => c.name.toLowerCase() !== 'uncategorized')
     : [
-        { id: 'velvet-suzani-jacket', name: 'VELVET SUZANI JACKET' },
-        { id: 'cotton-suzani-jacket', name: 'COTTON SUZANI JACKET' },
-        { id: 'velvet-long-suzani-kimono', name: 'VELVET LONG SUZANI KIMONO' },
-        { id: 'cotton-long-suzani-kimono', name: 'COTTON LONG SUZANI KIMONO' },
-        { id: 'velvet-short-kimono', name: 'VELVET SHORT KIMONO' },
-        { id: 'velvet-vest', name: 'VELVET VEST' },
-        { id: 'corduroy-jacket', name: 'Corduroy JACKET' }
+        { id: 'ee1ccb2f-e65c-46d7-9ec8-0e0fb84ecdf6', name: 'VELVET SUZANI JACKET' },
+        { id: '40039886-343c-43b0-9074-e4ad2c647da4', name: 'COTTON SUZANI JACKET' },
+        { id: '0e8de96e-2634-444a-bff5-5d1fcc71ac41', name: 'VELVET LONG SUZANI KIMONO' },
+        { id: '51de4b8e-768c-47ee-92e2-a310f3b04568', name: 'COTTON LONG SUZANI KIMONO' },
+        { id: 'fd358cd0-d535-4ce8-a031-e392315c39c7', name: 'VELVET SHORT KIMONO' },
+        { id: 'ea347015-35b0-4e89-b512-4855dc3077c5', name: 'VELVET VEST' },
+        { id: '6fc46e0a-837f-4841-895c-d7fa3af8c83c', name: 'Corduroy JACKET' }
       ];
 
   // Reset when opened
@@ -128,6 +140,7 @@ export const StyleFinderModal: React.FC<StyleFinderModalProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           categoryId: selectedCategory.id,
+          categoryName: selectedCategory.name,
           occasion: selectedOccasion.name
         })
       });
