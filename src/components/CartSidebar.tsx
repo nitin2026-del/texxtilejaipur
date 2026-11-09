@@ -229,7 +229,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onChe
 
                         {/* Price */}
                         <span className={`text-sm font-bold ${item.isFreeGift ? 'text-pink-400' : 'text-white'}`}>
-                          {item.isFreeGift ? '₹0.00' : formatPrice(item.price_inr * item.quantity)}
+                          {item.isFreeGift ? 'FREE' : formatPrice(item.price_inr * item.quantity)}
                         </span>
                       </div>
                     </div>

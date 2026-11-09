@@ -50,6 +50,16 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
+  const [paymentCancelled, setPaymentCancelled] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('payment') === 'cancelled') {
+        setPaymentCancelled(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleCategorySelect = (e: Event) => {
@@ -138,6 +148,41 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
     <main className="min-h-screen text-zinc-900 pb-16 bg-[#FDFBF7]">
       {/* Navigation */}
       <Navbar onCartOpen={() => setCartOpen(true)} />
+
+      {/* Payment Cancelled Recovery Banner */}
+      {paymentCancelled && (
+        <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 text-amber-900 sticky top-[84px] sm:top-[92px] z-30 shadow-md">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚠️</span>
+              <span><strong>Payment was not completed.</strong> Card issue or need assistance? We are here to help!</span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setCheckoutOpen(true)}
+                className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-md shadow-sm transition-colors text-xs"
+              >
+                Retry Checkout
+              </button>
+              <a
+                href="https://wa.me/919461858955?text=Hi%2C%20I%20had%20trouble%20with%20my%20payment%20on%20Textile%20Jaipur"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white font-bold rounded-md shadow-sm transition-colors text-xs"
+              >
+                WhatsApp Help
+              </a>
+              <button
+                onClick={() => setPaymentCancelled(false)}
+                className="text-amber-700 hover:text-amber-900 px-2 py-1 text-xs"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="relative w-full h-[72vh] sm:h-screen min-h-[500px] sm:min-h-[700px] flex flex-col justify-end sm:justify-center overflow-hidden">

@@ -494,7 +494,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                       </div>
                     </div>
                     <span className={`text-sm font-bold ${baseStandardUsd === 0 ? 'text-emerald-600' : 'text-zinc-900'}`}>
-                      {baseStandardUsd === 0 ? 'Free' : `$${baseStandardUsd.toFixed(2)}`}
+                      {baseStandardUsd === 0 ? 'Free' : formatPrice(baseStandardUsd / USD_RATE)}
                     </span>
                   </label>
                   
@@ -513,7 +513,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                         <span className="text-[10px] text-zinc-500">Priority processing, 3-5 business days</span>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-zinc-900">${baseExpressUsd.toFixed(2)}</span>
+                    <span className="text-sm font-bold text-zinc-900">{formatPrice(baseExpressUsd / USD_RATE)}</span>
                   </label>
                 </div>
               </div>
