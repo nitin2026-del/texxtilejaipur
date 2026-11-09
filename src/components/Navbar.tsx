@@ -131,7 +131,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
-  const { cart, currency, setCurrency, formatPrice } = useCart();
+  const { cart, currency, currencySymbol, setCurrency, formatPrice } = useCart();
   const { user, profile, loading, signOut, userTier, orderCount, setOrderCount } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
@@ -221,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
 
   const currencyFlags: Record<Currency, string> = {
     USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', AED: '🇦🇪',
-    AUD: '🇦🇺', NZD: '🇳🇿', CAD: '🇨🇦', INR: '🇮🇳',
+    AUD: '🇦🇺', NZD: '🇳🇿', CAD: '🇨🇦', INR: '🇮🇳', MXN: '🇲🇽',
   };
 
   return (
@@ -296,7 +296,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
               >
                 <IconGlobe />
                 <span className="hidden sm:inline">
-                  {currency} ({currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency === 'GBP' ? '£' : currency === 'AED' ? 'د.إ' : currency === 'AUD' ? 'A$' : currency === 'NZD' ? 'NZ$' : currency === 'CAD' ? 'C$' : '₹'})
+                  {currency} ({currencySymbol})
                 </span>
                 <span className="sm:hidden text-[10px]">{currency}</span>
                 <ChevronDown className={`h-3 w-3 text-zinc-400 transition-transform duration-200 ${isCurrencyOpen ? 'rotate-180' : ''}`} />
@@ -312,11 +312,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                     <div className="px-3.5 pb-2 mb-1 border-b border-zinc-100">
                       <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Select Currency</p>
                     </div>
-                    {(['USD', 'EUR', 'GBP', 'AED', 'AUD', 'NZD', 'CAD', 'INR'] as Currency[]).map((code) => {
+                    {(['USD', 'EUR', 'GBP', 'MXN', 'AED', 'AUD', 'NZD', 'CAD', 'INR'] as Currency[]).map((code) => {
                       const labels: Record<Currency, string> = {
                         USD: 'US Dollar ($)', EUR: 'Euro (€)', GBP: 'Pound (£)',
                         AED: 'Dirham (د.إ)', AUD: 'AUD (A$)', NZD: 'NZD (NZ$)',
-                        CAD: 'CAD (C$)', INR: 'Rupee (₹)',
+                        CAD: 'CAD (C$)', INR: 'Rupee (₹)', MXN: 'Mexican Peso ($)',
                       };
                       return (
                         <button

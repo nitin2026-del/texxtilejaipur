@@ -19,7 +19,7 @@ interface CheckoutModalProps {
 const COUNTRIES = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","Norway","Oman","Pakistan","Palau","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Rwanda","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Somalia","South Africa","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose }) => {
-  const { cart, formatPrice, getCartSubtotalInr, getCartTotalInr, getCartTotalDisplay, currency, clearCart, appliedCoupon } = useCart();
+  const { cart, formatPrice, getCartSubtotalInr, getCartTotalInr, getCartTotalDisplay, currency, setCurrency, clearCart, appliedCoupon } = useCart();
   const { user, profile, userTier, tierDiscountPercentage } = useAuth();
 
   const [step, setStep] = useState<'shipping' | 'payment' | 'success'>('shipping');
@@ -76,6 +76,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       setCreatedOrderId(null);
       setError('');
       setStep('shipping');
+      if (currency === 'MXN') {
+        setCountry('Mexico');
+      }
       if (user) {
         if (profile) {
           setFullName(profile.full_name || '');
@@ -441,6 +444,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                             key={c}
                             onClick={() => {
                               setCountry(c);
+                              if (c === 'Mexico') setCurrency('MXN');
                               setShowCountryDropdown(false);
                               setCountrySearch('');
                             }}
@@ -613,7 +617,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 return (
                   <PayPalPaymentForm 
                     orderId={createdOrderId} 
-                    amount={Number((effectiveInr * FX_RATES[currency]).toFixed(2))}
+                    amount={Number((effectiveInr * (FX_RATES[currency] || FX_RATES['USD'])).toFixed(2))}
                     currency={currency}
                     onSuccess={handlePaymentSuccess} 
                     onError={setError} 

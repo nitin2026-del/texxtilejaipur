@@ -163,9 +163,10 @@ export async function POST(req: NextRequest) {
         AUD: 0.016150,
         NZD: 0.020000,
         CAD: 0.016500,
+        MXN: 0.193648,
       };
 
-      const PAYPAL_SUPPORTED = ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD'];
+      const PAYPAL_SUPPORTED = ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'MXN'];
       const rawCurr = currency.toUpperCase();
       const targetCurrency = PAYPAL_SUPPORTED.includes(rawCurr) ? rawCurr : 'USD';
       const rate = FX_RATES[targetCurrency] || FX_RATES['USD'];
