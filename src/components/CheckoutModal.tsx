@@ -48,6 +48,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'paypal'>('paypal');
+  const [isInstagramBrowser, setIsInstagramBrowser] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      setIsInstagramBrowser(/Instagram|FBAN|FBAV/i.test(navigator.userAgent));
+    }
+  }, []);
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [selectedGlobalRing, setSelectedGlobalRing] = useState<string | null>(null);
   
@@ -612,6 +619,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
               </div>
 
 
+
+              {isInstagramBrowser && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-[11px] text-amber-900 flex items-start gap-2 mb-3">
+                  <span className="text-sm">💡</span>
+                  <span>
+                    <strong>Instagram Browser Tip:</strong> For easiest card payment, tap <strong>⋯</strong> in the top-right and select <strong>&quot;Open in Safari / Chrome&quot;</strong>.
+                  </span>
+                </div>
+              )}
 
               {paymentMethod === 'paypal' && (() => {
                 return (
