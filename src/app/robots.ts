@@ -5,13 +5,17 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        allow: ['/', '/api/merchant-feed'],
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Googlebot',
-        allow: '/',
+        allow: ['/', '/api/merchant-feed'],
         disallow: ['/admin/', '/api/', '/dashboard/'],
+      },
+      {
+        userAgent: 'Googlebot-Image',
+        allow: ['/'],
       },
     ],
     sitemap: 'https://www.textilejaipur.com/sitemap.xml',
