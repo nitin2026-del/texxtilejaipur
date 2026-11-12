@@ -23,7 +23,9 @@ export async function generateMetadata(
   }
 
   try {
-    const res = await fetch(`${url}/rest/v1/products?select=name,description,seo_title,seo_description,product_images(url,is_primary)&id=eq.${id}`, {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const filterParam = isUuid ? `id=eq.${id}` : `slug=eq.${encodeURIComponent(id)}`;
+    const res = await fetch(`${url}/rest/v1/products?select=id,name,description,seo_title,seo_description,product_images(url,is_primary)&${filterParam}`, {
       headers: {
         apikey: key,
         Authorization: `Bearer ${key}`
@@ -51,7 +53,7 @@ export async function generateMetadata(
         const metaDescription = item.seo_description 
           || (cleanRawDesc ? cleanRawDesc.substring(0, 155) : `Buy authentic handmade ${item.name} from Textile Jaipur. Authentic artisan craftsmanship with free worldwide shipping.`);
 
-        const productUrl = `https://www.textilejaipur.com/product/${id}`;
+        const productUrl = `https://www.textilejaipur.com/product/${item.id || id}`;
 
         return {
           title: metaTitle,
@@ -114,8 +116,10 @@ export default async function ProductPage({ params }: Props) {
     };
 
     // 1. Kick off independent fetches in parallel (added limits to prevent huge DB payloads)
-    const productPromise = fetch(`${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&id=eq.${id}`, fetchOptions);
-    const reviewsPromise = fetch(`${url}/rest/v1/reviews?or=(product_id.eq.${id},product_id.is.null)&status=eq.approved&order=created_at.desc&limit=15`, fetchOptions);
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const filterParam = isUuid ? `id=eq.${id}` : `slug=eq.${encodeURIComponent(id)}`;
+    const productPromise = fetch(`${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&${filterParam}`, fetchOptions);
+    const reviewsPromise = fetch(isUuid ? `${url}/rest/v1/reviews?or=(product_id.eq.${id},product_id.is.null)&status=eq.approved&order=created_at.desc&limit=15` : `${url}/rest/v1/reviews?product_id=is.null&status=eq.approved&order=created_at.desc&limit=15`, fetchOptions);
     const ugcPromise = fetch(`${url}/rest/v1/behind_the_scenes?status=eq.published&order=display_order.asc.nullslast&limit=6`, fetchOptions);
 
     const [res, reviewsRes, ugcRes] = await Promise.all([productPromise, reviewsPromise, ugcPromise]);
@@ -155,10 +159,11 @@ export default async function ProductPage({ params }: Props) {
     if (!product) return notFound();
 
     // 2. Fetch Related Products & Sibling Products IN PARALLEL (fixing waterfall)
-    const relatedPromise = fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${id}&categories.name=eq.${encodeURIComponent(product.category)}&limit=4`, fetchOptions);
+    const resolvedId = product.id;
+    const relatedPromise = fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${resolvedId}&categories.name=eq.${encodeURIComponent(product.category)}&limit=4`, fetchOptions);
     const siblingGroup = product.details?.sibling_group;
     const sibPromise = siblingGroup 
-      ? fetch(`${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${id}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`, fetchOptions)
+      ? fetch(`${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${resolvedId}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`, fetchOptions)
       : Promise.resolve(null);
 
     const [relatedRes, sibRes] = await Promise.all([relatedPromise, sibPromise]);
@@ -217,7 +222,7 @@ export default async function ProductPage({ params }: Props) {
     // duplicate removed
     if (siblingGroup) {
       const sibRes = await fetch(
-        `${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${id}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`,
+        `${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${resolvedId}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`,
         fetchOptions
       );
       if (sibRes.ok) {
@@ -278,7 +283,7 @@ export default async function ProductPage({ params }: Props) {
     manufacturer: {
       '@type': 'Organization',
       name: 'Textile Jaipur',
-      url: 'https://textilejaipur.com'
+      url: 'https://www.textilejaipur.com'
     },
     offers: {
       '@type': 'Offer',

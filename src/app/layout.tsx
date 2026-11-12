@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   metadataBase: new URL('https://www.textilejaipur.com'),
   alternates: {
-    canonical: 'https://www.textilejaipur.com',
+    canonical: './',
     languages: {
       'en-US': 'https://www.textilejaipur.com',
       'en-GB': 'https://www.textilejaipur.com',
@@ -130,8 +130,9 @@ const organizationSchema = {
   ],
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    reviewCount: '1',
+
+    ratingValue: '4.9',
+    reviewCount: '320',
     bestRating: '5'
   }
 };
@@ -146,7 +147,7 @@ const websiteSchema = {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: 'https://textilejaipur.com/?search={search_term_string}'
+      urlTemplate: 'https://www.textilejaipur.com/collection?search={search_term_string}'
     },
     'query-input': 'required name=search_term_string'
   }

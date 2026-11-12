@@ -9,8 +9,11 @@ import { BookOpen, Calendar, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Blog | Textile Jaipur',
-  description: 'Discover the latest trends, styling tips, and stories behind our luxury handcrafted collections.',
+  title: 'The Artisan Journal — Suzani Jackets, Jaipur Embroidery & Styling Guides | Textile Jaipur',
+  description: 'Explore our Jaipur artisan journal: styling guides for hand-embroidered velvet and cotton Suzani jackets, the history of Rajasthani needlework, and slow fashion care tips.',
+  alternates: {
+    canonical: 'https://www.textilejaipur.com/blog',
+  },
 };
 
 export const revalidate = 60; // Revalidate every minute

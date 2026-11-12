@@ -7,11 +7,12 @@ import { Calendar, ArrowLeft, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { Metadata } from 'next';
 
 export const revalidate = 60; // Revalidate every minute
 
 async function getBlogPost(slug: string) {
-  const decodedSlug = decodeURIComponent(slug);
+  const decodedSlug = decodeURIComponent(slug).trim();
   const { data, error } = await supabase
     .from('blogs')
     .select('*')
@@ -25,6 +26,39 @@ async function getBlogPost(slug: string) {
   return data;
 }
 
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = await getBlogPost(params.slug);
+  if (!post) {
+    return { title: 'Article Not Found | Textile Jaipur' };
+  }
+  const canonicalUrl = `https://www.textilejaipur.com/blog/${encodeURIComponent(post.slug)}`;
+  const metaTitle = post.title.includes('Textile Jaipur') ? post.title : `${post.title} | Textile Jaipur`;
+  const metaDesc = post.excerpt || `Read ${post.title} on the Textile Jaipur Artisan Journal — handcrafted Suzani jackets and embroidered outerwear from Jaipur, Rajasthan.`;
+
+  return {
+    title: metaTitle,
+    description: metaDesc,
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: metaTitle,
+      description: metaDesc,
+      url: canonicalUrl,
+      siteName: 'Textile Jaipur',
+      type: 'article',
+      publishedTime: post.created_at,
+      images: post.image_url ? [{ url: post.image_url, alt: post.title }] : [{ url: 'https://www.textilejaipur.com/about/img1.jpg', alt: post.title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: metaTitle,
+      description: metaDesc,
+      images: post.image_url ? [post.image_url] : ['https://www.textilejaipur.com/about/img1.jpg'],
+    },
+  };
+}
+
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getBlogPost(params.slug);
 
@@ -32,8 +66,48 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     notFound();
   }
 
+  const canonicalUrl = `https://www.textilejaipur.com/blog/${encodeURIComponent(post.slug)}`;
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt || post.title,
+    image: post.image_url ? [post.image_url] : ['https://www.textilejaipur.com/about/img1.jpg'],
+    datePublished: post.created_at,
+    dateModified: post.updated_at || post.created_at,
+    author: {
+      '@type': 'Organization',
+      name: 'Textile Jaipur Editorial',
+      url: 'https://www.textilejaipur.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Textile Jaipur',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.textilejaipur.com/logo.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalUrl,
+    },
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.textilejaipur.com' },
+      { '@type': 'ListItem', position: 2, name: 'The Artisan Journal', item: 'https://www.textilejaipur.com/blog' },
+      { '@type': 'ListItem', position: 3, name: post.title, item: canonicalUrl },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-zinc-950 selection:bg-gold/30 selection:text-gold-light font-sans flex flex-col relative overflow-hidden">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Top Gradient */}
       <div className="fixed top-0 left-0 w-full h-[500px] bg-gradient-to-b from-zinc-900/50 to-transparent pointer-events-none" />
 
@@ -99,6 +173,37 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
           </div>
         </div>
+
+        {/* Shop Related Hand-Embroidered Collections (SEO Internal Linking) */}
+        <section className="mt-12 p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800/80">
+          <h2 className="text-xl font-serif font-bold text-white mb-2">
+            Explore Our Hand-Embroidered Jaipur Collections
+          </h2>
+          <p className="text-sm text-zinc-400 mb-5">
+            Discover authentic artisan-crafted Suzani jackets, velvet coats, cotton jackets, and boho kimonos handmade in Jaipur with free worldwide shipping.
+          </p>
+          <div className="flex flex-wrap gap-2.5">
+            {[
+              { label: 'Suzani Jackets', href: '/collections/suzani-jackets' },
+              { label: 'Embroidered Jackets', href: '/collections/embroidered-jackets' },
+              { label: 'Velvet Suzani Jackets', href: '/collections/velvet-jackets' },
+              { label: 'Cotton Suzani Jackets', href: '/collections/cotton-jackets' },
+              { label: 'TNT Suzani Jackets', href: '/collections/tnt-suzani-jacket' },
+              { label: 'Corduroy Embroidered Jackets', href: '/collections/corduroy-jacket' },
+              { label: 'Velvet Short Kimonos', href: '/collections/velvet-short-kimono' },
+              { label: 'Long Suzani Kimonos', href: '/collections/velvet-long-suzani-kimono' },
+              { label: 'Shop All 170+ Pieces', href: '/collection' },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="px-4 py-2 rounded-full bg-zinc-950 border border-zinc-800 text-xs font-semibold text-zinc-200 hover:border-gold hover:text-gold transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </section>
 
       </main>
 

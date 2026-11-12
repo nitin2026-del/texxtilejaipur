@@ -1,24 +1,42 @@
-# Texxtile Jaipur
+# Textile Jaipur (https://www.textilejaipur.com)
 
-> Authentic handcrafted Indian ethnic wear direct from Jaipur, Rajasthan.
+> Authentic Hand-Embroidered Suzani Jackets, Velvet Coats, Cotton Artisan Jackets, Corduroy Jackets, and Boho Kimonos — Handcrafted in Jaipur, Rajasthan, India with Free Worldwide Shipping.
 
-## About Us
-Texxtile Jaipur bridges the gap between Jaipur's legendary artisans and discerning global customers. We offer premium handcrafted Indian ethnic wear, including embroidered jackets, Boho dresses, Banarasi silk, and suzani masterpieces. Every piece is ethically sourced and crafted using traditional techniques passed down through generations.
+## Brand Overview
+Textile Jaipur (`https://www.textilejaipur.com`) is a direct-to-consumer luxury artisan fashion house based in Jaipur, Rajasthan, India. Every garment is 100% hand-embroidered by master artisans using traditional Central Asian & Rajasthani **Suzani (Sujani) chain-stitch (Aari / Hook)** needlework on plush velvet, breathable organic cotton, corduroy, and quilted TNT fabrics.
 
-## Key Information
-- **Worldwide Shipping**: Free UPS Express delivery to 30+ countries.
-- **Craftsmanship**: 100% hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur. No factory production.
-- **Returns**: 14-Day no-questions-asked returns.
-- **Support**: 24/7 customer service available in English, Hindi, and Spanish.
+- **Official Website:** https://www.textilejaipur.com
+- **Catalog Size:** 170+ unique, in-stock hand-embroidered outerwear pieces, kimonos, dresses, vests, and tote bags
+- **Price Range:** ₹1,500 – ₹7,000 INR (~$18 – $85 USD)
+- **Shipping Policy:** Free Worldwide Express Shipping (USA, UK, Europe, Canada, Australia, India, and 100+ countries)
+- **Customer Rating:** 4.9 / 5.0 (320+ verified buyer reviews)
+- **Origin:** Jaipur Export Zone, Jaipur, Rajasthan 302001, India
 
-## Links
-- **Website**: https://textilejaipur.com
-- **Instagram**: https://instagram.com/textileofjaipur
-- **Facebook**: https://www.facebook.com/textileofjaipur
-- **YouTube**: https://www.youtube.com/@TextileJaipur
-- **LinkedIn**: https://linkedin.com/company/textilejaipur
+## Core Product Collections (Direct Indexable URLs)
+- **Hand-Embroidered Jackets (All Styles):** https://www.textilejaipur.com/collections/embroidered-jackets
+- **Suzani / Sujani Embroidered Jackets:** https://www.textilejaipur.com/collections/suzani-jackets
+- **Velvet Suzani Embroidered Jackets & Coats:** https://www.textilejaipur.com/collections/velvet-jackets
+- **Cotton Suzani Embroidered Jackets:** https://www.textilejaipur.com/collections/cotton-jackets
+- **TNT Quilted Suzani Jackets:** https://www.textilejaipur.com/collections/tnt-suzani-jacket
+- **Corduroy Hand-Embroidered Jackets:** https://www.textilejaipur.com/collections/corduroy-jacket
+- **Velvet Short Boho Kimonos:** https://www.textilejaipur.com/collections/velvet-short-kimono
+- **Velvet Long Suzani Kimono Coats & Duster Robes:** https://www.textilejaipur.com/collections/velvet-long-suzani-kimono
+- **Cotton Long Suzani Kimonos:** https://www.textilejaipur.com/collections/cotton-long-suzani-kimono
+- **Cotton Suzani Embroidered Dresses:** https://www.textilejaipur.com/collections/cotton-suzani-dress
+- **Velvet Suzani Embroidered Vests & Gilets:** https://www.textilejaipur.com/collections/velvet-vest
+- **Hand-Embroidered Cotton Tote Bags:** https://www.textilejaipur.com/collections/cotton-tote-bag
+- **Complete Catalog (170+ Pieces):** https://www.textilejaipur.com/collection
 
-## Contact
-- **Email**: support[at]textilejaipur.com
-- **Phone**: +91 87646 55537
-- **Address**: Jaipur Export Zone, Rajasthan, India 302001
+## Editorial & Craft Guides (The Artisan Journal)
+- **Blog Index:** https://www.textilejaipur.com/blog
+- **Why Hand-Embroidered Suzani Jackets Are the Ultimate Statement Piece:** https://www.textilejaipur.com/blog/embroidered-jackets-handmade-suzani-jackets-textile-jaipur
+- **Suzani Jackets: The Art of Traditional Embroidery Meets Modern Boho Fashion:** https://www.textilejaipur.com/blog/suzani-jackets-the-art-of-traditional-embroidery
+- **Handcrafted Embroidered Jackets: Where Heritage Meets Modern Style:** https://www.textilejaipur.com/blog/handcrafted-embroidered-jackets-where-heritage-meets-modern-style
+- **How to Style a Velvet Suzani Jacket for Winter:** https://www.textilejaipur.com/blog/how-to-style-velvet-suzani-jacket-winter
+- **5 Reasons Why Hand-Embroidered Jackets Are Worth Every Penny:** https://www.textilejaipur.com/blog/why-hand-embroidered-jackets-are-worth-it
+
+## Machine-Readable Feeds & Sitemaps
+- **XML Sitemap:** https://www.textilejaipur.com/sitemap.xml
+- **Google Merchant Center Product Feed (RSS 2.0 / g: namespace):** https://www.textilejaipur.com/api/merchant-feed
+- **Customer Reviews:** https://www.textilejaipur.com/reviews
+- **About Our Jaipur Artisans:** https://www.textilejaipur.com/about

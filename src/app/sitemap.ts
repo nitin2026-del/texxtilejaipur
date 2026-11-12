@@ -57,8 +57,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     {
       url: `${baseUrl}/blog`,
       lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/reviews`,
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/the-artisan-edit`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/track-order`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/llms.txt`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/agents.md`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/care`,
@@ -168,7 +204,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
       }
 
-      return [...staticRoutes, ...cleanCollectionRoutes, ...categoryRoutes, ...dynamicProductRoutes];
+      // Fetch published blog articles for SEO Authority (matching Zoshak's blog sitemap)
+      const blogRes = await fetch(`${url}/rest/v1/blogs?select=slug,created_at&status=eq.published`, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`
+        },
+        next: { revalidate: 3600 }
+      });
+
+      let blogRoutes: MetadataRoute.Sitemap = [];
+      if (blogRes.ok) {
+        const blogs = await blogRes.json();
+        if (Array.isArray(blogs)) {
+          blogRoutes = blogs
+            .filter((b: any) => b.slug)
+            .map((b: any) => ({
+              url: `${baseUrl}/blog/${encodeURIComponent(b.slug.trim())}`,
+              lastModified: b.created_at ? new Date(b.created_at) : now,
+              changeFrequency: 'weekly' as const,
+              priority: 0.8,
+            }));
+        }
+      }
+
+      return [...staticRoutes, ...cleanCollectionRoutes, ...categoryRoutes, ...blogRoutes, ...dynamicProductRoutes];
     }
   } catch (err) {
     console.error('Failed to fetch products for sitemap', err);

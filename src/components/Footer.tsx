@@ -261,9 +261,17 @@ export const Footer: React.FC = () => {
               </h4>
               <ul className="space-y-3">
                 {[
-                  { label: 'Our Collections', href: '/#categories' },
-                  { label: 'New Arrivals', href: '/#new-arrivals' },
-                  { label: 'All Products', href: '/collection' },
+                  { label: 'Suzani Jackets', href: '/collections/suzani-jackets' },
+                  { label: 'Embroidered Jackets', href: '/collections/embroidered-jackets' },
+                  { label: 'Velvet Suzani Jackets', href: '/collections/velvet-jackets' },
+                  { label: 'Cotton Suzani Jackets', href: '/collections/cotton-jackets' },
+                  { label: 'TNT Suzani Jackets', href: '/collections/tnt-suzani-jacket' },
+                  { label: 'Corduroy Embroidered Jackets', href: '/collections/corduroy-jacket' },
+                  { label: 'Velvet Short Kimonos', href: '/collections/velvet-short-kimono' },
+                  { label: 'Long Suzani Kimonos', href: '/collections/velvet-long-suzani-kimono' },
+                  { label: 'Cotton Suzani Dresses', href: '/collections/cotton-suzani-dress' },
+                  { label: 'The Artisan Journal (Blog)', href: '/blog' },
+                  { label: 'All 170+ Products', href: '/collection' },
                   { label: 'About Us', href: '/about' },
                   { label: 'Customer Reviews', href: '/reviews' },
                   { label: 'The Artisan Edit', href: '/the-artisan-edit' },
