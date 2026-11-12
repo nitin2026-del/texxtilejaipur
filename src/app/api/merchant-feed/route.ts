@@ -9,7 +9,7 @@ const GMC_COUNTRIES = [
   'CZ', 'DE', 'DK', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ES', 'ET',
   'FI', 'FR', 'GB', 'GE', 'GH', 'GR', 'GT', 'HK', 'HR', 'HU',
   'ID', 'IE', 'IL', 'IN', 'IT', 'JO', 'JP', 'KE', 'KH', 'KR',
-  'KW', 'KZ', 'LB', 'LK', 'LT', 'LU', 'LV', 'MA', 'MG', 'MM',
+  'KW', 'KZ', 'LB', 'LK', 'LU', 'LV', 'MA', 'MG', 'MM',
   'MT', 'MU', 'MX', 'MY', 'MZ', 'NG', 'NI', 'NL', 'NO', 'NP',
   'NZ', 'OM', 'PA', 'PE', 'PH', 'PK', 'PL', 'PR', 'PT', 'PY',
   'QA', 'RO', 'RU', 'SA', 'SE', 'SG', 'SI', 'SK', 'SN', 'SV',
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
     // Pre-build the worldwide shipping XML block in the exact same currency as the item price
     const shippingXml = GMC_COUNTRIES.map(
       (countryCode) =>
-        `      <g:shipping><g:country>${countryCode}</g:country><g:service>Free Worldwide Shipping</g:service><g:price>0.00 ${currency}</g:price><g:min_handling_time>1</g:min_handling_time><g:max_handling_time>3</g:max_handling_time><g:min_transit_time>5</g:min_transit_time><g:max_transit_time>12</g:max_transit_time></g:shipping>`
+        `      <g:shipping><g:country>${countryCode}</g:country><g:service>Free Worldwide Express Shipping</g:service><g:price>0.00 ${currency}</g:price><g:min_handling_time>1</g:min_handling_time><g:max_handling_time>3</g:max_handling_time><g:min_transit_time>5</g:min_transit_time><g:max_transit_time>12</g:max_transit_time></g:shipping>`
     ).join('\n');
 
     const itemsXml = (products || [])
@@ -85,20 +85,21 @@ export async function GET(request: Request) {
           ? [...item.product_images]
               .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
               .map((img: any) => img.url)
-              .filter(Boolean)
+              .filter((u: string) => Boolean(u) && !/\.(mp4|webm|mov|ogg)$/i.test(u))
           : [];
 
+        if (sortedImages.length === 0) return '';
+
         const primaryImage =
-          item.product_images?.find((img: any) => img.is_primary)?.url ||
-          sortedImages[0] ||
-          `${baseUrl}/about/img1.jpg`;
+          item.product_images?.find((img: any) => img.is_primary && !/\.(mp4|webm|mov|ogg)$/i.test(img.url))?.url ||
+          sortedImages[0];
 
         const additionalImages = sortedImages
           .filter((imgUrl: string) => imgUrl !== primaryImage)
           .slice(0, 10);
 
-        const categoryName = item.categories?.name || 'Embroidered Jacket';
-        const isBag = /bag/i.test(categoryName);
+        const categoryName = item.categories?.name || 'Velvet Suzani Jacket';
+        const isBag = /bag|tote/i.test(categoryName);
         const isDress = /dress/i.test(categoryName);
         const googleProductCategory = isBag
           ? 'Apparel & Accessories > Handbags, Wallets & Cases > Handbags'
@@ -106,9 +107,25 @@ export async function GET(request: Request) {
             ? 'Apparel & Accessories > Clothing > Dresses'
             : 'Apparel & Accessories > Clothing > Outerwear > Coats & Jackets';
 
-        const cleanTitle = item.seo_title
-          ? item.seo_title.replace(/\s*\|\s*Textile Jaipur.*$/i, '').replace(/\.\.\./g, '').trim()
-          : item.name;
+        const color =
+          item.details?.color ||
+          item.details?.image_analysis?.colorPalette?.dominant?.replace(/\s*\(#.*?\)/g, '').trim() ||
+          'Multicolor';
+        const material =
+          item.details?.material ||
+          (/velvet/i.test(categoryName) ? '100% Plush Velvet & Cotton Lining' : '100% Organic Handloom Cotton');
+        const pattern =
+          item.details?.pattern ||
+          item.details?.image_analysis?.craftTechnique ||
+          'Suzani Floral Chain-Stitch Hand Embroidery';
+        const sizeLabel = isBag ? 'One Size' : 'Free Size (Fits XS-XL)';
+        const gtin = item.details?.gtin || '';
+
+        // Google Merchant Center best practice title:
+        // Brand + Gender + Product Name + Product Type + Color + Material + Size + Model/SKU
+        const baseName = (item.name || '').split('—')[0].split('|')[0].trim();
+        const productType = item.details?.product_type || `Hand-Embroidered ${categoryName}`;
+        const richTitle = `Textile Jaipur Women's ${baseName} — ${color !== 'Multicolor' && !baseName.toLowerCase().includes(color.toLowerCase()) ? color + ' ' : ''}${productType} (${sizeLabel}, ${sku})`.slice(0, 150);
 
         const cleanDesc = (item.seo_description || item.description || item.name || '')
           .replace(/\*\*SEO Title:\*\*.*?\n/gi, '')
@@ -119,9 +136,6 @@ export async function GET(request: Request) {
         const convertedPrice = (Number(item.price) * rate).toFixed(2);
         const availability =
           item.stock_quantity > 0 || item.stock > 0 ? 'in_stock' : 'out_of_stock';
-        const color =
-          item.details?.image_analysis?.colorPalette?.dominant || 'Multicolor';
-        const material = item.details?.material || (/velvet/i.test(categoryName) ? 'Velvet' : 'Handloom Cotton & Velvet');
         const productUrl =
           currency === 'INR'
             ? `${baseUrl}/product/${item.id}`
@@ -134,10 +148,14 @@ export async function GET(request: Request) {
           )
           .join('\n');
 
+        const identifierXml = gtin
+          ? `      <g:gtin>${escapeXml(gtin)}</g:gtin>\n      <g:mpn>${escapeXml(sku)}</g:mpn>\n      <g:identifier_exists>yes</g:identifier_exists>`
+          : `      <g:mpn>${escapeXml(sku)}</g:mpn>\n      <g:identifier_exists>no</g:identifier_exists>`;
+
         return `    <item>
       <g:id>${escapeXml(sku)}</g:id>
-      <g:mpn>${escapeXml(sku)}</g:mpn>
-      <g:title>${escapeXml(cleanTitle)}</g:title>
+      <g:item_group_id>${escapeXml(sku)}</g:item_group_id>
+      <g:title>${escapeXml(richTitle)}</g:title>
       <g:description>${escapeXml(cleanDesc.slice(0, 4900))}</g:description>
       <g:link>${escapeXml(productUrl)}</g:link>
       <g:image_link>${escapeXml(primaryImage)}</g:image_link>
@@ -145,17 +163,25 @@ ${additionalImagesXml ? additionalImagesXml + '\n' : ''}      <g:availability>${
       <g:price>${convertedPrice} ${currency}</g:price>
       <g:brand>Textile Jaipur</g:brand>
       <g:condition>new</g:condition>
-      <g:identifier_exists>no</g:identifier_exists>
+${identifierXml}
       <g:google_product_category>${escapeXml(googleProductCategory)}</g:google_product_category>
       <g:product_type>${escapeXml(`Hand-Embroidered Outerwear > ${categoryName}`)}</g:product_type>
       <g:age_group>adult</g:age_group>
       <g:gender>female</g:gender>
       <g:color>${escapeXml(color)}</g:color>
       <g:material>${escapeXml(material)}</g:material>
-      <g:size>One Size</g:size>
+      <g:pattern>${escapeXml(pattern)}</g:pattern>
+      <g:size>${escapeXml(sizeLabel)}</g:size>
+      <g:size_type>regular</g:size_type>
+      <g:size_system>US</g:size_system>
+      <g:product_highlight>100% Hand-Embroidered Suzani Needlework by Master Artisans in Jaipur, India</g:product_highlight>
+      <g:product_highlight>Material: ${escapeXml(material)}</g:product_highlight>
+      <g:product_highlight>Color: ${escapeXml(color)} | Size: ${escapeXml(sizeLabel)}</g:product_highlight>
+      <g:product_highlight>Free Worldwide Express Shipping (5-10 Business Days) with 30-Day Returns</g:product_highlight>
 ${shippingXml}
     </item>`;
       })
+      .filter(Boolean)
       .join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>

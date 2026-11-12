@@ -127,8 +127,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Top-right: Brand Logo Overlay */}
-        <div className="absolute top-4 right-4 z-20 opacity-90 drop-shadow-md">
-          <img src="/icon.png" alt="Textile Jaipur" className="h-7 w-7 rounded-md object-cover border border-white/30 shadow-lg" />
+        <div className="hidden" aria-hidden="true">
+          <span />
         </div>
 
         {/* Top-left: Badges */}

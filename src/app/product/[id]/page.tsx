@@ -8,6 +8,7 @@ export const revalidate = 60; // ISR cache for 60 seconds
 
 type Props = {
   params: { id: string };
+  searchParams?: { currency?: string };
 };
 
 export async function generateMetadata(
@@ -94,7 +95,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { id } = params;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -249,7 +250,12 @@ export default async function ProductPage({ params }: Props) {
     ? (initialReviews.reduce((sum, r) => sum + r.stars, 0) / initialReviews.length).toFixed(1)
     : null;
 
-  const formattedPrice = Number(product.price_inr || 0).toFixed(2);
+  const FX_RATES: Record<string, number> = { INR: 1, USD: 0.0104, EUR: 0.0091, GBP: 0.0079, AED: 0.03948, AUD: 0.01615, NZD: 0.02, CAD: 0.0165, MXN: 0.1936 };
+  const requestedCurr = (searchParams?.currency || 'INR').toUpperCase();
+  const activeCurrency = FX_RATES[requestedCurr] ? requestedCurr : 'INR';
+  const activeRate = FX_RATES[activeCurrency];
+  const formattedPrice = (Number(product.price_inr || 0) * activeRate).toFixed(2);
+  const cleanSchemaImages = (product.images || []).filter((img: string) => !/\.(mp4|webm|mov|ogg)$/i.test(img));
   const gmcCountries = [
     'AE', 'AO', 'AR', 'AT', 'AU', 'BD', 'BE', 'BF', 'BG', 'BH',
     'BR', 'BY', 'CA', 'CH', 'CI', 'CL', 'CM', 'CO', 'CR', 'CY',
@@ -268,16 +274,23 @@ export default async function ProductPage({ params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    image: product.images,
+    image: cleanSchemaImages.length > 0 ? cleanSchemaImages : product.images,
     description: product.description,
     sku: product.sku,
+    mpn: product.sku,
+    productID: product.id,
+    gtin: product.details?.gtin || undefined,
+    itemCondition: 'https://schema.org/NewCondition',
+    category: product.details?.product_type || product.category,
+    size: /bag|tote/i.test(product.category) ? 'One Size' : 'Free Size (Fits XS-XL)',
+    audience: { '@type': 'PeopleAudience', suggestedGender: 'female', suggestedMinAge: 18 },
     brand: {
       '@type': 'Brand',
       name: 'Textile Jaipur'
     },
-    material: product.details?.material || undefined,
-    color: product.details?.image_analysis?.colorPalette?.dominant || undefined,
-    pattern: product.details?.image_analysis?.craftTechnique || undefined,
+    material: product.details?.material || '100% Handloom Cotton & Velvet',
+    color: product.details?.color || product.details?.image_analysis?.colorPalette?.dominant || 'Multicolor',
+    pattern: product.details?.pattern || product.details?.image_analysis?.craftTechnique || 'Suzani Floral Hand-Embroidery',
     keywords: product.details?.seo_keywords?.join(', ') || undefined,
     countryOfOrigin: 'IN',
     manufacturer: {
@@ -287,8 +300,9 @@ export default async function ProductPage({ params }: Props) {
     },
     offers: {
       '@type': 'Offer',
-      url: `https://www.textilejaipur.com/product/${product.id}`,
-      priceCurrency: 'INR',
+      url: activeCurrency === 'INR' ? `https://www.textilejaipur.com/product/${product.id}` : `https://www.textilejaipur.com/product/${product.id}?currency=${activeCurrency}`,
+      sku: product.sku,
+      priceCurrency: activeCurrency,
       price: formattedPrice,
       validFrom: '2026-01-01',
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -313,7 +327,7 @@ export default async function ProductPage({ params }: Props) {
         shippingRate: {
           '@type': 'MonetaryAmount',
           value: '0.00',
-          currency: 'INR'
+          currency: activeCurrency
         },
         shippingDestination: {
           '@type': 'DefinedRegion',
