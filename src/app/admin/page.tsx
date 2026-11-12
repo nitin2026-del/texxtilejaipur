@@ -104,6 +104,8 @@ interface Order {
     gateway: string;
     amount: number;
     currency: string;
+    razorpay_order_id?: string;
+    created_at?: string;
     status: string;
   }[];
 }
@@ -2173,6 +2175,45 @@ function AdminPortalContent() {
                     </thead>
                     <tbody className="divide-y divide-zinc-900/60">
                       {orders.map((order) => {
+                        const attr = (() => {
+                          let fbc = '';
+                          let fbcRecovered = false;
+                          let capiSent = false;
+                          let sourceUrl = '';
+                          let ua = '';
+                          for (const p of (order.payments || [])) {
+                            if (!p.razorpay_order_id) continue;
+                            try {
+                              const m = JSON.parse(p.razorpay_order_id);
+                              if (m.fbc && !fbc) fbc = m.fbc;
+                              if (m.fbc_recovered) fbcRecovered = true;
+                              if (m.meta_capi_sent) capiSent = true;
+                              if (m.userAgent && !ua) ua = m.userAgent;
+                              if (m.eventSourceUrl && (!sourceUrl || m.eventSourceUrl.includes('fbclid=') || m.eventSourceUrl.includes('utm_'))) {
+                                sourceUrl = m.eventSourceUrl;
+                              }
+                            } catch {}
+                          }
+                          let utmCampaign = '';
+                          let utmContent = '';
+                          let utmSource = '';
+                          let utmMedium = '';
+                          let hasFbclid = false;
+                          if (sourceUrl) {
+                            try {
+                              const u = new URL(sourceUrl);
+                              utmCampaign = u.searchParams.get('utm_campaign') || u.searchParams.get('utm_id') || '';
+                              utmContent = u.searchParams.get('utm_content') || '';
+                              utmSource = u.searchParams.get('utm_source') || '';
+                              utmMedium = u.searchParams.get('utm_medium') || '';
+                              hasFbclid = u.searchParams.has('fbclid');
+                            } catch {}
+                          }
+                          const isPaidMeta = Boolean(fbc || hasFbclid || utmMedium === 'paid' || ['fb', 'ig', 'facebook', 'instagram', 'meta'].includes(utmSource.toLowerCase()));
+                          const isInApp = /Instagram|FBAN|FBIOS|FBAV/i.test(ua);
+                          const isIgApp = /Instagram/i.test(ua);
+                          return { fbc, fbcRecovered, capiSent, sourceUrl, isPaidMeta, isInApp, isIgApp, utmCampaign, utmContent };
+                        })();
                         return (
                           <tr key={order.id} className="hover:bg-white/10 transition-colors">
                             <td className="p-4">
@@ -2189,6 +2230,34 @@ function AdminPortalContent() {
                             <td className="p-4">
                               <span className="block font-bold text-zinc-700">
                                 {order.shipping_addresses?.full_name || `${order.profiles?.first_name || ''} ${order.profiles?.last_name || ''}`.trim() || 'Guest User'}
+                              </span>
+                              <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                                {attr.isPaidMeta ? (
+                                  <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-600/15 text-blue-700 border border-blue-600/30" title={attr.sourceUrl || attr.fbc}>
+                                    🎯 Meta Paid Ad{attr.fbcRecovered ? ' (Recovered)' : ''}
+                                  </span>
+                                ) : attr.isInApp ? (
+                                  <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-purple-600/15 text-purple-700 border border-purple-600/30" title={attr.sourceUrl || 'Opened inside Meta In-App Browser without fbclid'}>
+                                    📱 {attr.isIgApp ? 'IG App' : 'FB App'} (No Ad Click ID)
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded bg-zinc-200/70 text-zinc-600">
+                                    🌐 Direct / Organic
+                                  </span>
+                                )}
+                                {attr.capiSent && (
+                                  <span className="inline-flex items-center text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-600/15 text-emerald-700 border border-emerald-600/30" title="Server-Side Purchase CAPI delivered to Meta">
+                                    CAPI ✓
+                                  </span>
+                                )}
+                              </div>
+                              {(attr.utmCampaign || attr.utmContent) && (
+                                <div className="mt-0.5 text-[9px] font-mono text-zinc-500 leading-tight">
+                                  {attr.utmCampaign && <span className="block truncate max-w-[170px]" title={`Campaign ID: ${attr.utmCampaign}`}>Cmp: {attr.utmCampaign}</span>}
+                                  {attr.utmContent && <span className="block truncate max-w-[170px]" title={`Ad ID: ${attr.utmContent}`}>Ad: {attr.utmContent}</span>}
+                                </div>
+                              )}
+                              <span>
                               </span>
                             </td>
                             <td className="p-4">

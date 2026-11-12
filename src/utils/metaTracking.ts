@@ -158,6 +158,22 @@ export const getMetaCookie = (name: string) => {
   return val;
 };
 
+export const getMetaLandingUrl = (): string | undefined => {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const hasAdParams = params.has('fbclid') || params.has('utm_source') || params.has('utm_campaign') || params.has('utm_content') || params.has('utm_id');
+    if (hasAdParams) {
+      localStorage.setItem('meta_landing_url', window.location.href);
+      sessionStorage.setItem('meta_landing_url', window.location.href);
+      return window.location.href;
+    }
+    return sessionStorage.getItem('meta_landing_url') || localStorage.getItem('meta_landing_url') || window.location.href;
+  } catch (e) {
+    return typeof window !== 'undefined' ? window.location.href : undefined;
+  }
+};
+
 export const initMetaCookies = () => {
   if (typeof window === 'undefined') return;
   try {
@@ -167,6 +183,7 @@ export const initMetaCookies = () => {
       sessionStorage.setItem('meta_test_event_code', testCode);
       localStorage.setItem('meta_test_event_code', testCode);
     }
+    getMetaLandingUrl();
     getMetaCookie('_fbp');
     getMetaCookie('_fbc');
   } catch (e) {

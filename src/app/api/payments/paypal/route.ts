@@ -23,7 +23,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned, fbp, fbc, testEventCode } = body;
+    const { action, paypalOrderId, orderId, amount, currency, landingPage, coinsUsed, coinsEarned, fbp, fbc, eventSourceUrl: clientEventSourceUrl, testEventCode } = body;
 
     if (action === 'capture') {
       if (!paypalOrderId || !orderId) {
@@ -218,7 +218,7 @@ export async function POST(req: NextRequest) {
       const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
       const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
       const userAgent = req.headers.get('user-agent') || undefined;
-      const eventSourceUrl = req.headers.get('referer') || `${siteUrl}/payment/success?order_id=${orderId}`;
+      const eventSourceUrl = clientEventSourceUrl || req.headers.get('referer') || `${siteUrl}/payment/success?order_id=${orderId}`;
 
       // Record the payment attempt in the payments table with Meta attribution metadata.
       // Stored as JSON in razorpay_order_id (verified TEXT column on payments table) since raw_response does not exist in schema.

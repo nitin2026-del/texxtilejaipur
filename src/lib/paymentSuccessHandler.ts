@@ -340,18 +340,25 @@ export async function handlePaymentSuccess(
     //   2. 'pending' PayPal record — written when customer first clicked PayPal button
     // This covers the ATC → leave → return 1-2 days later scenario where iOS ITP wiped the cookie.
     let recoveredOrderFbc: string | undefined;
-    if (!storedMeta?.fbc && !metaData?.fbc) {
-      for (const p of (allOrderPayments || [])) {
-        try {
-          const m = JSON.parse(p.razorpay_order_id || '{}');
+    let recoveredSourceUrl: string | undefined;
+    for (const p of (allOrderPayments || [])) {
+      try {
+        const m = JSON.parse(p.razorpay_order_id || '{}');
+        if (!storedMeta?.fbc && !metaData?.fbc && !recoveredOrderFbc) {
           const createdMs = getFbcCreationMs(m?.fbc);
           if (m?.fbc && createdMs && (Date.now() - createdMs) <= FBC_LOOKBACK_MS) {
             recoveredOrderFbc = m.fbc;
             console.log(`[CAPI] Recovered _fbc from prior payment attempt on same order ${orderId}`);
-            break;
           }
-        } catch { /* not a JSON attribution record */ }
-      }
+        }
+        if (
+          !recoveredSourceUrl &&
+          typeof m?.eventSourceUrl === 'string' &&
+          (m.eventSourceUrl.includes('fbclid=') || m.eventSourceUrl.includes('utm_'))
+        ) {
+          recoveredSourceUrl = m.eventSourceUrl;
+        }
+      } catch { /* not a JSON attribution record */ }
     }
 
     if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
@@ -378,7 +385,9 @@ export async function handlePaymentSuccess(
         const resolvedCurrency = (metaData?.trackingCurrency || storedMeta?.trackingCurrency || order?.display_currency || 'USD').toUpperCase();
         const resolvedAmount = Number((metaData?.trackingAmount || storedMeta?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0).toFixed(2));
         const testCode = metaData?.testEventCode || storedMeta?.testEventCode || process.env.META_TEST_EVENT_CODE;
-        const resolvedSourceUrl = storedMeta?.eventSourceUrl || `https://www.textilejaipur.com/payment/success?order_id=${orderId}`;
+        const resolvedSourceUrl = (storedMeta?.eventSourceUrl && (storedMeta.eventSourceUrl.includes('fbclid=') || storedMeta.eventSourceUrl.includes('utm_')))
+          ? storedMeta.eventSourceUrl
+          : (recoveredSourceUrl || storedMeta?.eventSourceUrl || `https://www.textilejaipur.com/payment/success?order_id=${orderId}`);
 
         const emailHashes = Array.from(new Set([
           hashMeta(normEmail(userEmail)),
@@ -434,7 +443,7 @@ export async function handlePaymentSuccess(
             ...(fbcRecovered ? { fbc_recovered: true } : {}),
             clientIp: resolvedIp,
             userAgent: resolvedUa,
-            meta_capi_sent: true,
+            eventSourceUrl: resolvedSourceUrl, meta_capi_sent: true,
             meta_capi_timestamp: new Date().toISOString()
           });
           if (existingPayment?.id) {

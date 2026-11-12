@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { X, CreditCard, ShoppingBag, ShieldCheck, User, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { trackMetaEvent, getMetaCookie } from '@/utils/metaTracking';
+import { trackMetaEvent, getMetaCookie, getMetaLandingUrl } from '@/utils/metaTracking';
 import { PayPalPaymentForm } from './PayPalPaymentForm';
 import { FreeRingWidget } from './FreeRingWidget';
 import { getOptimizedUrl } from '@/utils/imageUtils';
@@ -209,12 +209,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       try {
         const checkoutFbc = getMetaCookie('_fbc');
         const checkoutFbp = getMetaCookie('_fbp');
+        const landingUrl = getMetaLandingUrl();
         if (checkoutFbc || checkoutFbp) {
           const attrJson = JSON.stringify({
             fbp: checkoutFbp || undefined,
             fbc: checkoutFbc || undefined,
             capturedAt: 'checkout_shipping_submit',
-            eventSourceUrl: typeof window !== 'undefined' ? window.location.href : undefined,
+            eventSourceUrl: landingUrl || (typeof window !== 'undefined' ? window.location.href : undefined),
             userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
             trackingCurrency: currency || 'USD',
             trackingAmount: orderTotalDisplay

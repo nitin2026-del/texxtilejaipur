@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getMetaCookie } from '@/utils/metaTracking';
+import { getMetaCookie, getMetaLandingUrl } from '@/utils/metaTracking';
 
 interface PayPalPaymentFormProps {
   orderId: string;
@@ -58,6 +58,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
       // Extract Meta cookies (_fbp, _fbc) with sessionStorage fbclid fallback
       const fbp = getMetaCookie('_fbp') || '';
       const fbc = getMetaCookie('_fbc') || '';
+      const eventSourceUrl = getMetaLandingUrl() || (typeof window !== 'undefined' ? window.location.href : undefined);
       const testEventCode = typeof window !== 'undefined' ? (sessionStorage.getItem('meta_test_event_code') || localStorage.getItem('meta_test_event_code') || undefined) : undefined;
 
       const res = await fetch('/api/payments/paypal', {
@@ -71,6 +72,7 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
           coinsUsed: Number(coinsUsed),
           fbp,
           fbc,
+          eventSourceUrl,
           testEventCode
         }),
       });

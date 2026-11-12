@@ -258,6 +258,7 @@ export default function RootLayout({
                   document.cookie = '_fbp=' + fbpVal + '; path=/; max-age=7776000; SameSite=Lax';
                   localStorage.setItem('meta_fbp', fbpVal);
                   sessionStorage.setItem('meta_fbp', fbpVal);
+                  if (fbclid || params.get('utm_source') || params.get('utm_campaign') || params.get('utm_content') || params.get('utm_id')) { localStorage.setItem('meta_landing_url', window.location.href); sessionStorage.setItem('meta_landing_url', window.location.href); } else if (!sessionStorage.getItem('meta_landing_url') && !localStorage.getItem('meta_landing_url')) { sessionStorage.setItem('meta_landing_url', window.location.href); }
                 } catch (e) {}
               })();
               !function(f,b,e,v,n,t,s)
