@@ -5,7 +5,7 @@ type Props = {
   params: { id: string }
 }
 
-export async function generateMetadata(
+async function _unusedGenerateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
@@ -14,7 +14,7 @@ export async function generateMetadata(
   try {
     const { data: product } = await supabase
       .from('products')
-      .select('name, description, product_images(url)')
+      .select('name, description, seo_title, seo_description, product_images(url)')
       .eq('id', id)
       .single();
 
@@ -24,17 +24,20 @@ export async function generateMetadata(
       ? [product.product_images[0].url]
       : [];
 
+    const metaTitle = product.seo_title || `${product.name} | Textile Jaipur`;
+    const metaDesc = product.seo_description || product.description?.substring(0, 160) || 'Premium handcrafted ethnic wear from Textile Jaipur.';
+
     return {
-      title: `${product.name} | Textile Jaipur`,
-      description: product.description?.substring(0, 160) || 'Premium handcrafted ethnic wear.',
+      title: metaTitle,
+      description: metaDesc,
       openGraph: {
-        title: product.name,
-        description: product.description?.substring(0, 160),
+        title: metaTitle,
+        description: metaDesc,
         images: images,
       },
       twitter: {
-        title: product.name,
-        description: product.description?.substring(0, 160),
+        title: metaTitle,
+        description: metaDesc,
         images: images,
       }
     };

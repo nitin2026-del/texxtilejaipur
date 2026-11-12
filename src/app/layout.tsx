@@ -34,15 +34,15 @@ export const metadata: Metadata = {
   creator: 'Textile Jaipur',
   publisher: 'Textile Jaipur',
   manifest: '/manifest.json',
-  metadataBase: new URL('https://textilejaipur.com'),
+  metadataBase: new URL('https://www.textilejaipur.com'),
   alternates: {
-    canonical: 'https://textilejaipur.com',
+    canonical: 'https://www.textilejaipur.com',
     languages: {
-      'en-US': 'https://textilejaipur.com',
-      'en-GB': 'https://textilejaipur.com',
-      'es': 'https://textilejaipur.com',
-      'fr': 'https://textilejaipur.com',
-      'de': 'https://textilejaipur.com',
+      'en-US': 'https://www.textilejaipur.com',
+      'en-GB': 'https://www.textilejaipur.com',
+      'es': 'https://www.textilejaipur.com',
+      'fr': 'https://www.textilejaipur.com',
+      'de': 'https://www.textilejaipur.com',
     }
   },
   robots: {
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
     description: "Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur. Explore women's bohemian clothing with worldwide shipping.",
-    url: 'https://textilejaipur.com',
+    url: 'https://www.textilejaipur.com',
     siteName: 'Textile Jaipur',
     locale: 'en_US',
     type: 'website',
@@ -107,7 +107,7 @@ const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Textile Jaipur',
-  url: 'https://textilejaipur.com',
+  url: 'https://www.textilejaipur.com',
   logo: 'https://textilejaipur.com/about/img1.jpg',
   description: 'Premium handcrafted Indian ethnic wear — embroidered jackets, Boho dresses, block print textiles, suzani masterpieces — shipped worldwide from Jaipur, Rajasthan.',
   address: {
@@ -140,7 +140,7 @@ const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Textile Jaipur',
-  url: 'https://textilejaipur.com',
+  url: 'https://www.textilejaipur.com',
   description: 'Authentic handcrafted Indian ethnic wear shipped worldwide',
   potentialAction: {
     '@type': 'SearchAction',
@@ -156,12 +156,15 @@ const storeSchema = {
   '@context': 'https://schema.org',
   '@type': 'ClothingStore',
   name: 'Textile Jaipur',
-  url: 'https://textilejaipur.com',
+  url: 'https://www.textilejaipur.com',
   image: 'https://textilejaipur.com/about/img1.jpg',
   priceRange: '$$',
   currenciesAccepted: 'USD, EUR, GBP, INR',
   paymentAccepted: 'Credit Card, Debit Card, PayPal',
   openingHours: 'Mo-Su 00:00-24:00',
+  telephone: '+91-9929835848',
+  hasMap: 'https://www.google.com/maps?q=26.9124,75.7873',
+  geo: { '@type': 'GeoCoordinates', latitude: 26.9124, longitude: 75.7873 },
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Jaipur',

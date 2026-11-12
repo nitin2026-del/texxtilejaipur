@@ -219,6 +219,9 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
           {/* Bottom content — headline & CTA */}
           <div className="space-y-3 sm:space-y-6 sm:mt-0">
             <h1 className="text-[2.6rem] sm:text-7xl md:text-8xl lg:text-[100px] font-serif font-medium tracking-tight leading-[1.05] text-white drop-shadow-2xl max-w-4xl">
+              <span className="block text-[11px] sm:text-xs font-sans font-bold uppercase tracking-[0.28em] text-brand-300 mb-2 sm:mb-3">
+                Hand-Embroidered Suzani Jackets &amp; Jaipur Artisan Outerwear
+              </span>
               Modern <br />
               <span className="font-light italic text-brand-200">Bohemian</span> Luxe.
             </h1>
@@ -661,6 +664,78 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
                 <h3 className="text-lg font-bold text-zinc-900 mb-3 font-serif group-hover:text-brand-700 transition-colors">{item.title}</h3>
                 <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SEO Editorial Guide & Internal Category Links for Google Search & AI Overviews */}
+      <section className="w-full bg-white border-b border-zinc-200 py-16">
+        <div className="px-6 max-w-7xl mx-auto">
+          <div className="max-w-3xl mb-10">
+            <h2 className="text-2xl md:text-3xl font-serif font-bold text-zinc-900 mb-3">
+              Hand-Embroidered Suzani Jackets &amp; Artisan Outerwear from Jaipur
+            </h2>
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              Textile Jaipur specializes in handcrafted, slow-fashion embroidered jackets and bohemian outerwear made by master craftspeople and family workshops in Jaipur, Rajasthan. Every piece blends centuries-old Suzani chain-stitch needlework (`aari` and `resham` embroidery) with contemporary wearable silhouettes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="p-6 rounded-2xl bg-[#FDFBF7] border border-zinc-200/80">
+              <h3 className="text-base font-serif font-bold text-zinc-900 mb-2">
+                <a href="/collections/cotton-jackets" className="hover:text-brand-700 transition-colors">
+                  Suzani &amp; Cotton Artisan Jackets →
+                </a>
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Hand-embroidered cotton twill, quilted handloom, and TNT Suzani jackets featuring vibrant floral, pomegranate, and geometric motifs for lightweight, boho-chic layering.
+              </p>
+            </div>
+            <div className="p-6 rounded-2xl bg-[#FDFBF7] border border-zinc-200/80">
+              <h3 className="text-base font-serif font-bold text-zinc-900 mb-2">
+                <a href="/collections/velvet-jackets" className="hover:text-brand-700 transition-colors">
+                  Velvet &amp; Festive Embroidered Jackets →
+                </a>
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Plush and stone-washed velvet Suzani jackets detailed with dense chain-stitch floral needlework, botanical borders, and soft cotton lining for statement evening and winter wear.
+              </p>
+            </div>
+            <div className="p-6 rounded-2xl bg-[#FDFBF7] border border-zinc-200/80">
+              <h3 className="text-base font-serif font-bold text-zinc-900 mb-2">
+                <a href="/collections/velvet-short-kimono" className="hover:text-brand-700 transition-colors">
+                  Embroidered Kimonos &amp; Corduroy Coats →
+                </a>
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Relaxed open-front short and long Suzani kimonos, ribbed corduroy embroidered jackets, and sleeveless velvet vests crafted in limited editions in Jaipur.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-2">
+            {[
+              { href: '/collections/embroidered-jackets', label: 'All Embroidered Jackets' },
+              { href: '/collections/suzani-jackets', label: 'Suzani Embroidered Jackets' },
+              { href: '/collections/velvet-jackets', label: 'Velvet Suzani Jackets' },
+              { href: '/collections/cotton-jackets', label: 'Cotton Suzani Jackets' },
+              { href: '/collections/tnt-suzani-jacket', label: 'TNT Suzani Jackets' },
+              { href: '/collections/corduroy-jacket', label: 'Corduroy Embroidered Jackets' },
+              { href: '/collections/velvet-short-kimono', label: 'Velvet Short Kimonos' },
+              { href: '/collections/velvet-long-suzani-kimono', label: 'Velvet Long Kimonos' },
+              { href: '/collections/cotton-long-suzani-kimono', label: 'Cotton Long Kimonos' },
+              { href: '/collections/cotton-suzani-dress', label: 'Cotton Suzani Dresses' },
+              { href: '/collections/velvet-vest', label: 'Velvet Embroidered Vests' },
+              { href: '/collections/cotton-tote-bag', label: 'Embroidered Cotton Tote Bags' },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-xs font-medium px-3.5 py-1.5 rounded-full bg-zinc-100 hover:bg-brand-50 text-zinc-700 hover:text-brand-800 border border-zinc-200 transition-colors"
+              >
+                {link.label}
+              </a>
             ))}
           </div>
         </div>

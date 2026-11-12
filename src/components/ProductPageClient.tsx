@@ -39,6 +39,21 @@ interface Product {
     video_url?: string;
     culturalContext?: string;
     stylingAdvice?: string;
+    image_analysis?: {
+      colorPalette?: {
+        dominant?: string;
+        secondary?: string;
+        accents?: string[];
+      };
+      craftTechnique?: string;
+      fabricTexture?: string;
+      garmentSilhouette?: string;
+      aestheticMood?: string;
+      artisanProvenance?: string;
+      imageAltTexts?: string[];
+    };
+    image_alt_texts?: string[];
+    seo_keywords?: string[];
     translations?: {
       fr?: string;
       es?: string;
@@ -427,7 +442,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                         >
                           <img 
                             src={getOptimizedUrl(media.url, 1200)} /* Increased from 800 to 1200 for sharper details */ 
-                            alt={product.details?.image_analysis?.imageAltTexts?.[idx] || `${product.name} view ${idx + 1} - ${product.category} from Textile Jaipur`}
+                            alt={product.details?.image_analysis?.imageAltTexts?.[idx] || product.details?.image_alt_texts?.[idx] || `${product.name} view ${idx + 1} - ${product.category} from Textile Jaipur`}
                             loading={idx === 0 ? "eager" : "lazy"}
                             fetchPriority={idx === 0 ? "high" : "auto"}
                             className="absolute inset-0 w-full h-full object-cover"
@@ -524,7 +539,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                       }`}
                     >
                       <div className="absolute inset-0">
-                        <Image src={media.type === "image" ? getOptimizedUrl(media.url, 200) : getOptimizedUrl(product.images?.[0], 200)} alt={`Thumbnail ${idx}`} fill sizes="100px" className="absolute inset-0 w-full h-full object-cover" />
+                        <Image src={media.type === "image" ? getOptimizedUrl(media.url, 200) : getOptimizedUrl(product.images?.[0], 200)} alt={product.details?.image_analysis?.imageAltTexts?.[idx] || product.details?.image_alt_texts?.[idx] || `${product.name} view ${idx + 1}`} fill sizes="100px" className="absolute inset-0 w-full h-full object-cover" />
                       </div>
                       {media.type === 'video' && (
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center backdrop-blur-[1px]">
@@ -604,7 +619,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
 
                     <img
                       src={product.images?.[selectedMediaIndex] || mediaItems[selectedMediaIndex].url} /* Bypass compression for perfect zoom detail */
-                      alt={`${product.name} – full quality`}
+                      alt={product.details?.image_analysis?.imageAltTexts?.[selectedMediaIndex] || product.details?.image_alt_texts?.[selectedMediaIndex] || `${product.name} - high resolution craft view`}
                       onLoad={() => setImageLoading(false)}
                       className={`${isZoomed ? 'object-contain w-full h-full' : 'absolute inset-0 w-full h-full object-contain'} ${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
                       style={isZoomed ? { maxWidth: 'none' } : {}}
@@ -1057,6 +1072,63 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                           <div className={product.details.culturalContext ? "pt-4 border-t border-zinc-100" : ""}>
                             <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">How to Style</h5>
                             <p className="text-sm text-zinc-600 leading-relaxed">{product.details.stylingAdvice}</p>
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  </div>
+                )}
+
+                {/* Visual Craft & Color Palette Profile */}
+                {product.details?.image_analysis && (
+                  <div className="mt-6">
+                    <details className="group bg-white border border-amber-200/80 rounded-xl overflow-hidden shadow-sm [&_summary::-webkit-details-marker]:hidden">
+                      <summary className="bg-amber-50/70 px-5 py-4 border-b border-amber-200/80 flex items-center justify-between cursor-pointer hover:bg-amber-100/40 transition-colors">
+                        <div className="flex items-center gap-2">
+                          <Palette className="h-4 w-4 text-amber-800" />
+                          <h4 className="text-sm font-bold text-amber-950">Artisan Craft & Color Profile</h4>
+                        </div>
+                        <ChevronDown className="h-5 w-5 text-amber-800 group-open:-rotate-180 transition-transform duration-200" />
+                      </summary>
+                      <div className="p-5 space-y-4 text-sm">
+                        {product.details.image_analysis.colorPalette && (
+                          <div>
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-2">Palette</h5>
+                            <div className="flex flex-wrap gap-2 text-xs">
+                              {product.details.image_analysis.colorPalette.dominant && (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-zinc-900 text-white font-medium">
+                                  Dominant: {product.details.image_analysis.colorPalette.dominant}
+                                </span>
+                              )}
+                              {product.details.image_analysis.colorPalette.secondary && (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-amber-100 text-amber-900 font-medium border border-amber-200">
+                                  Secondary: {product.details.image_analysis.colorPalette.secondary}
+                                </span>
+                              )}
+                              {product.details.image_analysis.colorPalette.accents?.map((acc: string, aIdx: number) => (
+                                <span key={aIdx} className="inline-flex items-center px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
+                                  {acc}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {product.details.image_analysis.craftTechnique && (
+                          <div className="pt-3 border-t border-zinc-100">
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Craft Technique</h5>
+                            <p className="text-zinc-600 leading-relaxed">{product.details.image_analysis.craftTechnique}</p>
+                          </div>
+                        )}
+                        {product.details.image_analysis.garmentSilhouette && (
+                          <div className="pt-3 border-t border-zinc-100">
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Garment Silhouette</h5>
+                            <p className="text-zinc-600 leading-relaxed">{product.details.image_analysis.garmentSilhouette}</p>
+                          </div>
+                        )}
+                        {product.details.image_analysis.artisanProvenance && (
+                          <div className="pt-3 border-t border-zinc-100">
+                            <h5 className="text-xs font-bold text-zinc-900 uppercase tracking-wider mb-1">Artisan Provenance</h5>
+                            <p className="text-zinc-600 leading-relaxed">{product.details.image_analysis.artisanProvenance}</p>
                           </div>
                         )}
                       </div>

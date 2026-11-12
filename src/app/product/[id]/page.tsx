@@ -51,7 +51,7 @@ export async function generateMetadata(
         const metaDescription = item.seo_description 
           || (cleanRawDesc ? cleanRawDesc.substring(0, 155) : `Buy authentic handmade ${item.name} from Textile Jaipur. Authentic artisan craftsmanship with free worldwide shipping.`);
 
-        const productUrl = `https://textilejaipur.com/product/${id}`;
+        const productUrl = `https://www.textilejaipur.com/product/${id}`;
 
         return {
           title: metaTitle,
@@ -271,6 +271,9 @@ export default async function ProductPage({ params }: Props) {
       name: 'Textile Jaipur'
     },
     material: product.details?.material || undefined,
+    color: product.details?.image_analysis?.colorPalette?.dominant || undefined,
+    pattern: product.details?.image_analysis?.craftTechnique || undefined,
+    keywords: product.details?.seo_keywords?.join(', ') || undefined,
     countryOfOrigin: 'IN',
     manufacturer: {
       '@type': 'Organization',
@@ -279,7 +282,7 @@ export default async function ProductPage({ params }: Props) {
     },
     offers: {
       '@type': 'Offer',
-      url: `https://textilejaipur.com/product/${product.id}`,
+      url: `https://www.textilejaipur.com/product/${product.id}`,
       priceCurrency: 'INR',
       price: formattedPrice,
       validFrom: '2026-01-01',
@@ -351,19 +354,19 @@ export default async function ProductPage({ params }: Props) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://textilejaipur.com'
+        item: 'https://www.textilejaipur.com'
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: product.category,
-        item: `https://textilejaipur.com/collection?category=${encodeURIComponent(product.category)}`
+        item: `https://www.textilejaipur.com/collection?category=${encodeURIComponent(product.category)}`
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: product.name,
-        item: `https://textilejaipur.com/product/${product.id}`
+        item: `https://www.textilejaipur.com/product/${product.id}`
       }
     ]
   };

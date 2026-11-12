@@ -1,24 +1,9 @@
 import { NextResponse } from 'next/server';
 
-export const revalidate = 300; // Cache feed for 5 minutes
-
-// All 95 official Google Merchant Center supported target countries (<= 100 limit per item)
-const GMC_COUNTRIES = [
-  'AE', 'AO', 'AR', 'AT', 'AU', 'BD', 'BE', 'BF', 'BG', 'BH',
-  'BR', 'BY', 'CA', 'CH', 'CI', 'CL', 'CM', 'CO', 'CR', 'CY',
-  'CZ', 'DE', 'DK', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ES', 'ET',
-  'FI', 'FR', 'GB', 'GE', 'GH', 'GR', 'GT', 'HK', 'HR', 'HU',
-  'ID', 'IE', 'IL', 'IN', 'IT', 'JO', 'JP', 'KE', 'KH', 'KR',
-  'KW', 'KZ', 'LB', 'LK', 'LT', 'LU', 'LV', 'MA', 'MG', 'MM',
-  'MT', 'MU', 'MX', 'MY', 'MZ', 'NG', 'NI', 'NL', 'NO', 'NP',
-  'NZ', 'OM', 'PA', 'PE', 'PH', 'PK', 'PL', 'PR', 'PT', 'PY',
-  'QA', 'RO', 'RU', 'SA', 'SE', 'SG', 'SI', 'SK', 'SN', 'SV',
-  'TH', 'TN', 'TR', 'TW', 'TZ', 'UA', 'UG', 'US', 'UY', 'UZ',
-  'VE', 'VN', 'ZA', 'ZM', 'ZW',
-].slice(0, 100);
+export const revalidate = 3600;
 
 function escapeXml(unsafe: string): string {
-  return (unsafe || '')
+  return String(unsafe || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -26,24 +11,7 @@ function escapeXml(unsafe: string): string {
     .replace(/'/g, '&apos;');
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const currencyParam = (searchParams.get('currency') || 'INR').toUpperCase();
-
-  const FX_RATES: Record<string, number> = {
-    INR: 1,
-    USD: 0.0104,
-    EUR: 0.0091,
-    GBP: 0.0079,
-    AED: 0.03948,
-    AUD: 0.01615,
-    NZD: 0.02,
-    CAD: 0.0165,
-  };
-
-  const currency = FX_RATES[currencyParam] ? currencyParam : 'INR';
-  const rate = FX_RATES[currency];
-
+export async function GET() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
@@ -53,13 +21,10 @@ export async function GET(request: Request) {
 
   try {
     const res = await fetch(
-      `${url}/rest/v1/products?select=id,name,description,price,stock,stock_quantity,details,categories(name),product_images(url,is_primary,display_order)&order=display_rank.asc.nullslast`,
+      `${url}/rest/v1/products?select=id,name,slug,description,seo_title,seo_description,price,stock,stock_quantity,details,categories(name),product_images(url,is_primary,display_order)&status=eq.active&order=display_rank.asc.nullslast`,
       {
-        headers: {
-          apikey: key,
-          Authorization: `Bearer ${key}`,
-        },
-        next: { revalidate: 300 },
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        next: { revalidate: 3600 },
       }
     );
 
@@ -68,87 +33,89 @@ export async function GET(request: Request) {
     }
 
     const products = await res.json();
+    const baseUrl = 'https://www.textilejaipur.com';
 
-    // Pre-build the worldwide shipping XML block in the exact same currency as the item price
-    const shippingXml = GMC_COUNTRIES.map(
-      (countryCode) =>
-        `      <g:shipping><g:country>${countryCode}</g:country><g:service>Free Worldwide Shipping</g:service><g:price>0.00 ${currency}</g:price><g:min_handling_time>1</g:min_handling_time><g:max_handling_time>3</g:max_handling_time><g:min_transit_time>5</g:min_transit_time><g:max_transit_time>12</g:max_transit_time></g:shipping>`
-    ).join('\n');
+    const itemsXml = (products as any[])
+      .map((p) => {
+        const sortedImages = (p.product_images || [])
+          .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
+          .map((img: any) => img.url)
+          .filter(Boolean);
 
-    const itemsXml = (products || [])
-      .filter((p: any) => p.price && Number(p.price) > 0)
-      .map((item: any) => {
-        const sku = `HT-${item.id.slice(0, 8).toUpperCase()}`;
-        const sortedImages = item.product_images
-          ? [...item.product_images]
-              .sort((a: any, b: any) => (a.display_order || 0) - (b.display_order || 0))
-              .map((img: any) => img.url)
-              .filter(Boolean)
-          : [];
+        if (sortedImages.length === 0) return '';
 
-        const primaryImage =
-          item.product_images?.find((img: any) => img.is_primary)?.url ||
-          sortedImages[0] ||
-          'https://textilejaipur.com/about/img1.jpg';
+        const primaryImage = sortedImages[0];
+        const additionalImages = sortedImages.slice(1, 10);
+        const categoryName = p.categories?.name || 'Embroidered Jacket';
+        const isBag = /bag/i.test(categoryName);
+        const isDress = /dress/i.test(categoryName);
+        const googleProductCategory = isBag
+          ? 'Apparel & Accessories > Handbags, Wallets & Cases > Handbags'
+          : isDress
+            ? 'Apparel & Accessories > Clothing > Dresses'
+            : 'Apparel & Accessories > Clothing > Outerwear > Coats & Jackets';
 
-        const additionalImages = sortedImages
-          .filter((imgUrl: string) => imgUrl !== primaryImage)
-          .slice(0, 10);
+        const cleanTitle = p.seo_title
+          ? p.seo_title.replace(/\s*\|\s*Textile Jaipur.*$/i, '').replace(/\.\.\./g, '').trim()
+          : `${p.name} — Hand-Embroidered ${categoryName}`;
 
-        const cleanDesc = (item.description || item.name || '')
-          .replace(/\*\*SEO Title:\*\*.*?\n/gi, '')
-          .replace(/\*\*SEO Description:\*\*.*?\n/gi, '')
+        const cleanDesc = (p.seo_description || p.description || `Authentic hand-embroidered ${p.name} handcrafted by master artisans in Jaipur, Rajasthan.`)
           .replace(/[*#_~`]/g, '')
-          .trim();
+          .trim()
+          .slice(0, 4900);
 
-        const convertedPrice = (Number(item.price) * rate).toFixed(2);
-        const availability =
-          item.stock_quantity > 0 || item.stock > 0 ? 'in_stock' : 'out_of_stock';
-        const categoryName = item.categories?.name || 'Ethnic Wear';
-        const color =
-          item.details?.image_analysis?.colorPalette?.dominant || 'Multicolor';
-        const material = item.details?.material || 'Handloom Cotton & Velvet';
-        const productUrl =
-          currency === 'INR'
-            ? `https://textilejaipur.com/product/${item.id}`
-            : `https://textilejaipur.com/product/${item.id}?currency=${currency}`;
-
-        const additionalImagesXml = additionalImages
-          .map(
-            (imgUrl: string) =>
-              `      <g:additional_image_link>${escapeXml(imgUrl)}</g:additional_image_link>`
-          )
-          .join('\n');
+        const inStock = (p.stock_quantity || p.stock || 0) > 0;
+        const priceInr = Number(p.price || 0).toFixed(2);
+        const material = p.details?.material || (/velvet/i.test(categoryName) ? 'Velvet' : 'Cotton');
+        const color = p.details?.image_analysis?.colorPalette?.dominant || 'Multicolor';
+        const sku = `HT-${String(p.id).slice(0, 8).toUpperCase()}`;
 
         return `    <item>
-      <g:id>${escapeXml(sku)}</g:id>
-      <g:title>${escapeXml(item.name)}</g:title>
-      <g:description>${escapeXml(cleanDesc.slice(0, 4900))}</g:description>
-      <g:link>${escapeXml(productUrl)}</g:link>
+      <g:id>${escapeXml(p.id)}</g:id>
+      <g:mpn>${escapeXml(sku)}</g:mpn>
+      <g:title>${escapeXml(cleanTitle)}</g:title>
+      <g:description>${escapeXml(cleanDesc)}</g:description>
+      <g:link>${baseUrl}/product/${escapeXml(p.id)}</g:link>
       <g:image_link>${escapeXml(primaryImage)}</g:image_link>
-${additionalImagesXml ? additionalImagesXml + '\n' : ''}      <g:availability>${availability}</g:availability>
-      <g:price>${convertedPrice} ${currency}</g:price>
+${additionalImages.map((img: string) => `      <g:additional_image_link>${escapeXml(img)}</g:additional_image_link>`).join('\n')}
+      <g:availability>${inStock ? 'in_stock' : 'out_of_stock'}</g:availability>
+      <g:price>${priceInr} INR</g:price>
       <g:brand>Textile Jaipur</g:brand>
       <g:condition>new</g:condition>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:google_product_category>Apparel &amp; Accessories &gt; Clothing</g:google_product_category>
-      <g:product_type>${escapeXml(categoryName)}</g:product_type>
+      <g:google_product_category>${escapeXml(googleProductCategory)}</g:google_product_category>
+      <g:product_type>${escapeXml(`Hand-Embroidered Outerwear > ${categoryName}`)}</g:product_type>
       <g:age_group>adult</g:age_group>
       <g:gender>female</g:gender>
-      <g:color>${escapeXml(color)}</g:color>
       <g:material>${escapeXml(material)}</g:material>
-      <g:size>One Size</g:size>
-${shippingXml}
+      <g:color>${escapeXml(color)}</g:color>
+      <g:size>Free Size</g:size>
+      <g:shipping>
+        <g:country>IN</g:country>
+        <g:service>Standard</g:service>
+        <g:price>0.00 INR</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>US</g:country>
+        <g:service>Express</g:service>
+        <g:price>0.00 INR</g:price>
+      </g:shipping>
+      <g:shipping>
+        <g:country>GB</g:country>
+        <g:service>Express</g:service>
+        <g:price>0.00 INR</g:price>
+      </g:shipping>
     </item>`;
       })
+      .filter(Boolean)
       .join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
   <channel>
-    <title>Textile Jaipur - Official Product Feed (${currency})</title>
-    <link>https://textilejaipur.com</link>
-    <description>Authentic Handmade Jaipur Ethnic Wear &amp; Suzani Jackets</description>
+    <title>Textile Jaipur — Hand-Embroidered Suzani Jackets &amp; Artisan Outerwear</title>
+    <link>${baseUrl}</link>
+    <description>Authentic hand-embroidered Suzani jackets, velvet coats, cotton jackets, and boho kimonos handcrafted by master artisans in Jaipur, Rajasthan.</description>
 ${itemsXml}
   </channel>
 </rss>`;
@@ -157,11 +124,11 @@ ${itemsXml}
       status: 200,
       headers: {
         'Content-Type': 'application/xml; charset=utf-8',
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
     });
   } catch (err) {
-    console.error('Error generating Google Merchant feed:', err);
+    console.error('Merchant feed error:', err);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }

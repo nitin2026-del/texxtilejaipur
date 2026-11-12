@@ -1,8 +1,32 @@
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://textilejaipur.com';
+  const baseUrl = 'https://www.textilejaipur.com';
   const now = new Date();
+
+  const seoCollectionSlugs = [
+    'embroidered-jackets',
+    'suzani-jackets',
+    'velvet-jackets',
+    'velvet-suzani-jacket',
+    'cotton-jackets',
+    'cotton-suzani-jacket',
+    'tnt-suzani-jacket',
+    'corduroy-jacket',
+    'velvet-short-kimono',
+    'velvet-long-suzani-kimono',
+    'cotton-long-suzani-kimono',
+    'cotton-suzani-dress',
+    'velvet-vest',
+    'cotton-tote-bag',
+  ];
+
+  const cleanCollectionRoutes: MetadataRoute.Sitemap = seoCollectionSlugs.map((slug) => ({
+    url: `${baseUrl}/collections/${slug}`,
+    lastModified: now,
+    changeFrequency: 'daily',
+    priority: 0.95,
+  }));
 
   // Define static routes
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -144,11 +168,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
       }
 
-      return [...staticRoutes, ...categoryRoutes, ...dynamicProductRoutes];
+      return [...staticRoutes, ...cleanCollectionRoutes, ...categoryRoutes, ...dynamicProductRoutes];
     }
   } catch (err) {
     console.error('Failed to fetch products for sitemap', err);
   }
 
-  return [...staticRoutes, ...dynamicProductRoutes];
+  return [...staticRoutes, ...cleanCollectionRoutes, ...dynamicProductRoutes];
 }

@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
     ],
-    sitemap: 'https://textilejaipur.com/sitemap.xml',
-    host: 'https://textilejaipur.com',
+    sitemap: 'https://www.textilejaipur.com/sitemap.xml',
+    host: 'https://www.textilejaipur.com',
   };
 }

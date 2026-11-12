@@ -30,13 +30,14 @@ interface CollectionPageClientProps {
   categories: string[];
   saleBanner?: string | null;
   seoDescriptions?: Record<string, string>;
+  initialCategory?: string;
 }
 
-export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ initialProducts, categories, saleBanner, seoDescriptions = {} }) => {
+export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ initialProducts, categories, saleBanner, seoDescriptions = {}, initialCategory = 'All' }) => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [products] = useState<Product[]>(initialProducts);
   
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'All');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(24);
@@ -90,7 +91,7 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
 
     // Filter by Category
     if (selectedCategory !== 'All') {
-      result = result.filter(p => p.category === selectedCategory);
+      result = result.filter(p => p.category.toLowerCase() === selectedCategory.toLowerCase());
     }
 
     // Sort
@@ -184,17 +185,28 @@ export const CollectionPageClient: React.FC<CollectionPageClientProps> = ({ init
           </div>
         )}
 
-        {/* SEO Category Description */}
+        {/* SEO Category Heading & Description (Always rendered in SSR for Google indexing) */}
         {(() => {
           const descKey = Object.keys(seoDescriptions).find(k => k.toLowerCase() === selectedCategory.toLowerCase());
-          const descText = descKey ? seoDescriptions[descKey] : null;
-          if (!descText) return null;
+          const descText = descKey
+            ? seoDescriptions[descKey]
+            : `Shop authentic hand-embroidered ${selectedCategory === 'All' ? 'Suzani jackets, velvet coats, and boho kimonos' : selectedCategory.toLowerCase()} handcrafted by master artisans in Jaipur, Rajasthan.`;
+          const headingText = selectedCategory === 'All'
+            ? 'Hand-Embroidered Suzani Jackets & Jaipur Artisan Outerwear'
+            : `Hand-Embroidered ${selectedCategory}`;
           return (
             <div className="mb-8 p-6 md:p-8 bg-white border border-brand-100 rounded-2xl shadow-sm text-center max-w-3xl mx-auto animate-fade-in-up">
-              <h1 className="text-2xl md:text-3xl font-serif font-bold text-zinc-900 mb-4">{selectedCategory === 'All' ? 'Our Collection' : selectedCategory}</h1>
+              <h1 className="text-2xl md:text-3xl font-serif font-bold text-zinc-900 mb-3">{headingText}</h1>
               <p className="text-sm md:text-base text-zinc-600 leading-relaxed font-medium">
                 {descText}
               </p>
+              <nav aria-label="Category quick links" className="sr-only">
+                {categories.filter(c => c !== 'All').map((cat) => (
+                  <a key={cat} href={`/collection?category=${encodeURIComponent(cat)}`}>
+                    Hand-Embroidered {cat}
+                  </a>
+                ))}
+              </nav>
             </div>
           );
         })()}

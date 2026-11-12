@@ -78,15 +78,15 @@ export default async function Home() {
     '@type': 'ItemList',
     name: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
     description: 'Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur.',
-    url: 'https://textilejaipur.com',
+    url: 'https://www.textilejaipur.com',
     numberOfItems: products.length,
     itemListElement: products.slice(0, 30).map((p, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      url: `https://textilejaipur.com/product/${p.id}`,
+      url: `https://www.textilejaipur.com/product/${p.id}`,
       item: {
         '@type': 'Product',
-        '@id': `https://textilejaipur.com/product/${p.id}#product`,
+        '@id': `https://www.textilejaipur.com/product/${p.id}#product`,
         name: p.name,
         description: p.description || `Handmade ${p.category} from Jaipur, India`,
         image: p.images,
@@ -100,7 +100,7 @@ export default async function Home() {
         countryOfOrigin: 'IN',
         offers: {
           '@type': 'Offer',
-          url: `https://textilejaipur.com/product/${p.id}`,
+          url: `https://www.textilejaipur.com/product/${p.id}`,
           priceCurrency: 'INR',
           price: p.price_inr,
           itemCondition: 'https://schema.org/NewCondition',
@@ -143,7 +143,7 @@ export default async function Home() {
     '@type': 'ImageGallery',
     name: 'Textile Jaipur — Handcrafted Jacket Collection',
     description: 'Browse handmade embroidered Suzani jackets, velvet jackets, and boho kimonos from Textile Jaipur.',
-    url: 'https://textilejaipur.com',
+    url: 'https://www.textilejaipur.com',
     image: allProductImages.slice(0, 50).map((imgUrl: string) => ({
       '@type': 'ImageObject',
       url: imgUrl,
