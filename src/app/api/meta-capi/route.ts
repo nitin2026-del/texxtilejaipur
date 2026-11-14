@@ -115,7 +115,7 @@ const getPhoneHashes = (phone?: string, country?: string): string[] | undefined 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { eventName, eventData, eventId, url, userAgent, fbp, fbc, userData, testEventCode } = body;
+    const { eventName, eventData, eventId, url, landingUrl, userAgent, fbp, fbc, userData, testEventCode } = body;
     const uaToCheck = String(userAgent || req.headers.get('user-agent') || '');
     if (/googlebot|bingbot|yandexbot|baiduspider|duckduckbot|slurp|applebot|facebookexternalhit|meta-externalagent|facebot|twitterbot|linkedinbot|pinterestbot|ahrefsbot|semrushbot|mj12bot|dotbot|petalbot|bytespider|gptbot|claudebot|perplexitybot|headlesschrome|phantomjs|lighthouse|pagespeed|gtmetrix|pingdom|uptimerobot|statuscake/i.test(uaToCheck)) {
       return NextResponse.json({ success: true, skipped: 'bot' }, { status: 200 });
@@ -157,14 +157,19 @@ export async function POST(req: Request) {
     }
 
     let resolvedFbc = fbc || undefined;
-    if (!resolvedFbc && typeof url === 'string') {
-      try {
-        const parsedUrl = new URL(url);
-        const urlFbclid = parsedUrl.searchParams.get('fbclid') || (url.match(/[\?&#]fbclid=([^&#]+)/)?.[1]);
-        if (urlFbclid) {
-          resolvedFbc = `fb.1.${Date.now()}.${decodeURIComponent(urlFbclid)}`;
+    if (!resolvedFbc) {
+      for (const candidateUrl of [url, landingUrl]) {
+        if (typeof candidateUrl === 'string' && candidateUrl) {
+          try {
+            const parsedUrl = new URL(candidateUrl);
+            const urlFbclid = parsedUrl.searchParams.get('fbclid') || (candidateUrl.match(/[\?&#]fbclid=([^&#]+)/)?.[1]);
+            if (urlFbclid) {
+              resolvedFbc = `fb.1.${Date.now()}.${decodeURIComponent(urlFbclid)}`;
+              break;
+            }
+          } catch {}
         }
-      } catch {}
+      }
     }
 
     const payload = {

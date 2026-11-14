@@ -113,8 +113,8 @@ const getPhoneHashes = (phone?: string, country?: string): string[] | undefined 
   return hashes.length > 0 ? hashes : undefined;
 };
 
-// Meta's default click attribution window is 7 days, so only recover click IDs created within that window.
-const FBC_LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000;
+// Meta's official _fbc cookie lifetime is 90 days (max-age=7776000).
+const FBC_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 
 const getFbcCreationMs = (fbc?: string): number | undefined => {
   const parts = fbc?.split('.');
@@ -348,43 +348,60 @@ export async function handlePaymentSuccess(
     }
     const capiAlreadySent = !!storedMeta?.meta_capi_sent;
 
-    // Recover _fbc from any PRIOR payment/attribution record on this SAME order.
+    // Recover _fbc, _fbp, clientIp, userAgent, paypalEmail, and eventSourceUrl from any PRIOR payment/attribution record on this SAME order.
     // Sources in allOrderPayments (newest-first):
     //   1. 'attribution' record — written at checkout shipping-submit (EARLIEST, even before PayPal click)
     //   2. 'pending' PayPal record — written when customer first clicked PayPal button
-    // This covers the ATC → leave → return 1-2 days later scenario where iOS ITP wiped the cookie.
+    // This covers the ATC → leave → return days later scenario where iOS ITP wiped the cookie.
     let recoveredOrderFbc: string | undefined;
+    let recoveredOrderFbp: string | undefined;
+    let recoveredOrderIp: string | undefined;
+    let recoveredOrderUa: string | undefined;
+    let recoveredOrderPaypalEmail: string | undefined;
     let recoveredSourceUrl: string | undefined;
+    let recoveredProductUrl: string | undefined;
     for (const p of (allOrderPayments || [])) {
       try {
         const m = JSON.parse(p.razorpay_order_id || '{}');
-        if (!storedMeta?.fbc && !metaData?.fbc && !recoveredOrderFbc) {
-          const createdMs = getFbcCreationMs(m?.fbc);
-          if (m?.fbc && createdMs && (Date.now() - createdMs) <= FBC_LOOKBACK_MS) {
+        if (!storedMeta?.fbc && !metaData?.fbc && !recoveredOrderFbc && typeof m?.fbc === 'string' && m.fbc) {
+          const createdMs = getFbcCreationMs(m.fbc);
+          if (!createdMs || (Date.now() - createdMs) <= FBC_LOOKBACK_MS) {
             recoveredOrderFbc = m.fbc;
             console.log(`[CAPI] Recovered _fbc from prior payment attempt on same order ${orderId}`);
           }
         }
-        if (
-          !recoveredSourceUrl &&
-          typeof m?.eventSourceUrl === 'string' &&
-          (m.eventSourceUrl.includes('fbclid=') || m.eventSourceUrl.includes('utm_'))
-        ) {
-          recoveredSourceUrl = m.eventSourceUrl;
+        if (! recoveredOrderFbp && typeof m?.fbp === 'string' && m.fbp) {
+          recoveredOrderFbp = m.fbp;
+        }
+        if (!recoveredOrderIp && typeof m?.clientIp === 'string' && m.clientIp) {
+          recoveredOrderIp = m.clientIp;
+        }
+        if (!recoveredOrderUa && typeof m?.userAgent === 'string' && m.userAgent) {
+          recoveredOrderUa = m.userAgent;
+        }
+        if (!recoveredOrderPaypalEmail && typeof m?.paypalEmail === 'string' && m.paypalEmail) {
+          recoveredOrderPaypalEmail = m.paypalEmail;
+        }
+        if (typeof m?.eventSourceUrl === 'string' && m.eventSourceUrl) {
+          if (!recoveredSourceUrl && (m.eventSourceUrl.includes('fbclid=') || m.eventSourceUrl.includes('utm_'))) {
+            recoveredSourceUrl = m.eventSourceUrl;
+          } else if (!recoveredProductUrl && m.eventSourceUrl.includes('/product/')) {
+            recoveredProductUrl = m.eventSourceUrl;
+          }
         }
       } catch { /* not a JSON attribution record */ }
     }
 
     if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
       try {
-        const resolvedFbp = metaData?.fbp || storedMeta?.fbp || undefined;
+        const resolvedFbp = metaData?.fbp || storedMeta?.fbp || recoveredOrderFbp || undefined;
         let resolvedFbc: string | undefined = metaData?.fbc || storedMeta?.fbc || recoveredOrderFbc || undefined;
         let fbcRecovered = !!recoveredOrderFbc && !metaData?.fbc && !storedMeta?.fbc;
         let crossSessionUrl: string | undefined;
-        if (!resolvedFbc || (!recoveredSourceUrl && !(storedMeta?.eventSourceUrl || '').includes('fbclid=') && !(storedMeta?.eventSourceUrl || '').includes('/product/'))) {
-          // Cross-order fallback: look at OTHER orders from same customer within 7 days
+        if (!resolvedFbc || (!recoveredSourceUrl && !(storedMeta?.eventSourceUrl || '').includes('fbclid=') && !(storedMeta?.eventSourceUrl || '').includes('/product/') && !recoveredProductUrl)) {
+          // Cross-order fallback: look at OTHER orders from same customer within 90 days
           const crossSession = await recoverFbcFromPriorSessions(supabaseAdmin, orderId, {
-            emails: [userEmail, metaData?.paypalEmail || storedMeta?.paypalEmail].filter(Boolean) as string[],
+            emails: [userEmail, metaData?.paypalEmail || storedMeta?.paypalEmail || recoveredOrderPaypalEmail].filter(Boolean) as string[],
             phone: userPhone,
             userId: order?.user_id || undefined
           });
@@ -397,15 +414,15 @@ export async function handlePaymentSuccess(
           }
           if (fbcRecovered) console.log(`[CAPI] Recovered fbc from earlier session for order ${orderId}`);
         }
-        const rawIp = metaData?.clientIp || storedMeta?.clientIp;
+        const rawIp = metaData?.clientIp || storedMeta?.clientIp || recoveredOrderIp;
         const resolvedIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
-        const resolvedUa = metaData?.userAgent || storedMeta?.userAgent || undefined;
+        const resolvedUa = metaData?.userAgent || storedMeta?.userAgent || recoveredOrderUa || undefined;
         const resolvedCurrency = (metaData?.trackingCurrency || storedMeta?.trackingCurrency || order?.display_currency || 'USD').toUpperCase();
         const resolvedAmount = Number((metaData?.trackingAmount || storedMeta?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0).toFixed(2));
         const testCode = metaData?.testEventCode || storedMeta?.testEventCode || process.env.META_TEST_EVENT_CODE;
         const resolvedSourceUrl = (storedMeta?.eventSourceUrl && (storedMeta.eventSourceUrl.includes('fbclid=') || storedMeta.eventSourceUrl.includes('utm_')))
           ? storedMeta.eventSourceUrl
-          : (recoveredSourceUrl || crossSessionUrl || storedMeta?.eventSourceUrl || `https://www.textilejaipur.com/payment/success?order_id=${orderId}`);
+          : (recoveredSourceUrl || crossSessionUrl || recoveredProductUrl || storedMeta?.eventSourceUrl || `https://www.textilejaipur.com/payment/success?order_id=${orderId}`);
         if (!resolvedFbc && typeof resolvedSourceUrl === 'string') {
           try {
             const u = new URL(resolvedSourceUrl);
@@ -419,7 +436,7 @@ export async function handlePaymentSuccess(
 
         const emailHashes = Array.from(new Set([
           hashMeta(normEmail(userEmail)),
-          hashMeta(normEmail(metaData?.paypalEmail || storedMeta?.paypalEmail))
+          hashMeta(normEmail(metaData?.paypalEmail || storedMeta?.paypalEmail || recoveredOrderPaypalEmail))
         ].filter(Boolean) as string[]));
 
         const payload = {

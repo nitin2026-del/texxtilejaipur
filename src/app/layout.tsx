@@ -240,6 +240,34 @@ export default function RootLayout({
                 var lSet = function(k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
                 var sGet = function(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } };
                 var sSet = function(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} };
+                var cSet = function(k, v) {
+                  try { document.cookie = k + '=' + v + '; path=/; max-age=7776000; SameSite=Lax'; } catch (e) {}
+                  try {
+                    if (window.location && window.location.hostname && window.location.hostname.indexOf('textilejaipur.com') !== -1) {
+                      document.cookie = k + '=' + v + '; domain=.textilejaipur.com; path=/; max-age=7776000; SameSite=Lax';
+                    }
+                  } catch (e) {}
+                };
+                var cGet = function(k) {
+                  try {
+                    var parts = (document.cookie || '').split(';');
+                    var best = '';
+                    var bestTs = -1;
+                    for (var i = 0; i < parts.length; i++) {
+                      var p = parts[i].replace(/^\s+/, '');
+                      if (p.indexOf(k + '=') === 0) {
+                        var v = p.substring(k.length + 1);
+                        var segs = v.split('.');
+                        var ts = segs.length >= 3 ? Number(segs[2]) : 0;
+                        if (!best || (ts && ts >= bestTs)) {
+                          best = v;
+                          if (ts) bestTs = ts;
+                        }
+                      }
+                    }
+                    return best;
+                  } catch (e) { return ''; }
+                };
                 try {
                   var href = window.location.href || '';
                   var params = new URLSearchParams(window.location.search);
@@ -249,13 +277,12 @@ export default function RootLayout({
                     if (mHref && mHref[1]) { try { fbclid = decodeURIComponent(mHref[1]); } catch (e) { fbclid = mHref[1]; } }
                   }
                   if (fbclid) {
-                    var m = document.cookie.match(/(^| )_fbc=([^;]+)/);
-                    var existingFbc = (m ? m[2] : '') || lGet('meta_fbc') || sGet('meta_fbc') || '';
+                    var existingFbc = cGet('_fbc') || lGet('meta_fbc') || sGet('meta_fbc') || '';
                     var nowTs = String(Date.now());
                     var fbcVal = (existingFbc && existingFbc.slice(-fbclid.length - 1) === '.' + fbclid)
                       ? existingFbc
                       : ('fb.1.' + nowTs + '.' + fbclid);
-                    try { document.cookie = '_fbc=' + fbcVal + '; path=/; max-age=7776000; SameSite=Lax'; } catch (e) {}
+                    cSet('_fbc', fbcVal);
                     window.__META_FBC = fbcVal;
                     lSet('meta_fbc', fbcVal);
                     sSet('meta_fbc', fbcVal);
@@ -264,23 +291,21 @@ export default function RootLayout({
                     sSet('meta_fbclid', fbclid);
                     sSet('meta_fbclid_ts', nowTs);
                   } else {
-                    var mFbc = document.cookie.match(/(^| )_fbc=([^;]+)/);
-                    var storedFbc = (mFbc ? mFbc[2] : '') || lGet('meta_fbc') || sGet('meta_fbc') || '';
+                    var storedFbc = cGet('_fbc') || lGet('meta_fbc') || sGet('meta_fbc') || '';
                     if (!storedFbc) {
                       var savedClid = lGet('meta_fbclid') || sGet('meta_fbclid');
                       var savedTs = lGet('meta_fbclid_ts') || sGet('meta_fbclid_ts') || String(Date.now());
                       if (savedClid) storedFbc = 'fb.1.' + savedTs + '.' + savedClid;
                     }
                     if (storedFbc) {
-                      try { document.cookie = '_fbc=' + storedFbc + '; path=/; max-age=7776000; SameSite=Lax'; } catch (e) {}
+                      cSet('_fbc', storedFbc);
                       window.__META_FBC = storedFbc;
                       lSet('meta_fbc', storedFbc);
                       sSet('meta_fbc', storedFbc);
                     }
                   }
-                  var mFbp = document.cookie.match(/(^| )_fbp=([^;]+)/);
-                  var fbpVal = (mFbp ? mFbp[2] : '') || lGet('meta_fbp') || sGet('meta_fbp') || ('fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1000000000));
-                  try { document.cookie = '_fbp=' + fbpVal + '; path=/; max-age=7776000; SameSite=Lax'; } catch (e) {}
+                  var fbpVal = cGet('_fbp') || lGet('meta_fbp') || sGet('meta_fbp') || ('fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1000000000));
+                  cSet('_fbp', fbpVal);
                   window.__META_FBP = fbpVal;
                   lSet('meta_fbp', fbpVal);
                   sSet('meta_fbp', fbpVal);

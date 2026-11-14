@@ -269,7 +269,25 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
     if (product && !trackedViewIds.current.has(product.id)) {
       trackedViewIds.current.add(product.id);
       const parsedPriceInr = typeof product.price_inr === 'string' ? parseFloat(product.price_inr) : product.price_inr;
-      const activeCurrency = currency || 'USD';
+      let activeCurrency: keyof typeof FX_RATES = (currency || 'USD') as keyof typeof FX_RATES;
+      if (typeof window !== 'undefined' && activeCurrency === 'USD') {
+        try {
+          const savedCurr = localStorage.getItem('textilejaipur_currency') as keyof typeof FX_RATES | null;
+          if (savedCurr && FX_RATES[savedCurr]) {
+            activeCurrency = savedCurr;
+          } else {
+            const loc = navigator.language || '';
+            if (loc.includes('IN')) activeCurrency = 'INR';
+            else if (loc.includes('GB')) activeCurrency = 'GBP';
+            else if (loc.includes('AE')) activeCurrency = 'AED';
+            else if (loc.includes('AU')) activeCurrency = 'AUD';
+            else if (loc.includes('NZ')) activeCurrency = 'NZD';
+            else if (loc.includes('CA')) activeCurrency = 'CAD';
+            else if (loc.includes('MX') || loc.includes('es-MX')) activeCurrency = 'MXN';
+            else if (loc.includes('EU') || loc.includes('FR') || loc.includes('DE')) activeCurrency = 'EUR';
+          }
+        } catch {}
+      }
       const productPrice = Number((parsedPriceInr * (FX_RATES[activeCurrency] || FX_RATES['USD'])).toFixed(2));
       trackMetaEvent('ViewContent', {
         content_ids: [product.id],

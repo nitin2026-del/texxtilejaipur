@@ -25,6 +25,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Missing orderId or attrJson' }, { status: 400 });
     }
 
+    const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
+    const headerUa = req.headers.get('user-agent') || undefined;
+    let enrichedAttrJson = attrJson;
+    try {
+      const parsed = JSON.parse(attrJson);
+      enrichedAttrJson = JSON.stringify({
+        ...parsed,
+        clientIp: parsed.clientIp || clientIp,
+        userAgent: parsed.userAgent || headerUa
+      });
+    } catch {}
+
     // Verify the order exists before writing anything
     const { data: order, error: orderErr } = await supabaseAdmin
       .from('orders')
@@ -52,16 +65,25 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (existing) {
-      // Already have one — only update if the existing one has no fbc but the new one does
+      // Merge so we never lose fbc, fbp, clientIp, or an ad landing eventSourceUrl
       try {
         const existingMeta = JSON.parse(existing.razorpay_order_id || '{}');
-        const newMeta = JSON.parse(attrJson);
-        if (!existingMeta.fbc && newMeta.fbc) {
-          await supabaseAdmin
-            .from('payments')
-            .update({ razorpay_order_id: attrJson })
-            .eq('id', existing.id);
-        }
+        const newMeta = JSON.parse(enrichedAttrJson);
+        const mergedMeta = {
+          ...existingMeta,
+          ...newMeta,
+          fbc: existingMeta.fbc || newMeta.fbc,
+          fbp: existingMeta.fbp || newMeta.fbp,
+          clientIp: existingMeta.clientIp || newMeta.clientIp,
+          userAgent: existingMeta.userAgent || newMeta.userAgent,
+          eventSourceUrl: (existingMeta.eventSourceUrl && (existingMeta.eventSourceUrl.includes('fbclid=') || existingMeta.eventSourceUrl.includes('utm_')))
+            ? existingMeta.eventSourceUrl
+            : (newMeta.eventSourceUrl || existingMeta.eventSourceUrl)
+        };
+        await supabaseAdmin
+          .from('payments')
+          .update({ razorpay_order_id: JSON.stringify(mergedMeta) })
+          .eq('id', existing.id);
       } catch { /* ignore parse errors */ }
       return NextResponse.json({ ok: true, updated: true });
     }
@@ -79,7 +101,7 @@ export async function POST(req: NextRequest) {
         amount: 0,
         currency: 'USD',
         status: 'pending',          // must be 'pending' due to DB CHECK constraint
-        razorpay_order_id: attrJson // stores fbc/fbp JSON (reusing this TEXT column)
+        razorpay_order_id: enrichedAttrJson // stores fbc/fbp JSON (reusing this TEXT column)
       });
 
     if (insertErr) {

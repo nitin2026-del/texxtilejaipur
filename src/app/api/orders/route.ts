@@ -10,7 +10,7 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address, guest_email, coupon_code, shipping_method } = body;
+    const { items, total_inr, display_currency, total_display_currency, user_id, shipping_address, guest_email, coupon_code, shipping_method, fbp, fbc, event_source_url } = body;
 
     const authHeader = req.headers.get('Authorization');
     let supabaseClient = supabaseAdmin;
@@ -270,6 +270,40 @@ export async function POST(req: NextRequest) {
       // Clean up the orphaned order to avoid ghost orders
       await supabaseClient.from('orders').delete().eq('id', order.id);
       return NextResponse.json({ error: 'Failed to save order items. Please try again.' }, { status: 500 });
+    }
+
+    // 5. Save Meta attribution atomically at order creation (including server-observed clientIp & userAgent)
+    try {
+      const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+      const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
+      const userAgent = req.headers.get('user-agent') || undefined;
+      const sourceUrl = event_source_url || req.headers.get('referer') || undefined;
+      if (fbp || fbc || clientIp || sourceUrl) {
+        const attrJson = JSON.stringify({
+          fbp: fbp || undefined,
+          fbc: fbc || undefined,
+          clientIp,
+          userAgent,
+          capturedAt: 'order_create_server',
+          eventSourceUrl: sourceUrl,
+          trackingCurrency: (display_currency || 'USD').toUpperCase(),
+          trackingAmount: (typeof total_display_currency === 'number' || (typeof total_display_currency === 'string' && !isNaN(Number(total_display_currency))))
+            ? Number(Number(total_display_currency).toFixed(2))
+            : undefined
+        });
+        await supabaseAdmin.from('payments').insert({
+          order_id: order.id,
+          gateway: 'attribution',
+          provider: 'paypal',
+          provider_transaction_id: `attr_${order.id}`,
+          amount: 0,
+          currency: 'USD',
+          status: 'pending',
+          razorpay_order_id: attrJson
+        });
+      }
+    } catch (attrErr) {
+      console.warn('Non-critical attribution save warning:', attrErr);
     }
 
     return NextResponse.json({ orderId: order.id, orderNumber }, { status: 200 });

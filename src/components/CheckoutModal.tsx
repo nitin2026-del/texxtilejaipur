@@ -169,7 +169,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
         checkoutItems[0].selectedRingUrl = selectedGlobalRing;
       }
 
-      // 1. Create order via our API
+      const checkoutFbc = getMetaCookie('_fbc');
+      const checkoutFbp = getMetaCookie('_fbp');
+      const landingUrl = getMetaLandingUrl();
+
+      // 1. Create order via our API (including Meta attribution so it is saved atomically on the server)
       const orderRes = await fetch('/api/orders', {
         method: 'POST',
         headers: { 
@@ -185,6 +189,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
           display_currency: currency,
           total_display_currency: orderTotalDisplay, // this is the display currency before JaiCoins
           shipping_method: shippingMethod, // pass selected shipping method
+          fbp: checkoutFbp || undefined,
+          fbc: checkoutFbc || undefined,
+          event_source_url: landingUrl || (typeof window !== 'undefined' ? window.location.href : undefined),
           shipping_address: {
             full_name: fullName,
             address_line1: addressLine1,
@@ -207,9 +214,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
       // Save Meta attribution (fbc/fbp) to DB right now at order creation  the EARLIEST capture point.
       // Even if the customer leaves and returns days later without cookies, fbc is safe in the DB.
       try {
-        const checkoutFbc = getMetaCookie('_fbc');
-        const checkoutFbp = getMetaCookie('_fbp');
-        const landingUrl = getMetaLandingUrl();
         if (checkoutFbc || checkoutFbp) {
           const attrJson = JSON.stringify({
             fbp: checkoutFbp || undefined,

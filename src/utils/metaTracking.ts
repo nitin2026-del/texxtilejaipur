@@ -32,8 +32,12 @@ const getTestEventCode = () => {
 export const saveMetaUserData = (data?: MetaUserData) => {
   if (typeof window === 'undefined' || !data) return;
   try {
-    const existingRaw = localStorage.getItem('meta_user_data');
-    const existing: MetaUserData = existingRaw ? JSON.parse(existingRaw) : {};
+    let existingRaw: string | null = null;
+    try { existingRaw = localStorage.getItem('meta_user_data'); } catch (e) {}
+    if (!existingRaw) {
+      try { existingRaw = sessionStorage.getItem('meta_user_data'); } catch (e) {}
+    }
+    const existing: MetaUserData = existingRaw ? JSON.parse(existingRaw) : ((window as any).__META_USER_DATA || {});
     const merged: MetaUserData = {
       email: (data.email && !/@(domain\.com|example\.com|test\.com|invalid\.com)$/i.test(data.email.trim()) ? data.email.trim().toLowerCase() : undefined) || existing.email,
       phone: data.phone?.replace(/\D/g, '') || existing.phone,
@@ -49,7 +53,10 @@ export const saveMetaUserData = (data?: MetaUserData) => {
       if (!merged[k as keyof MetaUserData]) delete merged[k as keyof MetaUserData];
     });
     if (Object.keys(merged).length > 0) {
-      localStorage.setItem('meta_user_data', JSON.stringify(merged));
+      (window as any).__META_USER_DATA = merged;
+      const serialized = JSON.stringify(merged);
+      try { localStorage.setItem('meta_user_data', serialized); } catch (e) {}
+      try { sessionStorage.setItem('meta_user_data', serialized); } catch (e) {}
     }
   } catch (e) {
     // ignore storage errors
@@ -60,8 +67,12 @@ export const getStoredMetaUserData = (override?: MetaUserData): MetaUserData | u
   if (typeof window === 'undefined') return override;
   try {
     if (override) saveMetaUserData(override);
-    const existingRaw = localStorage.getItem('meta_user_data');
-    const existing: MetaUserData = existingRaw ? JSON.parse(existingRaw) : {};
+    let existingRaw: string | null = null;
+    try { existingRaw = localStorage.getItem('meta_user_data'); } catch (e) {}
+    if (!existingRaw) {
+      try { existingRaw = sessionStorage.getItem('meta_user_data'); } catch (e) {}
+    }
+    const existing: MetaUserData = existingRaw ? JSON.parse(existingRaw) : ((window as any).__META_USER_DATA || {});
     const merged: MetaUserData = {
       ...existing,
       ...(override ? Object.fromEntries(Object.entries(override).filter(([_, v]) => Boolean(v))) : {})
@@ -72,10 +83,57 @@ export const getStoredMetaUserData = (override?: MetaUserData): MetaUserData | u
   }
 };
 
+const readBestCookie = (name: string): string | undefined => {
+  if (typeof document === 'undefined') return undefined;
+  try {
+    const parts = (document.cookie || '').split(';');
+    let best: string | undefined;
+    let bestTs = -1;
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i].trim();
+      if (p.startsWith(name + '=')) {
+        const v = p.substring(name.length + 1);
+        const segs = v.split('.');
+        const ts = segs.length >= 3 ? Number(segs[2]) : 0;
+        if (!best || (ts && ts >= bestTs)) {
+          best = v;
+          if (ts) bestTs = ts;
+        }
+      }
+    }
+    return best;
+  } catch {
+    return undefined;
+  }
+};
+
+const writeCookieBothDomains = (name: string, val: string) => {
+  if (typeof document === 'undefined') return;
+  try { document.cookie = `${name}=${val}; path=/; max-age=7776000; SameSite=Lax`; } catch (e) {}
+  try {
+    if (typeof window !== 'undefined' && window.location?.hostname?.includes('textilejaipur.com')) {
+      document.cookie = `${name}=${val}; domain=.textilejaipur.com; path=/; max-age=7776000; SameSite=Lax`;
+    }
+  } catch (e) {}
+};
+
+const extractFbclidFromUrl = (rawUrl?: string | null): string | null => {
+  if (!rawUrl) return null;
+  try {
+    const u = new URL(rawUrl, 'https://www.textilejaipur.com');
+    const fromParam = u.searchParams.get('fbclid');
+    if (fromParam) return fromParam;
+  } catch {}
+  const m = rawUrl.match(/[\?&#]fbclid=([^&#]+)/);
+  if (m && m[1]) {
+    try { return decodeURIComponent(m[1]); } catch { return m[1]; }
+  }
+  return null;
+};
+
 export const getMetaCookie = (name: string) => {
   if (typeof document === 'undefined') return undefined;
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  let val = match ? match[2] : undefined;
+  let val = readBestCookie(name);
   
   // Auto-generate or restore _fbp from localStorage to guarantee 100% continuity across tabs/ITP
   if (name === '_fbp') {
@@ -97,7 +155,7 @@ export const getMetaCookie = (name: string) => {
       const random = Math.floor(Math.random() * 1000000000);
       val = `fb.1.${time}.${random}`;
     }
-    try { document.cookie = `_fbp=${val}; path=/; max-age=7776000; SameSite=Lax`; } catch (e) {}
+    writeCookieBothDomains('_fbp', val);
     if (typeof window !== 'undefined') (window as any).__META_FBP = val;
     try { localStorage.setItem('meta_fbp', val); } catch (e) {}
     try { sessionStorage.setItem('meta_fbp', val); } catch (e) {}
@@ -108,13 +166,16 @@ export const getMetaCookie = (name: string) => {
     let urlFbclid: string | null = null;
     try {
       if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlFbclid = urlParams.get('fbclid');
-        if (!urlFbclid && window.location.href) {
-          const mHref = window.location.href.match(/[\?&#]fbclid=([^&#]+)/);
-          if (mHref && mHref[1]) {
-            try { urlFbclid = decodeURIComponent(mHref[1]); } catch { urlFbclid = mHref[1]; }
+        urlFbclid = extractFbclidFromUrl(window.location.href);
+        if (!urlFbclid) {
+          let storedLanding: string | null = (window as any).__META_LANDING_URL || null;
+          if (!storedLanding) {
+            try { storedLanding = sessionStorage.getItem('meta_landing_url'); } catch (e) {}
           }
+          if (!storedLanding) {
+            try { storedLanding = localStorage.getItem('meta_landing_url'); } catch (e) {}
+          }
+          urlFbclid = extractFbclidFromUrl(storedLanding);
         }
       }
     } catch (e) {}
@@ -137,7 +198,7 @@ export const getMetaCookie = (name: string) => {
         try { sessionStorage.setItem('meta_fbclid', urlFbclid); sessionStorage.setItem('meta_fbclid_ts', now); } catch (e) {}
       }
       if (val) {
-        try { document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`; } catch (e) {}
+        writeCookieBothDomains('_fbc', val);
         if (typeof window !== 'undefined') (window as any).__META_FBC = val;
         try { localStorage.setItem('meta_fbc', val); } catch (e) {}
         try { sessionStorage.setItem('meta_fbc', val); } catch (e) {}
@@ -164,11 +225,12 @@ export const getMetaCookie = (name: string) => {
         }
       }
       if (val) {
-        try { document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`; } catch (e) {}
+        writeCookieBothDomains('_fbc', val);
         if (typeof window !== 'undefined') (window as any).__META_FBC = val;
       }
     } else {
-      // Cookie exists in document.cookie; back it up to localStorage/sessionStorage
+      // Cookie exists in document.cookie; synchronize both domains and back up to localStorage/sessionStorage
+      writeCookieBothDomains('_fbc', val);
       if (typeof window !== 'undefined') (window as any).__META_FBC = val;
       try { localStorage.setItem('meta_fbc', val); } catch (e) {}
       try { sessionStorage.setItem('meta_fbc', val); } catch (e) {}
@@ -379,6 +441,7 @@ export const trackMetaEvent = async (
     try {
       const fbp = getMetaCookie('_fbp');
       const fbc = getMetaCookie('_fbc');
+      const landingUrl = getMetaLandingUrl();
       
       await fetch('/api/meta-capi', {
         method: 'POST',
@@ -388,6 +451,7 @@ export const trackMetaEvent = async (
           eventData,
           eventId: id,
           url: window.location.href,
+          landingUrl,
           userAgent: navigator.userAgent,
           fbp,
           fbc,
