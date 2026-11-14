@@ -9,6 +9,12 @@ const hashMeta = (val?: string) => {
 };
 
 const normStr = (val?: string) => val ? val.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
+const normZip = (val?: string) => {
+  if (!val) return undefined;
+  const trimmed = val.trim();
+  const base = /^\d{5}-\d{4}$/.test(trimmed) ? trimmed.split('-')[0] : trimmed;
+  return normStr(base);
+};
 const normEmail = (val?: string) => val ? val.trim().toLowerCase() : undefined;
 const normPhone = (val?: string) => val ? val.replace(/\D/g, '') : undefined;
 
@@ -495,7 +501,7 @@ export async function handlePaymentSuccess(
               ln: hashMeta(normStr(lastName)) ? [hashMeta(normStr(lastName))] : undefined,
               ct: hashMeta(normStr(userCity)) ? [hashMeta(normStr(userCity))] : undefined,
               st: hashMeta(normStr(userState)) ? [hashMeta(normStr(userState))] : undefined,
-              zp: hashMeta(normStr(userZip)) ? [hashMeta(normStr(userZip))] : undefined,
+              zp: hashMeta(normZip(userZip)) ? [hashMeta(normZip(userZip))] : undefined,
               country: hashMeta(normCountry(userCountry)) ? [hashMeta(normCountry(userCountry))] : undefined,
               external_id: externalIdHashes.length > 0 ? externalIdHashes : undefined,
               fbp: resolvedFbp,

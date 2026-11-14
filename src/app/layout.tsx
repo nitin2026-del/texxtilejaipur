@@ -313,9 +313,12 @@ export default function RootLayout({
                     window.__META_LANDING_URL = href;
                     lSet('meta_landing_url', href);
                     sSet('meta_landing_url', href);
-                  } else if (!sGet('meta_landing_url') && !lGet('meta_landing_url')) {
+                    cSet('_tj_landing', encodeURIComponent(href));
+                  } else if (!sGet('meta_landing_url') && !lGet('meta_landing_url') && !cGet('_tj_landing')) {
                     window.__META_LANDING_URL = href;
+                    lSet('meta_landing_url', href);
                     sSet('meta_landing_url', href);
+                    cSet('_tj_landing', encodeURIComponent(href));
                   }
                 } catch (e) {}
               })();

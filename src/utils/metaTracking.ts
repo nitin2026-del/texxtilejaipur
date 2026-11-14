@@ -366,6 +366,14 @@ const COUNTRY_DIAL_MAP: Record<string, string> = {
 const normAdvStr = (val?: string) =>
   val ? val.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '') : '';
 
+const normAdvZip = (val?: string) => {
+  if (!val) return '';
+  const trimmed = val.trim();
+  // Meta requires US 9-digit ZIP+4 codes (e.g. 10001-1234) to use only the 5-digit primary ZIP
+  const base = /^\d{5}-\d{4}$/.test(trimmed) ? trimmed.split('-')[0] : trimmed;
+  return normAdvStr(base);
+};
+
 const normAdvCountry = (val?: string) => {
   if (!val) return '';
   const c = val.trim().toLowerCase();
@@ -428,10 +436,12 @@ export const trackMetaEvent = async (
         if (ct) advancedMatching.ct = ct;
         const st = normAdvStr(mergedUserData.state);
         if (st) advancedMatching.st = st;
-        const zp = normAdvStr(mergedUserData.zip);
+        const zp = normAdvZip(mergedUserData.zip);
         if (zp) advancedMatching.zp = zp;
         const countryIso = normAdvCountry(mergedUserData.country);
         if (countryIso) advancedMatching.country = countryIso;
+        const fbpForExt = getMetaCookie('_fbp');
+        if (fbpForExt) advancedMatching.external_id = fbpForExt;
         (window as any).fbq('set', 'autoConfig', false, PIXEL_ID);
         (window as any).fbq('init', PIXEL_ID, advancedMatching);
       }
@@ -450,7 +460,7 @@ export const trackMetaEvent = async (
       const fbc = getMetaCookie('_fbc');
       const landingUrl = getMetaLandingUrl();
       
-      await fetch('/api/meta-capi', {
+      await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

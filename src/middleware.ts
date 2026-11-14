@@ -15,9 +15,17 @@ export function middleware(req: NextRequest) {
 
     const existingFbc = req.cookies.get('_fbc')?.value;
     const existingFbp = req.cookies.get('_fbp')?.value;
+    const existingLanding = req.cookies.get('_tj_landing')?.value;
 
-    // Fast path: if no ad parameters in URL and no existing _fbc cookie to refresh, do nothing
-    if (!urlFbclid && !hasUtm && !existingFbc) {
+    const ua = req.headers.get('user-agent') || '';
+    const referer = req.headers.get('referer') || '';
+    // Detect iOS ATT / EU DMA visits from Facebook or Instagram where Meta/Apple stripped ?fbclid=
+    const isMetaAppOrReferer =
+      /FBAN|FBAV|FBIOS|Instagram|MetaIAB/i.test(ua) ||
+      /facebook\.com|instagram\.com|fb\.com|messenger\.com/i.test(referer);
+
+    // Fast path: if no ad params, not coming from Meta app/referer, and no existing _fbc cookie to refresh, do nothing
+    if (!urlFbclid && !hasUtm && !existingFbc && !isMetaAppOrReferer) {
       return NextResponse.next();
     }
 
@@ -36,7 +44,7 @@ export function middleware(req: NextRequest) {
       }
     }
 
-    // 2. Resolve _fbp (ensure every ad clicker gets a server-set 90-day _fbp immediately)
+    // 2. Resolve _fbp (ensure every ad clicker — including iOS ATT / EU visitors without fbclid — gets a server-set 90-day _fbp immediately)
     const fbpToSet =
       existingFbp || `fb.1.${now}.${Math.floor(Math.random() * 1000000000)}`;
 
@@ -60,7 +68,7 @@ export function middleware(req: NextRequest) {
     if (fbpToSet) {
       appendServerCookie('_fbp', fbpToSet);
     }
-    if (urlFbclid || hasUtm) {
+    if (urlFbclid || hasUtm || (isMetaAppOrReferer && !existingLanding)) {
       appendServerCookie('_tj_landing', encodeURIComponent(req.url));
     }
 

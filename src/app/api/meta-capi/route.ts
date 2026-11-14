@@ -19,6 +19,12 @@ const hashMeta = (val?: string) => {
 };
 
 const normStr = (val?: string) => val ? val.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[^a-z0-9]/g, '') : undefined;
+const normZip = (val?: string) => {
+  if (!val) return undefined;
+  const trimmed = val.trim();
+  const base = /^\d{5}-\d{4}$/.test(trimmed) ? trimmed.split('-')[0] : trimmed;
+  return normStr(base);
+};
 const normEmail = (val?: string) => val ? val.trim().toLowerCase() : undefined;
 const normPhone = (val?: string) => val ? val.replace(/\D/g, '') : undefined;
 
@@ -149,7 +155,11 @@ export async function POST(req: Request) {
     if ((eventName === 'ViewContent' || eventName === 'AddToCart' || eventName === 'InitiateCheckout' || eventName === 'AddPaymentInfo') && (!Array.isArray(eventData?.content_ids) || eventData.content_ids.length === 0)) {
       return NextResponse.json({ success: true, skipped: 'missing-content-ids' }, { status: 200 });
     }
-    const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    const rawIp =
+      req.headers.get('cf-connecting-ip') ||
+      req.headers.get('x-vercel-forwarded-for') ||
+      req.headers.get('x-forwarded-for') ||
+      req.headers.get('x-real-ip');
     const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
 
     const ALLOWED_EVENTS = ['PageView', 'ViewContent', 'AddToCart', 'InitiateCheckout', 'AddPaymentInfo', 'Search', 'Lead', 'Contact'];
@@ -192,9 +202,14 @@ export async function POST(req: Request) {
       }
     }
 
-    // If this visitor has an ad click (resolvedFbc), persist it in the Server-Side Ad Click Vault
-    // so if they leave without checking out and return 3+ days later after ITP clears _fbc, we recover it!
-    if (resolvedFbc) {
+    // Persist Meta session in the Server-Side Ad Click Vault (both when _fbc is present AND when
+    // iOS ATT / EU DMA stripped fbclid inside Facebook/Instagram In-App Browser or UTM campaign links)
+    const isMetaAppOrUtm =
+      Boolean(resolvedFbc) ||
+      /FBAN|FBAV|FBIOS|Instagram|MetaIAB/i.test(uaToCheck) ||
+      Boolean((effectiveLandingUrl || url || '').match(/fbclid=|utm_source=|utm_campaign=|utm_id=/i));
+
+    if (isMetaAppOrUtm && (resolvedFbc || resolvedFbp)) {
       saveAdClickToVault(supabaseAdmin, {
         fbc: resolvedFbc,
         fbp: resolvedFbp,
@@ -204,7 +219,8 @@ export async function POST(req: Request) {
         clientIp,
         userAgent: uaToCheck,
       }).catch(() => {});
-    } else if (eventName !== 'PageView' && (resolvedFbp || userData?.email || userData?.phone)) {
+    }
+    if (!resolvedFbc && eventName !== 'PageView' && (resolvedFbp || userData?.email || userData?.phone)) {
       // Returning visitor on a funnel event (ViewContent / AddToCart / InitiateCheckout / AddPaymentInfo):
       // check if they had a Day-1 ad click in the Server Vault!
       const vaultHit = await lookupAdClickFromVault(supabaseAdmin, {
@@ -214,6 +230,9 @@ export async function POST(req: Request) {
       });
       if (vaultHit?.fbc) {
         resolvedFbc = vaultHit.fbc;
+      }
+      if (!resolvedFbp && vaultHit?.fbp) {
+        resolvedFbp = vaultHit.fbp;
       }
     }
 
@@ -243,7 +262,7 @@ export async function POST(req: Request) {
               ln: hashMeta(normStr(userData?.lastName)) ? [hashMeta(normStr(userData?.lastName))] : undefined,
               ct: hashMeta(normStr(userData?.city)) ? [hashMeta(normStr(userData?.city))] : undefined,
               st: hashMeta(normStr(userData?.state)) ? [hashMeta(normStr(userData?.state))] : undefined,
-              zp: hashMeta(normStr(userData?.zip)) ? [hashMeta(normStr(userData?.zip))] : undefined,
+              zp: hashMeta(normZip(userData?.zip)) ? [hashMeta(normZip(userData?.zip))] : undefined,
               country: hashMeta(normCountry(userData?.country)) ? [hashMeta(normCountry(userData?.country))] : undefined,
               external_id: externalIdHashes.length > 0 ? externalIdHashes : undefined
             } : {})

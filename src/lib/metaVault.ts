@@ -5,7 +5,7 @@ export const FBC_MAX_AGE_SECONDS = 7776000; // 90 days (Meta official _fbc lifes
 export const FBC_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 
 export interface VaultEntry {
-  fbc: string;
+  fbc?: string;
   fbp?: string;
   landingUrl?: string;
   clientIp?: string;
@@ -100,7 +100,13 @@ export async function saveAdClickToVault(
     userAgent?: string;
   }
 ): Promise<void> {
-  if (!data.fbc || !data.fbc.startsWith('fb.')) return;
+  const hasValidFbc = Boolean(data.fbc && data.fbc.startsWith('fb.'));
+  const isMetaSession =
+    hasValidFbc ||
+    Boolean(data.landingUrl && (data.landingUrl.includes('fbclid=') || data.landingUrl.includes('utm_'))) ||
+    /FBAN|FBAV|FBIOS|Instagram|MetaIAB/i.test(data.userAgent || '');
+
+  if (!isMetaSession) return;
   const fbpKey = data.fbp?.trim() || '';
   const emailKey = normEmailKey(data.email);
   const phoneKey = normPhoneTailKey(data.phone);
@@ -122,7 +128,7 @@ export async function saveAdClickToVault(
     };
 
     const entry: VaultEntry = {
-      fbc: data.fbc,
+      fbc: hasValidFbc ? data.fbc : undefined,
       fbp: fbpKey || undefined,
       landingUrl: data.landingUrl || undefined,
       clientIp: data.clientIp || undefined,
@@ -131,12 +137,14 @@ export async function saveAdClickToVault(
     };
 
     const mergeEntry = (prev?: VaultEntry): VaultEntry => ({
-      fbc: entry.fbc || prev?.fbc || '',
+      fbc: entry.fbc || prev?.fbc,
       fbp: entry.fbp || prev?.fbp,
       landingUrl:
         entry.landingUrl && (entry.landingUrl.includes('fbclid=') || entry.landingUrl.includes('utm_'))
           ? entry.landingUrl
-          : prev?.landingUrl || entry.landingUrl,
+          : prev?.landingUrl && (prev.landingUrl.includes('fbclid=') || prev.landingUrl.includes('utm_') || prev.landingUrl.includes('/product/'))
+            ? prev.landingUrl
+            : entry.landingUrl || prev?.landingUrl,
       clientIp: entry.clientIp || prev?.clientIp,
       userAgent: entry.userAgent || prev?.userAgent,
       ts: now,
@@ -148,7 +156,7 @@ export async function saveAdClickToVault(
 
     // Prune expired entries (> 90 days) and cap map size to 1500 most recent entries per index
     const pruneMap = (map: Record<string, VaultEntry>) => {
-      const entries = Object.entries(map).filter(([, v]) => v && v.fbc && now - (v.ts || 0) <= FBC_LOOKBACK_MS);
+      const entries = Object.entries(map).filter(([, v]) => v && (v.fbc || v.fbp) && now - (v.ts || 0) <= FBC_LOOKBACK_MS);
       if (entries.length > 1500) {
         entries.sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0));
         return Object.fromEntries(entries.slice(0, 1500));
@@ -190,7 +198,7 @@ export async function lookupAdClickFromVault(
     if (!row?.value) return undefined;
     const vault = row.value as Partial<VaultStore>;
     const now = Date.now();
-    const isValid = (e?: VaultEntry) => Boolean(e && e.fbc && now - (e.ts || 0) <= FBC_LOOKBACK_MS);
+    const isValid = (e?: VaultEntry) => Boolean(e && (e.fbc || e.fbp) && now - (e.ts || 0) <= FBC_LOOKBACK_MS);
 
     // 1. Check by email (strongest cross-device & cross-browser identifier)
     for (const rawEmail of query.emails || []) {
