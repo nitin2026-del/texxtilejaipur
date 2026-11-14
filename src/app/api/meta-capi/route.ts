@@ -156,6 +156,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Missing token' }, { status: 500 });
     }
 
+    let resolvedFbc = fbc || undefined;
+    if (!resolvedFbc && typeof url === 'string') {
+      try {
+        const parsedUrl = new URL(url);
+        const urlFbclid = parsedUrl.searchParams.get('fbclid') || (url.match(/[\?&#]fbclid=([^&#]+)/)?.[1]);
+        if (urlFbclid) {
+          resolvedFbc = `fb.1.${Date.now()}.${decodeURIComponent(urlFbclid)}`;
+        }
+      } catch {}
+    }
+
     const payload = {
       data: [
         {
@@ -168,7 +179,7 @@ export async function POST(req: Request) {
             client_ip_address: clientIp,
             client_user_agent: userAgent,
             fbp: fbp || undefined,
-            fbc: fbc || undefined,
+            fbc: resolvedFbc,
             // Meta best practice: Never send PII (email, phone, name) on PageView events.
             // Sending emails on repeated PageViews triggers the "duplicate client Emails" warning in Meta Diagnostics.
             ...(eventName !== 'PageView' ? {

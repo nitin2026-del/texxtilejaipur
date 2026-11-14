@@ -79,9 +79,17 @@ export const getMetaCookie = (name: string) => {
   
   // Auto-generate or restore _fbp from localStorage to guarantee 100% continuity across tabs/ITP
   if (name === '_fbp') {
+    if (!val && typeof window !== 'undefined' && (window as any).__META_FBP) {
+      val = (window as any).__META_FBP;
+    }
     if (!val) {
       try {
-        val = localStorage.getItem('meta_fbp') || sessionStorage.getItem('meta_fbp') || undefined;
+        val = localStorage.getItem('meta_fbp') || undefined;
+      } catch (e) {}
+    }
+    if (!val) {
+      try {
+        val = sessionStorage.getItem('meta_fbp') || undefined;
       } catch (e) {}
     }
     if (!val) {
@@ -89,11 +97,10 @@ export const getMetaCookie = (name: string) => {
       const random = Math.floor(Math.random() * 1000000000);
       val = `fb.1.${time}.${random}`;
     }
-    document.cookie = `_fbp=${val}; path=/; max-age=7776000; SameSite=Lax`;
-    try {
-      localStorage.setItem('meta_fbp', val);
-      sessionStorage.setItem('meta_fbp', val);
-    } catch (e) {}
+    try { document.cookie = `_fbp=${val}; path=/; max-age=7776000; SameSite=Lax`; } catch (e) {}
+    if (typeof window !== 'undefined') (window as any).__META_FBP = val;
+    try { localStorage.setItem('meta_fbp', val); } catch (e) {}
+    try { sessionStorage.setItem('meta_fbp', val); } catch (e) {}
   }
 
   // Capture fbclid and auto-generate/restore _fbc without mutating existing creation timestamp
@@ -103,56 +110,68 @@ export const getMetaCookie = (name: string) => {
       if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         urlFbclid = urlParams.get('fbclid');
+        if (!urlFbclid && window.location.href) {
+          const mHref = window.location.href.match(/[\?&#]fbclid=([^&#]+)/);
+          if (mHref && mHref[1]) {
+            try { urlFbclid = decodeURIComponent(mHref[1]); } catch { urlFbclid = mHref[1]; }
+          }
+        }
       }
     } catch (e) {}
 
     if (urlFbclid) {
       // If current cookie or stored _fbc already matches this exact fbclid, keep its original creation timestamp!
-      let existingFbc = val;
+      let existingFbc = val || (typeof window !== 'undefined' ? (window as any).__META_FBC : undefined);
       if (!existingFbc) {
-        try {
-          existingFbc = localStorage.getItem('meta_fbc') || sessionStorage.getItem('meta_fbc') || undefined;
-        } catch (e) {}
+        try { existingFbc = localStorage.getItem('meta_fbc') || undefined; } catch (e) {}
+      }
+      if (!existingFbc) {
+        try { existingFbc = sessionStorage.getItem('meta_fbc') || undefined; } catch (e) {}
       }
       if (existingFbc && existingFbc.endsWith(`.${urlFbclid}`)) {
         val = existingFbc;
       } else {
         const now = Date.now().toString();
         val = `fb.1.${now}.${urlFbclid}`;
-        try {
-          localStorage.setItem('meta_fbclid', urlFbclid);
-          localStorage.setItem('meta_fbclid_ts', now);
-          sessionStorage.setItem('meta_fbclid', urlFbclid);
-          sessionStorage.setItem('meta_fbclid_ts', now);
-        } catch (e) {}
+        try { localStorage.setItem('meta_fbclid', urlFbclid); localStorage.setItem('meta_fbclid_ts', now); } catch (e) {}
+        try { sessionStorage.setItem('meta_fbclid', urlFbclid); sessionStorage.setItem('meta_fbclid_ts', now); } catch (e) {}
       }
-      document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`;
-      try {
-        localStorage.setItem('meta_fbc', val);
-        sessionStorage.setItem('meta_fbc', val);
-      } catch (e) {}
+      if (val) {
+        try { document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`; } catch (e) {}
+        if (typeof window !== 'undefined') (window as any).__META_FBC = val;
+        try { localStorage.setItem('meta_fbc', val); } catch (e) {}
+        try { sessionStorage.setItem('meta_fbc', val); } catch (e) {}
+      }
     } else if (!val) {
-      try {
-        const storedFbc = localStorage.getItem('meta_fbc') || sessionStorage.getItem('meta_fbc');
-        if (storedFbc) {
-          val = storedFbc;
-        } else {
-          const fbclid = localStorage.getItem('meta_fbclid') || sessionStorage.getItem('meta_fbclid');
-          const fbclidTs = localStorage.getItem('meta_fbclid_ts') || sessionStorage.getItem('meta_fbclid_ts');
-          if (fbclid) {
-            val = `fb.1.${fbclidTs || Date.now().toString()}.${fbclid}`;
-          }
+      if (typeof window !== 'undefined' && (window as any).__META_FBC) {
+        val = (window as any).__META_FBC;
+      }
+      if (!val) {
+        try { val = localStorage.getItem('meta_fbc') || undefined; } catch (e) {}
+      }
+      if (!val) {
+        try { val = sessionStorage.getItem('meta_fbc') || undefined; } catch (e) {}
+      }
+      if (!val) {
+        let fbclid: string | null = null;
+        let fbclidTs: string | null = null;
+        try { fbclid = localStorage.getItem('meta_fbclid'); fbclidTs = localStorage.getItem('meta_fbclid_ts'); } catch (e) {}
+        if (!fbclid) {
+          try { fbclid = sessionStorage.getItem('meta_fbclid'); fbclidTs = sessionStorage.getItem('meta_fbclid_ts'); } catch (e) {}
         }
-        if (val) {
-          document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`;
+        if (fbclid) {
+          val = `fb.1.${fbclidTs || Date.now().toString()}.${fbclid}`;
         }
-      } catch (e) {}
+      }
+      if (val) {
+        try { document.cookie = `_fbc=${val}; path=/; max-age=7776000; SameSite=Lax`; } catch (e) {}
+        if (typeof window !== 'undefined') (window as any).__META_FBC = val;
+      }
     } else {
       // Cookie exists in document.cookie; back it up to localStorage/sessionStorage
-      try {
-        localStorage.setItem('meta_fbc', val);
-        sessionStorage.setItem('meta_fbc', val);
-      } catch (e) {}
+      if (typeof window !== 'undefined') (window as any).__META_FBC = val;
+      try { localStorage.setItem('meta_fbc', val); } catch (e) {}
+      try { sessionStorage.setItem('meta_fbc', val); } catch (e) {}
     }
   }
   return val;
@@ -161,14 +180,21 @@ export const getMetaCookie = (name: string) => {
 export const getMetaLandingUrl = (): string | undefined => {
   if (typeof window === 'undefined') return undefined;
   try {
+    const href = window.location.href;
     const params = new URLSearchParams(window.location.search);
-    const hasAdParams = params.has('fbclid') || params.has('utm_source') || params.has('utm_campaign') || params.has('utm_content') || params.has('utm_id');
+    const hasAdParams = params.has('fbclid') || /[\?&#]fbclid=/.test(href) || params.has('utm_source') || params.has('utm_campaign') || params.has('utm_content') || params.has('utm_id');
     if (hasAdParams) {
-      localStorage.setItem('meta_landing_url', window.location.href);
-      sessionStorage.setItem('meta_landing_url', window.location.href);
-      return window.location.href;
+      (window as any).__META_LANDING_URL = href;
+      try { localStorage.setItem('meta_landing_url', href); } catch (e) {}
+      try { sessionStorage.setItem('meta_landing_url', href); } catch (e) {}
+      return href;
     }
-    return sessionStorage.getItem('meta_landing_url') || localStorage.getItem('meta_landing_url') || window.location.href;
+    let stored: string | null = null;
+    try { stored = sessionStorage.getItem('meta_landing_url'); } catch (e) {}
+    if (!stored) {
+      try { stored = localStorage.getItem('meta_landing_url'); } catch (e) {}
+    }
+    return stored || (window as any).__META_LANDING_URL || href;
   } catch (e) {
     return typeof window !== 'undefined' ? window.location.href : undefined;
   }

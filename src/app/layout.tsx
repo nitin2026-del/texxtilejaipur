@@ -236,33 +236,62 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
+                var lGet = function(k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+                var lSet = function(k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+                var sGet = function(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } };
+                var sSet = function(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} };
                 try {
+                  var href = window.location.href || '';
                   var params = new URLSearchParams(window.location.search);
                   var fbclid = params.get('fbclid');
+                  if (!fbclid) {
+                    var mHref = href.match(/[\?&#]fbclid=([^&#]+)/);
+                    if (mHref && mHref[1]) { try { fbclid = decodeURIComponent(mHref[1]); } catch (e) { fbclid = mHref[1]; } }
+                  }
                   if (fbclid) {
                     var m = document.cookie.match(/(^| )_fbc=([^;]+)/);
-                    var existingFbc = m ? m[2] : (localStorage.getItem('meta_fbc') || '');
+                    var existingFbc = (m ? m[2] : '') || lGet('meta_fbc') || sGet('meta_fbc') || '';
+                    var nowTs = String(Date.now());
                     var fbcVal = (existingFbc && existingFbc.slice(-fbclid.length - 1) === '.' + fbclid)
                       ? existingFbc
-                      : ('fb.1.' + Date.now() + '.' + fbclid);
-                    document.cookie = '_fbc=' + fbcVal + '; path=/; max-age=7776000; SameSite=Lax';
-                    localStorage.setItem('meta_fbc', fbcVal);
-                    sessionStorage.setItem('meta_fbc', fbcVal);
+                      : ('fb.1.' + nowTs + '.' + fbclid);
+                    try { document.cookie = '_fbc=' + fbcVal + '; path=/; max-age=7776000; SameSite=Lax'; } catch (e) {}
+                    window.__META_FBC = fbcVal;
+                    lSet('meta_fbc', fbcVal);
+                    sSet('meta_fbc', fbcVal);
+                    lSet('meta_fbclid', fbclid);
+                    lSet('meta_fbclid_ts', nowTs);
+                    sSet('meta_fbclid', fbclid);
+                    sSet('meta_fbclid_ts', nowTs);
                   } else {
                     var mFbc = document.cookie.match(/(^| )_fbc=([^;]+)/);
-                    var storedFbc = mFbc ? mFbc[2] : (localStorage.getItem('meta_fbc') || sessionStorage.getItem('meta_fbc') || '');
+                    var storedFbc = (mFbc ? mFbc[2] : '') || lGet('meta_fbc') || sGet('meta_fbc') || '';
+                    if (!storedFbc) {
+                      var savedClid = lGet('meta_fbclid') || sGet('meta_fbclid');
+                      var savedTs = lGet('meta_fbclid_ts') || sGet('meta_fbclid_ts') || String(Date.now());
+                      if (savedClid) storedFbc = 'fb.1.' + savedTs + '.' + savedClid;
+                    }
                     if (storedFbc) {
-                      document.cookie = '_fbc=' + storedFbc + '; path=/; max-age=7776000; SameSite=Lax';
-                      localStorage.setItem('meta_fbc', storedFbc);
-                      sessionStorage.setItem('meta_fbc', storedFbc);
+                      try { document.cookie = '_fbc=' + storedFbc + '; path=/; max-age=7776000; SameSite=Lax'; } catch (e) {}
+                      window.__META_FBC = storedFbc;
+                      lSet('meta_fbc', storedFbc);
+                      sSet('meta_fbc', storedFbc);
                     }
                   }
                   var mFbp = document.cookie.match(/(^| )_fbp=([^;]+)/);
-                  var fbpVal = mFbp ? mFbp[2] : (localStorage.getItem('meta_fbp') || ('fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1000000000)));
-                  document.cookie = '_fbp=' + fbpVal + '; path=/; max-age=7776000; SameSite=Lax';
-                  localStorage.setItem('meta_fbp', fbpVal);
-                  sessionStorage.setItem('meta_fbp', fbpVal);
-                  if (fbclid || params.get('utm_source') || params.get('utm_campaign') || params.get('utm_content') || params.get('utm_id')) { localStorage.setItem('meta_landing_url', window.location.href); sessionStorage.setItem('meta_landing_url', window.location.href); } else if (!sessionStorage.getItem('meta_landing_url') && !localStorage.getItem('meta_landing_url')) { sessionStorage.setItem('meta_landing_url', window.location.href); }
+                  var fbpVal = (mFbp ? mFbp[2] : '') || lGet('meta_fbp') || sGet('meta_fbp') || ('fb.1.' + Date.now() + '.' + Math.floor(Math.random() * 1000000000));
+                  try { document.cookie = '_fbp=' + fbpVal + '; path=/; max-age=7776000; SameSite=Lax'; } catch (e) {}
+                  window.__META_FBP = fbpVal;
+                  lSet('meta_fbp', fbpVal);
+                  sSet('meta_fbp', fbpVal);
+                  if (fbclid || params.get('utm_source') || params.get('utm_campaign') || params.get('utm_content') || params.get('utm_id')) {
+                    window.__META_LANDING_URL = href;
+                    lSet('meta_landing_url', href);
+                    sSet('meta_landing_url', href);
+                  } else if (!sGet('meta_landing_url') && !lGet('meta_landing_url')) {
+                    window.__META_LANDING_URL = href;
+                    sSet('meta_landing_url', href);
+                  }
                 } catch (e) {}
               })();
               !function(f,b,e,v,n,t,s)

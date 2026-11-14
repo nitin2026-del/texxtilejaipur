@@ -133,7 +133,7 @@ export async function recoverFbcFromPriorSessions(
   supabaseAdmin: SupabaseClient,
   currentOrderId: string,
   opts: { emails: string[]; phone?: string; userId?: string }
-): Promise<string | undefined> {
+): Promise<{ fbc?: string; sourceUrl?: string }> {
   try {
     const sinceIso = new Date(Date.now() - FBC_LOOKBACK_MS).toISOString();
     const orderIds = new Set<string>();
@@ -169,7 +169,7 @@ export async function recoverFbcFromPriorSessions(
     }
 
     orderIds.delete(currentOrderId);
-    if (orderIds.size === 0) return undefined;
+    if (orderIds.size === 0) return {};
 
     const { data: priorPayments } = await supabaseAdmin
       .from('payments')
@@ -178,21 +178,35 @@ export async function recoverFbcFromPriorSessions(
       .order('created_at', { ascending: false })
       .limit(50);
 
+    let recoveredFbc: string | undefined;
+    let recoveredUrl: string | undefined;
     for (const p of priorPayments || []) {
       try {
         const meta = JSON.parse(p.razorpay_order_id || '{}');
-        const createdMs = getFbcCreationMs(meta?.fbc);
-        if (meta?.fbc && createdMs && Date.now() - createdMs <= FBC_LOOKBACK_MS) {
-          return meta.fbc as string;
+        if (!recoveredFbc) {
+          const createdMs = getFbcCreationMs(meta?.fbc);
+          if (meta?.fbc && createdMs && Date.now() - createdMs <= FBC_LOOKBACK_MS) {
+            recoveredFbc = meta.fbc as string;
+          }
+        }
+        if (typeof meta?.eventSourceUrl === 'string' && meta.eventSourceUrl) {
+          const hasAd = meta.eventSourceUrl.includes('fbclid=') || meta.eventSourceUrl.includes('utm_');
+          const isProduct = meta.eventSourceUrl.includes('/product/');
+          if (hasAd && (!recoveredUrl || (!recoveredUrl.includes('fbclid=') && !recoveredUrl.includes('utm_')))) {
+            recoveredUrl = meta.eventSourceUrl;
+          } else if (isProduct && !recoveredUrl) {
+            recoveredUrl = meta.eventSourceUrl;
+          }
         }
       } catch {
         // not a JSON attribution record
       }
     }
+    return { fbc: recoveredFbc, sourceUrl: recoveredUrl };
   } catch (err) {
     console.error('[CAPI] fbc recovery lookup failed:', err);
   }
-  return undefined;
+  return {};
 }
 
 export async function handlePaymentSuccess(
@@ -366,16 +380,20 @@ export async function handlePaymentSuccess(
         const resolvedFbp = metaData?.fbp || storedMeta?.fbp || undefined;
         let resolvedFbc: string | undefined = metaData?.fbc || storedMeta?.fbc || recoveredOrderFbc || undefined;
         let fbcRecovered = !!recoveredOrderFbc && !metaData?.fbc && !storedMeta?.fbc;
-        if (!resolvedFbc) {
+        let crossSessionUrl: string | undefined;
+        if (!resolvedFbc || (!recoveredSourceUrl && !(storedMeta?.eventSourceUrl || '').includes('fbclid=') && !(storedMeta?.eventSourceUrl || '').includes('/product/'))) {
           // Cross-order fallback: look at OTHER orders from same customer within 7 days
-          const crossSessionFbc = await recoverFbcFromPriorSessions(supabaseAdmin, orderId, {
+          const crossSession = await recoverFbcFromPriorSessions(supabaseAdmin, orderId, {
             emails: [userEmail, metaData?.paypalEmail || storedMeta?.paypalEmail].filter(Boolean) as string[],
             phone: userPhone,
             userId: order?.user_id || undefined
           });
-          if (crossSessionFbc) {
-            resolvedFbc = crossSessionFbc;
+          if (!resolvedFbc && crossSession.fbc) {
+            resolvedFbc = crossSession.fbc;
             fbcRecovered = true;
+          }
+          if (crossSession.sourceUrl) {
+            crossSessionUrl = crossSession.sourceUrl;
           }
           if (fbcRecovered) console.log(`[CAPI] Recovered fbc from earlier session for order ${orderId}`);
         }
@@ -387,7 +405,17 @@ export async function handlePaymentSuccess(
         const testCode = metaData?.testEventCode || storedMeta?.testEventCode || process.env.META_TEST_EVENT_CODE;
         const resolvedSourceUrl = (storedMeta?.eventSourceUrl && (storedMeta.eventSourceUrl.includes('fbclid=') || storedMeta.eventSourceUrl.includes('utm_')))
           ? storedMeta.eventSourceUrl
-          : (recoveredSourceUrl || storedMeta?.eventSourceUrl || `https://www.textilejaipur.com/payment/success?order_id=${orderId}`);
+          : (recoveredSourceUrl || crossSessionUrl || storedMeta?.eventSourceUrl || `https://www.textilejaipur.com/payment/success?order_id=${orderId}`);
+        if (!resolvedFbc && typeof resolvedSourceUrl === 'string') {
+          try {
+            const u = new URL(resolvedSourceUrl);
+            const urlFbclid = u.searchParams.get('fbclid') || resolvedSourceUrl.match(/[\?&#]fbclid=([^&#]+)/)?.[1];
+            if (urlFbclid) {
+              resolvedFbc = `fb.1.${Date.now()}.${decodeURIComponent(urlFbclid)}`;
+              fbcRecovered = true;
+            }
+          } catch {}
+        }
 
         const emailHashes = Array.from(new Set([
           hashMeta(normEmail(userEmail)),
