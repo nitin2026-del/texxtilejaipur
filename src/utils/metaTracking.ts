@@ -249,12 +249,19 @@ export const getMetaLandingUrl = (): string | undefined => {
       (window as any).__META_LANDING_URL = href;
       try { localStorage.setItem('meta_landing_url', href); } catch (e) {}
       try { sessionStorage.setItem('meta_landing_url', href); } catch (e) {}
+      writeCookieBothDomains('_tj_landing', encodeURIComponent(href));
       return href;
     }
     let stored: string | null = null;
     try { stored = sessionStorage.getItem('meta_landing_url'); } catch (e) {}
     if (!stored) {
       try { stored = localStorage.getItem('meta_landing_url'); } catch (e) {}
+    }
+    if (!stored) {
+      const cookieLanding = readBestCookie('_tj_landing');
+      if (cookieLanding) {
+        try { stored = decodeURIComponent(cookieLanding); } catch { stored = cookieLanding; }
+      }
     }
     return stored || (window as any).__META_LANDING_URL || href;
   } catch (e) {

@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { generateInvoiceBuffer } from './invoiceGenerator';
+import { lookupAdClickFromVault } from './metaVault';
 import crypto from 'crypto';
 
 const hashMeta = (val?: string) => {
@@ -392,14 +393,21 @@ export async function handlePaymentSuccess(
       } catch { /* not a JSON attribution record */ }
     }
 
-    if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && !capiAlreadySent) {
+    // Allow re-sending with the exact same event_id (orderId) if a webhook previously sent CAPI without _fbc
+    // and the customer's browser subsequently arrived on /payment/success carrying the real _fbc cookie.
+    const hasNewFbcForAlreadySent = capiAlreadySent && !storedMeta?.fbc && !!(metaData?.fbc || recoveredOrderFbc);
+
+    if (process.env.META_ACCESS_TOKEN && !shouldSkipCapi && (!capiAlreadySent || hasNewFbcForAlreadySent)) {
       try {
-        const resolvedFbp = metaData?.fbp || storedMeta?.fbp || recoveredOrderFbp || undefined;
+        let resolvedFbp = metaData?.fbp || storedMeta?.fbp || recoveredOrderFbp || undefined;
         let resolvedFbc: string | undefined = metaData?.fbc || storedMeta?.fbc || recoveredOrderFbc || undefined;
         let fbcRecovered = !!recoveredOrderFbc && !metaData?.fbc && !storedMeta?.fbc;
         let crossSessionUrl: string | undefined;
+        let vaultIp: string | undefined;
+        let vaultUa: string | undefined;
+
+        // Layer 1 Cross-Session Recovery: Check prior orders in DB within 90 days by email, PayPal email, phone tail, or user_id
         if (!resolvedFbc || (!recoveredSourceUrl && !(storedMeta?.eventSourceUrl || '').includes('fbclid=') && !(storedMeta?.eventSourceUrl || '').includes('/product/') && !recoveredProductUrl)) {
-          // Cross-order fallback: look at OTHER orders from same customer within 90 days
           const crossSession = await recoverFbcFromPriorSessions(supabaseAdmin, orderId, {
             emails: [userEmail, metaData?.paypalEmail || storedMeta?.paypalEmail || recoveredOrderPaypalEmail].filter(Boolean) as string[],
             phone: userPhone,
@@ -412,11 +420,37 @@ export async function handlePaymentSuccess(
           if (crossSession.sourceUrl) {
             crossSessionUrl = crossSession.sourceUrl;
           }
-          if (fbcRecovered) console.log(`[CAPI] Recovered fbc from earlier session for order ${orderId}`);
+          if (fbcRecovered) console.log(`[CAPI] Recovered fbc from earlier order session for order ${orderId}`);
         }
-        const rawIp = metaData?.clientIp || storedMeta?.clientIp || recoveredOrderIp;
+
+        // Layer 2 Cross-Session Recovery: Check the Server-Side Ad Click Vault (covers shoppers who clicked an ad on Day 1,
+        // only viewed a product or added to cart without creating an order, left, and returned 3+ days later to buy!)
+        if (!resolvedFbc || (!recoveredSourceUrl && !crossSessionUrl)) {
+          const vaultHit = await lookupAdClickFromVault(supabaseAdmin, {
+            fbp: resolvedFbp,
+            emails: [userEmail, metaData?.paypalEmail || storedMeta?.paypalEmail || recoveredOrderPaypalEmail],
+            phone: userPhone,
+          });
+          if (vaultHit) {
+            if (!resolvedFbc && vaultHit.fbc) {
+              resolvedFbc = vaultHit.fbc;
+              fbcRecovered = true;
+              console.log(`[CAPI] Recovered Day-1 fbc from Server Ad Click Vault for order ${orderId}`);
+            }
+            if (!resolvedFbp && vaultHit.fbp) {
+              resolvedFbp = vaultHit.fbp;
+            }
+            if (!crossSessionUrl && vaultHit.landingUrl) {
+              crossSessionUrl = vaultHit.landingUrl;
+            }
+            vaultIp = vaultHit.clientIp;
+            vaultUa = vaultHit.userAgent;
+          }
+        }
+
+        const rawIp = metaData?.clientIp || storedMeta?.clientIp || recoveredOrderIp || vaultIp;
         const resolvedIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
-        const resolvedUa = metaData?.userAgent || storedMeta?.userAgent || recoveredOrderUa || undefined;
+        const resolvedUa = metaData?.userAgent || storedMeta?.userAgent || recoveredOrderUa || vaultUa || undefined;
         const resolvedCurrency = (metaData?.trackingCurrency || storedMeta?.trackingCurrency || order?.display_currency || 'USD').toUpperCase();
         const resolvedAmount = Number((metaData?.trackingAmount || storedMeta?.trackingAmount || Number(order?.total_display_currency) || order?.total || 0).toFixed(2));
         const testCode = metaData?.testEventCode || storedMeta?.testEventCode || process.env.META_TEST_EVENT_CODE;
@@ -439,6 +473,14 @@ export async function handlePaymentSuccess(
           hashMeta(normEmail(metaData?.paypalEmail || storedMeta?.paypalEmail || recoveredOrderPaypalEmail))
         ].filter(Boolean) as string[]));
 
+        const externalIdHashes = Array.from(new Set([
+          hashMeta(resolvedFbp),
+          hashMeta(normEmail(userEmail)),
+          hashMeta(order?.user_id || orderId)
+        ].filter(Boolean) as string[]));
+
+        const totalQty = (orderItems || []).reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
+
         const payload = {
           data: [{
             event_name: 'Purchase',
@@ -455,7 +497,7 @@ export async function handlePaymentSuccess(
               st: hashMeta(normStr(userState)) ? [hashMeta(normStr(userState))] : undefined,
               zp: hashMeta(normStr(userZip)) ? [hashMeta(normStr(userZip))] : undefined,
               country: hashMeta(normCountry(userCountry)) ? [hashMeta(normCountry(userCountry))] : undefined,
-              external_id: hashMeta(order?.user_id || orderId) ? [hashMeta(order?.user_id || orderId)] : undefined,
+              external_id: externalIdHashes.length > 0 ? externalIdHashes : undefined,
               fbp: resolvedFbp,
               fbc: resolvedFbc,
               client_ip_address: resolvedIp,
@@ -467,6 +509,7 @@ export async function handlePaymentSuccess(
               content_ids: (orderItems || []).map(item => item.product_id).filter(Boolean),
               contents: (orderItems || []).map(item => ({ id: item.product_id, quantity: item.quantity })),
               content_type: 'product',
+              num_items: totalQty || undefined,
               order_id: orderId
             }
           }],

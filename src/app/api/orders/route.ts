@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getCookieFromHeader, saveAdClickToVault, lookupAdClickFromVault } from '@/lib/metaVault';
 
 // Initialize a server-side Supabase client for admin operations
 const supabaseAdmin = createClient(
@@ -272,16 +273,51 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to save order items. Please try again.' }, { status: 500 });
     }
 
-    // 5. Save Meta attribution atomically at order creation (including server-observed clientIp & userAgent)
+    // 5. Save Meta attribution atomically at order creation (including server-observed clientIp, userAgent, HTTP cookies & Vault recovery)
     try {
       const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
       const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
       const userAgent = req.headers.get('user-agent') || undefined;
-      const sourceUrl = event_source_url || req.headers.get('referer') || undefined;
-      if (fbp || fbc || clientIp || sourceUrl) {
+      const cookieHeader = req.headers.get('cookie');
+      const cookieFbp = getCookieFromHeader(cookieHeader, '_fbp');
+      const cookieFbc = getCookieFromHeader(cookieHeader, '_fbc');
+      const cookieLanding = getCookieFromHeader(cookieHeader, '_tj_landing');
+
+      let resolvedFbp: string | undefined = fbp || cookieFbp || undefined;
+      let resolvedFbc: string | undefined = fbc || cookieFbc || undefined;
+      let sourceUrl: string | undefined = event_source_url || cookieLanding || req.headers.get('referer') || undefined;
+
+      // If visitor returned days later after ITP cleared _fbc, check the Server-Side Ad Click Vault!
+      if (!resolvedFbc && (resolvedFbp || guest_email || shipping_address?.phone)) {
+        const vaultHit = await lookupAdClickFromVault(supabaseAdmin, {
+          fbp: resolvedFbp,
+          emails: [guest_email],
+          phone: shipping_address?.phone,
+        });
+        if (vaultHit?.fbc) {
+          resolvedFbc = vaultHit.fbc;
+        }
+        if (vaultHit?.landingUrl && (!sourceUrl || (!sourceUrl.includes('fbclid=') && !sourceUrl.includes('utm_')))) {
+          sourceUrl = vaultHit.landingUrl;
+        }
+      }
+
+      if (resolvedFbc) {
+        saveAdClickToVault(supabaseAdmin, {
+          fbc: resolvedFbc,
+          fbp: resolvedFbp,
+          email: guest_email,
+          phone: shipping_address?.phone,
+          landingUrl: sourceUrl,
+          clientIp,
+          userAgent,
+        }).catch(() => {});
+      }
+
+      if (resolvedFbp || resolvedFbc || clientIp || sourceUrl) {
         const attrJson = JSON.stringify({
-          fbp: fbp || undefined,
-          fbc: fbc || undefined,
+          fbp: resolvedFbp,
+          fbc: resolvedFbc,
           clientIp,
           userAgent,
           capturedAt: 'order_create_server',

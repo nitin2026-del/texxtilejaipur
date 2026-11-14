@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { X, CreditCard, ShoppingBag, ShieldCheck, User, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { trackMetaEvent, getMetaCookie, getMetaLandingUrl } from '@/utils/metaTracking';
+import { trackMetaEvent, getMetaCookie, getMetaLandingUrl, saveMetaUserData } from '@/utils/metaTracking';
 import { PayPalPaymentForm } from './PayPalPaymentForm';
 import { FreeRingWidget } from './FreeRingWidget';
 import { getOptimizedUrl } from '@/utils/imageUtils';
@@ -127,6 +127,41 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
   }, [isOpen, cart, getCartTotalInr, currency]);
 
   if (!isOpen) return null;
+
+  const syncEarlyCheckoutVault = (nextEmail?: string, nextPhone?: string) => {
+    try {
+      const cleanEm = (nextEmail ?? email ?? user?.email ?? '').trim();
+      const cleanPh = (nextPhone ?? phone ?? '').trim();
+      const nameParts = (fullName || '').trim().split(/\s+/);
+      saveMetaUserData({
+        email: cleanEm || undefined,
+        phone: cleanPh || undefined,
+        firstName: nameParts[0] || undefined,
+        lastName: nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined,
+        city: city || undefined,
+        state: state || undefined,
+        zip: postalCode || undefined,
+        country: country || undefined,
+      });
+      const fbc = getMetaCookie('_fbc');
+      const fbp = getMetaCookie('_fbp');
+      if (fbc && (cleanEm.includes('@') || cleanPh.replace(/\D/g, '').length >= 8)) {
+        fetch('/api/orders/attribution', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'vault',
+            fbc,
+            fbp,
+            email: cleanEm || undefined,
+            phone: cleanPh || undefined,
+            landingUrl: getMetaLandingUrl(),
+          }),
+          keepalive: true,
+        }).catch(() => {});
+      }
+    } catch {}
+  };
 
   const handleShippingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -387,6 +422,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="+1 555-0199"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    onBlur={(e) => syncEarlyCheckoutVault(undefined, e.target.value)}
                     className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                 </div>
@@ -480,7 +516,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                     placeholder="Enter your email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    
+                    onBlur={(e) => syncEarlyCheckoutVault(e.target.value, undefined)}
                     className="w-full bg-white border border-zinc-300 rounded py-2 px-3 text-sm text-zinc-900 placeholder-zinc-500 focus:outline-none focus:border-gold"
                   />
                   <p className="text-[10px] text-zinc-400 mt-1">We'll send your order summary and tracking link here.</p>

@@ -1,5 +1,17 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+import {
+  getCookieFromHeader,
+  buildMetaSetCookieHeaders,
+  saveAdClickToVault,
+  lookupAdClickFromVault,
+} from '@/lib/metaVault';
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
 
 const hashMeta = (val?: string) => {
   if (!val) return undefined;
@@ -156,9 +168,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'Missing token' }, { status: 500 });
     }
 
-    let resolvedFbc = fbc || undefined;
+    const cookieHeader = req.headers.get('cookie');
+    const cookieFbp = getCookieFromHeader(cookieHeader, '_fbp');
+    const cookieFbc = getCookieFromHeader(cookieHeader, '_fbc');
+    const cookieLanding = getCookieFromHeader(cookieHeader, '_tj_landing');
+
+    let resolvedFbp: string | undefined = fbp || cookieFbp || undefined;
+    let resolvedFbc: string | undefined = fbc || cookieFbc || undefined;
+    const effectiveLandingUrl: string | undefined = landingUrl || cookieLanding || undefined;
+
     if (!resolvedFbc) {
-      for (const candidateUrl of [url, landingUrl]) {
+      for (const candidateUrl of [url, effectiveLandingUrl]) {
         if (typeof candidateUrl === 'string' && candidateUrl) {
           try {
             const parsedUrl = new URL(candidateUrl);
@@ -172,6 +192,35 @@ export async function POST(req: Request) {
       }
     }
 
+    // If this visitor has an ad click (resolvedFbc), persist it in the Server-Side Ad Click Vault
+    // so if they leave without checking out and return 3+ days later after ITP clears _fbc, we recover it!
+    if (resolvedFbc) {
+      saveAdClickToVault(supabaseAdmin, {
+        fbc: resolvedFbc,
+        fbp: resolvedFbp,
+        email: userData?.email,
+        phone: userData?.phone,
+        landingUrl: effectiveLandingUrl || url,
+        clientIp,
+        userAgent: uaToCheck,
+      }).catch(() => {});
+    } else if (eventName !== 'PageView' && (resolvedFbp || userData?.email || userData?.phone)) {
+      // Returning visitor on a funnel event (ViewContent / AddToCart / InitiateCheckout / AddPaymentInfo):
+      // check if they had a Day-1 ad click in the Server Vault!
+      const vaultHit = await lookupAdClickFromVault(supabaseAdmin, {
+        fbp: resolvedFbp,
+        emails: [userData?.email],
+        phone: userData?.phone,
+      });
+      if (vaultHit?.fbc) {
+        resolvedFbc = vaultHit.fbc;
+      }
+    }
+
+    const externalIdHashes = Array.from(
+      new Set([hashMeta(resolvedFbp), hashMeta(normEmail(userData?.email))].filter(Boolean) as string[])
+    );
+
     const payload = {
       data: [
         {
@@ -182,8 +231,8 @@ export async function POST(req: Request) {
           action_source: 'website',
           user_data: {
             client_ip_address: clientIp,
-            client_user_agent: userAgent,
-            fbp: fbp || undefined,
+            client_user_agent: userAgent || uaToCheck,
+            fbp: resolvedFbp,
             fbc: resolvedFbc,
             // Meta best practice: Never send PII (email, phone, name) on PageView events.
             // Sending emails on repeated PageViews triggers the "duplicate client Emails" warning in Meta Diagnostics.
@@ -195,7 +244,8 @@ export async function POST(req: Request) {
               ct: hashMeta(normStr(userData?.city)) ? [hashMeta(normStr(userData?.city))] : undefined,
               st: hashMeta(normStr(userData?.state)) ? [hashMeta(normStr(userData?.state))] : undefined,
               zp: hashMeta(normStr(userData?.zip)) ? [hashMeta(normStr(userData?.zip))] : undefined,
-              country: hashMeta(normCountry(userData?.country)) ? [hashMeta(normCountry(userData?.country))] : undefined
+              country: hashMeta(normCountry(userData?.country)) ? [hashMeta(normCountry(userData?.country))] : undefined,
+              external_id: externalIdHashes.length > 0 ? externalIdHashes : undefined
             } : {})
           },
           custom_data: eventData ? {
@@ -220,7 +270,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: result }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, result });
+    const res = NextResponse.json({ success: true, result });
+    const setCookies = buildMetaSetCookieHeaders(req.headers.get('host'), {
+      fbc: resolvedFbc,
+      fbp: resolvedFbp,
+      landingUrl: effectiveLandingUrl && (effectiveLandingUrl.includes('fbclid=') || effectiveLandingUrl.includes('utm_')) ? effectiveLandingUrl : undefined,
+    });
+    for (const c of setCookies) {
+      res.headers.append('Set-Cookie', c);
+    }
+    return res;
   } catch (error: any) {
     console.error('CAPI Handler Error:', error);
     return NextResponse.json({ success: false, error: error.message || String(error) }, { status: 500 });

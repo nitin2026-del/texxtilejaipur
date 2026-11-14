@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import paypal from '@paypal/checkout-server-sdk';
 import { createClient } from '@supabase/supabase-js';
 import { handlePaymentSuccess } from '@/lib/paymentSuccessHandler';
+import { getCookieFromHeader } from '@/lib/metaVault';
 
 // Initialize PayPal — switches between Sandbox and Live via env variable
 const clientId = process.env.PAYPAL_CLIENT_ID || '';
@@ -74,15 +75,18 @@ export async function POST(req: NextRequest) {
         // Don't throw — main order is already marked paid
       }
 
-      // Extract tracking parameters for CAPI
+      // Extract tracking parameters for CAPI (falling back to HTTP request cookies if client JS cookies were blocked)
       const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
       const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
       const userAgent = req.headers.get('user-agent') || undefined;
+      const cookieHeader = req.headers.get('cookie');
+      const resolvedFbp = fbp || getCookieFromHeader(cookieHeader, '_fbp');
+      const resolvedFbc = fbc || getCookieFromHeader(cookieHeader, '_fbc');
       const { data: trackOrder } = await supabaseAdmin.from('orders').select('display_currency, total_display_currency').eq('id', orderId).single();
       const rawTrackingAmount = Number(trackOrder?.total_display_currency) || 0;
       const metaData = { 
-        fbp, 
-        fbc, 
+        fbp: resolvedFbp, 
+        fbc: resolvedFbc, 
         clientIp: typeof clientIp === 'string' ? clientIp : undefined, 
         userAgent,
         trackingCurrency: (trackOrder?.display_currency || 'USD').toUpperCase(),
@@ -214,17 +218,21 @@ export async function POST(req: NextRequest) {
         })
         .eq('id', orderId);
 
-      // Extract client IP & User-Agent at the moment the customer clicks PayPal
+      // Extract client IP, User-Agent & HTTP cookies at the moment the customer clicks PayPal
       const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
       const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
       const userAgent = req.headers.get('user-agent') || undefined;
-      const eventSourceUrl = clientEventSourceUrl || req.headers.get('referer') || `${siteUrl}/payment/success?order_id=${orderId}`;
+      const cookieHeader = req.headers.get('cookie');
+      const resolvedFbp = fbp || getCookieFromHeader(cookieHeader, '_fbp');
+      const resolvedFbc = fbc || getCookieFromHeader(cookieHeader, '_fbc');
+      const cookieLanding = getCookieFromHeader(cookieHeader, '_tj_landing');
+      const eventSourceUrl = clientEventSourceUrl || cookieLanding || req.headers.get('referer') || `${siteUrl}/payment/success?order_id=${orderId}`;
 
       // Record the payment attempt in the payments table with Meta attribution metadata.
       // Stored as JSON in razorpay_order_id (verified TEXT column on payments table) since raw_response does not exist in schema.
       const metaAttributionJson = JSON.stringify({
-        fbp: fbp || undefined,
-        fbc: fbc || undefined,
+        fbp: resolvedFbp || undefined,
+        fbc: resolvedFbc || undefined,
         clientIp,
         userAgent,
         eventSourceUrl,

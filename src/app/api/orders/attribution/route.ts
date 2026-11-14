@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getCookieFromHeader, saveAdClickToVault } from '@/lib/metaVault';
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -19,23 +20,64 @@ const supabaseAdmin = createClient(
  */
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, attrJson } = await req.json();
+    const body = await req.json();
+    const { orderId, attrJson, action, fbc, fbp, email, phone, landingUrl } = body;
+
+    const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
+    const headerUa = req.headers.get('user-agent') || undefined;
+    const cookieHeader = req.headers.get('cookie');
+    const cookieFbp = getCookieFromHeader(cookieHeader, '_fbp');
+    const cookieFbc = getCookieFromHeader(cookieHeader, '_fbc');
+    const cookieLanding = getCookieFromHeader(cookieHeader, '_tj_landing');
+
+    // Early checkout form blur vault sync (before an orderId even exists!)
+    if (action === 'vault') {
+      const resolvedFbc = fbc || cookieFbc;
+      const resolvedFbp = fbp || cookieFbp;
+      if (resolvedFbc) {
+        await saveAdClickToVault(supabaseAdmin, {
+          fbc: resolvedFbc,
+          fbp: resolvedFbp,
+          email,
+          phone,
+          landingUrl: landingUrl || cookieLanding,
+          clientIp,
+          userAgent: headerUa,
+        });
+      }
+      return NextResponse.json({ ok: true, vaulted: Boolean(resolvedFbc) });
+    }
 
     if (!orderId || !attrJson) {
       return NextResponse.json({ ok: false, error: 'Missing orderId or attrJson' }, { status: 400 });
     }
 
-    const rawIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
-    const clientIp = typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : undefined;
-    const headerUa = req.headers.get('user-agent') || undefined;
     let enrichedAttrJson = attrJson;
     try {
       const parsed = JSON.parse(attrJson);
+      const finalFbc = parsed.fbc || cookieFbc;
+      const finalFbp = parsed.fbp || cookieFbp;
+      const finalUrl = parsed.eventSourceUrl || cookieLanding;
       enrichedAttrJson = JSON.stringify({
         ...parsed,
+        fbc: finalFbc,
+        fbp: finalFbp,
+        eventSourceUrl: finalUrl,
         clientIp: parsed.clientIp || clientIp,
         userAgent: parsed.userAgent || headerUa
       });
+      if (finalFbc) {
+        saveAdClickToVault(supabaseAdmin, {
+          fbc: finalFbc,
+          fbp: finalFbp,
+          email: parsed.email,
+          phone: parsed.phone,
+          landingUrl: finalUrl,
+          clientIp: parsed.clientIp || clientIp,
+          userAgent: parsed.userAgent || headerUa,
+        }).catch(() => {});
+      }
     } catch {}
 
     // Verify the order exists before writing anything
