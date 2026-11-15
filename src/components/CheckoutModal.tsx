@@ -507,12 +507,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose })
                 </div>
               </div>
 
-              {country === 'Mexico' && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[11px] text-amber-900 leading-relaxed">
-                  <strong>🇲🇽 Mexico Card Payment Note:</strong> Due to Mexican banking regulations, PayPal requires attaching an email and password to online card payments. You do <strong>not</strong> need a prior PayPal account — on the payment screen, simply select <strong>&quot;Create an account&quot;</strong>, enter your debit/credit card details (and digital CVV if required by your bank app), and choose any password to complete your order.
-                </div>
-              )}
-
               {!user && (
                 <div className="mb-4">
                   <label className="block text-xs font-semibold text-zinc-600 mb-1">Email Address <span className="text-zinc-400">(for order confirmation & tracking)</span></label>
