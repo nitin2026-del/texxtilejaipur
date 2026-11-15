@@ -124,6 +124,11 @@ export const PayPalPaymentForm: React.FC<PayPalPaymentFormProps> = ({
         <p className="text-sm font-bold text-white">
           <span className="text-yellow-400">{paymentAmount} {currency}</span>
         </p>
+        {currency === 'MXN' && (
+          <p className="text-[11px] text-emerald-400 font-medium mt-1">
+            Processed as ${Number((paymentAmount * (0.0104 / 0.193648)).toFixed(2))} USD on PayPal for instant Mexican card approval
+          </p>
+        )}
       </div>
 
       {/* PayPal Button */}

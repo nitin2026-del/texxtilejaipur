@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Secure amount validation
-      const { data: order } = await supabaseAdmin.from('orders').select('user_id, total').eq('id', orderId).single();
+      const { data: order } = await supabaseAdmin.from('orders').select('user_id, total, display_currency, total_display_currency').eq('id', orderId).single();
       if (!order) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
@@ -170,7 +170,8 @@ export async function POST(req: NextRequest) {
         MXN: 0.193648,
       };
 
-      const PAYPAL_SUPPORTED = ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'MXN'];
+      // Keep MXN on the website for display, but charge PayPal in USD so Mexican banks & cross-border card checkout approve the card
+      const PAYPAL_SUPPORTED = ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD'];
       const rawCurr = currency.toUpperCase();
       const targetCurrency = PAYPAL_SUPPORTED.includes(rawCurr) ? rawCurr : 'USD';
       const rate = FX_RATES[targetCurrency] || FX_RATES['USD'];
@@ -237,8 +238,8 @@ export async function POST(req: NextRequest) {
         userAgent,
         eventSourceUrl,
         testEventCode: testEventCode || undefined,
-        trackingCurrency: targetCurrency,
-        trackingAmount: secureAmountInTargetCurrency
+        trackingCurrency: (order.display_currency || targetCurrency || 'USD').toUpperCase(),
+        trackingAmount: Number((Number(order.total_display_currency) || secureAmountInTargetCurrency).toFixed(2))
       });
 
       const { error: insertPaymentError } = await supabaseAdmin

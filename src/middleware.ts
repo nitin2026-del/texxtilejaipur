@@ -68,7 +68,9 @@ export function middleware(req: NextRequest) {
     if (fbpToSet) {
       appendServerCookie('_fbp', fbpToSet);
     }
-    if (urlFbclid || hasUtm || (isMetaAppOrReferer && !existingLanding)) {
+    const isPaymentReturn =
+      searchParams.has('payment') || url.pathname.startsWith('/payment/');
+    if (!isPaymentReturn && (urlFbclid || hasUtm || (isMetaAppOrReferer && !existingLanding))) {
       appendServerCookie('_tj_landing', encodeURIComponent(req.url));
     }
 

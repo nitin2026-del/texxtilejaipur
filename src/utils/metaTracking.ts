@@ -244,7 +244,8 @@ export const getMetaLandingUrl = (): string | undefined => {
   try {
     const href = window.location.href;
     const params = new URLSearchParams(window.location.search);
-    const hasAdParams = params.has('fbclid') || /[\?&#]fbclid=/.test(href) || params.has('utm_source') || params.has('utm_campaign') || params.has('utm_content') || params.has('utm_id');
+    const isPaymentReturn = params.has('payment') || window.location.pathname.startsWith('/payment/');
+    const hasAdParams = !isPaymentReturn && (params.has('fbclid') || /[\?&#]fbclid=/.test(href) || params.has('utm_source') || params.has('utm_campaign') || params.has('utm_content') || params.has('utm_id'));
     if (hasAdParams) {
       (window as any).__META_LANDING_URL = href;
       try { localStorage.setItem('meta_landing_url', href); } catch (e) {}

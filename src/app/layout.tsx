@@ -309,7 +309,8 @@ export default function RootLayout({
                   window.__META_FBP = fbpVal;
                   lSet('meta_fbp', fbpVal);
                   sSet('meta_fbp', fbpVal);
-                  if (fbclid || params.get('utm_source') || params.get('utm_campaign') || params.get('utm_content') || params.get('utm_id')) {
+                  var isPayReturn = params.has('payment') || (window.location.pathname && window.location.pathname.indexOf('/payment/') === 0);
+                  if (!isPayReturn && (fbclid || params.get('utm_source') || params.get('utm_campaign') || params.get('utm_content') || params.get('utm_id'))) {
                     window.__META_LANDING_URL = href;
                     lSet('meta_landing_url', href);
                     sSet('meta_landing_url', href);
