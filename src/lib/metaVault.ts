@@ -136,15 +136,20 @@ export async function saveAdClickToVault(
       ts: now,
     };
 
+    const isIncomingBioLink = Boolean(
+      entry.landingUrl && /utm_content=link_in_bio|utm_medium=social/i.test(entry.landingUrl)
+    );
     const mergeEntry = (prev?: VaultEntry): VaultEntry => ({
-      fbc: entry.fbc || prev?.fbc,
+      fbc: isIncomingBioLink && prev?.fbc ? prev.fbc : (entry.fbc || prev?.fbc),
       fbp: entry.fbp || prev?.fbp,
       landingUrl:
-        entry.landingUrl && (entry.landingUrl.includes('fbclid=') || entry.landingUrl.includes('utm_'))
-          ? entry.landingUrl
-          : prev?.landingUrl && (prev.landingUrl.includes('fbclid=') || prev.landingUrl.includes('utm_') || prev.landingUrl.includes('/product/'))
-            ? prev.landingUrl
-            : entry.landingUrl || prev?.landingUrl,
+        isIncomingBioLink && prev?.landingUrl
+          ? prev.landingUrl
+          : entry.landingUrl && (entry.landingUrl.includes('fbclid=') || entry.landingUrl.includes('utm_'))
+            ? entry.landingUrl
+            : prev?.landingUrl && (prev.landingUrl.includes('fbclid=') || prev.landingUrl.includes('utm_') || prev.landingUrl.includes('/product/'))
+              ? prev.landingUrl
+              : entry.landingUrl || prev?.landingUrl,
       clientIp: entry.clientIp || prev?.clientIp,
       userAgent: entry.userAgent || prev?.userAgent,
       ts: now,

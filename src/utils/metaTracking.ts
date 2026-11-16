@@ -189,7 +189,7 @@ export const getMetaCookie = (name: string) => {
       if (!existingFbc) {
         try { existingFbc = sessionStorage.getItem('meta_fbc') || undefined; } catch (e) {}
       }
-      if (existingFbc && existingFbc.endsWith(`.${urlFbclid}`)) {
+      if (existingFbc && (existingFbc.endsWith(`.${urlFbclid}`) || (/utm_content=link_in_bio|utm_medium=social/i.test(typeof window !== 'undefined' ? window.location.search : '')))) {
         val = existingFbc;
       } else {
         const now = Date.now().toString();
@@ -245,14 +245,7 @@ export const getMetaLandingUrl = (): string | undefined => {
     const href = window.location.href;
     const params = new URLSearchParams(window.location.search);
     const isPaymentReturn = params.has('payment') || window.location.pathname.startsWith('/payment/');
-    const hasAdParams = !isPaymentReturn && (params.has('fbclid') || /[\?&#]fbclid=/.test(href) || params.has('utm_source') || params.has('utm_campaign') || params.has('utm_content') || params.has('utm_id'));
-    if (hasAdParams) {
-      (window as any).__META_LANDING_URL = href;
-      try { localStorage.setItem('meta_landing_url', href); } catch (e) {}
-      try { sessionStorage.setItem('meta_landing_url', href); } catch (e) {}
-      writeCookieBothDomains('_tj_landing', encodeURIComponent(href));
-      return href;
-    }
+    const isBioLink = params.get('utm_content') === 'link_in_bio' || params.get('utm_medium') === 'social';
     let stored: string | null = null;
     try { stored = sessionStorage.getItem('meta_landing_url'); } catch (e) {}
     if (!stored) {
@@ -263,6 +256,14 @@ export const getMetaLandingUrl = (): string | undefined => {
       if (cookieLanding) {
         try { stored = decodeURIComponent(cookieLanding); } catch { stored = cookieLanding; }
       }
+    }
+    const hasAdParams = !isPaymentReturn && !(isBioLink && stored) && (params.has('fbclid') || /[\?&#]fbclid=/.test(href) || params.has('utm_source') || params.has('utm_campaign') || params.has('utm_content') || params.has('utm_id'));
+    if (hasAdParams) {
+      (window as any).__META_LANDING_URL = href;
+      try { localStorage.setItem('meta_landing_url', href); } catch (e) {}
+      try { sessionStorage.setItem('meta_landing_url', href); } catch (e) {}
+      writeCookieBothDomains('_tj_landing', encodeURIComponent(href));
+      return href;
     }
     return stored || (window as any).__META_LANDING_URL || href;
   } catch (e) {

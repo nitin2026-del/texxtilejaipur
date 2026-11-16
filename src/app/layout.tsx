@@ -276,8 +276,9 @@ export default function RootLayout({
                     var mHref = href.match(/[\?&#]fbclid=([^&#]+)/);
                     if (mHref && mHref[1]) { try { fbclid = decodeURIComponent(mHref[1]); } catch (e) { fbclid = mHref[1]; } }
                   }
-                  if (fbclid) {
-                    var existingFbc = cGet('_fbc') || lGet('meta_fbc') || sGet('meta_fbc') || '';
+                  var isBioLink = params.get('utm_content') === 'link_in_bio' || params.get('utm_medium') === 'social';
+                  var existingFbc = cGet('_fbc') || lGet('meta_fbc') || sGet('meta_fbc') || '';
+                  if (fbclid && !(isBioLink && existingFbc)) {
                     var nowTs = String(Date.now());
                     var fbcVal = (existingFbc && existingFbc.slice(-fbclid.length - 1) === '.' + fbclid)
                       ? existingFbc
@@ -291,7 +292,7 @@ export default function RootLayout({
                     sSet('meta_fbclid', fbclid);
                     sSet('meta_fbclid_ts', nowTs);
                   } else {
-                    var storedFbc = cGet('_fbc') || lGet('meta_fbc') || sGet('meta_fbc') || '';
+                    var storedFbc = existingFbc;
                     if (!storedFbc) {
                       var savedClid = lGet('meta_fbclid') || sGet('meta_fbclid');
                       var savedTs = lGet('meta_fbclid_ts') || sGet('meta_fbclid_ts') || String(Date.now());
@@ -310,7 +311,8 @@ export default function RootLayout({
                   lSet('meta_fbp', fbpVal);
                   sSet('meta_fbp', fbpVal);
                   var isPayReturn = params.has('payment') || (window.location.pathname && window.location.pathname.indexOf('/payment/') === 0);
-                  if (!isPayReturn && (fbclid || params.get('utm_source') || params.get('utm_campaign') || params.get('utm_content') || params.get('utm_id'))) {
+                  var hasExistingLanding = Boolean(sGet('meta_landing_url') || lGet('meta_landing_url') || cGet('_tj_landing'));
+                  if (!isPayReturn && !(isBioLink && hasExistingLanding) && (fbclid || params.get('utm_source') || params.get('utm_campaign') || params.get('utm_content') || params.get('utm_id'))) {
                     window.__META_LANDING_URL = href;
                     lSet('meta_landing_url', href);
                     sSet('meta_landing_url', href);

@@ -34,9 +34,13 @@ export function middleware(req: NextRequest) {
     const isProdDomain = host.includes('textilejaipur.com');
     const now = Date.now();
 
-    // 1. Resolve _fbc (preserve creation timestamp if fbclid matches existing _fbc)
+    const isOrganicBioLink =
+      searchParams.get('utm_content') === 'link_in_bio' ||
+      searchParams.get('utm_medium') === 'social';
+
+    // 1. Resolve _fbc (preserve creation timestamp if fbclid matches existing _fbc; never let an organic link_in_bio fbclid overwrite an existing _fbc)
     let fbcToSet = existingFbc;
-    if (urlFbclid) {
+    if (urlFbclid && !(isOrganicBioLink && existingFbc)) {
       if (existingFbc && existingFbc.endsWith(`.${urlFbclid}`)) {
         fbcToSet = existingFbc;
       } else {
@@ -70,7 +74,7 @@ export function middleware(req: NextRequest) {
     }
     const isPaymentReturn =
       searchParams.has('payment') || url.pathname.startsWith('/payment/');
-    if (!isPaymentReturn && (urlFbclid || hasUtm || (isMetaAppOrReferer && !existingLanding))) {
+    if (!isPaymentReturn && !(isOrganicBioLink && existingLanding) && (urlFbclid || hasUtm || (isMetaAppOrReferer && !existingLanding))) {
       appendServerCookie('_tj_landing', encodeURIComponent(req.url));
     }
 
