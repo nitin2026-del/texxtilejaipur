@@ -136,10 +136,11 @@ export async function GET(request: Request) {
         const convertedPrice = (Number(item.price) * rate).toFixed(2);
         const availability =
           item.stock_quantity > 0 || item.stock > 0 ? 'in_stock' : 'out_of_stock';
+        const productSlug = item.slug || item.id;
         const productUrl =
           currency === 'INR'
-            ? `${baseUrl}/product/${item.id}`
-            : `${baseUrl}/product/${item.id}?currency=${currency}`;
+            ? `${baseUrl}/product/${productSlug}`
+            : `${baseUrl}/product/${productSlug}?currency=${currency}`;
 
         const additionalImagesXml = additionalImages
           .map(

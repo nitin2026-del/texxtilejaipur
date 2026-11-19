@@ -50,6 +50,7 @@ export default async function Home() {
 
         return {
           id: item.id,
+          slug: item.slug || undefined,
           sku: item.slug ? `HT-${item.slug.toUpperCase()}` : `HT-${item.id.slice(0, 8).toUpperCase()}`,
           name: item.name,
           description: item.description || '',
@@ -83,10 +84,10 @@ export default async function Home() {
     itemListElement: products.slice(0, 30).map((p, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      url: `https://www.textilejaipur.com/product/${p.id}`,
+      url: `https://www.textilejaipur.com/product/${p.slug || p.id}`,
       item: {
         '@type': 'Product',
-        '@id': `https://www.textilejaipur.com/product/${p.id}#product`,
+        '@id': `https://www.textilejaipur.com/product/${p.slug || p.id}#product`,
         name: p.name,
         description: p.description || `Handmade ${p.category} from Jaipur, India`,
         image: p.images,
@@ -100,7 +101,7 @@ export default async function Home() {
         countryOfOrigin: 'IN',
         offers: {
           '@type': 'Offer',
-          url: `https://www.textilejaipur.com/product/${p.id}`,
+          url: `https://www.textilejaipur.com/product/${p.slug || p.id}`,
           priceCurrency: 'INR',
           price: p.price_inr,
           itemCondition: 'https://schema.org/NewCondition',

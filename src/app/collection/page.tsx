@@ -152,7 +152,7 @@ export default async function CollectionPage({
 
     const [res, catRes, bannerRes, seoRes] = await Promise.all([
       fetch(
-        `${url}/rest/v1/products?select=id,name,price,stock,stock_quantity,is_featured,display_rank,created_at,details,categories(name),product_images(url,is_primary,display_order)&order=display_rank.asc.nullslast`,
+        `${url}/rest/v1/products?select=id,slug,name,price,stock,stock_quantity,is_featured,display_rank,created_at,details,categories(name),product_images(url,is_primary,display_order)&order=display_rank.asc.nullslast`,
         fetchOpts
       ),
       fetch(`${url}/rest/v1/categories?select=name&order=name`, fetchOpts),
@@ -171,6 +171,7 @@ export default async function CollectionPage({
 
         return {
           id: item.id,
+          slug: item.slug || undefined,
           sku: `HT-${item.id.slice(0, 8).toUpperCase()}`,
           name: item.name,
           description: '',
@@ -241,7 +242,7 @@ export default async function CollectionPage({
       itemListElement: schemaProducts.slice(0, 30).map((p, index) => ({
         '@type': 'ListItem',
         position: index + 1,
-        url: `https://www.textilejaipur.com/product/${p.id}`,
+        url: `https://www.textilejaipur.com/product/${p.slug || p.id}`,
         name: p.name,
         image: p.images?.[0],
         item: {
@@ -252,7 +253,7 @@ export default async function CollectionPage({
           brand: { '@type': 'Brand', name: 'Textile Jaipur' },
           offers: {
             '@type': 'Offer',
-            url: `https://www.textilejaipur.com/product/${p.id}`,
+            url: `https://www.textilejaipur.com/product/${p.slug || p.id}`,
             priceCurrency: 'INR',
             price: Number(p.price_inr || 0).toFixed(2),
             availability: p.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',

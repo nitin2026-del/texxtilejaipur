@@ -26,7 +26,7 @@ export async function generateMetadata(
   try {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
     const filterParam = isUuid ? `id=eq.${id}` : `slug=eq.${encodeURIComponent(id)}`;
-    const res = await fetch(`${url}/rest/v1/products?select=id,name,description,seo_title,seo_description,product_images(url,is_primary)&${filterParam}`, {
+    const res = await fetch(`${url}/rest/v1/products?select=id,slug,name,description,seo_title,seo_description,product_images(url,is_primary)&${filterParam}`, {
       headers: {
         apikey: key,
         Authorization: `Bearer ${key}`
@@ -54,7 +54,7 @@ export async function generateMetadata(
         const metaDescription = item.seo_description 
           || (cleanRawDesc ? cleanRawDesc.substring(0, 155) : `Buy authentic handmade ${item.name} from Textile Jaipur. Authentic artisan craftsmanship with free worldwide shipping.`);
 
-        const productUrl = `https://www.textilejaipur.com/product/${item.id || id}`;
+        const productUrl = `https://www.textilejaipur.com/product/${item.slug || item.id || id}`;
 
         return {
           title: metaTitle,
@@ -137,6 +137,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
 
         product = {
           id: item.id,
+          slug: item.slug || undefined,
           sku: `HT-${item.id.slice(0, 8).toUpperCase()}`,
           name: item.name,
           description: item.description || '',
@@ -300,7 +301,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
     },
     offers: {
       '@type': 'Offer',
-      url: activeCurrency === 'INR' ? `https://www.textilejaipur.com/product/${product.id}` : `https://www.textilejaipur.com/product/${product.id}?currency=${activeCurrency}`,
+      url: activeCurrency === 'INR' ? `https://www.textilejaipur.com/product/${product.slug || product.id}` : `https://www.textilejaipur.com/product/${product.slug || product.id}?currency=${activeCurrency}`,
       sku: product.sku,
       priceCurrency: activeCurrency,
       price: formattedPrice,
@@ -385,7 +386,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         '@type': 'ListItem',
         position: 3,
         name: product.name,
-        item: `https://www.textilejaipur.com/product/${product.id}`
+        item: `https://www.textilejaipur.com/product/${product.slug || product.id}`
       }
     ]
   };

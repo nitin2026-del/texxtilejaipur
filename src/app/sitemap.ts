@@ -153,7 +153,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     
     if (url && key) {
-      const res = await fetch(`${url}/rest/v1/products?select=id,updated_at,product_images(url)&status=eq.active`, {
+      const res = await fetch(`${url}/rest/v1/products?select=id,slug,updated_at,product_images(url)&status=eq.active`, {
         headers: {
           apikey: key,
           Authorization: `Bearer ${key}`
@@ -170,7 +170,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               .map((img: any) => img.url)
               .filter(Boolean);
             return {
-              url: `${baseUrl}/product/${product.id}`,
+              url: `${baseUrl}/product/${product.slug || product.id}`,
               lastModified: product.updated_at ? new Date(product.updated_at) : now,
               changeFrequency: 'daily',
               priority: 0.9,

@@ -9,6 +9,7 @@ import { getOptimizedUrl } from '@/utils/imageUtils';
 
 interface Product {
   id: string;
+  slug?: string;
   sku: string;
   name: string;
   description: string;
@@ -62,7 +63,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
   const handleWhatsAppShare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const url = `${window.location.origin}/product/${product.id}`;
+    const url = `${window.location.origin}/product/${product.slug || product.id}`;
     const text = `Check out this beautiful Jaipur textile! 🎨\n*${product.name}*\n${formatPrice(product.price_inr)}\n\n${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     setShareToast(true);
@@ -93,7 +94,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
       onTouchEnd={() => setIsHovered(false)}
       onTouchCancel={() => setIsHovered(false)}
     >
-      <Link href={`/product/${product.id}`} prefetch={true} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
+      <Link href={`/product/${product.slug || product.id}`} prefetch={true} className="block aspect-[4/5] overflow-hidden relative bg-[#FDFBF7] shrink-0">
         {/* Filter out any videos from the images array for the product card display */}
         {(() => {
           const validImages = (product.images || []).filter(img => !img.match(/\.(mp4|webm|mov|ogg)$/i));
@@ -195,7 +196,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
         <div className="space-y-1.5">
           {/* GI Tag + Rating row removed per feedback */}
 
-          <Link href={`/product/${product.id}`} prefetch={true} className="block">
+          <Link href={`/product/${product.slug || product.id}`} prefetch={true} className="block">
             <h4 className="text-lg font-serif text-zinc-900 tracking-wide line-clamp-1 group-hover:text-brand-700 transition-colors duration-300">
               {product.name}
             </h4>
@@ -229,7 +230,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  router.push(`/product/${product.id}`);
+                  router.push(`/product/${product.slug || product.id}`);
                 }}
                 className="flex-1 px-3 py-2 bg-zinc-900 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 hover:bg-zinc-800"
               >
@@ -255,7 +256,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             )}
 
             <Link
-              href={`/product/${product.id}`}
+              href={`/product/${product.slug || product.id}`}
               onClick={() => { try { sessionStorage.setItem('tj_buy_now', product.id); } catch {} }}
               className={`flex-1 px-3 py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center border border-brand-700 ${
                 product.stock === 0
