@@ -121,11 +121,13 @@ export async function GET(request: Request) {
         const sizeLabel = isBag ? 'One Size' : 'Free Size (Fits XS-XL)';
         const gtin = item.details?.gtin || '';
 
-        // Google Merchant Center best practice title:
-        // Brand + Gender + Product Name + Product Type + Color + Material + Size + Model/SKU
+        // Google Merchant Center best practice title for apparel:
+        // Put high-intent search keywords first (Color + Product Name + Fabric/Type + Size), Brand at the end (no SKU clutter)
         const baseName = (item.name || '').split('—')[0].split('|')[0].trim();
         const productType = item.details?.product_type || `Hand-Embroidered ${categoryName}`;
-        const richTitle = `Textile Jaipur Women's ${baseName} — ${color !== 'Multicolor' && !baseName.toLowerCase().includes(color.toLowerCase()) ? color + ' ' : ''}${productType} (${sizeLabel}, ${sku})`.slice(0, 150);
+        const colorPrefix = color !== 'Multicolor' && !baseName.toLowerCase().includes(color.toLowerCase()) ? `${color} ` : '';
+        const typeSuffix = baseName.toLowerCase().includes(categoryName.toLowerCase()) ? '' : ` — ${productType}`;
+        const richTitle = `Women's ${colorPrefix}${baseName}${typeSuffix} | Textile Jaipur`.slice(0, 150);
 
         const cleanDesc = (item.seo_description || item.description || item.name || '')
           .replace(/\*\*SEO Title:\*\*.*?\n/gi, '')
