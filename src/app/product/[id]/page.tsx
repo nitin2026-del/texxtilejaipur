@@ -168,7 +168,12 @@ export default async function ProductPage({ params, searchParams }: Props) {
       ? fetch(`${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${resolvedId}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`, fetchOptions)
       : Promise.resolve(null);
 
-    const [relatedRes, sibRes] = await Promise.all([relatedPromise, sibPromise]);
+    const productReviewsPromise = !isUuid
+      ? fetch(`${url}/rest/v1/reviews?or=(product_id.eq.${resolvedId},product_id.is.null)&status=eq.approved&order=created_at.desc&limit=15`, fetchOptions)
+      : Promise.resolve(null);
+
+    const [relatedRes, sibRes, productReviewsRes] = await Promise.all([relatedPromise, sibPromise, productReviewsPromise]);
+    const finalReviewsRes = productReviewsRes || reviewsRes;
     
     if (relatedRes.ok) {
       const relatedData = await relatedRes.json();
@@ -184,11 +189,11 @@ export default async function ProductPage({ params, searchParams }: Props) {
     }
 
     // 3. Process Reviews (sort product-specific reviews first, then global store reviews)
-    if (reviewsRes.ok) {
-      const reviewsData = await reviewsRes.json();
+    if (finalReviewsRes && finalReviewsRes.ok) {
+      const reviewsData = await finalReviewsRes.json();
       const sortedReviews = [...reviewsData].sort((a: any, b: any) => {
-        const aSpecific = a.product_id === id ? 1 : 0;
-        const bSpecific = b.product_id === id ? 1 : 0;
+        const aSpecific = a.product_id === resolvedId ? 1 : 0;
+        const bSpecific = b.product_id === resolvedId ? 1 : 0;
         return bSpecific - aSpecific;
       });
       initialReviews = sortedReviews.map((review: any) => ({
