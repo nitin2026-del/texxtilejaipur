@@ -288,18 +288,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
           {/* Right: Actions */}
           <div className="flex items-center gap-2.5 sm:gap-3">
             {/* Currency Selector */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
                 aria-label="Change Currency"
-                className="flex items-center gap-1.5 bg-zinc-50 hover:bg-zinc-100 rounded-full px-3 py-1.5 transition-all text-xs text-zinc-700 font-medium focus:outline-none cursor-pointer border border-zinc-200/80"
+                className="flex items-center gap-1.5 sm:gap-2 whitespace-nowrap bg-[#FAF8F5] hover:bg-[#F3EFE8] rounded-full px-2.5 sm:px-3.5 h-8 sm:h-9 transition-all duration-200 text-xs text-zinc-800 font-medium focus:outline-none cursor-pointer border border-stone-200/90 hover:border-amber-600/40 shadow-2xs"
               >
-                <IconGlobe />
-                <span className="hidden sm:inline">
-                  {currency} ({currencySymbol})
+                <span className="text-sm leading-none select-none">{currencyFlags[currency]}</span>
+                <span className="font-semibold tracking-wide text-[11px] sm:text-xs text-zinc-800">
+                  {currency}
                 </span>
-                <span className="sm:hidden text-[10px]">{currency}</span>
-                <ChevronDown className={`h-3 w-3 text-zinc-400 transition-transform duration-200 ${isCurrencyOpen ? 'rotate-180' : ''}`} />
+                <span className="hidden sm:inline text-[11px] text-zinc-400 font-normal">
+                  {currencySymbol}
+                </span>
+                <ChevronDown className={`h-3 w-3 text-zinc-400 shrink-0 transition-transform duration-200 ${isCurrencyOpen ? 'rotate-180 text-amber-700' : ''}`} />
               </button>
 
               {isCurrencyOpen && (
@@ -308,35 +310,47 @@ export const Navbar: React.FC<NavbarProps> = ({ onCartOpen }) => {
                     className="fixed inset-0 z-40 cursor-default" 
                     onClick={() => setIsCurrencyOpen(false)} 
                   />
-                  <div className="absolute right-0 mt-3 w-52 bg-white border border-zinc-100 rounded-2xl shadow-2xl shadow-black/10 py-2 z-50 flex flex-col animate-fade-in overflow-hidden">
-                    <div className="px-3.5 pb-2 mb-1 border-b border-zinc-100">
-                      <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Select Currency</p>
+                  <div className="absolute right-0 mt-2.5 w-60 bg-white/95 backdrop-blur-md border border-stone-200/90 rounded-2xl shadow-2xl shadow-stone-900/10 py-2 z-50 flex flex-col animate-fade-in overflow-hidden">
+                    <div className="px-4 py-2 mb-1 border-b border-stone-100 flex items-center justify-between">
+                      <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-[0.14em]">Select Currency</p>
+                      <span className="text-[10px] text-amber-700/80 font-medium">{currency}</span>
                     </div>
-                    {(['USD', 'EUR', 'GBP', 'MXN', 'AED', 'AUD', 'NZD', 'CAD', 'INR'] as Currency[]).map((code) => {
-                      const labels: Record<Currency, string> = {
-                        USD: 'US Dollar ($)', EUR: 'Euro (€)', GBP: 'Pound (£)',
-                        AED: 'Dirham (د.إ)', AUD: 'AUD (A$)', NZD: 'NZD (NZ$)',
-                        CAD: 'CAD (C$)', INR: 'Rupee (₹)', MXN: 'Mexican Peso ($)',
-                      };
-                      return (
-                        <button
-                          key={code}
-                          onClick={() => { setCurrency(code); setIsCurrencyOpen(false); }}
-                          className={`w-full text-left px-3.5 py-2 text-xs transition-all flex items-center gap-2.5 ${
-                            currency === code 
-                              ? 'text-brand-700 bg-brand-50/60 font-semibold' 
-                              : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
-                          }`}
-                        >
-                          <span className="text-sm">{currencyFlags[code]}</span>
-                          <span className="flex-1">{labels[code]}</span>
-                          {currency === code && <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />}
-                        </button>
-                      );
-                    })}
-                    <div className="px-3.5 py-2.5 mt-1 border-t border-zinc-100 bg-zinc-50/50">
-                      <p className="text-[10px] text-zinc-400 leading-relaxed">
-                        We ship <strong className="text-zinc-600">worldwide</strong>. Checkout comfortably in any currency.
+                    <div className="max-h-72 overflow-y-auto px-1.5 space-y-0.5">
+                      {(['USD', 'EUR', 'GBP', 'MXN', 'AED', 'AUD', 'NZD', 'CAD', 'INR'] as Currency[]).map((code) => {
+                        const names: Record<Currency, string> = {
+                          USD: 'US Dollar', EUR: 'Euro', GBP: 'British Pound',
+                          AED: 'UAE Dirham', AUD: 'Australian Dollar', NZD: 'New Zealand Dollar',
+                          CAD: 'Canadian Dollar', INR: 'Indian Rupee', MXN: 'Mexican Peso',
+                        };
+                        const symbols: Record<Currency, string> = {
+                          USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', AUD: 'A$', NZD: 'NZ$', CAD: 'C$', INR: '₹', MXN: '$',
+                        };
+                        const isActive = currency === code;
+                        return (
+                          <button
+                            key={code}
+                            onClick={() => { setCurrency(code); setIsCurrencyOpen(false); }}
+                            className={`w-full text-left px-2.5 py-2 rounded-xl text-xs transition-all flex items-center gap-2.5 cursor-pointer ${
+                              isActive
+                                ? 'text-amber-900 bg-amber-50/90 font-semibold'
+                                : 'text-zinc-600 hover:bg-stone-50 hover:text-zinc-900'
+                            }`}
+                          >
+                            <span className="text-base leading-none">{currencyFlags[code]}</span>
+                            <div className="flex-1 min-w-0 flex items-baseline gap-1.5">
+                              <span className={`font-semibold tracking-wide text-[11px] ${isActive ? 'text-amber-900' : 'text-zinc-800'}`}>{code}</span>
+                              <span className="text-[11px] text-zinc-400 truncate">{names[code]}</span>
+                            </div>
+                            <span className={`text-[11px] px-1.5 py-0.5 rounded-md ${isActive ? 'bg-amber-100/80 text-amber-900 font-semibold' : 'text-zinc-400'}`}>
+                              {symbols[code]}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="px-4 py-2.5 mt-1.5 border-t border-stone-100 bg-[#FAF8F5]">
+                      <p className="text-[10px] text-zinc-500 leading-relaxed">
+                        We ship <strong className="text-zinc-700">worldwide</strong>. Checkout comfortably in your currency.
                       </p>
                     </div>
                   </div>
