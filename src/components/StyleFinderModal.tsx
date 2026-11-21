@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, Check, ArrowRight, ArrowLeft, RotateCcw, ShoppingBag, Eye } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { getOptimizedUrl } from '@/utils/imageUtils';
@@ -97,17 +97,29 @@ export const StyleFinderModal: React.FC<StyleFinderModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
   const [liveCategories, setLiveCategories] = useState<Array<{ id: string; name: string }>>(categories || []);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    fetch('/api/categories')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setLiveCategories(data.map((c: any) => ({ id: c.id, name: c.name })));
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (categories && categories.length > 0) {
+      setLiveCategories(categories);
+    }
+  }, [categories]);
+
+  useEffect(() => {
+    if (isOpen && liveCategories.length === 0 && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetch('/api/categories')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            setLiveCategories(data.map((c: any) => ({ id: c.id, name: c.name })));
+          }
+        })
+        .catch(() => {
+          hasFetchedRef.current = false;
+        });
+    }
+  }, [isOpen, liveCategories.length]);
 
   // Filter to strictly the 3 categories requested by user:
   // 1. Velvet Suzani Jacket

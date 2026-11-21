@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
 import { StyleFinderModal } from './StyleFinderModal';
 
@@ -8,12 +8,20 @@ interface StyleFinderButtonProps {
   categories?: Array<{ id: string; name: string }>;
 }
 
-export const StyleFinderButton: React.FC<StyleFinderButtonProps> = ({ categories = [] }) => {
+export const StyleFinderButton: React.FC<StyleFinderButtonProps> = ({ categories }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [dbCategories, setDbCategories] = useState<Array<{ id: string; name: string }>>(categories);
+  const [dbCategories, setDbCategories] = useState<Array<{ id: string; name: string }>>(categories ?? []);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    if (categories.length === 0) {
+    if (categories && categories.length > 0) {
+      setDbCategories(categories);
+    }
+  }, [categories]);
+
+  useEffect(() => {
+    if (isOpen && dbCategories.length === 0 && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
       fetch('/api/categories')
         .then(res => res.json())
         .then(data => {
@@ -21,9 +29,11 @@ export const StyleFinderButton: React.FC<StyleFinderButtonProps> = ({ categories
             setDbCategories(data.map((c: any) => ({ id: c.id, name: c.name })));
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          hasFetchedRef.current = false;
+        });
     }
-  }, [categories]);
+  }, [isOpen, dbCategories.length]);
 
   // Listen for global custom event if any other button wants to trigger the style finder modal
   useEffect(() => {
