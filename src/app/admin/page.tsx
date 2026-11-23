@@ -80,6 +80,8 @@ interface ProfileSummary {
 interface Order {
   id: string;
   user_id: string;
+  order_number?: string;
+  guest_email?: string | null;
   status: string;
   payment_status: string;
   total: number;
@@ -96,7 +98,7 @@ interface Order {
     country: string;
   };
   created_at: string;
-  profiles?: { first_name?: string; last_name?: string; phone?: string; };
+  profiles?: { email?: string; first_name?: string; last_name?: string; full_name?: string; phone?: string; };
   shipping_addresses?: { full_name?: string; address_line1?: string; address_line2?: string; city?: string; state?: string; postal_code?: string; country?: string; phone?: string; };
   order_items?: OrderItem[];
   payments?: {
@@ -109,6 +111,9 @@ interface Order {
     status: string;
   }[];
 }
+
+const getOrderEmail = (order: Order): string =>
+  (order.guest_email || order.profiles?.email || '').trim();
 
 interface Blog {
   id: string;
@@ -897,7 +902,22 @@ function AdminPortalContent() {
         setProducts(mapped);
       }
 
-      // 2. Fetch Orders with relations
+      // 2. Fetch Orders with relations + non-blocking profile emails for logged-in buyers
+      const profileMap = new Map<string, { email?: string; first_name?: string; last_name?: string; full_name?: string; phone?: string }>();
+      try {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('id, email, first_name, last_name, full_name, phone');
+        if (Array.isArray(profilesData)) {
+          for (const prof of profilesData) {
+            if (prof?.id) profileMap.set(prof.id, prof);
+          }
+        }
+      } catch {
+        // Non-blocking: RLS or missing profiles never blocks loading orders
+      }
+
+      // 2b. Map relations and profile emails onto orders
       if (orderErr) {
         console.warn('Relationships fetch warning:', orderErr);
         const { data: fallbackOrders } = await supabase
@@ -913,6 +933,7 @@ function AdminPortalContent() {
               const { data: pays } = await supabase.from('payments').select('*').eq('order_id', ord.id);
               return {
                 ...ord,
+                profiles: (ord as any).profiles || (ord.user_id ? profileMap.get(ord.user_id) : undefined),
                 order_items: items || [],
                 payments: pays || []
               };
@@ -921,7 +942,11 @@ function AdminPortalContent() {
           setOrders(enriched as Order[]);
         }
       } else {
-        setOrders((orderData as Order[]) || []);
+        const enrichedOrders = ((orderData as Order[]) || []).map((ord) => ({
+          ...ord,
+          profiles: ord.profiles || (ord.user_id ? profileMap.get(ord.user_id) : undefined),
+        }));
+        setOrders(enrichedOrders);
       }
 
       // 3. Fetch Blogs
@@ -1696,6 +1721,7 @@ function AdminPortalContent() {
           trackingNumber: trackingNumberInput,
           status: shipmentStatusInput,
           shippingProvider: shippingProviderInput,
+          customerEmail: getOrderEmail(selectedOrder) || undefined,
           customerName: selectedOrder.shipping_addresses?.full_name,
         })
       });
@@ -2231,6 +2257,30 @@ function AdminPortalContent() {
                               <span className="block font-bold text-zinc-700">
                                 {order.shipping_addresses?.full_name || `${order.profiles?.first_name || ''} ${order.profiles?.last_name || ''}`.trim() || 'Guest User'}
                               </span>
+                              {(() => {
+                                const customerEmail = getOrderEmail(order);
+                                const customerPhone = order.shipping_addresses?.phone || order.profiles?.phone || '';
+                                return (
+                                  <>
+                                    {customerEmail ? (
+                                      <a
+                                        href={`mailto:${customerEmail}`}
+                                        title={customerEmail}
+                                        className="text-[11px] text-zinc-600 hover:text-brand-700 hover:underline block truncate max-w-[210px] mt-0.5 select-all"
+                                      >
+                                        {customerEmail}
+                                      </a>
+                                    ) : (
+                                      <span className="text-[10px] text-zinc-400 italic block mt-0.5">No email</span>
+                                    )}
+                                    {customerPhone && (
+                                      <span className="text-[10px] text-zinc-500 mt-0.5 block select-all">
+                                        {customerPhone}
+                                      </span>
+                                    )}
+                                  </>
+                                );
+                              })()}
                               <div className="mt-1.5 flex flex-wrap items-center gap-1">
                                 {attr.isPaidMeta ? (
                                   <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-600/15 text-blue-700 border border-blue-600/30" title={attr.sourceUrl || attr.fbc}>
@@ -4202,6 +4252,20 @@ function AdminPortalContent() {
                   <span className="text-zinc-500">Invoice Target:</span>
                   <span className="text-zinc-900 font-bold">{selectedOrder.shipping_addresses?.full_name || 'N/A'}</span>
                 </div>
+                <div className="flex justify-between gap-2">
+                  <span className="text-zinc-500 shrink-0">Customer Email:</span>
+                  {getOrderEmail(selectedOrder) ? (
+                    <a
+                      href={`mailto:${getOrderEmail(selectedOrder)}`}
+                      className="text-zinc-900 font-semibold hover:text-brand-700 hover:underline truncate select-all"
+                      title={getOrderEmail(selectedOrder)}
+                    >
+                      {getOrderEmail(selectedOrder)}
+                    </a>
+                  ) : (
+                    <span className="text-zinc-400 italic">N/A</span>
+                  )}
+                </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-zinc-500">Destination Address:</span>
                   <div className="text-zinc-700 font-semibold bg-white p-2 rounded border border-zinc-200">
@@ -4213,6 +4277,7 @@ function AdminPortalContent() {
                     </p>
                     <p>{selectedOrder.shipping_addresses?.country}</p>
                     {selectedOrder.shipping_addresses?.phone && <p className="mt-1">Phone: {selectedOrder.shipping_addresses.phone}</p>}
+                    {getOrderEmail(selectedOrder) && <p className="mt-0.5 select-all">Email: {getOrderEmail(selectedOrder)}</p>}
                   </div>
                 </div>
                 <div className="flex justify-between font-mono">
