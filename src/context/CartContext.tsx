@@ -138,6 +138,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
+    // Check if URL explicitly specifies ?currency= (e.g. Googlebot / Merchant Feed landings)
+    try {
+      const urlCurrency = new URLSearchParams(window.location.search).get('currency')?.toUpperCase() as Currency | undefined;
+      if (urlCurrency && FX_RATES[urlCurrency]) {
+        setCurrencyState(urlCurrency);
+        return;
+      }
+    } catch {}
+
     // Check if user has a saved preference first
     const savedCurrency = localStorage.getItem('textilejaipur_currency') as Currency;
     if (savedCurrency && FX_RATES[savedCurrency]) {

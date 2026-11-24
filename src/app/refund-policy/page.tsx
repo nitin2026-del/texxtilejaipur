@@ -28,50 +28,54 @@ export default function RefundPolicyPage() {
       <BottomNav onCartOpen={() => setCartOpen(true)} />
 
       <div className="pt-32 px-6 max-w-3xl mx-auto">
-        <h1 className="text-4xl font-serif font-bold text-zinc-900 mb-8">Our Philosophy & Return Policy</h1>
+        <h1 className="text-4xl font-serif font-bold text-zinc-900 mb-8">Return &amp; Refund Policy</h1>
         
         <div className="prose prose-zinc max-w-none text-zinc-700 space-y-6">
           <section className="mb-12">
             <h2 className="text-2xl font-serif text-zinc-900 mb-6 font-bold flex items-center gap-3">
-              <Heart className="h-6 w-6 text-brand-600" /> Respecting the Art
+              <Heart className="h-6 w-6 text-brand-600" /> Handcrafted with Care, Backed by a 14-Day Guarantee
             </h2>
             <div className="bg-white p-8 rounded-xl shadow-sm border border-zinc-100 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-1 h-full bg-brand-600"></div>
               <p className="text-zinc-600 leading-relaxed text-lg">
-                Every piece we create is a labor of love, woven with dedication, time, and the soul of our artisans. We do not operate a factory of mass-produced goods, but a studio of artistic expression. As such, we ask that you respect the craft and purchase with intention. 
+                Every Textile Jaipur piece is handcrafted in small batches by master artisans in Jaipur, Rajasthan. We want you to love your garment — if something isn&apos;t right, you have <strong>14 days from delivery</strong> to request a return or exchange.
               </p>
             </div>
           </section>
 
           <section className="mb-12">
             <h2 className="text-2xl font-serif text-zinc-900 mb-6 font-bold flex items-center gap-3">
-              <ShieldCheck className="h-6 w-6 text-brand-600" /> Strict Return Eligibility
+              <ShieldCheck className="h-6 w-6 text-brand-600" /> 14-Day Return &amp; Exchange Eligibility
             </h2>
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-zinc-100">
-              <p className="text-zinc-600 leading-relaxed font-semibold">
-                We do NOT accept returns for "change of mind" or arbitrary reasons. Treating our handmade art as something to casually try and discard diminishes the immense effort poured into every thread.
+            <div className="bg-white p-8 rounded-xl shadow-sm border border-zinc-100 space-y-4">
+              <p className="text-zinc-600 leading-relaxed">
+                Returns and exchanges are accepted within <strong>14 calendar days of delivery</strong> for all eligible orders. To qualify for a return:
               </p>
-              <p className="text-zinc-600 leading-relaxed mt-4">
-                Returns or exchanges are <strong>strictly limited</strong> to the following rare circumstances:
-              </p>
-              <ul className="list-disc pl-5 mt-4 space-y-2 text-zinc-600">
-                <li>You received a <strong>damaged</strong> or defective product.</li>
-                <li>You received the <strong>wrong</strong> item.</li>
+              <ul className="list-disc pl-5 space-y-2 text-zinc-600">
+                <li>Items must be <strong>unworn, unwashed, and unused</strong>, in their original condition with all original tags and packaging attached.</li>
+                <li>Return requests must be initiated within <strong>14 days</strong> of receiving your parcel via our <Link href="/returns" className="text-brand-700 font-semibold underline">Returns Portal</Link> or by emailing <a href="mailto:textileofrajasthan.info@gmail.com" className="text-brand-700 font-semibold underline">textileofrajasthan.info@gmail.com</a>.</li>
               </ul>
-              <p className="text-zinc-600 leading-relaxed mt-4">
-                If your situation meets these criteria, you must contact us within <strong>3 days</strong> of receiving the item. It must be unworn, unwashed, and in its exact original condition with all tags attached.
-              </p>
             </div>
           </section>
 
-          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">How to Request a Valid Return</h2>
+          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">Return Shipping Costs</h2>
+          <ul className="list-disc pl-5 space-y-2 text-zinc-700">
+            <li><strong>Damaged, Defective, or Incorrect Items (Free Return Shipping):</strong> If your piece arrives damaged, defective, or is not the item you ordered, Textile Jaipur covers 100% of return shipping costs and provides a full refund or free replacement.</li>
+            <li><strong>Sizing or Change-of-Mind Returns:</strong> For returns due to sizing preference or change of mind within 14 days of delivery, the customer is responsible for return shipping postage back to our studio.</li>
+          </ul>
+
+          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">How to Start a Return</h2>
           <p>
-            If you have received a damaged or incorrect piece, please email us directly with clear photos of the issue. Our team will review your case. We reserve the right to deny any return that does not explicitly meet our criteria or appears to take advantage of our policies.
+            Visit our <Link href="/returns" className="text-brand-700 font-semibold underline">Returns &amp; Exchanges Portal</Link> with your order number and email address, or email us at <a href="mailto:textileofrajasthan.info@gmail.com" className="text-brand-700 font-semibold underline">textileofrajasthan.info@gmail.com</a> (or call <a href="tel:+918764655537" className="text-brand-700 font-semibold underline">+91 87646 55537</a>). Our team responds within 24 hours with return instructions (and a prepaid label for any damaged or incorrect items).
           </p>
 
-          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">Refunds & Processing</h2>
+          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">Refund Processing Timeline</h2>
           <p>
-            Once a valid return is received and inspected in our studio, we will notify you of the approval. If approved, your refund or replacement will be processed. We appreciate your understanding and support in valuing authentic artisan craftsmanship over fast fashion convenience.
+            Once your returned item arrives at our Jaipur studio and passes quality inspection, we will notify you by email and issue your full item refund to your original payment method (PayPal or credit/debit card) within <strong>5–7 business days</strong>. There are no restocking fees.
+          </p>
+
+          <p className="text-sm text-zinc-500 pt-4 border-t border-zinc-200">
+            Looking for shipping timelines? Read our <Link href="/shipping" className="text-brand-700 font-semibold underline">Shipping &amp; Delivery Policy</Link>.
           </p>
         </div>
       </div>

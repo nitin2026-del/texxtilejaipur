@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     question: "What is your return policy?",
-    answer: "To protect the artistic integrity of our handcrafted pieces, we do not accept returns for change of mind. We accept returns strictly for damaged or incorrect items reported within 3 days of delivery."
+    answer: "We offer a 14-day return and exchange window from delivery for unworn, unwashed items with original tags attached. We cover return shipping for damaged, defective, or incorrect items; for sizing or change-of-mind returns, customers cover return postage."
   },
   {
     question: "Can I request custom sizing?",
@@ -398,10 +398,12 @@ export const Footer: React.FC = () => {
                 Made with <Heart className="h-3 w-3 text-red-500 fill-red-500" /> in Jaipur, India
               </p>
             </div>
-            <div className="flex items-center gap-6 text-xs text-zinc-500 font-medium">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-zinc-500 font-medium">
+              <a href="/shipping" className="hover:text-zinc-300 transition-colors">Shipping Policy</a>
+              <a href="/returns" className="hover:text-zinc-300 transition-colors">Returns</a>
+              <a href="/refund-policy" className="hover:text-zinc-300 transition-colors">Refund Policy</a>
               <a href="/privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</a>
               <a href="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</a>
-              <a href="/refund-policy" className="hover:text-zinc-300 transition-colors">Refund Policy</a>
             </div>
           </div>
         </div>

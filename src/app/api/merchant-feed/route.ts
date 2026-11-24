@@ -180,7 +180,7 @@ ${identifierXml}
       <g:product_highlight>100% Hand-Embroidered Suzani Needlework by Master Artisans in Jaipur, India</g:product_highlight>
       <g:product_highlight>Material: ${escapeXml(material)}</g:product_highlight>
       <g:product_highlight>Color: ${escapeXml(color)} | Size: ${escapeXml(sizeLabel)}</g:product_highlight>
-      <g:product_highlight>Free Worldwide Express Shipping (5-10 Business Days) with 30-Day Returns</g:product_highlight>
+      <g:product_highlight>Free Worldwide Express Shipping (5-10 Business Days) with 14-Day Easy Returns</g:product_highlight>
 ${shippingXml}
     </item>`;
       })

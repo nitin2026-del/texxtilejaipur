@@ -15,54 +15,52 @@ export default async function Home() {
   let products: any[] = [];
 
   try {
-    const catRes = await fetch(
-      `${url}/rest/v1/categories?select=id,name,parent_id,display_order&order=display_order.asc.nullsfirst,name.asc`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        next: { revalidate: 60 }
-      }
-    );
+    const fetchOpts = {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      next: { revalidate: 60 }
+    };
+    const [catRes, res] = await Promise.all([
+      fetch(
+        `${url}/rest/v1/categories?select=id,name,parent_id,display_order&order=display_order.asc.nullsfirst,name.asc`,
+        fetchOpts
+      ),
+      fetch(
+        `${url}/rest/v1/products?select=id,slug,name,price,stock,stock_quantity,is_featured,display_rank,details,categories(name),product_images(url,is_primary,display_order)&order=display_rank.asc.nullslast,name.asc`,
+        fetchOpts
+      )
+    ]);
+
     if (catRes.ok) {
       dbCategories = await catRes.json();
     }
-  } catch (err) {
-    console.error('Failed to fetch categories', err);
-  }
-
-  try {
-    const restUrl = `${url}/rest/v1/products?select=*,categories(name),product_images(url,is_primary,display_order)&order=display_rank.asc.nullslast,name.asc`;
-    const res = await fetch(restUrl, {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`
-      },
-      next: { revalidate: 60 }
-    });
 
     if (res.ok) {
       const data = await res.json();
       products = (data as any[]).map((item) => {
-        const sortedImages = item.product_images
+        const sortedImageObjs = item.product_images
           ? [...item.product_images]
+              .filter((img) => img?.url && !/\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(img.url))
               .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
-              .map((img) => img.url)
           : [];
+        const primaryObj = sortedImageObjs.find((img) => img.is_primary);
+        const orderedImages = primaryObj
+          ? [primaryObj.url, ...sortedImageObjs.filter((img) => img.url !== primaryObj.url).map((img) => img.url)]
+          : sortedImageObjs.map((img) => img.url);
+        const cardImages = orderedImages.slice(0, 2);
 
         return {
           id: item.id,
           slug: item.slug || undefined,
-          sku: item.slug ? `HT-${item.slug.toUpperCase()}` : `HT-${item.id.slice(0, 8).toUpperCase()}`,
+          sku: `HT-${item.id.slice(0, 8).toUpperCase()}`,
           name: item.name,
-          description: item.description || '',
+          description: '',
           price_inr: item.price || 0,
           category: item.categories?.name || 'Ethnic Wear',
-          images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
+          images: cardImages.length > 0 ? cardImages : ['https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80'],
           stock: item.stock_quantity || item.stock || 0,
           details: {
-            material: item.description?.includes('Silk') ? 'Pure Silk' : item.description?.includes('Cotton') ? 'Premium Cotton' : 'Handloom Fabric',
-            origin: 'Jaipur, Rajasthan',
-            care: 'Dry clean only',
-            ...(item.details || {})
+            material: item.details?.material || 'Handloom Fabric',
+            isBestseller: Boolean(item.details?.isBestseller),
           },
           is_featured: item.is_featured || false,
           display_rank: item.display_rank || 999
@@ -70,7 +68,7 @@ export default async function Home() {
       });
     }
   } catch (err) {
-    console.error('Failed to fetch products', err);
+    console.error('Failed to fetch homepage data', err);
   }
 
   // Build ItemList + Product structured data for Google rich results / image carousel
@@ -89,8 +87,8 @@ export default async function Home() {
         '@type': 'Product',
         '@id': `https://www.textilejaipur.com/product/${p.slug || p.id}#product`,
         name: p.name,
-        description: p.description || `Handmade ${p.category} from Jaipur, India`,
-        image: p.images,
+        description: `Handmade ${p.category} crafted by Jaipur artisans`,
+        image: p.images.slice(0, 2),
         sku: p.sku,
         brand: {
           '@type': 'Brand',
@@ -111,6 +109,17 @@ export default async function Home() {
           seller: {
             '@type': 'Organization',
             name: 'Textile Jaipur'
+          },
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: ['IN', 'US', 'GB', 'CA', 'AU', 'DE', 'FR'],
+            returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            merchantReturnDays: 14,
+            returnMethod: 'https://schema.org/ReturnByMail',
+            returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+            customerRemorseReturnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+            itemDefectReturnFees: 'https://schema.org/FreeReturn',
+            merchantReturnLink: 'https://www.textilejaipur.com/refund-policy'
           },
           shippingDetails: {
             '@type': 'OfferShippingDetails',
@@ -154,6 +163,12 @@ export default async function Home() {
 
   return (
     <>
+      <link
+        rel="preload"
+        as="image"
+        href="https://images.unsplash.com/photo-1610030469983-98e550d615ef?q=75&w=800&auto=format&fit=crop"
+        fetchPriority="high"
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}

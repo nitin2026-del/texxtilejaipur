@@ -40,7 +40,7 @@ export async function generateMetadata(
         const item = data[0];
         const primaryImage = item.product_images?.find((img: any) => img.is_primary)?.url 
           || item.product_images?.[0]?.url 
-          || 'https://textilejaipur.com/images/default-share.jpg';
+          || 'https://www.textilejaipur.com/about/img1.jpg';
 
         const cleanRawDesc = (item.description || '')
           .replace(/\*\*SEO Title:\*\*.*?\n/gi, '')
@@ -162,10 +162,10 @@ export default async function ProductPage({ params, searchParams }: Props) {
 
     // 2. Fetch Related Products & Sibling Products IN PARALLEL (fixing waterfall)
     const resolvedId = product.id;
-    const relatedPromise = fetch(`${url}/rest/v1/products?select=*,categories!inner(name),product_images(url,is_primary)&id=neq.${resolvedId}&categories.name=eq.${encodeURIComponent(product.category)}&limit=4`, fetchOptions);
+    const relatedPromise = fetch(`${url}/rest/v1/products?select=id,slug,name,price,categories!inner(name),product_images(url,is_primary)&id=neq.${resolvedId}&categories.name=eq.${encodeURIComponent(product.category)}&limit=4`, fetchOptions);
     const siblingGroup = product.details?.sibling_group;
     const sibPromise = siblingGroup 
-      ? fetch(`${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${resolvedId}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`, fetchOptions)
+      ? fetch(`${url}/rest/v1/products?select=id,slug,name,price,product_images(url,is_primary)&id=neq.${resolvedId}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`, fetchOptions)
       : Promise.resolve(null);
 
     const productReviewsPromise = !isUuid
@@ -179,6 +179,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
       const relatedData = await relatedRes.json();
       relatedProducts = relatedData.map((item: any) => ({
         id: item.id,
+        slug: item.slug || undefined,
         name: item.name,
         price_inr: item.price,
         category: item.categories?.name || 'Ethnic Wear',
@@ -202,6 +203,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         name: review.reviewer_name || 'Anonymous',
         location: review.reviewer_location || undefined,
         date: new Date(review.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        createdAtIso: review.created_at ? new Date(review.created_at).toISOString().split('T')[0] : undefined,
         stars: review.rating || 5,
         title: review.title ? `"${review.title}"` : undefined,
         body: review.comment || '',
@@ -225,22 +227,16 @@ export default async function ProductPage({ params, searchParams }: Props) {
       }));
     }
 
-    // 5. Fetch Sibling Products (lightweight: only if sibling_group exists)
-    // duplicate removed
-    if (siblingGroup) {
-      const sibRes = await fetch(
-        `${url}/rest/v1/products?select=id,name,price,product_images(url,is_primary)&id=neq.${resolvedId}&details->>sibling_group=eq.${encodeURIComponent(siblingGroup)}&limit=10`,
-        fetchOptions
-      );
-      if (sibRes.ok) {
-        const sibData = await sibRes.json();
-        siblingProducts = sibData.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          price_inr: item.price,
-          image: item.product_images?.find((img: any) => img.is_primary)?.url || item.product_images?.[0]?.url || ''
-        }));
-      }
+    // 5. Process Sibling Products from parallel fetch
+    if (sibRes && sibRes.ok) {
+      const sibData = await sibRes.json();
+      siblingProducts = sibData.map((item: any) => ({
+        id: item.id,
+        slug: item.slug || undefined,
+        name: item.name,
+        price_inr: item.price,
+        image: item.product_images?.find((img: any) => img.is_primary)?.url || item.product_images?.[0]?.url || ''
+      }));
     }
     
   } catch (err) {
@@ -324,9 +320,12 @@ export default async function ProductPage({ params, searchParams }: Props) {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: gmcCountries,
         returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 30,
+        merchantReturnDays: 14,
         returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/FreeReturn'
+        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+        customerRemorseReturnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+        itemDefectReturnFees: 'https://schema.org/FreeReturn',
+        merchantReturnLink: 'https://www.textilejaipur.com/refund-policy'
       },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
@@ -360,7 +359,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
     jsonLdProduct.review = initialReviews.slice(0, 5).map(r => ({
       '@type': 'Review',
       author: { '@type': 'Person', name: r.name },
-      datePublished: r.date,
+      datePublished: r.createdAtIso || r.date,
       reviewRating: {
         '@type': 'Rating',
         ratingValue: r.stars,
@@ -369,6 +368,23 @@ export default async function ProductPage({ params, searchParams }: Props) {
       reviewBody: r.body
     }));
   }
+
+  const CATEGORY_SLUG_MAP: Record<string, string> = {
+    'VELVET SUZANI JACKET': 'velvet-suzani-jacket',
+    'COTTON SUZANI JACKET': 'cotton-suzani-jacket',
+    'TNT SUZANI JACKET': 'tnt-suzani-jacket',
+    'CORDUROY JACKET': 'corduroy-jacket',
+    'VELVET SHORT KIMONO': 'velvet-short-kimono',
+    'VELVET LONG SUZANI KIMONO': 'velvet-long-suzani-kimono',
+    'COTTON LONG SUZANI KIMONO': 'cotton-long-suzani-kimono',
+    'COTTON SUZANI DRESS': 'cotton-suzani-dress',
+    'VELVET VEST': 'velvet-vest',
+    'COTTON TOTE BAG': 'cotton-tote-bag',
+  };
+  const categorySlug = CATEGORY_SLUG_MAP[(product.category || '').toUpperCase()];
+  const categoryBreadcrumbUrl = categorySlug
+    ? `https://www.textilejaipur.com/collections/${categorySlug}`
+    : `https://www.textilejaipur.com/collection?category=${encodeURIComponent(product.category)}`;
 
   // Breadcrumb JSON-LD
   const jsonLdBreadcrumb = {
@@ -385,7 +401,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         '@type': 'ListItem',
         position: 2,
         name: product.category,
-        item: `https://www.textilejaipur.com/collection?category=${encodeURIComponent(product.category)}`
+        item: categoryBreadcrumbUrl
       },
       {
         '@type': 'ListItem',
@@ -396,9 +412,13 @@ export default async function ProductPage({ params, searchParams }: Props) {
     ]
   };
 
+  const preloadHeroImg = cleanSchemaImages[0];
+
   return (
     <>
-      <link rel="preload" as="image" href={getOptimizedUrl(product.images[0], 800)} fetchPriority="high" />
+      {preloadHeroImg && (
+        <link rel="preload" as="image" href={getOptimizedUrl(preloadHeroImg, 1200)} fetchPriority="high" />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }}

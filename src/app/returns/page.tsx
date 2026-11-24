@@ -56,9 +56,9 @@ export default function ReturnsPage() {
 
       <div className="pt-32 px-6 max-w-5xl mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-zinc-900 mb-4">Returns & Exchanges</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-zinc-900 mb-4">Returns &amp; Exchanges</h1>
           <p className="text-zinc-600 max-w-lg mx-auto text-lg">
-            We value our artistic creations and only accept returns for items that are damaged or incorrect upon arrival. Enter your order details below to request a return under these conditions.
+            We accept returns and exchanges within 14 days of delivery for unworn items with original tags attached. Enter your order details below to begin.
           </p>
         </div>
 
@@ -73,7 +73,7 @@ export default function ReturnsPage() {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold">Request a Return</h2>
-                    <p className="text-xs text-zinc-500">For damaged or wrong items only</p>
+                    <p className="text-xs text-zinc-500">Eligible within 14 days of delivery</p>
                   </div>
                 </div>
 
@@ -124,7 +124,7 @@ export default function ReturnsPage() {
                 </div>
                 <h2 className="text-2xl font-bold text-zinc-900 mb-3">Order Found!</h2>
                 <p className="text-zinc-600 mb-8">
-                  We've sent a secure link to <strong>{email}</strong>. Please check your inbox and reply with photos of the damaged or incorrect items.
+                  We&apos;ve sent a secure return link to <strong>{email}</strong>. Please check your inbox to select your item(s) and complete your return request.
                 </p>
                 <button 
                   onClick={() => setStep('form')}
@@ -138,24 +138,8 @@ export default function ReturnsPage() {
 
           {/* Policy Section */}
           <div className="flex flex-col justify-center space-y-8">
-            <h3 className="text-2xl font-serif font-bold text-zinc-900 border-b border-zinc-200 pb-4">Our Policy</h3>
+            <h3 className="text-2xl font-serif font-bold text-zinc-900 border-b border-zinc-200 pb-4">Our 14-Day Return Policy</h3>
             
-            <div className="flex gap-4">
-              <div className="mt-1">
-                <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center">
-                  <Box className="h-5 w-5 text-zinc-700" />
-                </div>
-              </div>
-              <div>
-                <h4 className="font-bold text-zinc-900 mb-1">Strict Limitations</h4>
-                <p className="text-sm text-zinc-600 leading-relaxed">
-                  We do NOT accept returns for "change of mind" or sizing issues. Each piece is handmade art and must be treated with respect. Returns are ONLY accepted for damaged or incorrect items.
-                </p>
-              </div>
-            </div>
-
-
-
             <div className="flex gap-4">
               <div className="mt-1">
                 <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center">
@@ -163,14 +147,31 @@ export default function ReturnsPage() {
                 </div>
               </div>
               <div>
-                <h4 className="font-bold text-zinc-900 mb-1">3-Day Window</h4>
+                <h4 className="font-bold text-zinc-900 mb-1">14-Day Return Window</h4>
                 <p className="text-sm text-zinc-600 leading-relaxed">
-                  If your item is damaged or incorrect, you must report it within 3 days of delivery. Items must be unworn, unwashed, and have original tags attached.
+                  You may request a return or exchange within 14 calendar days of receiving your order. Items must be unworn, unwashed, and have all original tags attached.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="mt-1">
+                <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center">
+                  <Box className="h-5 w-5 text-zinc-700" />
+                </div>
+              </div>
+              <div>
+                <h4 className="font-bold text-zinc-900 mb-1">Simple Eligibility &amp; Return Shipping</h4>
+                <p className="text-sm text-zinc-600 leading-relaxed">
+                  We cover 100% of return shipping for damaged, defective, or incorrect items. For sizing or change-of-mind returns, customers cover return shipping postage. Refunds are issued to your original payment method within 5–7 business days after inspection.
                 </p>
               </div>
             </div>
             
-            <div className="mt-4 pt-6 border-t border-zinc-200">
+            <div className="mt-4 pt-6 border-t border-zinc-200 space-y-2">
+              <p className="text-sm text-zinc-500">
+                Read our full <Link href="/refund-policy" className="text-brand-700 font-bold hover:underline">Return &amp; Refund Policy</Link>.
+              </p>
               <p className="text-sm text-zinc-500">
                 Need help? <a href="mailto:textileofrajasthan.info@gmail.com" className="text-brand-700 font-bold hover:underline">Contact Support</a>
               </p>

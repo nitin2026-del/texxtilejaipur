@@ -33,6 +33,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
   const [wishlisted, setWishlisted] = useState(false);
   const [shareToast, setShareToast] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [hasHovered, setHasHovered] = useState(false);
 
   // Load wishlist state from localStorage
   useEffect(() => {
@@ -88,9 +89,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
       <div 
         id={`product-${product.id}`}
       className="relative bg-white flex flex-col h-full group transition-all duration-500" 
-      onMouseEnter={() => setIsHovered(true)} 
+      onMouseEnter={() => { setHasHovered(true); setIsHovered(true); }} 
       onMouseLeave={() => setIsHovered(false)}
-      onTouchStart={() => setIsHovered(true)}
+      onTouchStart={() => { setHasHovered(true); setIsHovered(true); }}
       onTouchEnd={() => setIsHovered(false)}
       onTouchCancel={() => setIsHovered(false)}
     >
@@ -105,18 +106,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onCartOpen })
             <>
               {/* Primary Image */}
               <img 
-                src={getOptimizedUrl(primaryImage)} 
+                src={getOptimizedUrl(primaryImage, 600)} 
+                srcSet={`${getOptimizedUrl(primaryImage, 600)} 600w, ${getOptimizedUrl(primaryImage, 800)} 800w`}
+                sizes="(max-width: 640px) 50vw, 320px"
                 alt={`${product.name} - Handmade ${product.category}`}
                 loading="lazy"
+                decoding="async"
                 className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered && secondaryImage ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
               />
               
-              {/* Secondary Image (Crossfade) */}
-              {secondaryImage && (
+              {/* Secondary Image (Crossfade - lazy mounted on first hover/touch) */}
+              {secondaryImage && hasHovered && (
                 <img 
-                  src={getOptimizedUrl(secondaryImage)} 
+                  src={getOptimizedUrl(secondaryImage, 600)} 
                   alt={`${product.name} back view - Handmade ${product.category}`}
                   loading="lazy"
+                  decoding="async"
                   className={`object-cover absolute inset-0 w-full h-full transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] ${isHovered ? 'scale-110 opacity-100' : 'scale-100 opacity-0'}`}
                 />
               )}

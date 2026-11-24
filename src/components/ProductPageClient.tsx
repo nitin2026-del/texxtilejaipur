@@ -24,6 +24,7 @@ import { ShieldCheck, Truck, Globe, Star, Minus, Plus, Check, Heart, Share2, Awa
 
 interface Product {
   id: string;
+  slug?: string;
   sku: string;
   name: string;
   description: string;
@@ -71,6 +72,7 @@ interface Product {
 
 interface SiblingProduct {
   id: string;
+  slug?: string;
   name: string;
   price_inr: number;
   image: string;
@@ -94,6 +96,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
     const router = useRouter();
     const [quantity, setQuantity] = useState(1);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
+  const [loadedSlides, setLoadedSlides] = useState<Set<number>>(() => new Set([0]));
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
@@ -108,6 +111,19 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
     }
     return items;
   }, [product]);
+
+  useEffect(() => {
+    setLoadedSlides(prev => {
+      const nextIdx = selectedMediaIndex + 1;
+      const hasCurrent = prev.has(selectedMediaIndex);
+      const needsNext = nextIdx < mediaItems.length && !prev.has(nextIdx);
+      if (hasCurrent && !needsNext) return prev;
+      const next = new Set(prev);
+      next.add(selectedMediaIndex);
+      if (nextIdx < mediaItems.length) next.add(nextIdx);
+      return next;
+    });
+  }, [selectedMediaIndex, mediaItems.length]);
   const [viewers, setViewers] = useState(0);
   useEffect(() => { setViewers(Math.floor(Math.random() * 13) + 12); }, []);
   const [wishlisted, setWishlisted] = useState(false);
@@ -256,7 +272,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
 
   const handleWhatsAppShare = () => {
     if (!product) return;
-    const url = `${window.location.origin}/product/${product.id}`;
+    const url = `${window.location.origin}/product/${product.slug || product.id}`;
     const text = `Check out this beautiful Jaipur textile! 🎨\n*${product.name}*\n${formatPrice(product.price_inr)}\n\n${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     setShareToast(true);
@@ -384,6 +400,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
     if (!next || next.id === product?.id) return;
     setProduct(next);
     setSelectedMediaIndex(0);
+    setLoadedSlides(new Set([0]));
     setQuantity(1);
     setLanguage('en');
     setLightboxOpen(false);
@@ -458,13 +475,16 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                           onClick={() => { if (isActive) { setImageLoading(true); setLightboxOpen(true); } }}
                           title="Click to view full quality"
                         >
-                          <img 
-                            src={getOptimizedUrl(media.url, 1200)} /* Increased from 800 to 1200 for sharper details */ 
-                            alt={product.details?.image_analysis?.imageAltTexts?.[idx] || product.details?.image_alt_texts?.[idx] || `${product.name} view ${idx + 1} - ${product.category} from Textile Jaipur`}
-                            loading={idx === 0 ? "eager" : "lazy"}
-                            fetchPriority={idx === 0 ? "high" : "auto"}
-                            className="absolute inset-0 w-full h-full object-cover"
-                          />
+                          {(loadedSlides.has(idx) || isActive) && (
+                            <img 
+                              src={getOptimizedUrl(media.url, 1200)}
+                              alt={product.details?.image_analysis?.imageAltTexts?.[idx] || product.details?.image_alt_texts?.[idx] || `${product.name} view ${idx + 1} - ${product.category} from Textile Jaipur`}
+                              loading={idx === 0 ? "eager" : "lazy"}
+                              fetchPriority={idx === 0 ? "high" : "auto"}
+                              decoding={idx === 0 ? "sync" : "async"}
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                          )}
                           {isActive && !lookSwitcherVisible && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
@@ -797,7 +817,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                       
                       {/* Siblings */}
                       {siblingProducts.map(sib => (
-                        <a key={sib.id} href={`/product/${sib.id}`} onClick={(e) => handleLookLinkClick(e, sib.id)} title={sib.name} className="relative w-14 h-14 rounded border border-zinc-200 hover:border-[#1a1464] hover:shadow-md transition-all overflow-hidden block group">
+                        <a key={sib.id} href={`/product/${sib.slug || sib.id}`} onClick={(e) => handleLookLinkClick(e, sib.id)} title={sib.name} className="relative w-14 h-14 rounded border border-zinc-200 hover:border-[#1a1464] hover:shadow-md transition-all overflow-hidden block group">
                           <Image src={getOptimizedUrl(sib.image || "", 100)} alt={sib.name} fill sizes="100px" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
                         </a>
                       ))}
@@ -945,7 +965,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                     </p>
                     <p className="flex justify-between items-center">
                       <span className="text-zinc-500 flex items-center gap-1.5"><RefreshCw className="h-3.5 w-3.5" /> Returns:</span> 
-                      <strong className="text-zinc-900 text-right">7 Days | We pay return shipping on defects | Full Refund</strong>
+                      <strong className="text-zinc-900 text-right">14-Day Easy Returns | Free return shipping on defects</strong>
                     </p>
                   </div>
 
@@ -965,7 +985,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                         <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                       </summary>
                       <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                        We provide free, fully-tracked worldwide shipping via premium couriers. Estimated delivery is 5-9 business days to all global destinations. Need it sooner? Contact us for expedited options.
+                        We provide free, fully-tracked worldwide shipping via premium couriers. Estimated delivery is 5-9 business days to all global destinations. Need it sooner? Contact us for expedited options. See our full <a href="/shipping" className="underline text-[#1a1464] font-semibold">Shipping Policy</a>.
                       </div>
                     </details>
                     <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -983,7 +1003,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
                         <ChevronDown className="h-4 w-4 text-zinc-500 group-open:-rotate-180 transition-transform duration-200" />
                       </summary>
                       <div className="p-3 pt-0 text-xs text-zinc-600 leading-relaxed bg-zinc-50 border-t border-zinc-100">
-                        We accept returns within 7 days for damaged or incorrect items, providing a full refund. We cover return shipping costs for defects. For change of mind, returns are generally not accepted to protect the artistic integrity of these handcrafted pieces.
+                        We accept returns and exchanges within 14 days of delivery for unworn, unwashed items with original tags attached. We cover return shipping costs for damaged, defective, or incorrect items; for change-of-mind or sizing returns, the customer covers return shipping postage. See our full <a href="/refund-policy" className="underline text-[#1a1464] font-semibold">Return &amp; Refund Policy</a>.
                       </div>
                     </details>
                     <details className="group bg-white border border-zinc-200 rounded-lg overflow-hidden [&_summary::-webkit-details-marker]:hidden">
@@ -1324,7 +1344,7 @@ function ProductPageClientInner({ product: initialProduct, relatedProducts, init
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {relatedProducts.map((rp) => (
-                <a key={rp.id} href={`/product/${rp.id}`} className="group block bg-white border border-zinc-200 rounded-xl overflow-hidden hover:border-brand-300 hover:shadow-xl transition-all">
+                <a key={rp.id} href={`/product/${rp.slug || rp.id}`} className="group block bg-white border border-zinc-200 rounded-xl overflow-hidden hover:border-brand-300 hover:shadow-xl transition-all">
                   <div className="aspect-[4/5] relative bg-zinc-100 overflow-hidden">
                     {rp.image.match(/\.(mp4|webm)(\?.*)?$/i) ? (
                       <video

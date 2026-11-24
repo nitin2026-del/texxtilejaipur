@@ -101,6 +101,10 @@ export async function POST(req: NextRequest) {
     if (finalEmail) {
       const mailer = await getTransporter();
       const finalName = (orderData.shipping_addresses as any)?.full_name || 'Customer';
+      const isDefectOrWrong = reason === 'defective' || reason === 'not_as_pictured';
+      const shippingInstructionText = isDefectOrWrong
+        ? 'Since your item arrived damaged, defective, or incorrect, our team will send you a prepaid return shipping label along with further instructions within 24 hours.'
+        : 'Our support team will review your request within 24 hours and send you the return address and shipping instructions to complete your return.';
       
       const emailHtml = `
         <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; background: #000; color: #fff; padding: 40px; border-radius: 8px;">
@@ -108,7 +112,7 @@ export async function POST(req: NextRequest) {
           <h2 style="text-align: center;">Return Request Confirmed</h2>
           <p>Hi ${finalName},</p>
           <p>We've successfully received your return request for order <strong>${orderId}</strong>.</p>
-          <p>Our support team will review your request and send you a prepaid return shipping label along with further instructions within 24 hours.</p>
+          <p>${shippingInstructionText}</p>
           <p style="color: #666; font-size: 12px; text-align: center; margin-top: 40px;">
             Thank you, Textile Jaipur Support
           </p>

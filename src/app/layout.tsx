@@ -20,7 +20,7 @@ export const viewport = {
 
 export const metadata: Metadata = {
   title: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
-  description: "Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur. Explore women's bohemian clothing with worldwide shipping.",
+  description: "Shop handmade embroidered Suzani jackets, velvet coats, boho kimonos & tote bags crafted in Jaipur. Free worldwide express shipping & 14-day returns.",
   keywords: [
     'Indian ethnic wear online', 'buy Indian textiles USA', 'handmade embroidered jacket', 'suzani jacket Europe',
     'boho dress India export', 'Jaipur textile online shop', 'Indian export clothing UK', 'authentic Rajasthani clothing',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     'comprar ropa india', 'Jaipur fashion store', 'Rajasthan handloom', 'ethnic wear worldwide shipping',
     'Indian dress for women', 'Indian luxury fashion', 'export quality Indian clothing'
   ].join(', '),
-  authors: [{ name: 'Textile Jaipur', url: 'https://textilejaipur.com' }],
+  authors: [{ name: 'Textile Jaipur', url: 'https://www.textilejaipur.com' }],
   creator: 'Textile Jaipur',
   publisher: 'Textile Jaipur',
   manifest: '/manifest.json',
@@ -38,11 +38,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: './',
     languages: {
-      'en-US': 'https://www.textilejaipur.com',
-      'en-GB': 'https://www.textilejaipur.com',
-      'es': 'https://www.textilejaipur.com',
-      'fr': 'https://www.textilejaipur.com',
-      'de': 'https://www.textilejaipur.com',
+      'en': 'https://www.textilejaipur.com',
+      'x-default': 'https://www.textilejaipur.com',
     }
   },
   robots: {
@@ -58,14 +55,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
-    description: "Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur. Explore women's bohemian clothing with worldwide shipping.",
+    description: "Shop handmade embroidered Suzani jackets, velvet coats, boho kimonos & tote bags crafted in Jaipur. Free worldwide express shipping & 14-day returns.",
     url: 'https://www.textilejaipur.com',
     siteName: 'Textile Jaipur',
     locale: 'en_US',
     type: 'website',
     images: [
       {
-        url: 'https://textilejaipur.com/about/img1.jpg',
+        url: 'https://www.textilejaipur.com/about/img1.jpg',
         width: 1200,
         height: 630,
         alt: 'Textile Jaipur - Handcrafted Indian Ethnic Wear'
@@ -75,8 +72,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Handmade Embroidered Jackets & Boho Kimonos | Textile Jaipur',
-    description: "Shop handmade embroidered jackets, velvet jackets, boho kimonos, Suzani jackets and embroidered tote bags at Textile Jaipur. Explore women's bohemian clothing with worldwide shipping.",
-    images: ['https://textilejaipur.com/about/img1.jpg'],
+    description: "Shop handmade embroidered Suzani jackets, velvet coats, boho kimonos & tote bags crafted in Jaipur. Free worldwide express shipping & 14-day returns.",
+    images: ['https://www.textilejaipur.com/about/img1.jpg'],
     creator: '@textileofjaipur',
     site: '@textileofjaipur'
   },
@@ -108,7 +105,7 @@ const organizationSchema = {
   '@type': 'Organization',
   name: 'Textile Jaipur',
   url: 'https://www.textilejaipur.com',
-  logo: 'https://textilejaipur.com/about/img1.jpg',
+  logo: 'https://www.textilejaipur.com/about/img1.jpg',
   description: 'Premium handcrafted Indian ethnic wear — embroidered jackets, Boho dresses, block print textiles, suzani masterpieces — shipped worldwide from Jaipur, Rajasthan.',
   address: {
     '@type': 'PostalAddress',
@@ -120,6 +117,7 @@ const organizationSchema = {
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer service',
+    telephone: '+91-8764655537',
     email: 'textileofrajasthan.info@gmail.com',
     availableLanguage: ['English', 'Hindi']
   },
@@ -128,12 +126,16 @@ const organizationSchema = {
     'https://www.facebook.com/textileofjaipur',
     'https://www.youtube.com/@TextileJaipur'
   ],
-  aggregateRating: {
-    '@type': 'AggregateRating',
-
-    ratingValue: '5.0',
-    reviewCount: '1',
-    bestRating: '5'
+  hasMerchantReturnPolicy: {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: ['US', 'GB', 'CA', 'AU', 'NZ', 'DE', 'FR', 'IT', 'ES', 'NL', 'AE', 'MX', 'IN'],
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: 14,
+    returnMethod: 'https://schema.org/ReturnByMail',
+    returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+    customerRemorseReturnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+    itemDefectReturnFees: 'https://schema.org/FreeReturn',
+    merchantReturnLink: 'https://www.textilejaipur.com/refund-policy'
   }
 };
 
@@ -158,12 +160,12 @@ const storeSchema = {
   '@type': 'ClothingStore',
   name: 'Textile Jaipur',
   url: 'https://www.textilejaipur.com',
-  image: 'https://textilejaipur.com/about/img1.jpg',
+  image: 'https://www.textilejaipur.com/about/img1.jpg',
   priceRange: '$$',
   currenciesAccepted: 'USD, EUR, GBP, INR',
   paymentAccepted: 'Credit Card, Debit Card, PayPal',
   openingHours: 'Mo-Su 00:00-24:00',
-  telephone: '+91-9929835848',
+  telephone: '+91-8764655537',
   hasMap: 'https://www.google.com/maps?q=26.9124,75.7873',
   geo: { '@type': 'GeoCoordinates', latitude: 26.9124, longitude: 75.7873 },
   address: {
@@ -182,6 +184,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://images.weserv.nl" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.weserv.nl" />
         {/* Google tag (gtag.js) */}
         <Script
           id="google-tag-src"

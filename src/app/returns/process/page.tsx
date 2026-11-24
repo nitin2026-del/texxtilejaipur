@@ -184,44 +184,44 @@ function ReturnProcessContent() {
                 </select>
               </div>
 
-              {/* Refund Breakdown */}
-              {Object.values(selectedItems).some(Boolean) && (
-                <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-6 mt-8">
-                  <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest mb-4">Refund Estimate</h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between text-zinc-600">
-                      <span>Gross Refund Amount:</span>
-                      <span>₹{Object.keys(selectedItems)
-                        .filter(id => selectedItems[id])
-                        .reduce((acc, id) => {
-                          const item = items.find(i => i.id === id);
-                          return acc + (item ? item.price_at_time * item.quantity : 0);
-                        }, 0).toLocaleString()}</span>
+              {/* Refund Summary */}
+              {Object.values(selectedItems).some(Boolean) && (() => {
+                const grossTotal = Object.keys(selectedItems)
+                  .filter(id => selectedItems[id])
+                  .reduce((acc, id) => {
+                    const item = items.find(i => i.id === id);
+                    return acc + (item ? item.price_at_time * item.quantity : 0);
+                  }, 0);
+                const isDefectOrWrong = reason === 'defective' || reason === 'not_as_pictured';
+
+                return (
+                  <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-6 mt-8">
+                    <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest mb-4">Refund Summary</h3>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between text-zinc-600">
+                        <span>Selected Items Total:</span>
+                        <span>₹{grossTotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-zinc-600 pb-3 border-b border-zinc-200">
+                        <span>Return Shipping:</span>
+                        {isDefectOrWrong ? (
+                          <span className="font-semibold text-emerald-700">Free (Covered by Textile Jaipur)</span>
+                        ) : (
+                          <span className="text-zinc-600">Customer covers return postage</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between font-bold text-zinc-900 pt-1 text-base">
+                        <span>Full Item Refund Amount:</span>
+                        <span>₹{grossTotal.toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-zinc-600">
-                      <span>PayPal Transaction Fee:</span>
-                      <span className="text-red-500">-₹500</span>
-                    </div>
-                    <div className="flex justify-between text-zinc-600 pb-3 border-b border-zinc-200">
-                      <span>Return Shipping Fee:</span>
-                      <span className="text-red-500">-₹4,000</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-zinc-900 pt-1 text-base">
-                      <span>Estimated Net Refund:</span>
-                      <span>₹{Math.max(0, Object.keys(selectedItems)
-                        .filter(id => selectedItems[id])
-                        .reduce((acc, id) => {
-                          const item = items.find(i => i.id === id);
-                          return acc + (item ? item.price_at_time * item.quantity : 0);
-                        }, 0) - 4500).toLocaleString()}</span>
+
+                    <div className="mt-4 text-xs bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-800">
+                      <strong>Note:</strong> Once your returned piece arrives at our Jaipur studio unworn with original tags attached and passes inspection, your full item refund will be issued to your original payment method within 5–7 business days. No restocking fees apply.
                     </div>
                   </div>
-                  
-                  <div className="mt-4 text-xs text-zinc-500 bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-800">
-                    <strong>Note:</strong> The estimated net refund amount will be processed and returned to your original payment method <strong>only after</strong> the returned product reaches our warehouse and passes quality inspection.
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
               <button 
                 type="submit"

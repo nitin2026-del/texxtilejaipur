@@ -14,6 +14,7 @@ import { getOptimizedUrl } from '@/utils/imageUtils';
 
 interface Product {
   id: string;
+  slug?: string;
   sku: string;
   name: string;
   description: string;
@@ -23,7 +24,7 @@ interface Product {
   stock: number;
   is_featured?: boolean;
   display_rank?: number;
-  details: { material?: string; origin?: string; care?: string };
+  details: { material?: string; origin?: string; care?: string; isBestseller?: boolean };
 }
 
 interface Category {
@@ -314,17 +315,23 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
                     <img 
                       src={getOptimizedUrl(products[0]?.images?.[0] || '', 600)} 
                       alt={products[0]?.name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-[110%] object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] -translate-y-8" 
                     />
                     <div className="flex flex-col gap-4">
                       <img 
                         src={getOptimizedUrl(products[1]?.images?.[0] || '', 400)} 
                         alt={products[1]?.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-[60%] object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] translate-y-4" 
                       />
                       <img 
                         src={getOptimizedUrl(products[2]?.images?.[0] || '', 400)} 
                         alt={products[2]?.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-[40%] object-cover rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] translate-y-8" 
                       />
                     </div>
@@ -333,6 +340,8 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
                  <img 
                    src="/heritage_craft.png" 
                    alt="Textile Jaipur Artisans" 
+                   loading="lazy"
+                   decoding="async"
                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                  />
                )}
@@ -507,6 +516,8 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
               <img 
                 src="/heritage_craft.png" 
                 alt="Jaipur Artisan Craft"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
               />
             </div>
@@ -572,6 +583,8 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
                 <img 
                   src={getOptimizedUrl(prod.images?.[0], 400)} 
                   alt="Instagram Post" 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
@@ -622,7 +635,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
               { number: '3,200+', label: 'Happy Customers', icon: Globe },
               { number: '400+', label: 'Years of Craft Heritage', icon: Award },
               { number: '4.9★', label: 'Average Rating', icon: Star },
-              { number: '3-Day', label: 'Damage Replacements', icon: ShieldCheck },
+              { number: '14-Day', label: 'Easy Returns', icon: ShieldCheck },
             ].map((stat, i) => (
               <div key={stat.label} className="group flex flex-col items-center text-center p-6 bg-gradient-to-b from-zinc-900 to-zinc-900/50 rounded-2xl border border-zinc-800/50 hover:border-brand-500/30 transition-colors duration-500 hover:shadow-[0_0_30px_-10px_rgba(182,128,91,0.2)]">
                 <div className="h-12 w-12 rounded-full bg-brand-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500">
@@ -652,7 +665,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
             {[
               { icon: Truck, title: 'UPS Express Worldwide', desc: 'Fast, fully tracked delivery to every country on the globe. Full tracking number provided on dispatch.' },
               { icon: Lock, title: 'Secure Payments', desc: 'Pay by Visa, Mastercard, Amex or PayPal. All transactions are 256-bit SSL encrypted and PayPal buyer-protected.' },
-              { icon: Palette, title: 'Artisanal Commitment', desc: 'As an artisanal studio, we strictly accept returns only for damaged or incorrect items within 3 days.' },
+              { icon: Palette, title: '14-Day Easy Returns', desc: 'Shop with confidence. Unworn items with original tags can be returned or exchanged within 14 days of delivery.' },
               { icon: FileText, title: 'Customs & Duties Handled', desc: 'Confused about import taxes? Don\'t be. We manage all export paperwork. You receive the package — we handle the rest.' },
               { icon: Scissors, title: '100% Genuinely Handcrafted', desc: 'Every product is hand-stitched, hand-embroidered, or hand-block-printed by certified artisans in Jaipur, Rajasthan.' },
               { icon: MessageCircle, title: 'Real Customer Support', desc: 'Questions before you buy? Email or WhatsApp us. We reply within 4 hours — in English, Hindi and Spanish.' },
@@ -773,7 +786,7 @@ export function HomePageClient({ products, dbCategories }: HomePageClientProps) 
 
 /* ---- Recently Viewed Section ---- */
 function RecentlyViewedSection() {
-  const [products, setProducts] = useState<{id:string;name:string;price_inr:number;images:string[];category:string}[]>([]);
+  const [products, setProducts] = useState<{id:string;slug?:string;name:string;price_inr:number;images:string[];category:string}[]>([]);
   const { formatPrice } = useCart();
 
   useEffect(() => {
@@ -798,13 +811,15 @@ function RecentlyViewedSection() {
           {products.map((product) => (
             <a
               key={product.id}
-              href={`/product/${product.id}`}
+              href={`/product/${product.slug || product.id}`}
               className="shrink-0 w-40 group"
             >
               <div className="aspect-[4/5] rounded-xl overflow-hidden bg-zinc-50 relative mb-2">
                 <img
-                  src={product.images?.[0] || 'https://via.placeholder.com/160x200'}
+                  src={getOptimizedUrl(product.images?.[0], 400)}
                   alt={product.name}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>

@@ -294,7 +294,7 @@ export default async function CollectionSlugPage({
           brand: { '@type': 'Brand', name: 'Textile Jaipur' },
           offers: {
             '@type': 'Offer',
-            url: `https://www.textilejaipur.com/product/${p.id}`,
+            url: `https://www.textilejaipur.com/product/${p.slug || p.id}`,
             priceCurrency: 'INR',
             price: Number(p.price_inr || 0).toFixed(2),
             availability: p.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',

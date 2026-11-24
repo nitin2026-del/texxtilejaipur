@@ -46,9 +46,11 @@ export default function TermsOfServicePage() {
             All prices are subject to change without notice. We make every effort to provide you with the most accurate, up-to-date pricing. However, pricing errors may occasionally occur. If an item&apos;s correct price is higher than our stated price, we will, at our discretion, either contact you for instructions before shipping or cancel your order and notify you of such cancellation.
           </p>
 
-          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">4. Shipping and Duties</h2>
+          <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">4. Shipping, Duties &amp; Returns</h2>
           <p>
-            For international orders, the customer is responsible for all customs duties, taxes, and fees associated with the importation of goods into their respective countries, unless specified as UPS Express at checkout.
+            We offer free worldwide UPS Express shipping on all orders, with export paperwork and customs duties handled by Textile Jaipur so there are no surprise customs fees at delivery. For full delivery estimates and tracking details, see our{' '}
+            <a href="/shipping" className="text-brand-700 font-semibold underline">Shipping Policy</a>. Eligible unworn items with original tags may be returned or exchanged within 14 days of delivery per our{' '}
+            <a href="/refund-policy" className="text-brand-700 font-semibold underline">Return &amp; Refund Policy</a>.
           </p>
 
           <h2 className="text-2xl font-serif font-bold text-zinc-900 mt-8 mb-4">5. Governing Law</h2>
