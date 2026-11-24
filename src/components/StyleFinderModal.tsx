@@ -1,10 +1,26 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Sparkles, Check, ArrowRight, ArrowLeft, RotateCcw, ShoppingBag, Eye } from 'lucide-react';
+import { X, Check, ArrowRight, ArrowLeft, RotateCcw, ShoppingBag, Eye } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { getOptimizedUrl } from '@/utils/imageUtils';
 import Link from 'next/link';
+
+export const AtelierHangerIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M10 6a2 2 0 1 1 2 2v1.4" />
+    <path d="M12 9.4 3.5 15.8a1.4 1.4 0 0 0 .85 2.5h15.3a1.4 1.4 0 0 0 .85-2.5L12 9.4Z" />
+  </svg>
+);
 
 interface StyleFinderModalProps {
   isOpen: boolean;
@@ -18,7 +34,7 @@ const TARGET_THREE_CATEGORIES = [
     fallbackId: 'ee1ccb2f-e65c-46d7-9ec8-0e0fb84ecdf6',
     desc: 'Plush velvet, warm jewel tones & intricate artisan embroidery',
     tag: 'Warm & Regal',
-    icon: '✨'
+    icon: '👑'
   },
   {
     name: 'COTTON SUZANI JACKET',
@@ -256,7 +272,7 @@ export const StyleFinderModal: React.FC<StyleFinderModalProps> = ({
             )}
 
             <div className="w-8 h-8 rounded-full bg-gold/10 border border-gold/40 flex items-center justify-center text-gold">
-              <Sparkles className="w-4 h-4 animate-pulse" />
+              <AtelierHangerIcon className="w-4 h-4" />
             </div>
             <div>
               <h2 className="text-lg font-serif font-bold text-zinc-100 tracking-wide flex items-center gap-2">
@@ -393,13 +409,13 @@ export const StyleFinderModal: React.FC<StyleFinderModalProps> = ({
                 <div className="absolute inset-0 rounded-full border-2 border-gold/30 animate-ping opacity-30" />
                 <div className="absolute inset-2 rounded-full border border-gold/50 animate-spin" style={{ animationDuration: '4s' }} />
                 <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-600/40 via-gold/30 to-amber-300/40 border border-gold/60 flex items-center justify-center shadow-lg shadow-gold/20">
-                  <Sparkles className="w-7 h-7 text-gold animate-bounce" />
+                  <AtelierHangerIcon className="w-7 h-7 text-gold" />
                 </div>
               </div>
 
               <div className="space-y-2 max-w-sm">
                 <p className="text-[11px] text-gold uppercase tracking-widest font-semibold">
-                  AI Stylist Matching Engine
+                  Atelier Style Curation
                 </p>
                 <h3 className="text-lg font-serif font-bold text-zinc-100 min-h-[56px] flex items-center justify-center">
                   {AI_STEPS[aiStepIndex]}
@@ -444,7 +460,7 @@ export const StyleFinderModal: React.FC<StyleFinderModalProps> = ({
               <div className="p-4 rounded-xl bg-gold/10 border border-gold/30 relative">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-gold/20 border border-gold/50 flex-shrink-0 flex items-center justify-center text-gold mt-0.5">
-                    <Sparkles className="w-4 h-4" />
+                    <AtelierHangerIcon className="w-4 h-4" />
                   </div>
                   <div>
                     <h4 className="text-xs uppercase tracking-wider font-bold text-gold mb-1">

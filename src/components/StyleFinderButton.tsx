@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles } from 'lucide-react';
-import { StyleFinderModal } from './StyleFinderModal';
+import { ArrowRight } from 'lucide-react';
+import { StyleFinderModal, AtelierHangerIcon } from './StyleFinderModal';
 
 interface StyleFinderButtonProps {
   categories?: Array<{ id: string; name: string }>;
@@ -48,20 +48,24 @@ export const StyleFinderButton: React.FC<StyleFinderButtonProps> = ({ categories
       <div className="fixed bottom-6 left-6 z-40 hidden sm:block">
         <button
           onClick={() => setIsOpen(true)}
-          className="group flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-zinc-950/90 hover:bg-zinc-900 border border-gold/50 hover:border-gold shadow-xl shadow-gold/10 backdrop-blur-md transition-all duration-300 hover:scale-105"
-          aria-label="Need Help Choosing? AI Recommendation"
+          className="group flex items-center gap-3 pl-2 pr-2.5 py-2 rounded-full bg-[#FDFBF7]/95 hover:bg-white border border-[#DFCDB7] hover:border-[#B6805B] shadow-[0_12px_32px_-10px_rgba(44,24,16,0.22),0_2px_8px_-2px_rgba(182,128,91,0.14)] hover:shadow-[0_16px_38px_-10px_rgba(44,24,16,0.28)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5"
+          aria-label="Style Guide — Find your perfect jacket"
         >
-          <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center text-gold group-hover:rotate-12 transition-transform">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#36241A] to-[#1F120C] ring-1 ring-[#D4AF37]/35 flex items-center justify-center text-[#EBD5A7] shrink-0 group-hover:scale-105 transition-transform duration-300">
+            <AtelierHangerIcon className="w-[18px] h-[18px]" />
           </div>
-          <div className="text-left">
-            <p className="text-[11px] font-bold text-zinc-100 tracking-wide font-serif leading-none flex items-center gap-1.5">
-              <span>Need Recommendation?</span>
-              <span className="text-[9px] font-sans uppercase px-1.5 py-0.5 rounded bg-gold/20 text-gold font-bold">
-                AI Stylist
-              </span>
+          <div className="text-left pr-0.5">
+            <p className="text-[9px] font-sans font-semibold uppercase tracking-[0.2em] text-[#98664A] leading-none flex items-center gap-1.5">
+              <span>Style Guide</span>
+              <span className="w-1 h-1 rounded-full bg-[#C9A46A]" />
+              <span>10 Sec</span>
             </p>
-            <p className="text-[9px] text-zinc-400 mt-0.5">Find your perfect jacket in 10s</p>
+            <p className="text-[13.5px] font-serif font-medium text-[#23140E] tracking-[0.01em] leading-snug mt-1">
+              Find Your Perfect Jacket
+            </p>
+          </div>
+          <div className="w-7 h-7 rounded-full bg-[#F5EFE6] group-hover:bg-[#2C1810] text-[#7E5540] group-hover:text-[#F3E5AB] flex items-center justify-center transition-colors duration-300 shrink-0">
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
           </div>
         </button>
       </div>
@@ -70,11 +74,16 @@ export const StyleFinderButton: React.FC<StyleFinderButtonProps> = ({ categories
       <div className="fixed bottom-20 left-4 z-40 sm:hidden">
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-zinc-950/95 border border-gold/60 shadow-lg shadow-gold/15 backdrop-blur-md text-gold text-xs font-semibold"
-          aria-label="AI Recommendation"
+          className="group flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full bg-[#FDFBF7]/95 border border-[#DFCDB7] shadow-[0_8px_24px_-6px_rgba(44,24,16,0.24)] backdrop-blur-md active:scale-95 transition-all"
+          aria-label="Open Style Guide"
         >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span className="text-[11px] font-serif">Style Finder</span>
+          <div className="w-6 h-6 rounded-full bg-[#2C1810] text-[#EBD5A7] flex items-center justify-center">
+            <AtelierHangerIcon className="w-3.5 h-3.5" />
+          </div>
+          <span className="text-[11.5px] font-serif font-medium text-[#23140E] tracking-wide">
+            Style Guide
+          </span>
+          <ArrowRight className="w-3 h-3 text-[#98664A]" />
         </button>
       </div>
 
